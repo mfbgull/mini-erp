@@ -1,0 +1,545 @@
+/* SAP Fiori Theme - Inspired by SAP's Enterprise Design System
+ * Professional blue/gold color palette with enterprise-grade styling
+ */
+
+:root {
+  /* ============================================
+     SAP Fiori Brand Colors - Belize Theme
+     ============================================ */
+
+  /* Primary Colors - SAP Blue */
+  --sap-primary: #427CAC;               /* SAP Brand Blue */
+  --sap-primary-light: #E0F2FA;         /* Light blue background */
+  --sap-primary-dark: #2C4E6C;          /* Darker blue for active states */
+  --sap-primary-darker: #1B3554;         /* Darkest blue for pressed */
+  --sap-primary-light-20: rgba(66, 124, 172, 0.15);
+  --sap-primary-light-10: rgba(66, 124, 172, 0.08);
+
+  /* Brand Colors */
+  --sap-blue: #427CAC;                   /* Main SAP blue */
+  --sap-blue-light: #E0F2FA;             /* Light blue */
+  --sap-blue-dark: #2C4E6C;               /* Dark blue */
+
+  /* SAP Gold Accent */
+  --sap-gold: #E09D00;                  /* Gold accent */
+  --sap-gold-light: #FFF3CD;             /* Light gold */
+  --sap-gold-dark: #B8860B;               /* Darker gold */
+
+  /* Accent Colors - SAP Style */
+  --sap-teal: #91C8F6;                   /* Light blue accent */
+  --sap-teal-light: #E7ECF0;
+  --sap-teal-dark: #5C8BB2;
+
+  --sap-green: #107E3E;                  /* Green accent */
+  --sap-green-light: #D4EED9;
+  --sap-green-dark: #0B5A29;
+
+  /* ============================================
+     Neutral Colors - SAP Palette
+     ============================================ */
+
+  /* Background Colors */
+  --sap-bg-white: #FFFFFF;
+  --sap-bg-light: #FAFAFA;              /* SAP standard background */
+  --sap-bg-lighter: #F0F2F5;
+  --sap-bg-sidebar: #FFFFFF;
+
+  /* Text Colors */
+  --sap-text-primary: #32363A;           /* SAP dark text */
+  --sap-text-secondary: #6A6D70;
+  --sap-text-tertiary: #8A8D90;
+  --sap-text-disabled: #B5B5B5;
+
+  /* Border Colors */
+  --sap-border-light: #D9D9D9;
+  --sap-border: #BFBFBF;                /* SAP standard border */
+  --sap-border-dark: #999999;
+
+  /* ============================================
+     Semantic Colors - SAP Style
+     ============================================ */
+
+  /* Success */
+  --sap-success: #107E3E;
+  --sap-success-light: #D4EED9;
+  --sap-success-bg: #E8F8EF;
+  --sap-success-text: #0A5A2C;
+
+  /* Warning */
+  --sap-warning: #E09D00;              /* SAP gold for warnings */
+  --sap-warning-light: #FFF8DC;
+  --sap-warning-bg: #FEF9E7;
+  --sap-warning-text: #8C6B00;
+
+  /* Danger/Error */
+  --sap-danger: #BB0000;
+  --sap-danger-light: #FFD9E6;
+  --sap-danger-bg: #FFF0F3;
+  --sap-danger-text: #880000;
+
+  /* Info */
+  --sap-info: #427CAC;
+  --sap-info-light: #D6EBF7;
+  --sap-info-bg: #E8F4FA;
+  --sap-info-text: #1A4E6E;
+
+  /* ============================================
+     Typography - SAP Standards
+     ============================================ */
+
+  --sap-font-family: '72', 'Arial', 'Helvetica', sans-serif; /* SAP 72 font preferred */
+  --sap-font-family-web: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --sap-font-size-xs: 11px;
+  --sap-font-size-sm: 12px;
+  --sap-font-size-base: 14px;
+  --sap-font-size-lg: 16px;
+  --sap-font-size-xl: 18px;
+  --sap-font-size-2xl: 20px;
+  --sap-font-size-3xl: 24px;
+  --sap-font-size-4xl: 30px;
+
+  --sap-font-weight-normal: 400;
+  --sap-font-weight-medium: 500;
+  --sap-font-weight-semibold: 600;
+  --sap-font-weight-bold: 700;
+
+  --sap-line-height-tight: 1.25;
+  --sap-line-height-normal: 1.5;
+  --sap-line-height-relaxed: 1.75;
+
+  /* ============================================
+     Spacing - SAP System
+     ============================================ */
+
+  --sap-space-1: 4px;
+  --sap-space-2: 8px;
+  --sap-space-3: 12px;
+  --sap-space-4: 16px;
+  --sap-space-5: 20px;
+  --sap-space-6: 24px;
+  --sap-space-8: 32px;
+  --sap-space-10: 40px;
+  --sap-space-12: 48px;
+
+  /* ============================================
+     Border Radius - SAP Style (More Rounded)
+     ============================================ */
+
+  --sap-radius-none: 0px;
+  --sap-radius-sm: 2px;
+  --sap-radius: 4px;
+  --sap-radius-md: 6px;
+  --sap-radius-lg: 8px;
+  --sap-radius-xl: 12px;
+  --sap-radius-full: 50%;
+
+  /* ============================================
+     Shadows - SAP Depth System (Subtle)
+     ============================================ */
+
+  --sap-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --sap-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --sap-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --sap-shadow-md: 0 8px 12px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+  --sap-shadow-lg: 0 16px 20px rgba(0, 0, 0, 0.18), 0 8px 12px rgba(0, 0, 0, 0.12);
+
+  /* ============================================
+     Transitions - SAP Professional
+     ============================================ */
+
+  --sap-transition-fast: 120ms;
+  --sap-transition-base: 200ms;
+  --sap-transition-slow: 300ms;
+  --sap-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   SAP Fiori Theme Overrides - Apply when .theme-sap is active
+   ============================================ */
+
+.theme-sap {
+  font-family: var(--sap-font-family-web);
+
+  /* Override variables with SAP values */
+  --primary: var(--sap-primary);
+  --primary-100: var(--sap-primary-light);
+  --primary-500: var(--sap-primary);
+  --primary-700: var(--sap-primary-dark);
+  --primary-light: var(--sap-primary-light-10);
+
+  --neutral-50: var(--sap-bg-light);
+  --neutral-100: var(--sap-bg-white);
+  --neutral-200: var(--sap-border-light);
+  --neutral-400: var(--sap-text-tertiary);
+  --neutral-600: var(--sap-text-secondary);
+  --neutral-700: var(--sap-text-primary);
+  --neutral-900: #000000;
+
+  --success: var(--sap-success);
+  --warning: var(--sap-warning);
+  --error: var(--sap-danger);
+
+  --text-primary: var(--sap-text-primary);
+  --text-secondary: var(--sap-text-secondary);
+  --text-tertiary: var(--sap-text-tertiary);
+
+  --card-bg: var(--sap-bg-white);
+  --input-bg: var(--sap-bg-white);
+  --bg-light: var(--sap-bg-light);
+  --hover-bg: var(--sap-bg-lighter);
+  --border-color: var(--sap-border-light);
+  --border-color-light: var(--sap-border-light);
+
+  --space-xs: var(--sap-space-2);
+  --space-sm: var(--sap-space-3);
+  --space-md: var(--sap-space-4);
+  --space-lg: var(--sap-space-6);
+  --space-xl: var(--sap-space-8);
+  --space-xxl: var(--sap-space-12);
+
+  --radius-sm: var(--sap-radius-sm);
+  --radius-md: var(--sap-radius-md);
+  --radius-full: var(--sap-radius-full);
+
+  --shadow-sm: var(--sap-shadow-sm);
+  --shadow-md: var(--sap-shadow-md);
+}
+
+/* ============================================
+   SAP Fiori Button Styles
+   ============================================ */
+
+.theme-sap .btn {
+  border-radius: var(--sap-radius) !important;
+  font-weight: var(--sap-font-weight-medium);
+  transition: all var(--sap-transition-base) var(--sap-ease);
+  box-shadow: var(--sap-shadow-xs);
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+/* Primary Button - SAP Blue */
+.theme-sap .btn-primary {
+  background: var(--sap-primary);
+  border: 1px solid var(--sap-primary-dark) !important;
+  color: white;
+  box-shadow: var(--sap-shadow-sm);
+}
+
+.theme-sap .btn-primary:hover:not(:disabled) {
+  background: var(--sap-primary-dark);
+  border-color: var(--sap-primary-darker) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--sap-shadow-md);
+}
+
+.theme-sap .btn-primary:active:not(:disabled) {
+  background: var(--sap-primary-darker);
+  transform: translateY(0);
+}
+
+/* Secondary Button - SAP Style */
+.theme-sap .btn-secondary {
+  background: var(--sap-bg-white);
+  color: var(--sap-text-primary);
+  border: 1px solid var(--sap-border) !important;
+  box-shadow: var(--sap-shadow-xs);
+}
+
+.theme-sap .btn-secondary:hover:not(:disabled) {
+  background: var(--sap-bg-lighter);
+  border-color: var(--sap-primary) !important;
+  color: var(--sap-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--sap-shadow-sm);
+}
+
+/* Danger Button - SAP Red */
+.theme-sap .btn-danger {
+  background: var(--sap-danger);
+  border: 1px solid #880000 !important;
+  color: white;
+  box-shadow: var(--sap-shadow-xs);
+}
+
+.theme-sap .btn-danger:hover:not(:disabled) {
+  background: #880000;
+  border-color: #550000 !important;
+  transform: translateY(-1px);
+  box-shadow: var(--sap-shadow-sm);
+}
+
+/* Success Button - SAP Green */
+.theme-sap .btn-success {
+  background: var(--sap-success);
+  border: 1px solid #0A5A2C !important;
+  color: white;
+  box-shadow: var(--sap-shadow-xs);
+}
+
+.theme-sap .btn-success:hover:not(:disabled) {
+  background: #0A5A2C;
+  border-color: #074022 !important;
+  transform: translateY(-1px);
+  box-shadow: var(--sap-shadow-sm);
+}
+
+/* ============================================
+   SAP Fiori Card Styles
+   ============================================ */
+
+.theme-sap .card {
+  background: var(--sap-bg-white);
+  border-radius: var(--sap-radius-md) !important;
+  box-shadow: var(--sap-shadow-sm);
+  border: 1px solid var(--sap-border);
+}
+
+.theme-sap .card:hover {
+  box-shadow: var(--sap-shadow-md);
+  border-color: var(--sap-primary-light);
+}
+
+/* ============================================
+   SAP Fiori Table Styles
+   ============================================ */
+
+.theme-sap .data-table&ad {
+  background: var(--sap-bg-lighter);
+  border-bottom: 1px solid var(--sap-border);
+}
+
+.theme-sap .data-table th {
+  font-weight: var(--sap-font-weight-semibold);
+  color: var(--sap-text-primary);
+  background: var(--sap-bg-lighter);
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: var(--sap-font-size-sm);
+  padding: var(--sap-space-4) var(--sap-space-5);
+}
+
+.theme-sap .data-table tbody tr:hover {
+  background: var(--sap-primary-light);
+}
+
+/* ============================================
+   SAP Fiori Status Badges
+   ============================================ */
+
+.theme-sap .status-tag {
+  border-radius: var(--sap-radius) !important;
+  font-weight: var(--sap-font-weight-medium);
+  font-size: var(--sap-font-size-sm);
+  padding: var(--sap-space-2) var(--sap-space-4);
+  letter-spacing: 0.01em;
+  box-shadow: var(--sap-shadow-xs);
+  background: var(--sap-bg-lighter);
+  border: 1px solid var(--sap-border-light);
+}
+
+.theme-sap .status-draft {
+  background: var(--sap-bg-lighter);
+  color: var(--sap-text-secondary);
+  border-color: var(--sap-border-light);
+}
+
+.theme-sap .status-submitted,
+.theme-sap .status-confirmed {
+  background: var(--sap-info-bg);
+  color: var(--sap-info-text);
+  border-color: var(--sap-info-light);
+}
+
+.theme-sap .status-completed,
+.theme-sap .status-paid {
+  background: var(--sap-success-bg);
+  color: var(--sap-success-text);
+  border-color: var(--sap-success-light);
+}
+
+.theme-sap .status-cancelled,
+.theme-sap .status-rejected {
+  background: var(--sap-danger-bg);
+  color: var(--sap-danger-text);
+  border-color: var(--sap-danger-light);
+}
+
+.theme-sap .status-overdue {
+  background: var(--sap-warning-bg);
+  color: var(--sap-warning-text);
+  border-color: var(--sap-warning-light);
+}
+
+/* ============================================
+   SAP Fiori Form Input Styles
+   ============================================ */
+
+.theme-sap .form-input,
+.theme-sap .form-select,
+.theme-sap .form-textarea {
+  border: 1px solid var(--sap-border) !important;
+  border-radius: var(--sap-radius) !important;
+  font-size: var(--sap-font-size-base);
+  transition: all var(--sap-transition-base) var(--sap-ease);
+  background: var(--sap-bg-white);
+}
+
+.theme-sap .form-input:focus,
+.theme-sap .form-select:focus,
+.theme-sap .form-textarea:focus {
+  outline: none;
+  border-color: var(--sap-primary) !important;
+  box-shadow: 0 0 0 2px var(--sap-primary) !important;
+}
+
+/* ============================================
+   SAP Fiori KPI Cards
+   ============================================ */
+
+.theme-sap .kpi-card {
+  background: var(--sap-bg-white);
+  border-radius: var(--sap-radius-md) !important;
+  box-shadow: var(--sap-shadow-sm);
+  border: 1px solid var(--sap-border);
+  transition: all var(--sap-transition-base) var(--sap-ease);
+}
+
+.theme-sap .kpi-card:hover {
+  box-shadow: var(--sap-shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--sap-primary-light);
+}
+
+.theme-sap .kpi-icon {
+  border-radius: var(--sap-radius) !important;
+}
+
+/* ============================================
+   SAP Fiori Sidebar Enhancements
+   ============================================ */
+
+.theme-sap .sidebar {
+  background: var(--sap-bg-sidebar);
+  border-right: 1px solid var(--sap-border);
+}
+
+.theme-sap .sidebar-nav {
+  background: var(--sap-bg-white);
+}
+
+.theme-sap .nav-item {
+  border-radius: var(--sap-radius-sm) !important;
+  margin-bottom: 2px;
+  transition: all var(--sap-transition-fast) var(--sap-ease);
+}
+
+.theme-sap .nav-item:hover {
+  background: var(--sap-primary-light);
+  color: var(--sap-primary) !important;
+}
+
+.theme-sap .nav-item.active {
+  background: var(--sap-primary);
+  color: white !important;
+  box-shadow: var(--sap-shadow-sm);
+}
+
+/* ============================================
+   SAP Fiori Quick Actions
+   ============================================ */
+
+.theme-sap .quick-action-btn {
+  border-radius: var(--sap-radius-md) !important;
+  background: var(--sap-bg-white);
+  border: 1px solid var(--sap-border-light) !important;
+  transition: all var(--sap-transition-base) var(--sap-ease);
+}
+
+.theme-sap .quick-action-btn:hover {
+  background: var(--sap-primary);
+  color: white !important;
+  border-color: var(--sap-primary-dark) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--sap-shadow-md);
+}
+
+/* ============================================
+   SAP Fiori Alert Items
+   ============================================ */
+
+.theme-sap .alert-item {
+  background: var(--sap-warning-bg);
+  border-left: 3px solid var(--sap-warning) !important;
+  border-radius: var(--sap-radius) !important;
+  transition: all var(--sap-transition-base) var(--sap-ease);
+}
+
+.theme-sap .alert-item:hover {
+  background: var(--sap-warning-light);
+  transform: translateX(2px);
+}
+
+.theme-sap .stock-low {
+  color: var(--sap-warning);
+  font-weight: var(--sap-font-weight-semibold);
+}
+
+/* ============================================
+   SAP Fiori Typography Overrides
+   ============================================ */
+
+.theme-sap h1,
+.theme-sap h2,
+.theme-sap h3,
+.theme-sap h4 {
+  font-weight: var(--sap-font-weight-bold);
+  color: var(--sap-text-primary);
+}
+
+.theme-sap h1 {
+  font-size: var(--sap-font-size-4xl);
+  line-height: var(--sap-line-height-tight);
+}
+
+.theme-sap h2 {
+  font-size: var(--sap-font-size-3xl);
+  line-height: var(--sap-line-height-tight);
+}
+
+.theme-sap h3 {
+  font-size: var(--sap-font-size-2xl);
+  line-height: var(--sap-line-height-tight);
+}
+
+.theme-sap h4 {
+  font-size: var(--sap-font-size-xl);
+  line-height: var(--sap-line-height-tight);
+}
+
+/* ============================================
+   SAP Fiori Scrollbar
+   ============================================ */
+
+.theme-sap ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.theme-sap ::-webkit-scrollbar-track {
+  background: var(--sap-bg-lighter);
+  border-radius: var(--sap-radius);
+}
+
+.theme-sap ::-webkit-scrollbar-thumb {
+  background: var(--sap-border);
+  border-radius: var(--sap-radius);
+}
+
+.theme-sap ::-webkit-scrollbar-thumb:hover {
+  background: var(--sap-primary);
+}
+
+/* ============================================
+   SAP Fiori Theme Applied Successfully
+   ============================================ */

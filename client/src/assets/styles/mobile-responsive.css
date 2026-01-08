@@ -1,0 +1,672 @@
+/* Mobile-Responsive Enhancements for Mini ERP */
+/* Target: 320px - 768px screens */
+
+@media (max-width: 768px) {
+  /* ============================================
+     LAYOUT & CONTAINER ADJUSTMENTS
+     ============================================ */
+  
+  .main-content {
+    margin-left: 0 !important;
+    margin-top: 60px;
+    padding-bottom: 80px;
+  }
+  
+  .main-content.sidebar-collapsed {
+    margin-left: 0 !important;
+  }
+  
+  .content {
+    padding: var(--space-md) var(--space-sm) !important;
+  }
+  
+  /* ============================================
+     PAGE HEADER & HEADINGS
+     ============================================ */
+  
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--space-md) !important;
+    margin-bottom: var(--space-md) !important;
+  }
+  
+  .page-header h1 {
+    font-size: 24px !important;
+  }
+  
+  .page-header .header-actions {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .page-header .header-actions .btn {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+    text-align: center;
+    padding: var(--space-sm) var(--space-md) !important;
+  }
+  
+  /* ============================================
+     SIDEBAR & NAVIGATION
+     ============================================ */
+  
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 60px !important;
+    flex-direction: row !important;
+    z-index: 1000 !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+  
+  .sidebar-menu {
+    display: none !important;
+    position: absolute !important;
+    top: 60px !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-height: calc(100vh - 60px) !important;
+    overflow-y: auto !important;
+    background: var(--neutral-100) !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+  
+  .sidebar-menu.open {
+    display: block !important;
+  }
+  
+  .sidebar-item {
+    padding: var(--space-md) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+  
+  .sidebar-toggle {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 16px !important;
+    right: 16px !important;
+    z-index: 1001 !important;
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 50% !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+  
+  /* ============================================
+     FORMS & INPUTS
+     ============================================ */
+  
+  .form-row {
+    flex-direction: column !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .form-group {
+    width: 100% !important;
+  }
+  
+  .form-group label {
+    display: block !important;
+    margin-bottom: var(--space-xs) !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100% !important;
+    padding: var(--space-sm) !important;
+    font-size: 16px !important;
+    min-height: 48px !important;
+    border-radius: var(--radius-md) !important;
+  }
+  
+  .filters-form .filters-row {
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .filters-form .filter-group {
+    width: 100% !important;
+  }
+  
+  .filters-form .filter-group label {
+    display: block !important;
+    margin-bottom: 4px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: var(--text-secondary) !important;
+  }
+  
+  .filters-form .filter-group select,
+  .filters-form .filter-group input {
+    width: 100% !important;
+    padding: var(--space-sm) !important;
+    min-height: 44px !important;
+    font-size: 14px !important;
+  }
+  
+  /* ============================================
+     BUTTONS
+     ============================================ */
+  
+  .btn {
+    min-height: 48px !important;
+    padding: var(--space-sm) var(--space-md) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: var(--radius-md) !important;
+  }
+  
+  .btn-sm,
+  .btn-small {
+    min-height: 40px !important;
+    padding: var(--space-xs) var(--space-sm) !important;
+    font-size: 13px !important;
+  }
+  
+  /* ============================================
+     CARDS & STATS
+     ============================================ */
+  
+  .stats-cards {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .stat-card {
+    padding: var(--space-md) !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .stat-card .kpi-icon {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 24px !important;
+  }
+  
+  .stat-card .kpi-value {
+    font-size: 28px !important;
+  }
+  
+  /* ============================================
+     MODALS & DIALOGS
+     ============================================ */
+  
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: var(--space-sm) !important;
+  }
+  
+  .modal {
+    width: 100% !important;
+    max-height: 90vh !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+  }
+  
+  .modal-header {
+    padding: var(--space-md) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+  
+  .modal-body {
+    padding: var(--space-md) !important;
+    max-height: calc(90vh - 140px) !important;
+    overflow-y: auto !important;
+  }
+  
+  .modal-footer {
+    padding: var(--space-md) !important;
+    border-top: 1px solid var(--border-color) !important;
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .modal-footer .btn {
+    width: 100% !important;
+    min-height: 48px !important;
+  }
+  
+  /* ============================================
+     SEARCH MODAL
+     ============================================ */
+  
+  .search-modal .modal {
+    max-height: 80vh !important;
+  }
+  
+  .search-input-wrapper {
+    padding: var(--space-md) !important;
+  }
+  
+  .search-input-wrapper input {
+    width: 100% !important;
+    min-height: 48px !important;
+    font-size: 16px !important;
+  }
+  
+  /* ============================================
+     CHARTS & VISUALIZATIONS
+     ============================================ */
+  
+  .charts-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .chart-card {
+    padding: var(--space-md) !important;
+    overflow: hidden !important;
+  }
+  
+  .chart-card canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* ============================================
+     KPI CARDS
+     ============================================ */
+  
+  .kpi-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .kpi-card {
+    padding: var(--space-md) !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .kpi-card .kpi-icon {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 24px !important;
+  }
+  
+  .kpi-card .kpi-value {
+    font-size: 24px !important;
+  }
+  
+  /* ============================================
+     PAGINATION
+     ============================================ */
+  
+  .pagination {
+    flex-wrap: wrap !important;
+    gap: var(--space-sm) !important;
+    justify-content: center !important;
+  }
+  
+  .pagination .btn {
+    min-width: 80px !important;
+  }
+  
+  .pagination .page-info {
+    width: 100% !important;
+    text-align: center !important;
+    order: -1 !important;
+  }
+  
+  /* ============================================
+     EMPTY STATES & LOADING
+     ============================================ */
+  
+  .empty-state {
+    padding: var(--space-xl) var(--space-md) !important;
+  }
+  
+  .loading-overlay {
+    padding: var(--space-xl) var(--space-md) !important;
+  }
+  
+  /* ============================================
+     TOAST NOTIFICATIONS
+     ============================================ */
+  
+  .toast-container {
+    top: 70px !important;
+    right: var(--space-sm) !important;
+    left: var(--space-sm) !important;
+    max-width: none !important;
+  }
+  
+  .toast {
+    width: 100% !important;
+    margin-bottom: var(--space-sm) !important;
+  }
+}
+
+/* ============================================
+   TABLE TO CARD TRANSFORMATION (MOBILE)
+   ============================================ */
+
+@media (max-width: 768px) {
+  .data-table-container {
+    overflow-x: visible !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  
+  .data-table {
+    display: block !important;
+  }
+  
+  .data-table thead {
+    display: none !important;
+  }
+  
+  .data-table tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .data-table tbody tr {
+    display: block !important;
+    background: var(--neutral-100) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
+    padding: var(--space-md) !important;
+    border: 1px solid var(--border-color) !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .data-table tbody tr:last-child {
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+  
+  .data-table td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: var(--space-sm) 0 !important;
+    border-bottom: 1px solid var(--border-color-light) !important;
+  }
+  
+  .data-table td:last-child {
+    border-bottom: none !important;
+    padding-top: var(--space-md) !important;
+  }
+  
+  .data-table td::before {
+    content: attr(data-label) !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    color: var(--text-secondary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+  
+  .data-table td[data-label="Actions"],
+  .data-table td[data-label="""],
+  .data-table td:last-child {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: var(--space-xs) !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .data-table td[data-label="Actions"]::before,
+  .data-table td[data-label=""""]::before,
+  .data-table td:last-child::before {
+    display: none !important;
+  }
+  
+  /* Table Actions in Card Mode */
+  .data-table .table-actions {
+    display: flex !important;
+    gap: var(--space-xs) !important;
+    justify-content: flex-end !important;
+  }
+  
+  .data-table .table-actions .btn {
+    min-width: 44px !important;
+    height: 44px !important;
+    padding: var(--space-xs) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 12px !important;
+  }
+  
+  /* Status Tags in Card Mode */
+  .data-table .status-tag {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+  
+  /* Clickable rows in card mode */
+  .data-table tbody tr.clickable {
+    cursor: pointer !important;
+  }
+  
+  .data-table tbody tr.clickable:active {
+    background: var(--hover-bg) !important;
+    transform: scale(0.99) !important;
+  }
+  
+  /* Empty state in card mode */
+  .data-table .empty-state td {
+    display: block !important;
+    text-align: center !important;
+    padding: var(--space-xl) var(--space-md) !important;
+  }
+  
+  .data-table .empty-state td::before {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   ENHANCED MOBILE UTILITIES
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Hide elements on mobile */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Show elements on mobile */
+  .mobile-only {
+    display: block !important;
+  }
+  
+  /* Full width on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  /* Touch-friendly spacing */
+  .touch-friendly {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  /* Safe area padding for notched devices */
+  .safe-area-padding {
+    padding-left: env(safe-area-inset-left) !important;
+    padding-right: env(safe-area-inset-right) !important;
+  }
+  
+  /* Prevent horizontal scroll */
+  .no-horizontal-scroll {
+    overflow-x: hidden !important;
+  }
+  
+  /* Better text rendering on mobile */
+  .mobile-text-optimized {
+    -webkit-text-size-adjust: 100% !important;
+    text-rendering: optimizeLegibility !important;
+  }
+}
+
+/* ============================================
+   LARGE MOBILE DEVICES (414px - 768px)
+   ============================================ */
+
+@media (min-width: 414px) and (max-width: 768px) {
+  .page-header .header-actions .btn {
+    flex: 0 1 auto !important;
+    min-width: auto !important;
+  }
+  
+  .filters-form .filters-row {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .filters-form .filter-group {
+    flex: 1 1 45% !important;
+  }
+  
+  .filters-form .filter-group.search-group {
+    flex: 1 1 100% !important;
+  }
+  
+  .stat-card,
+  .kpi-card {
+    padding: var(--space-md) !important;
+  }
+  
+  .modal {
+    max-width: 90% !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE DEVICES (< 414px)
+   ============================================ */
+
+@media (max-width: 413px) {
+  .content {
+    padding: var(--space-sm) var(--space-xs) !important;
+  }
+  
+  .page-header h1 {
+    font-size: 20px !important;
+  }
+  
+  .page-header .header-actions {
+    flex-direction: column !important;
+  }
+  
+  .page-header .header-actions .btn {
+    width: 100% !important;
+  }
+  
+  .data-table tbody tr {
+    padding: var(--space-sm) !important;
+  }
+  
+  .data-table td {
+    padding: var(--space-xs) 0 !important;
+    font-size: 13px !important;
+  }
+  
+  .data-table .table-actions .btn {
+    min-width: 36px !important;
+    height: 36px !important;
+    font-size: 10px !important;
+  }
+  
+  .btn {
+    min-height: 44px !important;
+    padding: var(--space-xs) var(--space-sm) !important;
+    font-size: 13px !important;
+  }
+  
+  .stat-card .kpi-value,
+  .kpi-card .kpi-value {
+    font-size: 24px !important;
+  }
+  
+  .modal-footer .btn {
+    min-height: 48px !important;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Focus states for touch devices */
+  *:focus-visible {
+    outline: 2px solid var(--primary-500) !important;
+    outline-offset: 2px !important;
+  }
+  
+  /* Minimum touch target size */
+  .btn,
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .filter-group select,
+  .filter-group input {
+    min-height: 44px !important;
+  }
+  
+  /* Better tap highlight */
+  html {
+    -webkit-tap-highlight-color: rgba(54, 123, 245, 0.2) !important;
+  }
+  
+  /* Prevent zoom on iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth !important;
+  }
+  
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* GPU acceleration for transforms */
+  .btn,
+  .data-table tbody tr,
+  .stat-card,
+  .kpi-card {
+    transform: translateZ(0) !important;
+    will-change: transform, background-color !important;
+  }
+  
+  /* Efficient rendering */
+  .data-table tbody tr {
+    backface-visibility: hidden !important;
+  }
+}

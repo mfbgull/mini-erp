@@ -1,0 +1,83 @@
+{
+  "name": "mini-erp",
+  "version": "1.0.0",
+  "description": "Mini ERP - Desktop Application for Windows",
+  "main": "electron/main.js",
+  "author": "Mini ERP",
+  "license": "MIT",
+  "scripts": {
+    "install-deps": "cd client && npm install && cd ../server && npm install",
+    "build-client": "cd client && npm run build",
+    "build-server": "cd server && npm run build",
+    "build-all": "npm run build-client && npm run build-server",
+    "start-electron": "electron .",
+    "dist": "npm run build-all && electron-builder",
+    "dist-win": "npm run build-all && electron-builder --win --x64",
+    "dist-all": "npm run build-all && electron-builder -wlm"
+  },
+  "dependencies": {
+    "axios": "^1.13.2"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "rimraf": "^6.1.2"
+  },
+  "build": {
+    "appId": "com.minierp.app",
+    "productName": "Mini ERP",
+    "copyright": "Copyright © 2024 Mini ERP",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "server/dist",
+        "to": "server",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "server/src/migrations",
+        "to": "server/src/migrations",
+        "filter": ["*.sql"]
+      },
+      {
+        "from": "server/package.json",
+        "to": "server/package.json"
+      },
+      {
+        "from": "server/node_modules",
+        "to": "server/node_modules",
+        "filter": ["**/*", "!**/.bin/**"]
+      },
+      {
+        "from": "client/dist",
+        "to": "client/dist"
+      }
+    ],
+    "asarUnpack": [
+      "**/node_modules/better-sqlite3/**/*",
+      "**/node_modules/sqlite3/**/*",
+      "server/node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false,
+      "signDlls": false,
+      "signingHashAlgorithms": []
+    }
+  }
+}

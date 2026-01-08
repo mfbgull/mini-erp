@@ -1,0 +1,110 @@
+.bom-usage-report {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bom-usage-report .page-header {
+  margin-bottom: 20px;
+}
+
+.bom-usage-report .report-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bom-usage-report .filter-toggle {
+  margin-right: 10px;
+}
+
+.bom-usage-report .export-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.bom-usage-report .export-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bom-usage-report .report-filters {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.bom-usage-report .filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: end;
+}
+
+.bom-usage-report .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 150px;
+}
+
+.bom-usage-report .filter-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.bom-usage-report .filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.bom-usage-report .apply-filters-btn {
+  margin-left: 10px;
+  margin-bottom: 5px;
+}
+
+.bom-usage-report .report-content {
+  flex: 1;
+  min-height: 400px;
+}
+
+.bom-usage-report .ag-theme-quartz {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.bom-usage-report .no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 40px;
+}
+
+.bom-usage-report .no-data h3 {
+  margin: 15px 0 5px 0;
+  color: var(--text-primary);
+}
+
+.bom-usage-report .no-data p {
+  margin: 0;
+  color: var(--text-secondary);
+}

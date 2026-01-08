@@ -1,0 +1,217 @@
+.settings-page {
+  max-width: 1000px;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.settings-section {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--neutral-100);
+}
+
+.section-header h2 {
+  margin: 0 0 var(--space-xs) 0;
+  font-size: 1.3rem;
+  color: var(--neutral-800);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.section-description {
+  margin: 0;
+  color: var(--neutral-500);
+  font-size: 0.9rem;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+.preview-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.preview-section .section-header {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.preview-section h2,
+.preview-section .section-description {
+  color: white;
+}
+
+.preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(10px);
+}
+
+.preview-label {
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.preview-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-section {
+    padding: var(--space-lg);
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}
+
+/* Theme Selector Styles */
+.theme-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-md);
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--bg-light);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 200ms ease;
+  position: relative;
+}
+
+.theme-option:hover {
+  background: var(--hover-bg);
+  border-color: var(--primary-500);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-option.active {
+  border-color: var(--primary-500);
+  background: var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-option-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-option-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.theme-option-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.theme-option-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.theme-option-check {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-500);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Responsive Theme Selector */
+@media (max-width: 768px) {
+  .theme-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-option {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .theme-option-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+  }
+
+  .theme-option-name {
+    font-size: 1rem;
+  }
+
+  .theme-option-description {
+    font-size: 0.8rem;
+  }
+}

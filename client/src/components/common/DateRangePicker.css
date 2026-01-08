@@ -1,0 +1,50 @@
+.date-range-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.date-range-inputs {
+  display: flex;
+  gap: var(--space-md);
+  align-items: end;
+}
+
+.date-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.date-input-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--neutral-700);
+}
+
+.date-input {
+  padding: var(--space-sm);
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background: white;
+  min-width: 140px;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary), transparent 80%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .date-range-inputs {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  
+  .date-input {
+    width: 100%;
+  }
+}

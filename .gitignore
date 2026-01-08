@@ -1,0 +1,149 @@
+# ============================================
+# MINI ERP - GITIGNORE CONFIGURATION
+# ============================================
+
+# ----------------------------------------
+# NODE.JS & DEPENDENCIES
+# ----------------------------------------
+node_modules/
+*/node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# ----------------------------------------
+# DATABASE FILES (CRITICAL - CONTAINS DATA)
+# ----------------------------------------
+database/erp.db
+database/erp.db-shm
+database/erp.db-wal
+database/backups/*.db
+database/backups/*.db-journal
+*.sqlite
+*.db
+
+# ----------------------------------------
+# ENVIRONMENT VARIABLES (SECURITY)
+# ----------------------------------------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.local
+
+# ----------------------------------------
+# BUILD OUTPUTS (GENERATED)
+# ----------------------------------------
+client/dist/
+client/build/
+server/dist/
+server/*.js
+server/*.js.map
+!server/server.js
+!server/test-*.js
+dist/
+build/
+
+# ----------------------------------------
+# ELECTRON BUILDS (GENERATED)
+# ----------------------------------------
+electron/out/
+electron/release/
+electron/dist/
+*.exe
+*.dmg
+*.msi
+*.AppImage
+*.deb
+
+# ----------------------------------------
+# LOGS & TEMPORARY FILES
+# ----------------------------------------
+*.log
+*.tmp
+*.temp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.pid
+*.seed
+
+# ----------------------------------------
+# IDE & EDITOR FILES
+# ----------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# ----------------------------------------
+# TEST & COVERAGE
+# ----------------------------------------
+coverage/
+.nyc_output/
+*.lcov
+htmlcov/
+
+# ----------------------------------------
+# SECRETS & KEYS (NEVER COMMIT)
+# ----------------------------------------
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+secrets/
+keys/
+private/
+
+# ----------------------------------------
+# OS SPECIFIC
+# ----------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ----------------------------------------
+# PROJECT SPECIFIC IGNORES
+# ----------------------------------------
+opencode.jsonc
+.nul/
+temp/
+_tmp/
+
+# ----------------------------------------
+# AGENT/AI TOOL FILES
+# ----------------------------------------
+.claude/
+.qwen/
+.opencode/
+*.agent.log
+copilotilot*/
+
+# ----------------------------------------
+# INCLUDE IMPORTANT FILES (!NEGATION)
+# ----------------------------------------
+# These files should ALWAYS be committed:
+# !package.json
+# !package-lock.json
+# !README.md
+# !.gitignore

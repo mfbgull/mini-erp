@@ -1,0 +1,525 @@
+/* Odoo ERP Theme - Inspired by Odoo's Purple Design System
+ * Professional purple/violet color palette with modern styling
+ */
+
+:root {
+  /* ============================================
+     Odoo Brand Colors - Purple/Violet
+     ============================================ */
+
+  /* Primary Colors - Odoo Purple */
+  --odoo-primary: #702963;           /* Main brand purple */
+  --odoo-primary-light: #F3E5F3;      /* Light purple background */
+  --odoo-primary-dark: #4A1A43;        /* Darker purple for active states */
+  --odoo-primary-darker: #2F0F2B;       /* Darkest purple for pressed */
+  --odoo-primary-light-20: rgba(112, 41, 99, 0.15);
+  --odoo-primary-light-10: rgba(112, 41, 99, 0.08);
+
+  /* Brand Colors */
+  --odoo-purple: #702963;              /* Main purple */
+  --odoo-purple-light: #F3E5F3;         /* Light purple */
+  --odoo-purple-dark: #4A1A43;           /* Dark purple */
+
+  /* Accent Colors - Odoo Style */
+  --odoo-teal: #00A091;                /* Green/teal accent */
+  --odoo-teal-light: #E6F7F5;
+  --odoo-teal-dark: #007A6B;
+
+  --odoo-pink: #FF6B9D;                /* Pink accent */
+  --odoo-pink-light: #FFE6F0;
+  --odoo-pink-dark: #D6407A;
+
+  --odoo-blue: #5C4DFF;                /* Blue accent */
+  --odoo-blue-light: #E8E5FF;
+
+  /* ============================================
+     Neutral Colors - Odoo Palette
+     ============================================ */
+
+  /* Background Colors */
+  --odoo-bg-white: #FFFFFF;
+  --odoo-bg-light: #F8F9FA;
+  --odoo-bg-lighter: #F1F3F5;
+  --odoo-bg-sidebar: #FFFFFF;
+
+  /* Text Colors */
+  --odoo-text-primary: #1F2937;
+  --odoo-text-secondary: #6B7280;
+  --odoo-text-tertiary: #9CA3AF;
+  --odoo-text-disabled: #D1D5DB;
+
+  /* Border Colors */
+  --odoo-border-light: #E5E7EB;
+  --odoo-border: #D1D5DB;
+  --odoo-border-dark: #9CA3AF;
+
+  /* ============================================
+     Semantic Colors - Odoo Style
+     ============================================ */
+
+  /* Success */
+  --odoo-success: #00A091;
+  --odoo-success-light: #D1FAE5;
+  --odoo-success-bg: #E6F7F5;
+  --odoo-success-text: #006B61;
+
+  /* Warning */
+  --odoo-warning: #FFA726;
+  --odoo-warning-light: #FFE0B2;
+  --odoo-warning-bg: #FFF3E0;
+  --odoo-warning-text: #BF360C;
+
+  /* Danger/Error */
+  --odoo-danger: #FF5252;
+  --odoo-danger-light: #FFCDD2;
+  --odoo-danger-bg: #FFEBEE;
+  --odoo-danger-text: #B71C1C;
+
+  /* Info */
+  --odoo-info: #5C4DFF;
+  --odoo-info-light: #D1C7EE;
+  --odoo-info-bg: #EDE7FF;
+  --odoo-info-text: #3A00C0;
+
+  /* ============================================
+     Typography - Odoo Standards
+     ============================================ */
+
+  --odoo-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --odoo-font-size-xs: 11px;
+  --odoo-font-size-sm: 12px;
+  --odoo-font-size-base: 14px;
+  --odoo-font-size-lg: 16px;
+  --odoo-font-size-xl: 18px;
+  --odoo-font-size-2xl: 20px;
+  --odoo-font-size-3xl: 24px;
+  --odoo-font-size-4xl: 30px;
+
+  --odoo-font-weight-normal: 400;
+  --odoo-font-weight-medium: 500;
+  --odoo-font-weight-semibold: 600;
+  --odoo-font-weight-bold: 700;
+
+  --odoo-line-height-tight: 1.25;
+  --odoo-line-height-normal: 1.5;
+  --odoo-line-height-relaxed: 1.75;
+
+  /* ============================================
+     Spacing - Odoo System
+     ============================================ */
+
+  --odoo-space-1: 4px;
+  --odoo-space-2: 8px;
+  --odoo-space-3: 12px;
+  --odoo-space-4: 16px;
+  --odoo-space-5: 20px;
+  --odoo-space-6: 24px;
+  --odoo-space-8: 32px;
+  --odoo-space-10: 40px;
+  --odoo-space-12: 48px;
+
+  /* ============================================
+     Border Radius - Odoo Style
+     ============================================ */
+
+  --odoo-radius-none: 0px;
+  --odoo-radius-sm: 4px;
+  --odoo-radius: 6px;
+  --odoo-radius-md: 8px;
+  --odoo-radius-lg: 12px;
+  --odoo-radius-xl: 16px;
+  --odoo-radius-full: 50%;
+
+  /* ============================================
+     Shadows - Odoo Depth System
+     ============================================ */
+
+  --odoo-shadow-xs: 0 1px 2px rgba(112, 41, 99, 0.04);
+  --odoo-shadow-sm: 0 1px 3px rgba(112, 41, 99, 0.08), 0 1px 2px rgba(112, 41, 99, 0.04);
+  --odoo-shadow: 0 4px 6px -1px rgba(112, 41, 99, 0.1), 0 2px 4px -1px rgba(112, 41, 99, 0.06);
+  --odoo-shadow-md: 0 10px 15px -3px rgba(112, 41, 99, 0.1), 0 4px 6px -2px rgba(112, 41, 99, 0.05);
+  --odoo-shadow-lg: 0 20px 25px -5px rgba(112, 41, 99, 0.1), 0 10px 10px -5px rgba(112, 41, 99, 0.04);
+
+  /* ============================================
+     Transitions - Odoo Smooth
+     ============================================ */
+
+  --odoo-transition-fast: 150ms;
+  --odoo-transition-base: 200ms;
+  --odoo-transition-slow: 300ms;
+  --odoo-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   Odoo Theme Overrides - Apply when .theme-odoo is active
+   ============================================ */
+
+.theme-odoo {
+  /* Override variables with Odoo values */
+  --primary: var(--odoo-primary);
+  --primary-100: var(--odoo-primary-light);
+  --primary-500: var(--odoo-primary);
+  --primary-700: var(--odoo-primary-dark);
+  --primary-light: var(--odoo-primary-light-10);
+
+  --neutral-50: var(--odoo-bg-light);
+  --neutral-100: var(--odoo-bg-white);
+  --neutral-200: var(--odoo-border-light);
+  --neutral-400: var(--odoo-text-tertiary);
+  --neutral-600: var(--odoo-text-secondary);
+  --neutral-700: var(--odoo-text-primary);
+  --neutral-900: #111827;
+
+  --success: var(--odoo-success);
+  --warning: var(--odoo-warning);
+  --error: var(--odoo-danger);
+
+  --text-primary: var(--odoo-text-primary);
+  --text-secondary: var(--odoo-text-secondary);
+  --text-tertiary: var(--odoo-text-tertiary);
+
+  --card-bg: var(--odoo-bg-white);
+  --input-bg: var(--odoo-bg-white);
+  --bg-light: var(--odoo-bg-light);
+  --hover-bg: var(--odoo-bg-lighter);
+  --border-color: var(--odoo-border-light);
+  --border-color-light: var(--odoo-border-light);
+
+  --space-xs: var(--odoo-space-2);
+  --space-sm: var(--odoo-space-3);
+  --space-md: var(--odoo-space-4);
+  --space-lg: var(--odoo-space-6);
+  --space-xl: var(--odoo-space-8);
+  --space-xxl: var(--odoo-space-12);
+
+  --radius-sm: var(--odoo-radius-sm);
+  --radius-md: var(--odoo-radius-md);
+  --radius-full: var(--odoo-radius-full);
+
+  --shadow-sm: var(--odoo-shadow-sm);
+  --shadow-md: var(--odoo-shadow-md);
+}
+
+/* ============================================
+   Odoo Button Styles
+   ============================================ */
+
+.theme-odoo .btn {
+  border-radius: var(--odoo-radius) !important;
+  font-weight: var(--odoo-font-weight-medium);
+  transition: all var(--odoo-transition-base) var(--odoo-ease);
+  box-shadow: var(--odoo-shadow-xs);
+  letter-spacing: 0.01em;
+}
+
+/* Primary Button - Odoo Purple Gradient */
+.theme-odoo .btn-primary {
+  background: linear-gradient(135deg, var(--odoo-primary) 0%, var(--odoo-primary-dark) 100%);
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(112, 41, 99, 0.3);
+}
+
+.theme-odoo .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--odoo-primary-dark) 0%, var(--odoo-primary-darker) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(112, 41, 99, 0.4);
+}
+
+/* Secondary Button - Odoo Style */
+.theme-odoo .btn-secondary {
+  background: var(--odoo-bg-white);
+  color: var(--odoo-text-primary);
+  border: 1px solid var(--odoo-border) !important;
+  box-shadow: var(--odoo-shadow-xs);
+}
+
+.theme-odoo .btn-secondary:hover:not(:disabled) {
+  background: var(--odoo-primary-light);
+  border-color: var(--odoo-primary) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--odoo-shadow-sm);
+}
+
+/* Danger Button - Odoo Pink/Red */
+.theme-odoo .btn-danger {
+  background: linear-gradient(135deg, var(--odoo-danger) 0%, #D32F2F 100%);
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(255, 82, 82, 0.3);
+}
+
+.theme-odoo .btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 82, 82, 0.4);
+}
+
+/* Success Button - Odoo Teal */
+.theme-odoo .btn-success {
+  background: linear-gradient(135deg, var(--odoo-success) 0%, #006B61 100%);
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 160, 145, 0.3);
+}
+
+.theme-odoo .btn-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #006B61 0%, #004D46 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 160, 145, 0.4);
+}
+
+/* ============================================
+   Odoo Card Styles
+   ============================================ */
+
+.theme-odoo .card {
+  background: var(--odoo-bg-white);
+  border-radius: var(--odoo-radius-md) !important;
+  box-shadow: var(--odoo-shadow-sm);
+  border: 1px solid var(--odoo-border-light);
+}
+
+.theme-odoo .card:hover {
+  box-shadow: var(--odoo-shadow);
+  border-color: var(--odoo-primary-light);
+}
+
+/* ============================================
+   Odoo Table Styles
+   ============================================ */
+
+.theme-odoo .data-table&ad {
+  background: var(--odoo-bg-lighter);
+  border-bottom: 2px solid var(--odoo-primary);
+}
+
+.theme-odoo .data-table th {
+  font-weight: var(--odoo-font-weight-semibold);
+  color: var(--odoo-text-primary);
+  background: var(--odoo-bg-lighter);
+  text-transform: uppercase;
+  font-size: var(--odoo-font-size-xs);
+  letter-spacing: 0.05em;
+  padding: var(--odoo-space-4) var(--odoo-space-5);
+}
+
+.theme-odoo .data-table tbody tr:hover {
+  background: var(--odoo-primary-light);
+}
+
+/* ============================================
+   Odoo Status Badges
+   ============================================ */
+
+.theme-odoo .status-tag {
+  border-radius: var(--odoo-radius-full) !important;
+  font-weight: var(--odoo-font-weight-medium);
+  font-size: var(--odoo-font-size-sm);
+  padding: var(--odoo-space-2) var(--odoo-space-4);
+  letter-spacing: 0.01em;
+  box-shadow: var(--odoo-shadow-xs);
+}
+
+.theme-odoo .status-draft {
+  background: var(--odoo-bg-lighter);
+  color: var(--odoo-text-secondary);
+  border: 1px solid var(--odoo-border);
+}
+
+.theme-odoo .status-submitted,
+.theme-odoo .status-confirmed {
+  background: var(--odoo-info-bg);
+  color: var(--odoo-info-text);
+  border: 1px solid var(--odoo-info-light);
+}
+
+.theme-odoo .status-completed,
+.theme-odoo .status-paid {
+  background: var(--odoo-success-bg);
+  color: var(--odoo-success-text);
+  border: 1px solid var(--odoo-success-light);
+}
+
+.theme-odoo .status-cancelled,
+.theme-odoo .status-rejected {
+  background: var(--odoo-danger-bg);
+  color: var(--odoo-danger-text);
+  border: 1px solid var(--odoo-danger-light);
+}
+
+.theme-odoo .status-overdue {
+  background: var(--odoo-warning-bg);
+  color: var(--odoo-warning-text);
+  border: 1px solid var(--odoo-warning-light);
+}
+
+/* ============================================
+   Odoo Form Input Styles
+   ============================================ */
+
+.theme-odoo .form-input,
+.theme-odoo .form-select,
+.theme-odoo .form-textarea {
+  border: 1px solid var(--odoo-border) !important;
+  border-radius: var(--odoo-radius) !important;
+  font-size: var(--odoo-font-size-base);
+  transition: all var(--odoo-transition-base) var(--odoo-ease);
+  background: var(--odoo-bg-white);
+}
+
+.theme-odoo .form-input:focus,
+.theme-odoo .form-select:focus,
+.theme-odoo .form-textarea:focus {
+  outline: none;
+  border-color: var(--odoo-primary) !important;
+  box-shadow: 0 0 0 3px var(--odoo-primary-light), var(--odoo-shadow-sm) !important;
+}
+
+/* ============================================
+   Odoo KPI Cards
+   ============================================ */
+
+.theme-odoo .kpi-card {
+  background: var(--odoo-bg-white);
+  border-radius: var(--odoo-radius-md) !important;
+  box-shadow: var(--odoo-shadow-sm);
+  border: 1px solid var(--odoo-border-light);
+  transition: all var(--odoo-transition-base) var(--odoo-ease);
+}
+
+.theme-odoo .kpi-card:hover {
+  box-shadow: var(--odoo-shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--odoo-primary-light);
+}
+
+.theme-odoo .kpi-icon {
+  border-radius: var(--odoo-radius) !important;
+}
+
+/* ============================================
+   Odoo Sidebar Enhancements
+   ============================================ */
+
+.theme-odoo .sidebar {
+  background: var(--odoo-bg-sidebar);
+  border-right: 1px solid var(--odoo-border);
+}
+
+.theme-odoo .sidebar-nav {
+  background: linear-gradient(180deg, var(--odoo-primary-light) 0%, var(--odoo-bg-white) 100%);
+}
+
+.theme-odoo .nav-item {
+  border-radius: var(--odoo-radius) !important;
+  margin-bottom: 2px;
+  transition: all var(--odoo-transition-fast) var(--odoo-ease);
+}
+
+.theme-odoo .nav-item:hover {
+  background: var(--odoo-primary-light);
+  color: var(--odoo-primary) !important;
+}
+
+.theme-odoo .nav-item.active {
+  background: var(--odoo-primary);
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(112, 41, 99, 0.3);
+}
+
+/* ============================================
+   Odoo Quick Actions
+   ============================================ */
+
+.theme-odoo .quick-action-btn {
+  border-radius: var(--odoo-radius-md) !important;
+  background: var(--odoo-bg-white);
+  border: 1px solid var(--odoo-border-light) !important;
+  transition: all var(--odoo-transition-base) var(--odoo-ease);
+}
+
+.theme-odoo .quick-action-btn:hover {
+  background: var(--odoo-primary);
+  color: white !important;
+  border-color: var(--odoo-primary) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--odoo-shadow);
+}
+
+/* ============================================
+   Odoo Alert Items
+   ============================================ */
+
+.theme-odoo .alert-item {
+  background: var(--odoo-warning-bg);
+  border-left: 4px solid var(--odoo-warning) !important;
+  border-radius: var(--odoo-radius) !important;
+  transition: all var(--odoo-transition-base) var(--odoo-ease);
+}
+
+.theme-odoo .alert-item:hover {
+  background: var(--odoo-warning-light);
+  transform: translateX(2px);
+}
+
+.theme-odoo .stock-low {
+  color: var(--odoo-warning);
+  font-weight: var(--odoo-font-weight-semibold);
+}
+
+/* ============================================
+   Odoo Typography Overrides
+   ============================================ */
+
+.theme-odoo h1,
+.theme-odoo h2,
+.theme-odoo h3,
+.theme-odoo h4 {
+  font-weight: var(--odoo-font-weight-bold);
+  color: var(--odoo-text-primary);
+}
+
+.theme-odoo h1 {
+  font-size: var(--odoo-font-size-4xl);
+  line-height: var(--odoo-line-height-tight);
+}
+
+.theme-odoo h2 {
+  font-size: var(--odoo-font-size-3xl);
+  line-height: var(--odoo-line-height-tight);
+}
+
+.theme-odoo h3 {
+  font-size: var(--odoo-font-size-2xl);
+  line-height: var(--odoo-line-height-tight);
+}
+
+.theme-odoo h4 {
+  font-size: var(--odoo-font-size-xl);
+  line-height: var(--odoo-line-height-tight);
+}
+
+/* ============================================
+   Odoo Scrollbar
+   ============================================ */
+
+.theme-odoo ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.theme-odoo ::-webkit-scrollbar-track {
+  background: var(--odoo-bg-lighter);
+  border-radius: var(--odoo-radius);
+}
+
+.theme-odoo ::-webkit-scrollbar-thumb {
+  background: var(--odoo-primary);
+  border-radius: var(--odoo-radius);
+}
+
+.theme-odoo ::-webkit-scrollbar-thumb:hover {
+  background: var(--odoo-primary-dark);
+}
+
+/* ============================================
+   Odoo Theme Applied Successfully
+   ============================================ */

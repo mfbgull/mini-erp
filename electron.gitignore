@@ -1,0 +1,31 @@
+# Electron build output
+dist/
+out/
+
+# Electron build cache
+.electron-builder/
+
+# Build resources
+build/icon.ico
+build/icon.png
+
+# Node modules (will be included in build via extraResources)
+# but ignored from git tracking
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

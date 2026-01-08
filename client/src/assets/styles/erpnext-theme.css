@@ -1,0 +1,618 @@
+/* ERPNext Theme - Complete Design System
+ * Transforming miniERP to match ERPNext's distinctive look and feel
+ */
+
+:root {
+  /* ============================================
+     ERPNext Brand Colors
+     ============================================ */
+
+  /* Primary Colors - ERPNext Blue */
+  --erp-primary: #367BF5;
+  --erp-primary-light: #EBF2FF;
+  --erp-primary-dark: #285EBC;
+  --erp-primary-darker: #1E4A94;
+  --erp-primary-light-20: rgba(54, 123, 245, 0.2);
+  --erp-primary-light-10: rgba(54, 123, 245, 0.1);
+
+  /* Brand Colors - ERPNext Signature */
+  --erp-brand: #003366;           /* Navy for headers */
+  --erp-brand-light: #EBF2FF;     /* Light blue backgrounds */
+  --erp-brand-dark: #002244;      /* Darker navy */
+
+  /* Accent Colors - ERPNext Vibrant */
+  --erp-teal: #00A693;           /* Success/positive actions */
+  --erp-teal-light: #E6F7F5;
+  --erp-teal-dark: #007A6B;
+
+  --erp-orange: #F68E56;         /* Warning/attention */
+  --erp-orange-light: #FEF3EE;
+  --erp-orange-dark: #D4682E;
+
+  --erp-purple: #8B5CF6;         /* Special actions */
+  --erp-purple-light: #F3E8FF;
+
+  /* ============================================
+     Neutral Colors - ERPNext Palette
+     ============================================ */
+
+  /* Background Colors */
+  --erp-bg-white: #FFFFFF;
+  --erp-bg-light: #F8F9FA;
+  --erp-bg-lighter: #F1F3F5;
+  --erp-bg-sidebar: #FFFFFF;
+
+  /* Text Colors */
+  --erp-text-primary: #1F2937;
+  --erp-text-secondary: #6B7280;
+  --erp-text-tertiary: #9CA3AF;
+  --erp-text-disabled: #D1D5DB;
+
+  /* Border Colors */
+  --erp-border-light: #E5E7EB;
+  --erp-border: #D1D5DB;
+  --erp-border-dark: #9CA3AF;
+
+  /* ============================================
+     Semantic Colors - ERPNext Style
+     ============================================ */
+
+  /* Success */
+  --erp-success: #10B981;
+  --erp-success-light: #D1FAE5;
+  --erp-success-bg: #ECFDF5;
+  --erp-success-text: #065F46;
+
+  /* Warning */
+  --erp-warning: #F59E0B;
+  --erp-warning-light: #FEF3C7;
+  --erp-warning-bg: #FFFBEB;
+  --erp-warning-text: #92400E;
+
+  /* Danger/Error */
+  --erp-danger: #EF4444;
+  --erp-danger-light: #FEE2E2;
+  --erp-danger-bg: #FEF2F2;
+  --erp-danger-text: #991B1B;
+
+  /* Info */
+  --erp-info: #3B82F6;
+  --erp-info-light: #DBEAFE;
+  --erp-info-bg: #EFF6FF;
+  --erp-info-text: #1E40AF;
+
+  /* ============================================
+     Typography - ERPNext Standards
+     ============================================ */
+
+  --erp-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --erp-font-size-xs: 11px;
+  --erp-font-size-sm: 12px;
+  --erp-font-size-base: 14px;
+  --erp-font-size-lg: 16px;
+  --erp-font-size-xl: 18px;
+  --erp-font-size-2xl: 20px;
+  --erp-font-size-3xl: 24px;
+  --erp-font-size-4xl: 30px;
+
+  --erp-font-weight-normal: 400;
+  --erp-font-weight-medium: 500;
+  --erp-font-weight-semibold: 600;
+  --erp-font-weight-bold: 700;
+
+  --erp-line-height-tight: 1.25;
+  --erp-line-height-normal: 1.5;
+  --erp-line-height-relaxed: 1.75;
+
+  /* ============================================
+     Spacing - ERPNext System
+     ============================================ */
+
+  --erp-space-1: 4px;
+  --erp-space-2: 8px;
+  --erp-space-3: 12px;
+  --erp-space-4: 16px;
+  --erp-space-5: 20px;
+  --erp-space-6: 24px;
+  --erp-space-8: 32px;
+  --erp-space-10: 40px;
+  --erp-space-12: 48px;
+
+  /* ============================================
+     Border Radius - ERPNext Consistent
+     ============================================ */
+
+  --erp-radius-none: 0px;
+  --erp-radius-sm: 4px;
+  --erp-radius: 6px;          /* ERPNext standard */
+  --erp-radius-md: 8px;
+  --erp-radius-lg: 12px;
+  --erp-radius-xl: 16px;
+  --erp-radius-full: 50%;
+
+  /* ============================================
+     Shadows - ERPNext Depth System
+     ============================================ */
+
+  --erp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --erp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --erp-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --erp-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --erp-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* ============================================
+     Transitions - ERPNext Smooth
+     ============================================ */
+
+  --erp-transition-fast: 150ms;
+  --erp-transition-base: 200ms;
+  --erp-transition-slow: 300ms;
+  --erp-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   Global Overrides - Apply ERPNext Theme
+   ============================================ */
+
+body {
+  font-family: var(--erp-font-family);
+  font-size: var(--erp-font-size-base);
+  line-height: var(--erp-line-height-normal);
+  color: var(--erp-text-primary);
+  background-color: var(--erp-bg-light);
+}
+
+/* Override existing variables */
+:root {
+  --primary: var(--erp-primary);
+  --primary-100: var(--erp-primary-light);
+  --primary-500: var(--erp-primary);
+  --primary-700: var(--erp-primary-dark);
+  --primary-light: var(--erp-primary-light-10);
+
+  --neutral-50: var(--erp-bg-light);
+  --neutral-100: var(--erp-bg-white);
+  --neutral-200: var(--erp-border-light);
+  --neutral-400: var(--erp-text-tertiary);
+  --neutral-600: var(--erp-text-secondary);
+  --neutral-700: var(--erp-text-primary);
+  --neutral-900: #111827;
+
+  --success: var(--erp-success);
+  --warning: var(--erp-warning);
+  --error: var(--erp-danger);
+
+  --text-primary: var(--erp-text-primary);
+  --text-secondary: var(--erp-text-secondary);
+  --text-tertiary: var(--erp-text-tertiary);
+
+  --card-bg: var(--erp-bg-white);
+  --input-bg: var(--erp-bg-white);
+  --bg-light: var(--erp-bg-light);
+  --hover-bg: var(--erp-bg-lighter);
+  --border-color: var(--erp-border-light);
+  --border-color-light: var(--erp-border-light);
+
+  --space-xs: var(--erp-space-2);
+  --space-sm: var(--erp-space-3);
+  --space-md: var(--erp-space-4);
+  --space-lg: var(--erp-space-6);
+  --space-xl: var(--erp-space-8);
+  --space-xxl: var(--erp-space-12);
+
+  --radius-sm: var(--erp-radius-sm);
+  --radius-md: var(--erp-radius-md);
+  --radius-full: var(--erp-radius-full);
+
+  --shadow-sm: var(--erp-shadow-sm);
+  --shadow-md: var(--erp-shadow-md);
+}
+
+/* ============================================
+   ERPNext Button Styles
+   ============================================ */
+
+.btn {
+  border-radius: var(--erp-radius) !important;
+  font-weight: var(--erp-font-weight-medium);
+  transition: all var(--erp-transition-base) var(--erp-ease);
+  box-shadow: var(--erp-shadow-xs);
+  letter-spacing: 0.01em;
+}
+
+/* Primary Button - ERPNext Style */
+.btn-primary {
+  background: linear-gradient(135deg, var(--erp-primary) 0%, var(--erp-primary-dark) 100%);
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(54, 123, 245, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--erp-primary-dark) 0%, var(--erp-primary-darker) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(54, 123, 245, 0.4);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(54, 123, 245, 0.3);
+}
+
+/* Secondary Button - ERPNext Style */
+.btn-secondary {
+  background: var(--erp-bg-white);
+  color: var(--erp-text-primary);
+  border: 1px solid var(--erp-border) !important;
+  box-shadow: var(--erp-shadow-xs);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--erp-bg-light);
+  border-color: var(--erp-border-dark) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--erp-shadow-sm);
+}
+
+/* Danger Button - ERPNext Style */
+.btn-danger {
+  background: linear-gradient(135deg, var(--erp-danger) 0%, #DC2626 100%);
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+}
+
+/* Success Button - ERPNext Style */
+.btn-success {
+  background: linear-gradient(135deg, var(--erp-success) 0%, #059669 100%);
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+}
+
+/* ============================================
+   ERPNext Card Styles
+   ============================================ */
+
+.card {
+  background: var(--erp-bg-white);
+  border-radius: var(--erp-radius-md) !important;
+  box-shadow: var(--erp-shadow-sm);
+  border: 1px solid var(--erp-border-light);
+}
+
+.card:hover {
+  box-shadow: var(--erp-shadow);
+  transition: box-shadow var(--erp-transition-base) var(--erp-ease);
+}
+
+/* ============================================
+   ERPNext Table Styles
+   ============================================ */
+
+.data-table thead {
+  background: var(--erp-bg-lighter);
+  border-bottom: 2px solid var(--erp-border);
+}
+
+.data-table th {
+  font-weight: var(--erp-font-weight-semibold);
+  color: var(--erp-text-primary);
+  background: var(--erp-bg-lighter);
+  text-transform: uppercase;
+  font-size: var(--erp-font-size-xs);
+  letter-spacing: 0.05em;
+  padding: var(--erp-space-4) var(--erp-space-5);
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--erp-border-light);
+}
+
+.data-table tbody tr:hover {
+  background: var(--erp-primary-light-20);
+}
+
+.data-table td {
+  padding: var(--erp-space-4) var(--erp-space-5);
+  color: var(--erp-text-primary);
+}
+
+/* ============================================
+   ERPNext Status Badges - Pill Style
+   ============================================ */
+
+.status-tag {
+  border-radius: var(--erp-radius-full) !important;
+  font-weight: var(--erp-font-weight-medium);
+  font-size: var(--erp-font-size-sm);
+  padding: var(--erp-space-2) var(--erp-space-4);
+  letter-spacing: 0.01em;
+  box-shadow: var(--erp-shadow-xs);
+}
+
+.status-draft {
+  background: var(--erp-bg-lighter);
+  color: var(--erp-text-secondary);
+  border: 1px solid var(--erp-border);
+}
+
+.status-submitted,
+.status-confirmed {
+  background: var(--erp-info-bg);
+  color: var(--erp-info-text);
+  border: 1px solid var(--erp-info-light);
+}
+
+.status-completed,
+.status-paid {
+  background: var(--erp-success-bg);
+  color: var(--erp-success-text);
+  border: 1px solid var(--erp-success-light);
+}
+
+.status-cancelled,
+.status-rejected {
+  background: var(--erp-danger-bg);
+  color: var(--erp-danger-text);
+  border: 1px solid var(--erp-danger-light);
+}
+
+.status-overdue {
+  background: var(--erp-warning-bg);
+  color: var(--erp-warning-text);
+  border: 1px solid var(--erp-warning-light);
+}
+
+/* ============================================
+   ERPNext Form Input Styles
+   ============================================ */
+
+.form-input,
+.form-select,
+.form-textarea {
+  border: 1px solid var(--erp-border) !important;
+  border-radius: var(--erp-radius) !important;
+  font-size: var(--erp-font-size-base);
+  transition: all var(--erp-transition-base) var(--erp-ease);
+  background: var(--erp-bg-white);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--erp-primary) !important;
+  box-shadow: 0 0 0 3px var(--erp-primary-light), var(--erp-shadow-sm) !important;
+}
+
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+  background: var(--erp-bg-lighter);
+  opacity: 0.6;
+}
+
+/* ============================================
+   ERPNext KPI Cards
+   ============================================ */
+
+.kpi-card {
+  background: var(--erp-bg-white);
+  border-radius: var(--erp-radius-md) !important;
+  box-shadow: var(--erp-shadow-sm);
+  border: 1px solid var(--erp-border-light);
+  transition: all var(--erp-transition-base) var(--erp-ease);
+}
+
+.kpi-card:hover {
+  box-shadow: var(--erp-shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--erp-primary-light);
+}
+
+.kpi-icon {
+  border-radius: var(--erp-radius) !important;
+}
+
+/* ============================================
+   ERPNext Sidebar Enhancements
+   ============================================ */
+
+.sidebar {
+  background: var(--erp-bg-sidebar);
+  border-right: 1px solid var(--erp-border);
+}
+
+.sidebar-nav {
+  background: linear-gradient(180deg, var(--erp-brand-light) 0%, var(--erp-bg-white) 100%);
+}
+
+.nav-item {
+  border-radius: var(--erp-radius) !important;
+  margin-bottom: 2px;
+  transition: all var(--erp-transition-fast) var(--erp-ease);
+}
+
+.nav-item:hover {
+  background: var(--erp-primary-light);
+  color: var(--erp-primary) !important;
+}
+
+.nav-item.active {
+  background: var(--erp-primary);
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(54, 123, 245, 0.3);
+}
+
+/* ============================================
+   ERPNext Loading Spinner
+   ============================================ */
+
+.spinner {
+  border: 3px solid var(--erp-primary-light);
+  border-top: 3px solid var(--erp-primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: erp-spin 1s linear infinite;
+}
+
+@keyframes erp-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+   ERPNext Quick Actions
+   ============================================ */
+
+.quick-action-btn {
+  border-radius: var(--erp-radius-md) !important;
+  background: var(--erp-bg-white);
+  border: 1px solid var(--erp-border-light) !important;
+  transition: all var(--erp-transition-base) var(--erp-ease);
+}
+
+.quick-action-btn:hover {
+  background: var(--erp-primary);
+  color: white !important;
+  border-color: var(--erp-primary) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--erp-shadow);
+}
+
+/* ============================================
+   ERPNext Typography Overrides
+   ============================================ */
+
+h1, h2, h3, h4 {
+  font-weight: var(--erp-font-weight-bold);
+  color: var(--erp-text-primary);
+}
+
+h1 { font-size: var(--erp-font-size-4xl); line-height: var(--erp-line-height-tight); }
+h2 { font-size: var(--erp-font-size-3xl); line-height: var(--erp-line-height-tight); }
+h3 { font-size: var(--erp-font-size-2xl); line-height: var(--erp-line-height-tight); }
+h4 { font-size: var(--erp-font-size-xl); line-height: var(--erp-line-height-tight); }
+
+/* ============================================
+   ERPNext Chart Cards
+   ============================================ */
+
+.chart-card {
+  background: var(--erp-bg-white);
+  border-radius: var(--erp-radius-md) !important;
+  box-shadow: var(--erp-shadow-sm);
+  border: 1px solid var(--erp-border-light);
+}
+
+/* ============================================
+   ERPNext Alert Cards
+   ============================================ */
+
+.alert-card {
+  background: var(--erp-bg-white);
+  border-radius: var(--erp-radius-md) !important;
+  box-shadow: var(--erp-shadow-sm);
+  border: 1px solid var(--erp-border-light);
+}
+
+.alert-item {
+  background: var(--erp-warning-bg);
+  border-left: 4px solid var(--erp-warning) !important;
+  border-radius: var(--erp-radius) !important;
+  transition: all var(--erp-transition-base) var(--erp-ease);
+}
+
+.alert-item:hover {
+  background: var(--erp-warning-light);
+  transform: translateX(2px);
+}
+
+.stock-low {
+  color: var(--erp-warning);
+  font-weight: var(--erp-font-weight-semibold);
+}
+
+/* ============================================
+   ERPNext Tooltip
+   ============================================ */
+
+.tooltip-popup {
+  background: var(--erp-text-primary);
+  color: white;
+  border-radius: var(--erp-radius);
+  box-shadow: var(--erp-shadow-md);
+  font-size: var(--erp-font-size-sm);
+  padding: var(--erp-space-2) var(--erp-space-3);
+}
+
+.tooltip-icon {
+  background: var(--erp-text-tertiary);
+  color: white;
+}
+
+/* ============================================
+   ERPNext Scrollbar
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--erp-bg-lighter);
+  border-radius: var(--erp-radius);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--erp-border-dark);
+  border-radius: var(--erp-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--erp-text-secondary);
+}
+
+/* ============================================
+   ERPNext Responsive Enhancements
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .kpi-card,
+  .chart-card,
+  .alert-card {
+    border-radius: var(--erp-radius-md) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .btn {
+    border-radius: var(--erp-radius) !important;
+  }
+
+  .kpi-card {
+    padding: var(--erp-space-4);
+  }
+
+  .kpi-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================================
+   ERPNext Theme Applied Successfully
+   ============================================ */

@@ -1,0 +1,110 @@
+.customer-statements-report {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.customer-statements-report .page-header {
+  margin-bottom: 20px;
+}
+
+.customer-statements-report .report-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.customer-statements-report .filter-toggle {
+  margin-right: 10px;
+}
+
+.customer-statements-report .export-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.customer-statements-report .export-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.customer-statements-report .report-filters {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.customer-statements-report .filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: end;
+}
+
+.customer-statements-report .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 150px;
+}
+
+.customer-statements-report .filter-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.customer-statements-report .filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.customer-statements-report .apply-filters-btn {
+  margin-left: 10px;
+  margin-bottom: 5px;
+}
+
+.customer-statements-report .report-content {
+  flex: 1;
+  min-height: 400px;
+}
+
+.customer-statements-report .ag-theme-quartz {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.customer-statements-report .no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  text-align: center;
+  color: var(--text-secondary);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 40px;
+}
+
+.customer-statements-report .no-data h3 {
+  margin: 15px 0 5px 0;
+  color: var(--text-primary);
+}
+
+.customer-statements-report .no-data p {
+  margin: 0;
+  color: var(--text-secondary);
+}

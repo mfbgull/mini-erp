@@ -1,0 +1,37 @@
+# Source code files not needed in build
+.git
+.gitignore
+.github
+BUILD_INSTRUCTIONS.md
+electron.gitignore
+
+# Build artifacts
+dist
+out
+build/resources
+
+# Documentation
+*.md
+!BUILD_INSTRUCTIONS.md
+
+# Dev dependencies
+client/node_modules
+server/node_modules
+
+# Test files
+test
+*.test.js
+*.spec.js
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo

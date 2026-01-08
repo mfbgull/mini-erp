@@ -1,0 +1,223 @@
+.search-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.search-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  background: var(--card-bg);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color);
+}
+
+.search-modal-header {
+  padding: 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-modal-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.search-modal-icon {
+  position: absolute;
+  left: 35px;
+  color: var(--text-secondary);
+  z-index: 1;
+}
+
+.search-modal-input {
+  width: 100%;
+  padding: 12px 20px 12px 55px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 16px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-modal-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-modal-close-btn {
+  position: absolute;
+  right: 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-modal-close-btn:hover {
+  background: var(--bg-light);
+  color: var(--text-primary);
+}
+
+.search-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.search-modal-no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.search-modal-no-results-icon {
+  margin-bottom: 15px;
+  color: var(--text-tertiary);
+}
+
+.search-modal-no-results h3 {
+  margin: 0 0 5px 0;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.search-modal-no-results p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.search-modal-category {
+  margin-bottom: 10px;
+}
+
+.search-modal-category-title {
+  padding: 12px 20px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  background: var(--bg-light);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-modal-category-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.search-modal-item {
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-modal-item:last-child {
+  border-bottom: none;
+}
+
+.search-modal-item:hover {
+  background: var(--primary);
+}
+
+.search-modal-item:hover .search-modal-item-name {
+  color: #FFFFFF;
+}
+
+.search-modal-item:hover .search-modal-item-path {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.search-modal-item-content {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-modal-item-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.search-modal-item-path {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-family: 'Courier New', monospace;
+  padding: 2px 8px;
+  background: var(--bg-light);
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.search-modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-light);
+}
+
+.search-modal-shortcuts {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.search-modal-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  background: var(--card-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-modal-overlay {
+    padding: 10px;
+  }
+  
+  .search-modal {
+    max-height: 90vh;
+  }
+  
+  .search-modal-shortcuts {
+    justify-content: center;
+  }
+}
