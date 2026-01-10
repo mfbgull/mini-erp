@@ -2,17 +2,17 @@ import { forwardRef } from 'react';
 import './InvoiceTemplate.css';
 
 interface InvoiceItem {
-  quantity: number;
-  unit_price?: number;
-  rate?: number;
-  tax_rate?: number;
-  tax?: number;
-  discount_type?: string;
-  discount?: { type?: string; value?: number };
-  discount_value?: number;
-  item_name?: string;
-  description?: string;
-  item_code?: string;
+  quantity?: number | null;
+  unit_price?: number | null;
+  rate?: number | null;
+  tax_rate?: number | null;
+  tax?: number | null;
+  discount_type?: string | null;
+  discount?: { type?: string | null; value?: number | null } | null;
+  discount_value?: number | null;
+  item_name?: string | null;
+  description?: string | null;
+  item_code?: string | null;
 }
 
 interface Invoice {
@@ -20,33 +20,46 @@ interface Invoice {
   status: string;
   invoice_date: string;
   due_date: string;
-  payment_terms_days?: number;
+  payment_terms_days?: number | null;
   customer_name: string;
-  customer_address?: string;
-  customer_phone?: string;
-  customer_email?: string;
-  items?: InvoiceItem[];
-  notes?: string;
-  terms?: string;
+  customer_address?: string | null;
+  customer_phone?: string | null;
+  customer_email?: string | null;
+  items?: InvoiceItem[] | null;
+  notes?: string | null;
+  terms?: string | null;
   total_amount: number;
-  paid_amount?: number;
-  balance_amount?: number;
-  discount_type?: string;
-  discount_value?: number;
+  paid_amount?: number | null;
+  balance_amount?: number | null;
+  discount_type?: string | null;
+  discount_value?: number | null;
 }
 
 interface Company {
-  name?: string;
-  address?: string;
-  phone?: string;
-  email?: string;
-  taxId?: string;
+  name?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  taxId?: string | null;
 }
 
 interface InvoiceTemplateProps {
   invoice: Invoice;
   company?: Company;
 }
+
+// Helper function to safely convert any value to string for number parsing
+const safeToString = (value: any): string => {
+  if (value === null || value === undefined) return '0';
+  return String(value);
+};
+
+// Helper function to safely parse float
+const safeParseFloat = (value: any): number => {
+  const str = safeToString(value);
+  const result = parseFloat(str);
+  return isNaN(result) ? 0 : result;
+};
 
 const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invoice, company }, ref) => {
   const formatDate = (dateString: string) => {
@@ -67,11 +80,12 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
   };
 
   const calculateItemTotal = (item: InvoiceItem) => {
-    const quantity = parseFloat(item.quantity.toString()) || 0;
-    const rate = parseFloat((item.unit_price || item.rate).toString()) || 0;
-    const taxRate = parseFloat((item.tax_rate || item.tax).toString()) || 0;
-    const discountType = item.discount_type || item.discount?.type || 'flat';
-    const discountValue = parseFloat((item.discount_value || item.discount?.value).toString()) || 0;
+    if (!item) return 0;
+    const quantity = safeParseFloat(item.quantity);
+    const rate = safeParseFloat(item.unit_price ?? item.rate);
+    const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
+    const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
+    const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
 
     let subtotal = quantity * rate;
 
@@ -88,8 +102,9 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
   const getSubtotal = () => {
     return (invoice.items || []).reduce((sum, item) => {
-      const quantity = parseFloat(item.quantity.toString()) || 0;
-      const rate = parseFloat((item.unit_price || item.rate).toString()) || 0;
+      if (!item) return sum;
+      const quantity = safeParseFloat(item.quantity);
+      const rate = safeParseFloat(item.unit_price ?? item.rate);
       return sum + (quantity * rate);
     }, 0);
   };
@@ -98,10 +113,11 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
     let discount = 0;
 
     (invoice.items || []).forEach(item => {
-      const quantity = parseFloat(item.quantity.toString()) || 0;
-      const rate = parseFloat((item.unit_price || item.rate).toString()) || 0;
-      const discountType = item.discount_type || item.discount?.type || 'flat';
-      const discountValue = parseFloat((item.discount_value || item.discount?.value).toString()) || 0;
+      if (!item) return;
+      const quantity = safeParseFloat(item.quantity);
+      const rate = safeParseFloat(item.unit_price ?? item.rate);
+      const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
+      const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
       const subtotal = quantity * rate;
 
       if (discountType === 'percentage') {
@@ -125,11 +141,12 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
   const getTotalTax = () => {
     return (invoice.items || []).reduce((sum, item) => {
-      const quantity = parseFloat(item.quantity.toString()) || 0;
-      const rate = parseFloat((item.unit_price || item.rate).toString()) || 0;
-      const taxRate = parseFloat((item.tax_rate || item.tax).toString()) || 0;
-      const discountType = item.discount_type || item.discount?.type || 'flat';
-      const discountValue = parseFloat((item.discount_value || item.discount?.value).toString()) || 0;
+      if (!item) return sum;
+      const quantity = safeParseFloat(item.quantity);
+      const rate = safeParseFloat(item.unit_price ?? item.rate);
+      const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
+      const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
+      const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
 
       let subtotal = quantity * rate;
       if (discountType === 'percentage') {
@@ -216,11 +233,12 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
           </thead>
           <tbody>
             {(invoice.items || []).map((item, index) => {
-              const quantity = parseFloat(item.quantity.toString()) || 0;
-              const rate = parseFloat((item.unit_price || item.rate).toString()) || 0;
-              const discountType = item.discount_type || item.discount?.type || 'flat';
-              const discountValue = parseFloat((item.discount_value || item.discount?.value).toString()) || 0;
-              const taxRate = parseFloat((item.tax_rate || item.tax).toString()) || 0;
+              if (!item) return null;
+              const quantity = safeParseFloat(item.quantity);
+              const rate = safeParseFloat(item.unit_price ?? item.rate);
+              const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
+              const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
+              const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
 
               return (
                 <tr key={index}>

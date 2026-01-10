@@ -11,6 +11,9 @@ import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
+import CompactCustomerCardView from '../../components/common/CompactCustomerCard';
+import CustomerPreview from './CustomerPreview';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import './CustomersPage.css';
 
 // Register AG Grid modules
@@ -23,7 +26,8 @@ export default function CustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
-  
+  const { isMobile } = useMobileDetection();
+
   const queryClient = useQueryClient();
 
   // Fetch customers
@@ -310,6 +314,16 @@ export default function CustomersPage() {
         <div className="loading">
           <div className="spinner"></div>
         </div>
+      ) : isMobile ? (
+        <CompactCustomerCardView
+          customers={customers}
+          onView={(customer) => setSelectedCustomer(customer)}
+          onEdit={handleEdit}
+          onAddPayment={(customer) => {
+            setSelectedCustomer(customer);
+            setIsModalOpen(true);
+          }}
+        />
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
@@ -350,6 +364,22 @@ export default function CustomersPage() {
           }}
         />
       </Modal>
+
+      {/* Mobile Preview Modal */}
+      {selectedCustomer && isMobile && (
+        <CustomerPreview
+          customer={selectedCustomer}
+          onClose={() => setSelectedCustomer(null)}
+          onView={() => navigate(`/customers/${selectedCustomer.id}`)}
+          onEdit={() => {
+            setIsModalOpen(true);
+          }}
+          onAddPayment={() => {
+            // Navigate to payment page or open payment modal
+            toast.info('Payment feature coming soon');
+          }}
+        />
+      )}
     </div>
   );
 }

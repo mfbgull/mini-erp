@@ -5,17 +5,23 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { AgGridReact } from 'ag-grid-react';
+import { Plus } from 'lucide-react';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
+import CompactPurchaseCardView from '../../components/common/CompactPurchaseCard';
+import PurchasePreview from './PurchasePreview';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import './PurchasesPage.css';
 
 export default function PurchasesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewPurchase, setPreviewPurchase] = useState(null);
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
   const navigate = useNavigate();
+  const { isMobile } = useMobileDetection();
 
   const { data: purchases = [], isLoading } = useQuery({
     queryKey: ['purchases'],
@@ -303,6 +309,17 @@ export default function PurchasesPage() {
         <div className="loading">
           <div className="spinner"></div>
         </div>
+      ) : isMobile ? (
+        <CompactPurchaseCardView
+          purchases={purchases}
+          onView={(purchase) => setPreviewPurchase(purchase)}
+          onEdit={(purchase) => {
+            // For now, navigate to a hypothetical edit page or open modal
+            // Could implement inline edit or navigate to edit page
+            toast.info('Edit functionality coming soon');
+          }}
+          onNew={handleNew}
+        />
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
@@ -318,6 +335,17 @@ export default function PurchasesPage() {
             paginationPageSizeSelector={[10, 20, 50, 100]}
           />
         </div>
+      )}
+
+      {/* Mobile Preview Modal */}
+      {previewPurchase && (
+        <PurchasePreview
+          purchase={previewPurchase}
+          onClose={() => setPreviewPurchase(null)}
+          onEdit={() => {
+            toast.info('Edit functionality coming soon');
+          }}
+        />
       )}
 
       <Modal
