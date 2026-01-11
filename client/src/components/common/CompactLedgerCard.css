@@ -1,0 +1,373 @@
+/* Compact Ledger Card Styles */
+.compact-ledger-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.compact-ledger-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.ledger-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 0.5rem;
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
+.ledger-date .date-day {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.ledger-date .date-month {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-top: 0.125rem;
+}
+
+.ledger-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.ledger-type {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.ledger-type .type-icon {
+  font-size: 1rem;
+}
+
+.ledger-ref {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.ledger-amounts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+}
+
+.ledger-amounts .amount-debit {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #dc2626;
+  margin: 0;
+}
+
+.ledger-amounts .amount-credit {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #16a34a;
+  margin: 0;
+}
+
+.ledger-amounts .amount-balance {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Details Modal */
+.compact-ledger-card .details-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.compact-ledger-card .details-modal {
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  background: white;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.compact-ledger-card .details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.compact-ledger-card .details-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.compact-ledger-card .details-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.compact-ledger-card .close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s;
+}
+
+.compact-ledger-card .close-button:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.compact-ledger-card .close-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.compact-ledger-card .details-content {
+  padding: 1.25rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.compact-ledger-card .detail-section {
+  margin-bottom: 1.25rem;
+}
+
+.compact-ledger-card .detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.compact-ledger-card .section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.75rem 0;
+}
+
+.compact-ledger-card .type-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.compact-ledger-card .type-icon-large {
+  font-size: 1.25rem;
+}
+
+.compact-ledger-card .type-banner.type-invoice {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.compact-ledger-card .type-banner.type-payment {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.compact-ledger-card .type-banner.type-adjustment {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.compact-ledger-card .type-banner.type-opening {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.compact-ledger-card .type-banner.type-credit {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.compact-ledger-card .type-banner.type-debit {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.compact-ledger-card .type-banner.type-default {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.compact-ledger-card .detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.compact-ledger-card .detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.compact-ledger-card .detail-label {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.compact-ledger-card .detail-value {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.compact-ledger-card .detail-value.debit {
+  color: #dc2626;
+}
+
+.compact-ledger-card .detail-value.credit {
+  color: #16a34a;
+}
+
+.compact-ledger-card .description-text {
+  font-size: 0.8125rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.compact-ledger-card .details-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.compact-ledger-card .action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.compact-ledger-card .action-btn.view-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.compact-ledger-card .action-btn.view-btn:hover {
+  background: #2563eb;
+}
+
+.compact-ledger-card .btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Empty state */
+.compact-ledger-card .mobile-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+.compact-ledger-card .empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.compact-ledger-card .empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.375rem;
+}
+
+.compact-ledger-card .empty-subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  max-width: 280px;
+}
+
+@media (min-width: 640px) {
+  .compact-ledger-card .details-modal-overlay {
+    align-items: center;
+  }
+
+  .compact-ledger-card .details-modal {
+    border-radius: 16px;
+    max-width: 480px;
+  }
+}

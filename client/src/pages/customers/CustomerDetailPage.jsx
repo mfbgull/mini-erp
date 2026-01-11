@@ -32,6 +32,10 @@ import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import PaymentModal from '../../components/customers/PaymentModal';
+import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
+import CompactPaymentCardView from '../../components/common/CompactPaymentCard';
+import CompactLedgerCardView from '../../components/common/CompactLedgerCard';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import './CustomerDetailPage.css';
 
 // Register AG Grid modules
@@ -42,6 +46,7 @@ export default function CustomerDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
+  const { isMobile } = useMobileDetection();
   const [activeTab, setActiveTab] = useState('overview');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -294,29 +299,64 @@ export default function CustomerDetailPage() {
           )}
 
           {activeTab === 'invoices' && (
-            <InvoicesTab
-              invoices={invoices}
-              loading={invoicesLoading}
-              onViewInvoice={(invoiceId) => navigate(`/sales/invoice/${invoiceId}`)}
-              onDeleteInvoice={handleDeleteInvoice}
-            />
+            isMobile ? (
+              <div className="invoices-tab-mobile">
+                <CompactInvoiceCardView
+                  invoices={invoices}
+                  onView={(invoice) => navigate(`/sales/invoice/${invoice.id}`)}
+                  onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}`)}
+                  onDelete={handleDeleteInvoice}
+                />
+              </div>
+            ) : (
+              <InvoicesTab
+                invoices={invoices}
+                loading={invoicesLoading}
+                onViewInvoice={(invoiceId) => navigate(`/sales/invoice/${invoiceId}`)}
+                onDeleteInvoice={handleDeleteInvoice}
+              />
+            )
           )}
 
           {activeTab === 'ledger' && (
-            <LedgerTab
-              ledger={ledger}
-              loading={ledgerLoading}
-              customerName={customer?.customer_name}
-            />
+            isMobile ? (
+              <div className="ledger-tab-mobile">
+                <CompactLedgerCardView
+                  ledger={ledger}
+                  formatCurrency={formatCurrency}
+                  onView={(entry) => {
+                    if (entry.reference_no) {
+                      navigate(`/sales/invoice/${entry.reference_no}`);
+                    }
+                  }}
+                />
+              </div>
+            ) : (
+              <LedgerTab
+                ledger={ledger}
+                loading={ledgerLoading}
+                customerName={customer?.customer_name}
+              />
+            )
           )}
 
           {activeTab === 'payments' && (
-            <PaymentsTab
-              payments={payments}
-              loading={paymentsLoading}
-              onEditPayment={handleEditPayment}
-              onDeletePayment={handleDeletePayment}
-            />
+            isMobile ? (
+              <div className="payments-tab-mobile">
+                <CompactPaymentCardView
+                  payments={payments}
+                  onEdit={handleEditPayment}
+                  onDelete={handleDeletePayment}
+                />
+              </div>
+            ) : (
+              <PaymentsTab
+                payments={payments}
+                loading={paymentsLoading}
+                onEditPayment={handleEditPayment}
+                onDeletePayment={handleDeletePayment}
+              />
+            )
           )}
         </div>
 
@@ -805,12 +845,6 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice }) {
             paginationPageSize={15}
             paginationPageSizeSelector={[10, 15, 25, 50]}
             rowSelection={{ mode: 'singleRow' }}
-            onGridReady={(params) => {
-              params.api.sizeColumnsToFit({
-                defaultMinWidth: 100,
-                columnLimits: []
-              });
-            }}
           />
         </div>
       )}
@@ -1182,12 +1216,6 @@ function LedgerTab({ ledger, loading, customerName }) {
               paginationPageSize={10}
               paginationPageSizeSelector={[10, 15, 25, 50]}
               rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                params.api.sizeColumnsToFit({
-                  defaultMinWidth: 100,
-                  columnLimits: []
-                });
-              }}
             />
           </div>
 
@@ -1305,12 +1333,6 @@ function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }) {
             paginationPageSize={15}
             paginationPageSizeSelector={[10, 15, 25, 50]}
             rowSelection={{ mode: 'singleRow' }}
-            onGridReady={(params) => {
-              params.api.sizeColumnsToFit({
-                defaultMinWidth: 100,
-                columnLimits: []
-              });
-            }}
           />
         </div>
       )}

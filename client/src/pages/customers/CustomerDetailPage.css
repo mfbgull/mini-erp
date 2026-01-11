@@ -231,7 +231,7 @@
 
 .financial-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
 
@@ -308,7 +308,7 @@
 
 .invoice-status-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
 
@@ -662,6 +662,20 @@
 .invoices-tab, .ledger-tab, .payments-tab {
   padding: var(--space-md);
   min-height: 500px;
+}
+
+.invoices-tab-mobile,
+.ledger-tab-mobile,
+.payments-tab-mobile {
+  padding: 0;
+}
+
+.invoices-tab-mobile .compact-mobile-cards-wrapper,
+.ledger-tab-mobile .compact-mobile-cards-wrapper,
+.payments-tab-mobile .compact-mobile-cards-wrapper {
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .ag-theme-quartz {
@@ -1060,5 +1074,99 @@
 
   .total-item:last-child {
     border-bottom: none;
+  }
+}
+/* Quick Access Section */
+.overview-quick-access {
+  margin-bottom: 1.5rem;
+}
+
+.quick-access-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.quick-access-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.quick-access-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #3b82f6;
+}
+
+.quick-access-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #0284c7;
+}
+
+.quick-access-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.quick-access-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.quick-access-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* Responsive for Quick Access */
+@media (max-width: 1024px) {
+  .quick-access-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .quick-access-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .quick-access-card {
+    padding: 1rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .quick-access-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .quick-access-value {
+    font-size: 1.25rem;
+  }
+
+  .quick-access-label {
+    font-size: 0.75rem;
   }
 }
