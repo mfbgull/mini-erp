@@ -37,31 +37,6 @@ export default function InventoryMovementReport() {
   const { formatCurrency } = useSettings();
   const gridRef = useRef(null);
 
-  // Safely size columns when grid is visible
-  useEffect(() => {
-    const gridElement = gridRef.current?.querySelector('.ag-theme-quartz');
-    if (!gridElement) return;
-
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentRect.width > 0) {
-          const gridApi = gridRef.current?.api;
-          if (gridApi) {
-            gridApi.sizeColumnsToFit({
-              defaultMinWidth: 100,
-              columnLimits: []
-            });
-          }
-          observer.disconnect();
-          break;
-        }
-      }
-    });
-
-    observer.observe(gridElement);
-    return () => observer.disconnect();
-  }, [reportData]);
-
   // Fetch items for filter
   const { data: items = [], isLoading: itemsLoading } = useQuery({
     queryKey: ['items'],
@@ -96,6 +71,31 @@ export default function InventoryMovementReport() {
       return response.data.data;
     }
   });
+
+  // Safely size columns when grid is visible
+  useEffect(() => {
+    const gridElement = gridRef.current?.querySelector('.ag-theme-quartz');
+    if (!gridElement) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          const gridApi = gridRef.current?.api;
+          if (gridApi) {
+            gridApi.sizeColumnsToFit({
+              defaultMinWidth: 100,
+              columnLimits: []
+            });
+          }
+          observer.disconnect();
+          break;
+        }
+      }
+    });
+
+    observer.observe(gridElement);
+    return () => observer.disconnect();
+  }, [reportData?.movements]);
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();

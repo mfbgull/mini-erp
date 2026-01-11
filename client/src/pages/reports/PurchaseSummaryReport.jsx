@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -33,6 +33,7 @@ export default function PurchaseSummaryReport() {
   const [itemId, setItemId] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const { formatCurrency } = useSettings();
+  const gridRef = useRef(null);
 
   // Fetch suppliers for filter
   const { data: suppliers = [] } = useQuery({
@@ -67,6 +68,31 @@ export default function PurchaseSummaryReport() {
       return response.data.data;
     }
   });
+
+  // Safely size columns when grid is visible
+  useEffect(() => {
+    const gridElement = gridRef.current?.querySelector('.ag-theme-quartz');
+    if (!gridElement) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          const gridApi = gridRef.current?.api;
+          if (gridApi) {
+            gridApi.sizeColumnsToFit({
+              defaultMinWidth: 100,
+              columnLimits: []
+            });
+          }
+          observer.disconnect();
+          break;
+        }
+      }
+    });
+
+    observer.observe(gridElement);
+    return () => observer.disconnect();
+  }, [reportData?.purchases]);
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();
@@ -347,7 +373,7 @@ export default function PurchaseSummaryReport() {
         </div>
       )}
 
-      <div className="report-content">
+      <div className="report-content" ref={gridRef}>
         {isLoading ? (
           <div className="loading">
             <div className="spinner"></div>
@@ -366,12 +392,6 @@ export default function PurchaseSummaryReport() {
               paginationPageSize={20}
               paginationPageSizeSelector={[10, 20, 50, 100]}
               rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                params.api.sizeColumnsToFit({
-                  defaultMinWidth: 100,
-                  columnLimits: []
-                });
-              }}
             />
           </div>
         ) : (

@@ -31,31 +31,6 @@ export default function StockValuationReport() {
   const { formatCurrency } = useSettings();
   const gridRef = useRef(null);
 
-  // Safely size columns when grid is visible
-  useEffect(() => {
-    const gridElement = gridRef.current?.querySelector('.ag-theme-quartz');
-    if (!gridElement) return;
-
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentRect.width > 0) {
-          const gridApi = gridRef.current?.api;
-          if (gridApi) {
-            gridApi.sizeColumnsToFit({
-              defaultMinWidth: 100,
-              columnLimits: []
-            });
-          }
-          observer.disconnect();
-          break;
-        }
-      }
-    });
-
-    observer.observe(gridElement);
-    return () => observer.disconnect();
-  }, [reportData?.stockValuation]);
-
   // Fetch warehouses for filter
   const { data: warehouses = [] } = useQuery({
     queryKey: ['warehouses'],
@@ -91,6 +66,31 @@ export default function StockValuationReport() {
       return response.data.data;
     }
   });
+
+  // Safely size columns when grid is visible
+  useEffect(() => {
+    const gridElement = gridRef.current?.querySelector('.ag-theme-quartz');
+    if (!gridElement) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect.width > 0) {
+          const gridApi = gridRef.current?.api;
+          if (gridApi) {
+            gridApi.sizeColumnsToFit({
+              defaultMinWidth: 100,
+              columnLimits: []
+            });
+          }
+          observer.disconnect();
+          break;
+        }
+      }
+    });
+
+    observer.observe(gridElement);
+    return () => observer.disconnect();
+  }, [reportData?.stockValuation]);
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();

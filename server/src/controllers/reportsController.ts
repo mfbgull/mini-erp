@@ -1020,7 +1020,7 @@ function getPurchaseSummary(req: Request, res: Response): void {
         COALESCE(SUM((poi.quantity - poi.received_quantity) * poi.unit_price), 0) as balance_amount
       FROM purchase_orders po
       JOIN suppliers s ON po.supplier_id = s.id
-      LEFT JOIN purchase_order_items poi ON po.id = poi.purchase_order_id
+      LEFT JOIN purchase_order_items poi ON po.id = poi.po_id
     `;
 
     const params: (string | number)[] = [];
@@ -1057,7 +1057,7 @@ function getPurchaseSummary(req: Request, res: Response): void {
         COALESCE(SUM(poi.quantity * poi.unit_price), 0) as total_amount,
         COALESCE(SUM(poi.quantity), 0) as total_items
       FROM purchase_orders po
-      LEFT JOIN purchase_order_items poi ON po.id = poi.purchase_order_id
+      LEFT JOIN purchase_order_items poi ON po.id = poi.po_id
     ` + whereClause;
 
     const summary = db.prepare(summaryQuery).get(...params) as any;
