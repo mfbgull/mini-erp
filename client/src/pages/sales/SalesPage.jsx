@@ -1,17 +1,24 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { AgGridReact } from 'ag-grid-react';
-import { FileText, ShoppingCart, Plus, Eye, Edit2 } from 'lucide-react';
+import { FileText, ShoppingCart, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
+import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
+import InvoicePreview from './InvoicePreview';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import './SalesPage.css';
 
 export default function SalesPage() {
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
   const navigate = useNavigate();
+  const { isMobile } = useMobileDetection();
+  const [previewInvoice, setPreviewInvoice] = useState(null);
 
   // Fetch invoices
   const { data: invoices = [], isLoading: invoicesLoading } = useQuery({
@@ -28,6 +35,26 @@ export default function SalesPage() {
     total: invoices.reduce((sum, inv) => sum + parseFloat(inv.total_amount || 0), 0),
     paid: invoices.reduce((sum, inv) => sum + parseFloat(inv.paid_amount || 0), 0),
     outstanding: invoices.reduce((sum, inv) => sum + parseFloat(inv.balance_amount || 0), 0)
+  };
+
+  // Delete invoice mutation
+  const deleteInvoiceMutation = useMutation({
+    mutationFn: async (invoiceId) => {
+      return api.delete(`/invoices/${invoiceId}`);
+    },
+    onSuccess: () => {
+      toast.success('Invoice deleted successfully');
+      queryClient.invalidateQueries(['invoices']);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to delete invoice');
+    }
+  });
+
+  const handleDeleteInvoice = (invoice) => {
+    if (window.confirm(`Are you sure you want to delete invoice "${invoice.invoice_no}"?`)) {
+      deleteInvoiceMutation.mutate(invoice.id);
+    }
   };
 
   // Invoice column definitions
@@ -191,6 +218,12 @@ export default function SalesPage() {
           <div className="loading">
             <div className="spinner"></div>
           </div>
+        ) : isMobile ? (
+          <CompactInvoiceCardView
+            invoices={invoices}
+            onView={(invoice) => setPreviewInvoice(invoice)}
+            onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}`)}
+          />
         ) : (
           <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>
             <AgGridReact
@@ -210,6 +243,16 @@ export default function SalesPage() {
           </div>
         )}
       </div>
+
+      {/* Mobile Preview Modal */}
+      {previewInvoice && (
+        <InvoicePreview
+          invoice={previewInvoice}
+          onClose={() => setPreviewInvoice(null)}
+          onEdit={() => navigate(`/sales/invoice/${previewInvoice.id}`)}
+          onDelete={() => handleDeleteInvoice(previewInvoice)}
+        />
+      )}
     </div>
   );
 }

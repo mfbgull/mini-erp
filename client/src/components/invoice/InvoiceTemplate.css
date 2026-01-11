@@ -406,12 +406,33 @@
 /* Responsive */
 @media (max-width: 768px) {
   .invoice-template {
-    padding: 20px;
+    padding: 16px;
+    font-size: 14px;
   }
 
   .invoice-template-header {
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+
+  .invoice-template-brand {
+    gap: 12px;
+  }
+
+  .invoice-template-logo .logo-placeholder {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
+
+  .invoice-template-company .company-name {
+    font-size: 1.25rem;
+  }
+
+  .invoice-template-title {
+    font-size: 2rem;
   }
 
   .invoice-template-title-section {
@@ -420,16 +441,34 @@
 
   .invoice-template-info {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .invoice-template-bill-to,
+  .invoice-template-details {
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
   }
 
   .invoice-template-summary {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
+    margin-bottom: 20px;
   }
 
   .summary-notes {
     padding-right: 0;
+  }
+
+  .summary-totals {
+    padding: 16px;
+  }
+
+  .summary-row.balance {
+    margin: 10px -16px -16px -16px;
+    padding: 12px 16px;
   }
 
   .invoice-template-table {
@@ -448,6 +487,15 @@
 
   .invoice-template-footer {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
+    padding-top: 20px;
+  }
+
+  .footer-message p {
+    font-size: 1rem;
+  }
+
+  .footer-payment-info {
+    padding: 16px;
   }
 }

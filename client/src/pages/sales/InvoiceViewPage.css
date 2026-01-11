@@ -131,10 +131,20 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .invoice-view-page {
+    min-height: 100vh;
+    background: #f8fafc;
+  }
+
   .invoice-view-toolbar {
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 60px;
+    z-index: 99;
   }
 
   .toolbar-left,
@@ -142,19 +152,52 @@
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
+    gap: 8px;
   }
 
   .toolbar-title {
     order: -1;
     width: 100%;
     text-align: center;
+    font-size: 16px;
   }
 
-  .invoice-view-container {
-    padding: 16px;
+  .toolbar-left button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .toolbar-right {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .toolbar-right button {
+    flex: 1;
+    min-width: 70px;
+    max-width: 90px;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .toolbar-right button .btn-icon {
+    margin-right: 4px;
   }
 
   .toolbar-right button span {
-    display: none;
+    display: inline !important;
+    font-size: 12px;
+  }
+
+  .invoice-view-container {
+    padding: 12px;
+  }
+
+  .invoice-preview-wrapper {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    overflow: hidden;
   }
 }
