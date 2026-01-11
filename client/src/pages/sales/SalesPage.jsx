@@ -223,6 +223,7 @@ export default function SalesPage() {
             invoices={invoices}
             onView={(invoice) => setPreviewInvoice(invoice)}
             onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}`)}
+            onDelete={handleDeleteInvoice}
           />
         ) : (
           <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>

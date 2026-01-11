@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreVertical, Eye, Edit2, X } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, Trash2, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../utils/formatters';
 import './CompactInvoiceCard.css';
@@ -20,9 +20,10 @@ interface CompactInvoiceCardProps {
   invoice: Invoice;
   onView: (invoice: Invoice) => void;
   onEdit: (invoice: Invoice) => void;
+  onDelete?: (invoice: Invoice) => void;
 }
 
-export function CompactInvoiceCard({ invoice, onView, onEdit }: CompactInvoiceCardProps) {
+export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete }: CompactInvoiceCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -68,6 +69,13 @@ export function CompactInvoiceCard({ invoice, onView, onEdit }: CompactInvoiceCa
   const handleEdit = () => {
     setShowMenu(false);
     onEdit(invoice);
+  };
+
+  const handleDelete = () => {
+    setShowMenu(false);
+    if (onDelete) {
+      onDelete(invoice);
+    }
   };
 
   const handleBackdropClick = () => {
@@ -119,6 +127,12 @@ export function CompactInvoiceCard({ invoice, onView, onEdit }: CompactInvoiceCa
                   <Edit2 className="dropdown-icon" />
                   Edit
                 </button>
+                {onDelete && (
+                  <button type="button" className="dropdown-item delete" onClick={handleDelete}>
+                    <Trash2 className="dropdown-icon" />
+                    Delete
+                  </button>
+                )}
               </div>
             </>
           )}
@@ -218,7 +232,12 @@ export function CompactInvoiceCard({ invoice, onView, onEdit }: CompactInvoiceCa
   );
 }
 
-export default function CompactInvoiceCardView({ invoices, onView, onEdit }: { invoices: Invoice[], onView: (invoice: Invoice) => void, onEdit: (invoice: Invoice) => void }) {
+export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDelete }: { 
+  invoices: Invoice[], 
+  onView: (invoice: Invoice) => void, 
+  onEdit: (invoice: Invoice) => void,
+  onDelete?: (invoice: Invoice) => void 
+}) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredInvoices = invoices.filter(invoice =>
@@ -272,6 +291,7 @@ export default function CompactInvoiceCardView({ invoices, onView, onEdit }: { i
             invoice={invoice}
             onView={onView}
             onEdit={onEdit}
+            onDelete={onDelete}
           />
         ))}
       </div>
