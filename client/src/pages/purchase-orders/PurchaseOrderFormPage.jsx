@@ -171,175 +171,197 @@ export default function PurchaseOrderFormPage({ mode }) {
       <form onSubmit={handleSubmit} className="po-form">
         {/* Header Section */}
         <div className="form-section">
-          <h3>Purchase Order Details</h3>
-
-          <div className="form-row">
-            <FormInput
-              label="PO Number"
-              name="po_no"
-              type="text"
-              value={isEditMode ? 'Auto-generated' : 'Auto-generated'}
-              disabled
-              className="po-number"
-            />
-
-            <FormInput
-              label="Status *"
-              name="status"
-              type="select"
-              value={formData.status}
-              onChange={handleHeaderChange}
-              options={[
-                { value: 'Draft', label: 'Draft' },
-                { value: 'Submitted', label: 'Submitted' }
-              ]}
-              disabled={isEditMode}
-            />
+          <div className="form-section-header">
+            <h3>Purchase Order Details</h3>
           </div>
-
-          <div className="form-row">
-            <FormInput
-              label="Supplier *"
-              name="supplier_id"
-              type="searchable-select"
-              value={formData.supplier_id}
-              onChange={handleHeaderChange}
-              options={suppliers.map(s => ({ value: s.id, label: s.supplier_name }))}
-              placeholder="Search suppliers..."
-              required
-            />
-
-            <FormInput
-              label="PO Date *"
-              name="po_date"
-              type="date"
-              value={formData.po_date}
-              onChange={handleHeaderChange}
-              required
-            />
+          <div className="form-section-content">
+            <div className="po-details-grid">
+              <div className="po-detail-card">
+                <label>PO Number</label>
+                <FormInput
+                  name="po_no"
+                  type="text"
+                  value={isEditMode ? 'Auto-generated' : 'Auto-generated'}
+                  disabled
+                />
+              </div>
+              
+              <div className="po-detail-card">
+                <label>Status *</label>
+                <FormInput
+                  name="status"
+                  type="select"
+                  value={formData.status}
+                  onChange={handleHeaderChange}
+                  options={[
+                    { value: 'Draft', label: 'Draft' },
+                    { value: 'Submitted', label: 'Submitted' }
+                  ]}
+                  disabled={isEditMode}
+                />
+              </div>
+              
+              <div className="po-detail-card">
+                <label>Supplier *</label>
+                <FormInput
+                  name="supplier_id"
+                  type="searchable-select"
+                  value={formData.supplier_id}
+                  onChange={handleHeaderChange}
+                  options={suppliers.map(s => ({ value: s.id, label: s.supplier_name }))}
+                  placeholder="Search suppliers..."
+                  required
+                />
+              </div>
+              
+              <div className="po-detail-card">
+                <label>PO Date *</label>
+                <FormInput
+                  name="po_date"
+                  type="date"
+                  value={formData.po_date}
+                  onChange={handleHeaderChange}
+                  required
+                />
+              </div>
+              
+              <div className="po-detail-card">
+                <label>Expected Delivery</label>
+                <FormInput
+                  name="expected_delivery_date"
+                  type="date"
+                  value={formData.expected_delivery_date}
+                  onChange={handleHeaderChange}
+                />
+              </div>
+              
+              <div className="po-detail-card">
+                <label>Warehouse (for receipt)</label>
+                <FormInput
+                  name="warehouse_id"
+                  type="searchable-select"
+                  value={formData.warehouse_id}
+                  onChange={handleHeaderChange}
+                  options={warehouses.map(w => ({
+                    value: w.id,
+                    label: `${w.warehouse_code} - ${w.warehouse_name}`
+                  }))}
+                  placeholder="Select warehouse..."
+                />
+              </div>
+            </div>
+            
+            <div className="notes-row">
+              <FormInput
+                label="Notes"
+                name="notes"
+                type="textarea"
+                value={formData.notes}
+                onChange={handleHeaderChange}
+                placeholder="Additional notes..."
+                rows={3}
+              />
+            </div>
           </div>
-
-          <div className="form-row">
-            <FormInput
-              label="Expected Delivery Date"
-              name="expected_delivery_date"
-              type="date"
-              value={formData.expected_delivery_date}
-              onChange={handleHeaderChange}
-            />
-
-            <FormInput
-              label="Warehouse (for receipt)"
-              name="warehouse_id"
-              type="searchable-select"
-              value={formData.warehouse_id}
-              onChange={handleHeaderChange}
-              options={warehouses.map(w => ({
-                value: w.id,
-                label: `${w.warehouse_code} - ${w.warehouse_name}`
-              }))}
-              placeholder="Select warehouse..."
-            />
-          </div>
-
-          <FormInput
-            label="Notes"
-            name="notes"
-            type="textarea"
-            value={formData.notes}
-            onChange={handleHeaderChange}
-            placeholder="Additional notes..."
-            rows={3}
-          />
         </div>
 
         {/* Line Items Section */}
         <div className="form-section">
-          <div className="section-header">
+          <div className="form-section-header">
             <h3>Line Items</h3>
-            <Button type="button" variant="secondary" onClick={addItem}>
-              + Add Item
-            </Button>
           </div>
-
-          <table className="items-table">
-            <thead>
-              <tr>
-                <th width="30%">Item</th>
-                <th width="15%">Quantity</th>
-                <th width="15%">Unit Price</th>
-                <th width="20%">Amount</th>
-                <th width="10%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(item => {
-                const selectedItem = inventoryItems.find(i => i.id === parseInt(item.item_id));
-                const itemTotal = calculateItemTotal(item);
-                return (
-                  <tr key={item.id}>
-                    <td>
-                      <FormInput
-                        name="item_id"
-                        type="searchable-select"
-                        value={item.item_id}
-                        onChange={(e) => handleItemChange(item.id, 'item_id', e.target.value)}
-                        options={inventoryItems.map(i => ({
-                          value: i.id,
-                          label: `${i.item_code} - ${i.item_name}`
-                        }))}
-                        placeholder="Select item..."
-                        required
-                      />
-                    </td>
-                    <td>
-                      <FormInput
-                        name="quantity"
-                        type="number"
-                        step="0.001"
-                        value={item.quantity}
-                        onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)}
-                        placeholder="0.000"
-                        required
-                      />
-                    </td>
-                    <td>
-                      <FormInput
-                        name="unit_price"
-                        type="number"
-                        step="0.01"
-                        value={item.unit_price}
-                        onChange={(e) => handleItemChange(item.id, 'unit_price', e.target.value)}
-                        placeholder="0.00"
-                        required
-                      />
-                    </td>
-                    <td className="amount-cell">
-                      {formatCurrency(itemTotal)}
-                    </td>
-                    <td className="actions-cell">
-                      <Button
-                        type="button"
-                        variant="danger"
-                        onClick={() => removeItem(item.id)}
-                        disabled={items.length === 1}
-                      >
-                        Remove
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="form-section-content">
+            <table className="items-table">
+              <thead>
+                <tr>
+                  <th width="35%">Item</th>
+                  <th width="15%">Qty</th>
+                  <th width="15%">Unit Price</th>
+                  <th width="20%">Amount</th>
+                  <th width="10%"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map(item => {
+                  const selectedItem = inventoryItems.find(i => i.id === parseInt(item.item_id));
+                  const itemTotal = calculateItemTotal(item);
+                  return (
+                    <tr key={item.id}>
+                      <td>
+                        <FormInput
+                          name="item_id"
+                          type="searchable-select"
+                          value={item.item_id}
+                          onChange={(e) => handleItemChange(item.id, 'item_id', e.target.value)}
+                          options={inventoryItems.map(i => ({
+                            value: i.id,
+                            label: `${i.item_code} - ${i.item_name}`,
+                            stock: i.current_stock || 0,
+                            price: i.standard_cost || i.purchase_price || 0
+                          }))}
+                          placeholder="Select item..."
+                          required
+                        />
+                      </td>
+                      <td>
+                        <FormInput
+                          name="quantity"
+                          type="number"
+                          step="0.001"
+                          min="0"
+                          value={item.quantity}
+                          onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)}
+                          placeholder="Qty"
+                          required
+                        />
+                      </td>
+                      <td>
+                        <FormInput
+                          name="unit_price"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={item.unit_price}
+                          onChange={(e) => handleItemChange(item.id, 'unit_price', e.target.value)}
+                          placeholder="Price"
+                          required
+                        />
+                      </td>
+                      <td className="amount-cell">
+                        {formatCurrency(itemTotal)}
+                      </td>
+                      <td className="actions-cell">
+                        <Button
+                          type="button"
+                          variant="danger"
+                          onClick={() => removeItem(item.id)}
+                          disabled={items.length === 1}
+                        >
+                          ×
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            
+            <button type="button" className="add-item-btn" onClick={addItem}>
+              + Add Item
+            </button>
+          </div>
         </div>
 
         {/* Totals Section */}
         <div className="form-section totals-section">
           <div className="totals">
-            <div className="total-row">
-              <span>Total:</span>
-              <strong>{formatCurrency(totalAmount)}</strong>
+            <div className="totals-row subtotal">
+              <span className="label">Subtotal:</span>
+              <span className="value">{formatCurrency(totalAmount)}</span>
+            </div>
+            <div className="totals-row total">
+              <span className="label">Total:</span>
+              <span className="value">{formatCurrency(totalAmount)}</span>
             </div>
           </div>
         </div>
@@ -349,7 +371,12 @@ export default function PurchaseOrderFormPage({ mode }) {
           <Button type="button" variant="secondary" onClick={() => navigate('/purchase-orders')}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" loading={mutation.isPending}>
+          <Button 
+            type="button" 
+            variant="primary" 
+            loading={mutation.isPending}
+            onClick={() => handleSubmit({ preventDefault: () => {} })}
+          >
             {formData.status === 'Draft' ? 'Save Draft' : 'Submit'}
           </Button>
         </div>
