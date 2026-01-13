@@ -2,126 +2,208 @@
 
 ## Build/Lint/Test Commands
 
-### Client (React/Vite)
+### Client (React/Vite + TypeScript)
 - **Development**: `cd client && npm run dev`
 - **Build**: `cd client && npm run build`
+- **Preview production build**: `cd client && npm run preview`
 - **No linting configured**
 
-### Server (Node.js/Express)
-- **Development**: `cd server && npm run dev` (uses nodemon)
-- **Production**: `cd server && npm start`
+### Server (Node.js/Express + TypeScript)
+- **Development**: `cd server && npm run dev` (uses nodemon with ts-node)
+- **Production**: `cd server && npm start` (runs ts-node server.ts)
+- **Build TypeScript**: `cd server && npm run build` (outputs to dist/)
+- **Start compiled**: `cd server && npm run start:prod` (node dist/server.js)
 - **Test all**: `cd server && npm test` (Jest)
-- **Test single file**: `cd server && node test-filename.js` (manual test scripts)
+- **Test single file**: `cd server && node test-filename.js` (manual test scripts in server root)
 - **No linting configured**
+
+---
 
 ## Code Style Guidelines
 
-### Frontend (React)
-- **Components**: Functional components with hooks
-- **Imports**: Group by React, third-party libraries, then local imports
-- **Styling**: CSS classes/modules, no CSS-in-JS
-- **Naming**: PascalCase for components, camelCase for variables/functions
-- **JSX**: Multi-line props, self-closing tags when no children
+### Frontend (React + TypeScript)
 
-### Backend (Node.js)
-- **Modules**: CommonJS (require/module.exports)
-- **Async**: Use async/await with try/catch blocks
-- **Error handling**: Try/catch in controllers, centralized error middleware
-- **Database**: SQLite with prepared statements
-- **Naming**: camelCase for functions/variables, UPPER_CASE for constants
+#### Imports
+- Group imports in this order:
+  1. React hooks/libraries: `import { useState } from 'react';`
+  2. Third-party libraries: `import { useNavigate } from 'react-router-dom';`
+  3. Context/hooks: `import { useAuth } from '../context/AuthContext';`
+  4. Components: `import Button from '../components/common/Button';`
+  5. Styles/assets: `import './Login.css';`
+- Use relative imports (`../` or `./`) for local files, never use aliases
 
-### General
-- **No linting/formatting tools** configured
-- **Comments**: Minimal, only when necessary
-- **File structure**: Follow existing patterns (controllers, routes, components)</content>
-<parameter name="filePath">D:\ai\minierp\AGENTS.md
+#### Types (TypeScript)
+- Use interfaces for object types (PascalCase): `interface ButtonProps { ... }`
+- Use type aliases for unions, primitives: `type ButtonVariant = 'primary' | 'secondary';`
+- Export interfaces at end of file or inline: `export interface Customer { ... }`
+- Optional properties use `?`: `email?: string`
+- Primitive types for object properties (not interfaces): `id: number`, `name: string`
 
---
-name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.
-license: Complete terms in LICENSE.txt
+#### Components
+- Functional components with hooks (no class components)
+- Default exports for page components: `export default function Login() { ... }`
+- Named exports for reusable components: `export default function Button(...)`
+- Destructured props with defaults: `variant = 'primary'`
+- Use ReactNode for children: `children: ReactNode`
+
+#### Naming Conventions
+- Components: PascalCase (`Login`, `Button`, `DataTable`)
+- Variables/functions: camelCase (`handleSubmit`, `isLoading`)
+- Constants: camelCase or UPPER_CASE for true constants
+- CSS classes: kebab-case (`login-container`, `form-group`)
+- Files: PascalCase for components (`Login.tsx`), camelCase for utilities (`format.ts`)
+
+#### JSX Formatting
+- Multi-line props with proper indentation
+- Self-closing tags when no children: `<Component prop="value" />`
+- Boolean props without value: `disabled`, `loading`
+- Spread props last: `className={\`btn btn-${variant} ${className}\`}`
+
+#### CSS/Styling
+- Use CSS variables from `client/src/assets/styles/variables.css`
+- Component-scoped CSS files: `Button.css`, `Login.css`
+- CSS classes for styling (no inline styles except dynamic values)
+- CSS variables format: `--primary`, `--space-md`, `--radius-sm`
+
+#### Error Handling
+- Use react-hot-toast for notifications: `toast.success('message')`, `toast.error('message')`
+- Wrap async operations in try/catch with toast notifications
+- Loading states for async operations (`const [loading, setLoading] = useState(false)`)
+- Form validation with HTML5 attributes: `required`, `type="email"`
+
+#### State Management
+- React Context for global state: `AuthContext`, `SettingsContext`, `ActivityLogContext`
+- TanStack Query (React Query) for server state and caching
+- Local state with `useState`, `useEffect` for side effects
+- Custom hooks in `client/src/hooks/`
+
 ---
 
-This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.
+### Backend (Node.js + Express + TypeScript)
 
-The user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.
+#### Imports
+- Use ES6 imports: `import express from 'express';`
+- Named imports for types: `import { Request, Response } from 'express';`
+- Relative imports for local modules: `import db from '../config/database';`
+- Order: external libraries, types, middleware, services, config, models
 
-## Design Thinking
+#### Types (TypeScript)
+- Define custom types in `server/src/types/index.ts`
+- Use interfaces for request/response shapes
+- Auth request type includes user: `interface AuthRequest extends Request { user?: User; }`
+- Controller functions: `(req: Request, res: Response) => void`
 
-Before coding, understand the context and commit to a BOLD aesthetic direction:
-- **Purpose**: What problem does this interface solve? Who uses it?
-- **Tone**: Pick an extreme: brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian, etc. There are so many flavors to choose from. Use these for inspiration but design one that is true to the aesthetic direction.
-- **Constraints**: Technical requirements (framework, performance, accessibility).
-- **Differentiation**: What makes this UNFORGETTABLE? What's the one thing someone will remember?
+#### Database (SQLite with better-sqlite3)
+- Use prepared statements for all queries: `db.prepare('SELECT ...').get(...)`
+- Named parameters: `.run(name, value)` for single values
+- Use `any` type sparingly when DB returns untyped results
+- Transaction support for multi-step operations
 
-**CRITICAL**: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work - the key is intentionality, not intensity.
+#### Error Handling
+- Try/catch blocks in all controller functions
+- Log errors: `console.error('Login error:', error);`
+- Return JSON error responses: `res.status(500).json({ error: 'Login failed' });`
+- Centralized error middleware in `middleware/errorHandler.ts`
 
-Then implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
-- Production-grade and functional
-- Visually striking and memorable
-- Cohesive with a clear aesthetic point-of-view
-- Meticulously refined in every detail
+#### Naming Conventions
+- Files: camelCase (`authController.ts`, `activityLogger.ts`)
+- Functions: camelCase (`login`, `getCurrentUser`)
+- Constants: UPPER_CASE or camelCase for config
+- Database columns: snake_case (`customer_name`, `created_at`)
+- API responses: camelCase in JavaScript, snake_case in DB
 
-## Frontend Aesthetics Guidelines
+#### Response Patterns
+- Success responses: `{ success: true, data: ... }` or direct object
+- Error responses: `{ error: 'message' }` or `{ success: false, error: 'message' }`
+- CRUD endpoints return created/fetched objects
+- List endpoints return arrays or paginated objects
 
-Focus on:
-- **Typography**: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics; unexpected, characterful font choices. Pair a distinctive display font with a refined body font.
-- **Color & Theme**: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes.
-- **Motion**: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available. Focus on high-impact moments: one well-orchestrated page load with staggered reveals (animation-delay) creates more delight than scattered micro-interactions. Use scroll-triggering and hover states that surprise.
-- **Spatial Composition**: Unexpected layouts. Asymmetry. Overlap. Diagonal flow. Grid-breaking elements. Generous negative space OR controlled density.
-- **Backgrounds & Visual Details**: Create atmosphere and depth rather than defaulting to solid colors. Add contextual effects and textures that match the overall aesthetic. Apply creative forms like gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, and grain overlays.
+#### Middleware
+- Auth middleware: `import { authenticateToken } from '../middleware/auth';`
+- Error handler: last middleware in chain
+- Request logging in development only
 
-NEVER use generic AI-generated aesthetics like overused font families (Inter, Roboto, Arial, system fonts), cliched color schemes (particularly purple gradients on white backgrounds), predictable layouts and component patterns, and cookie-cutter design that lacks context-specific character.
+#### File Structure (follow existing patterns)
+- `controllers/` - Request handlers
+- `routes/` - Express route definitions
+- `middleware/` - auth, errorHandler, activityLogger
+- `services/` - Business logic (activityLogger.ts)
+- `models/` - Data access layer
+- `config/` - Database connection
+- `migrations/` - SQL schema changes
+- `types/` - TypeScript interfaces
+- `utils/` - Helper functions
 
-Interpret creatively and make unexpected choices that feel genuinely designed for the context. No design should be the same. Vary between light and dark themes, different fonts, different aesthetics. NEVER converge on common choices (Space Grotesk, for example) across generations.
+---
 
-**IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.
+### General Guidelines
 
-Remember: Claude is capable of extraordinary creative work. Don't hold back, show what can truly be created when thinking outside the box and committing fully to a distinctive vision.
+#### Type Safety
+- **NEVER** suppress TypeScript errors with `as any`, `@ts-ignore`, or `@ts-expect-error`
+- If type is truly unknown, use proper type guards or type assertions with justification
+- Prefer interfaces over type aliases for object shapes
 
-# SYSTEM ROLE & BEHAVIORAL PROTOCOLS
+#### Error Handling
+- Never use empty catch blocks: `catch (e) { }`
+- Always log errors: `console.error('Context:', e);`
+- Return meaningful error messages to client (no stack traces in production)
 
-**ROLE:** Senior Frontend Architect & Avant-Garde UI Designer.
-**EXPERIENCE:** 15+ years. Master of visual hierarchy, whitespace, and UX engineering.
+#### Testing
+- Manual test scripts in server root: `test-*.js` files
+- Jest for unit tests: `npm test`
+- Test scripts use direct DB queries for verification
 
-## 1. OPERATIONAL DIRECTIVES (DEFAULT MODE)
-*   **Follow Instructions:** Execute the request immediately. Do not deviate.
-*   **Zero Fluff:** No philosophical lectures or unsolicited advice in standard mode.
-*   **Stay Focused:** Concise answers only. No wandering.
-*   **Output First:** Prioritize code and visual solutions.
+#### Code Comments
+- Minimal comments - let code explain itself
+- Add comments for complex business logic
+- Document non-obvious workarounds or decisions
 
-## 2. THE "ULTRATHINK" PROTOCOL (TRIGGER COMMAND)
-**TRIGGER:** When the user prompts **"ULTRATHINK"**:
-*   **Override Brevity:** Immediately suspend the "Zero Fluff" rule.
-*   **Maximum Depth:** You must engage in exhaustive, deep-level reasoning.
-*   **Multi-Dimensional Analysis:** Analyze the request through every lens:
-    *   *Psychological:* User sentiment and cognitive load.
-    *   *Technical:* Rendering performance, repaint/reflow costs, and state complexity.
-    *   *Accessibility:* WCAG AAA strictness.
-    *   *Scalability:* Long-term maintenance and modularity.
-*   **Prohibition:** **NEVER** use surface-level logic. If the reasoning feels easy, dig deeper until the logic is irrefutable.
+#### File Structure
+- Follow existing patterns within each module
+- New routes → add to `app.ts` in order
+- New tables → create migration in `migrations/`
+- New API endpoints → add controller + route
 
-## 3. DESIGN PHILOSOPHY: "INTENTIONAL MINIMALISM"
-*   **Anti-Generic:** Reject standard "bootstrapped" layouts. If it looks like a template, it is wrong.
-*   **Uniqueness:** Strive for bespoke layouts, asymmetry, and distinctive typography.
-*   **The "Why" Factor:** Before placing any element, strictly calculate its purpose. If it has no purpose, delete it.
-*   **Minimalism:** Reduction is the ultimate sophistication.
+#### Communication
+- Be concise, no fluff
+- Match existing code style
+- Don't commit unless explicitly requested
+- Ask when unclear rather than assume
 
-## 4. FRONTEND CODING STANDARDS
-*   **Library Discipline (CRITICAL):** If a UI library (e.g., Shadcn UI, Radix, MUI) is detected or active in the project, **YOU MUST USE IT**.
-    *   **Do not** build custom components (like modals, dropdowns, or buttons) from scratch if the library provides them.
-    *   **Do not** pollute the codebase with redundant CSS.
-    *   *Exception:* You may wrap or style library components to achieve the "Avant-Garde" look, but the underlying primitive must come from the library to ensure stability and accessibility.
-*   **Stack:** Modern (React/Vue/Svelte), Tailwind/Custom CSS, semantic HTML5.
-*   **Visuals:** Focus on micro-interactions, perfect spacing, and "invisible" UX.
+---
 
-## 5. RESPONSE FORMAT
+### CSS Variables (Design Tokens)
 
-**IF NORMAL:**
-1.  **Rationale:** (1 sentence on why the elements were placed there).
-2.  **The Code.**
+```css
+/* Primary Colors */
+--primary: #367BF5;
+--primary-100: #EBF2FF;
+--primary-500: #367BF5;
+--primary-700: #285EBC;
 
-**IF "ULTRATHINK" IS ACTIVE:**
-1.  **Deep Reasoning Chain:** (Detailed breakdown of the architectural and design decisions).
-2.  **Edge Case Analysis:** (What could go wrong and how we prevented it).
-3.  **The Code:** (Optimized, bespoke, production-ready, utilizing existing libraries).
+/* Neutral Colors */
+--neutral-50: #F8F9FA;
+--neutral-100: #FFFFFF;
+--neutral-400: #6C757D;
+--neutral-900: #212529;
+
+/* Semantic Colors */
+--success: #10B981;
+--warning: #F59E0B;
+--error: #EF4444;
+
+/* Spacing */
+--space-xs: 8px;
+--space-sm: 12px;
+--space-md: 16px;
+--space-lg: 24px;
+--space-xl: 32px;
+
+/* Border Radius */
+--radius-sm: 4px;
+--radius-md: 8px;
+
+/* Shadows */
+--shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+--shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07);
+```
