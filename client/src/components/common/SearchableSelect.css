@@ -2,6 +2,12 @@
   margin-bottom: 1rem;
 }
 
+/* In table cells, remove bottom margin */
+.items-table .searchable-select-container,
+.po-form .items-table .searchable-select-container {
+  margin-bottom: 0;
+}
+
 /* Selected option with checkmark */
 .option-content {
   display: flex;

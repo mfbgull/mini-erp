@@ -210,7 +210,6 @@ export default function PurchaseOrderFormPage({ mode }) {
                   onChange={handleHeaderChange}
                   options={suppliers.map(s => ({ value: s.id, label: s.supplier_name }))}
                   placeholder="Search suppliers..."
-                  required
                 />
               </div>
               
@@ -221,7 +220,6 @@ export default function PurchaseOrderFormPage({ mode }) {
                   type="date"
                   value={formData.po_date}
                   onChange={handleHeaderChange}
-                  required
                 />
               </div>
               
@@ -274,9 +272,9 @@ export default function PurchaseOrderFormPage({ mode }) {
             <table className="items-table">
               <thead>
                 <tr>
-                  <th width="35%">Item</th>
-                  <th width="15%">Qty</th>
-                  <th width="15%">Unit Price</th>
+                  <th width="35%">Item *</th>
+                  <th width="15%">Qty *</th>
+                  <th width="15%">Unit Price *</th>
                   <th width="20%">Amount</th>
                   <th width="10%"></th>
                 </tr>
@@ -300,7 +298,6 @@ export default function PurchaseOrderFormPage({ mode }) {
                             price: i.standard_cost || i.purchase_price || 0
                           }))}
                           placeholder="Select item..."
-                          required
                         />
                       </td>
                       <td>
@@ -312,7 +309,6 @@ export default function PurchaseOrderFormPage({ mode }) {
                           value={item.quantity}
                           onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)}
                           placeholder="Qty"
-                          required
                         />
                       </td>
                       <td>
@@ -324,7 +320,6 @@ export default function PurchaseOrderFormPage({ mode }) {
                           value={item.unit_price}
                           onChange={(e) => handleItemChange(item.id, 'unit_price', e.target.value)}
                           placeholder="Price"
-                          required
                         />
                       </td>
                       <td className="amount-cell">
