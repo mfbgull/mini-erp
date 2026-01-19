@@ -1,0 +1,285 @@
+/* Compact Stock By Warehouse Card Styles */
+.compact-mobile-cards-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  overflow: visible;
+}
+
+.compact-mobile-search-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--neutral-100);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-md);
+}
+
+.compact-mobile-search-container .search-icon {
+  color: var(--neutral-400);
+  flex-shrink: 0;
+}
+
+.compact-mobile-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--text-primary);
+  padding: 0;
+  min-height: 24px;
+}
+
+.compact-mobile-search-input:focus {
+  outline: none;
+}
+
+.compact-mobile-search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Compact Card Container */
+.compact-mobile-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  overflow: visible;
+}
+
+/* Compact Card */
+.compact-mobile-card {
+  background: var(--neutral-100);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+}
+
+.compact-mobile-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-500);
+}
+
+.compact-mobile-card:active {
+  transform: scale(0.99);
+}
+
+/* Stock-specific card styling */
+.compact-mobile-card.stock-card {
+  border-left: 4px solid var(--success);
+}
+
+.compact-mobile-card.stock-card:hover {
+  border-left-color: var(--primary-600);
+}
+
+/* Compact Card Content Layout */
+.compact-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* Left: Item Info */
+.compact-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.compact-item-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compact-item-code {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Right: Quantity + Warehouse */
+.compact-item-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-shrink: 0;
+}
+
+/* Stock Display */
+.compact-stock-display {
+  text-align: right;
+  min-width: 70px;
+}
+
+.stock-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 2px 0;
+}
+
+.stock-value {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.stock-unit {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin: 2px 0 0 0;
+}
+
+.stock-normal {
+  color: var(--success);
+}
+
+.stock-low {
+  color: var(--warning);
+}
+
+.stock-out-of-stock {
+  color: var(--error);
+}
+
+/* Stock Warehouse Info */
+.stock-warehouse-info {
+  text-align: right;
+  min-width: 80px;
+}
+
+.warehouse-label {
+  display: block;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.warehouse-value {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: block;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multi-badge {
+  margin-left: 4px;
+  font-size: 10px;
+}
+
+/* Stock Footer */
+.stock-footer {
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px dashed var(--border-color);
+}
+
+.stock-value-display {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* Mobile Empty State */
+.mobile-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  text-align: center;
+  background: var(--neutral-100);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: var(--space-md);
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 413px) {
+  .compact-item-name {
+    font-size: 14px;
+  }
+
+  .compact-item-code {
+    font-size: 11px;
+  }
+
+  .stock-value {
+    font-size: 14px;
+  }
+
+  .stock-warehouse-info {
+    min-width: 60px;
+  }
+
+  .warehouse-value {
+    max-width: 60px;
+  }
+
+  .compact-mobile-card {
+    padding: var(--space-sm);
+  }
+
+  .compact-item-right {
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 360px) {
+  .compact-card-content {
+    gap: var(--space-sm);
+  }
+
+  .compact-item-right {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .compact-stock-display {
+    text-align: left;
+  }
+
+  .stock-warehouse-info {
+    text-align: left;
+  }
+}

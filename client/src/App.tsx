@@ -49,9 +49,13 @@ import ProductionSummaryReport from './pages/reports/ProductionSummaryReport';
 import BOMUsageReport from './pages/reports/BOMUsageReport';
 import ExpensesReport from './pages/reports/ExpensesReport';
 import SettingsPage from './pages/SettingsPage';
+import IntegrationsPage from './pages/IntegrationsPage';
 import ExpensesPage from './pages/expenses/ExpensesPage';
 import ActivityLog from './pages/ActivityLog';
 import Sidebar from './components/layout/Sidebar';
+import FloatingActionButton from './components/layout/FloatingActionButton';
+import MobileInvoiceWizard from './pages/invoice/MobileInvoiceWizard';
+import { InvoiceProvider } from './context/InvoiceContext';
 
 import './assets/styles/variables.css';
 import './assets/styles/global.css';
@@ -157,15 +161,18 @@ function AppLayout() {
               <Route path="/reports/bom-usage" element={<BOMUsageReport />} />
               <Route path="/reports/expenses" element={<ExpensesReport />} />
               <Route path="/expenses" element={<ExpensesPage />} />
-              <Route path="/sales" element={<SalesPage />} />
+<Route path="/sales" element={<SalesPage />} />
               <Route path="/sales/invoice" element={<SalesInvoicePage />} />
               <Route path="/sales/invoice/:invoiceId" element={<SalesInvoicePage />} />
               <Route path="/sales/invoice/:invoiceId/view" element={<InvoiceViewPage />} />
+              <Route path="/invoices/create" element={<MobileInvoiceWizard />} />
               <Route path="/pos" element={<POSPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/integrations" element={<IntegrationsPage />} />
               <Route path="/activity-log" element={<ActivityLog />} />
-              <Route path="*" element={<Navigate to="/" />} />
+<Route path="*" element={<Navigate to="/" />} />
             </Routes>
+            <FloatingActionButton />
           </div>
         </div>
         <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
@@ -202,9 +209,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <AuthProvider>
+<AuthProvider>
           <ThemeProvider>
-            <AppRoutesOuter />
+            <InvoiceProvider>
+              <AppRoutesOuter />
+            </InvoiceProvider>
             <Toaster
               position="top-right"
               toastOptions={{

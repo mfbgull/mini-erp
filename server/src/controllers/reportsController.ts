@@ -709,7 +709,7 @@ function getStockValuationReport(req: Request, res: Response): void {
 
     const valuationData = db.prepare(query).all(...params);
 
-    const totalValue = valuationData.reduce((sum: number, item: any) => sum + item.total_value, 0);
+    const totalValue = valuationData.reduce((sum: number, item: any) => sum + (item.total_value || 0), 0);
 
     res.json({
       success: true,
@@ -717,7 +717,7 @@ function getStockValuationReport(req: Request, res: Response): void {
         stockValuation: valuationData,
         summary: {
           totalItems: valuationData.length,
-          totalValue: parseFloat(totalValue.toFixed(2))
+          totalValue: parseFloat((totalValue as number).toFixed(2))
         },
         valuationMethod: valuationMethod
       }
@@ -793,11 +793,11 @@ function getInventoryMovementReport(req: Request, res: Response): void {
     // Calculate summary
     const totalInbound = movements
       .filter((m: any) => m.movement_type === 'IN' || m.movement_type === 'in')
-      .reduce((sum: number, m: any) => sum + Math.abs(parseFloat(m.quantity || 0)), 0);
-    
+      .reduce((sum: number, m: any) => sum + Math.abs(parseFloat(m.quantity || 0)), 0) as number;
+
     const totalOutbound = movements
       .filter((m: any) => m.movement_type === 'OUT' || m.movement_type === 'out' || m.movement_type === 'SALE' || m.movement_type === 'ADJUSTMENT')
-      .reduce((sum: number, m: any) => sum + Math.abs(parseFloat(m.quantity || 0)), 0);
+      .reduce((sum: number, m: any) => sum + Math.abs(parseFloat(m.quantity || 0)), 0) as number;
 
     res.json({
       success: true,

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { useQuery } from '@tanstack/react-query';
@@ -16,6 +17,8 @@ import {
 } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import api from '../utils/api';
+import FloatingActionButton from '../components/layout/FloatingActionButton';
+import { InvoiceWizard } from '../components/invoice/InvoiceWizard';
 import './Dashboard.css';
 
 // Register Chart.js components
@@ -33,6 +36,7 @@ ChartJS.register(
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [showInvoiceWizard, setShowInvoiceWizard] = useState(false);
 
   // Fetch real data
   const { data: items = [] } = useQuery({
@@ -46,8 +50,8 @@ export default function Dashboard() {
   const { data: sales = [] } = useQuery({
     queryKey: ['dashboard-sales'],
     queryFn: async () => {
-      const response = await api.get('/sales');
-      return response.data;
+      const response = await api.get('/invoices');
+      return response.data.data || [];
     }
   });
 
@@ -192,16 +196,12 @@ export default function Dashboard() {
       <div className="dashboard-header">
         <div>
           <h1>Dashboard</h1>
-          <p className="dashboard-subtitle">Welcome back, {user?.full_name}!</p>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="kpi-grid">
         <div className="kpi-card">
-          <div className="kpi-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            📦
-          </div>
           <div className="kpi-content">
             <div className="kpi-label">Total Items</div>
             <div className="kpi-value">{totalItems}</div>
@@ -210,9 +210,6 @@ export default function Dashboard() {
         </div>
 
         <div className="kpi-card">
-          <div className="kpi-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            💰
-          </div>
           <div className="kpi-content">
             <div className="kpi-label">Stock Value</div>
             <div className="kpi-value">{formatCurrency(totalStockValue)}</div>
@@ -221,9 +218,6 @@ export default function Dashboard() {
         </div>
 
         <div className="kpi-card">
-          <div className="kpi-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            📈
-          </div>
           <div className="kpi-content">
             <div className="kpi-label">Sales Revenue</div>
             <div className="kpi-value">{formatCurrency(totalSalesRevenue)}</div>
@@ -232,9 +226,6 @@ export default function Dashboard() {
         </div>
 
         <div className="kpi-card">
-          <div className="kpi-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            🏭
-          </div>
           <div className="kpi-content">
             <div className="kpi-label">Production</div>
             <div className="kpi-value">{productionsArray.length}</div>
@@ -361,6 +352,15 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Floating Quick Actions (Mobile) */}
+      <FloatingActionButton />
+
+      {/* Invoice Wizard Modal */}
+      <InvoiceWizard
+        isOpen={showInvoiceWizard}
+        onClose={() => setShowInvoiceWizard(false)}
+      />
     </div>
   );
 }

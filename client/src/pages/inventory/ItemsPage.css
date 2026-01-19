@@ -185,3 +185,27 @@
   padding-top: var(--space-lg);
   border-top: 1px solid #DEE2E6;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .item-form {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-section {
+    padding: var(--space-sm) !important;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-section h4 {
+    font-size: 16px !important;
+  }
+}

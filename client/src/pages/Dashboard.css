@@ -1,5 +1,5 @@
 .dashboard {
-  padding: 0;
+  padding: 10px 0 0 0;
 }
 
 .dashboard-header {
@@ -20,6 +20,61 @@
   margin-bottom: var(--space-xl);
 }
 
+/* Mobile responsiveness for KPI Grid */
+@media (max-width: 768px) {
+  .dashboard .kpi-grid {
+    grid-template-columns: repeat(2, 1fr); /* Two cards per row on mobile */
+    gap: var(--space-sm); /* Smaller gap since no icons */
+  }
+  
+  .dashboard .kpi-card {
+    padding: var(--space-sm); /* Reduce padding on small screens */
+    display: flex !important;
+    flex-direction: column !important;
+    flex-direction: -webkit-flex !important;
+    -webkit-flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .dashboard .kpi-card .kpi-content {
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  
+  .dashboard .kpi-card .kpi-label {
+    font-size: 0.7rem !important;
+    margin-bottom: 2px !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .dashboard .kpi-card .kpi-value {
+    font-size: 1.2rem !important;
+    margin-bottom: 2px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .dashboard .kpi-card .kpi-subtitle {
+    font-size: 0.65rem !important;
+    margin-top: 2px !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+}
+
 .kpi-card {
   background: white;
   border-radius: var(--radius-md);
@@ -29,22 +84,12 @@
   align-items: center;
   gap: var(--space-md);
   transition: transform 0.2s, box-shadow 0.2s;
+  min-width: 0;
 }
 
 .kpi-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.kpi-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-  flex-shrink: 0;
 }
 
 .kpi-content {
@@ -66,6 +111,8 @@
   font-weight: 700;
   color: var(--neutral-900);
   margin-bottom: var(--space-xs);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .kpi-subtitle {
@@ -76,9 +123,20 @@
 /* Charts Grid */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Two equal columns for the charts side by side */
+  grid-template-columns: repeat(2, 1fr); /* Two equal columns for charts side by side */
   gap: var(--space-lg);
   margin-bottom: var(--space-xl);
+}
+
+/* Mobile responsiveness for Charts Grid */
+@media (max-width: 640px) {
+  .charts-grid {
+    grid-template-columns: 1fr; /* Stack charts on small screens */
+  }
+  
+  .chart-container {
+    height: 250px; /* Reduce height for mobile */
+  }
 }
 
 .chart-card {
@@ -115,6 +173,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--space-lg);
+}
+
+/* Mobile responsiveness for Dashboard Bottom */
+@media (max-width: 640px) {
+  .dashboard-bottom {
+    grid-template-columns: 1fr; /* Full width cards on mobile */
+  }
 }
 
 /* Alert Card */
@@ -191,11 +256,17 @@
 }
 
 /* Quick Actions Card */
-.quick-actions-card {
-  background: white;
-  border-radius: var(--radius-md);
-  padding: var(--space-lg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+/* Mobile responsiveness for Quick Actions Grid */
+@media (max-width: 640px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr); /* Two buttons per row on mobile */
+  }
 }
 
 .quick-actions-card h3 {
@@ -255,28 +326,85 @@
 
 @media (max-width: 640px) {
   .kpi-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr); /* Two cards per row on mobile */
+    gap: var(--space-sm);
   }
-
+  
   .kpi-card {
-    padding: var(--space-md);
+    padding: var(--space-sm);
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 4px;
   }
-
-  .kpi-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 1.5rem;
+  
+  .kpi-content {
+    text-align: center;
+    width: 100%;
   }
-
+  
+  .kpi-label {
+    font-size: 0.65rem;
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+  
   .kpi-value {
-    font-size: 1.5rem;
+    font-size: 1rem;
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+  
+  .kpi-subtitle {
+    font-size: 0.55rem;
+    margin-top: 2px;
+    line-height: 1.2;
   }
 
   .quick-actions-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr); /* Two buttons per row on mobile */
   }
 
   .chart-container {
     height: 250px;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 413px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr); /* Keep two cards per row */
+    gap: var(--space-xs);
+  }
+  
+  .kpi-card {
+    padding: var(--space-sm); /* Reduce padding for very small screens */
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 2px;
+  }
+  
+  .kpi-content {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .kpi-label {
+    font-size: 0.6rem;
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+  
+  .kpi-value {
+    font-size: 1rem; /* Smaller font for very small screens */
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+  
+  .kpi-subtitle {
+    font-size: 0.55rem;
+    margin-top: 2px;
+    line-height: 1.2;
   }
 }

@@ -13,6 +13,7 @@ router.delete('/items/:id', inventoryController.deleteItem);
 
 router.get('/items-categories', inventoryController.getCategories);
 router.get('/items-low-stock', inventoryController.getLowStock);
+router.get('/items-uom', inventoryController.getUnitsOfMeasure);
 
 router.get('/warehouses', inventoryController.getWarehouses);
 router.get('/warehouses/:id', inventoryController.getWarehouse);

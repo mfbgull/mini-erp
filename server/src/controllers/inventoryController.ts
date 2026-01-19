@@ -147,6 +147,41 @@ function getLowStock(req: Request, res: Response): void {
   }
 }
 
+function getUnitsOfMeasure(req: Request, res: Response): void {
+  try {
+    const usedUoms = db.prepare(`
+      SELECT DISTINCT unit_of_measure
+      FROM items
+      WHERE unit_of_measure IS NOT NULL
+      ORDER BY unit_of_measure
+    `).all() as { unit_of_measure: string }[];
+
+    const standardUoms = [
+      'Nos',
+      'Kg',
+      'Ltr',
+      'Box',
+      'Pack',
+      'Bottle',
+      'Meter',
+      'Roll',
+      'Set',
+      'Pcs',
+      'Dozen'
+    ];
+
+    const allUoms = Array.from(new Set([
+      ...standardUoms,
+      ...usedUoms.map(u => u.unit_of_measure)
+    ]));
+
+    res.json(allUoms);
+  } catch (error) {
+    console.error('Get units of measure error:', error);
+    res.status(500).json({ error: 'Failed to fetch units of measure' });
+  }
+}
+
 function getWarehouses(req: Request, res: Response): void {
   try {
     const warehouses = WarehouseModel.getAll(db);
@@ -334,6 +369,7 @@ export default {
   deleteItem,
   getCategories,
   getLowStock,
+  getUnitsOfMeasure,
   getWarehouses,
   getWarehouse,
   createWarehouse,

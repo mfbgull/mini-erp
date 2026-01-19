@@ -107,6 +107,7 @@ export default function Sidebar() {
     { path: '/production', label: 'Production', icon: '🏭' },
     { path: '/expenses', label: 'Expenses', icon: '💸' },
     { path: '/activity-log', label: 'Activity Log', icon: '📝' },
+    { path: '/integrations', label: 'Integrations', icon: '🔗' },
     { path: '/settings', label: 'Settings', icon: '⚙️' }
   ];
 
@@ -170,7 +171,7 @@ export default function Sidebar() {
               >
                 <div className="nav-section-title" title={isCollapsed && !isMobile ? item.label : ''}>
                   <span>{item.icon}</span>
-                  {!isCollapsed && !isMobile && <span className="nav-label">{item.label}</span>}
+                  {(!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen) && <span className="nav-label">{item.label}</span>}
                 </div>
                 <div
                   className={`nav-children ${isCollapsed && !isMobile ? 'dropdown' : ''}`}
@@ -201,7 +202,7 @@ export default function Sidebar() {
                 onClick={handleNavClick}
               >
                 <span className="nav-icon">{item.icon}</span>
-                {!isCollapsed && !isMobile && <span className="nav-label">{item.label}</span>}
+                {(!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen) && <span className="nav-label">{item.label}</span>}
               </NavLink>
             )
           ))}
@@ -210,14 +211,14 @@ export default function Sidebar() {
         <div className="sidebar-footer">
           <div className="user-info">
             <div className="user-avatar">{user?.full_name?.charAt(0)}</div>
-            {!isCollapsed && !isMobile && (
+            {(!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen) && (
               <div className="user-details">
                 <div className="user-name">{user?.full_name}</div>
                 <div className="user-role tiny">{user?.role}</div>
               </div>
             )}
           </div>
-          {!isCollapsed && !isMobile && (
+          {(!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen) && (
             <button className="logout-btn" onClick={logout} title="Logout">
               🚪
             </button>

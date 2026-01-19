@@ -9,18 +9,20 @@
   .main-content {
     margin-left: 0 !important;
     margin-top: 60px;
-    padding: 0 var(--space-sm) 80px var(--space-sm) !important;
+    padding: 0 var(--space-sm) var(--space-lg) var(--space-sm) !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
   .main-content.sidebar-collapsed {
     margin-left: 0 !important;
+    padding-bottom: 12px !important;
   }
 
-  .content {
-    padding: var(--space-md) var(--space-sm) !important;
+   .content {
+    padding: 0 !important;
     width: 100% !important;
+    overflow-x: hidden !important;
     box-sizing: border-box !important;
   }
 
@@ -289,30 +291,38 @@
     height: auto !important;
   }
   
-  /* ============================================
-     KPI CARDS
-     ============================================ */
-  
+   /* ============================================
+      KPI CARDS
+      ============================================ */
+
   .kpi-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: var(--space-sm) !important;
   }
   
   .kpi-card {
-    padding: var(--space-md) !important;
-    flex-direction: row !important;
+    padding: var(--space-sm) !important;
+    flex-direction: column !important;
     align-items: center !important;
-    gap: var(--space-md) !important;
-  }
-  
-  .kpi-card .kpi-icon {
-    width: 48px !important;
-    height: 48px !important;
-    font-size: 24px !important;
+    gap: 4px !important;
+    text-align: center !important;
   }
   
   .kpi-card .kpi-value {
-    font-size: 24px !important;
+    font-size: 1.1rem !important;
+  }
+  
+  .kpi-card .kpi-content {
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .kpi-card .kpi-label {
+    font-size: 0.7rem !important;
+  }
+  
+  .kpi-card .kpi-subtitle {
+    font-size: 0.65rem !important;
   }
   
   /* ============================================
@@ -855,7 +865,7 @@
 
 @media (max-width: 413px) {
   .content {
-    padding: var(--space-sm) var(--space-xs) !important;
+    padding: 0 !important;
   }
   
   .page-header h1 {
@@ -889,6 +899,35 @@
     min-height: 44px !important;
     padding: var(--space-xs) var(--space-sm) !important;
     font-size: 13px !important;
+  }
+  
+  .kpi-card {
+    padding: var(--space-sm) !important;
+    gap: 2px !important;
+  }
+  
+  .kpi-card .kpi-icon {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 20px !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .kpi-card .kpi-label {
+    font-size: 0.65rem !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .kpi-card .kpi-value {
+    font-size: 1.1rem !important;
+    margin-bottom: 2px !important;
+    line-height: 1.2 !important;
+  }
+  
+  .kpi-card .kpi-subtitle {
+    font-size: 0.6rem !important;
+    margin-top: 2px !important;
+    line-height: 1.2 !important;
   }
   
   .stat-card .kpi-value,

@@ -348,7 +348,8 @@ function updateExpense(req: AuthRequest, res: Response): void {
     );
 
     // Log expense update using activity logger
-    logCRUD(ActionType.EXPENSE_UPDATE, 'Expense', parseInt(id, 10), `Updated expense: ${existingExpense.expense_no}`, req.user!.id, {
+    const expenseId = Array.isArray(id) ? id[0] : id;
+    logCRUD(ActionType.EXPENSE_UPDATE, 'Expense', parseInt(expenseId, 10), `Updated expense: ${existingExpense.expense_no}`, req.user!.id, {
       expense_no: existingExpense.expense_no,
       changes: Object.keys(req.body).filter(k => req.body[k] !== undefined)
     });
@@ -482,8 +483,10 @@ function getExpensesByCategory(req: Request, res: Response): void {
     const { category } = req.params;
     const { from_date, to_date } = req.query;
 
+    const categoryParam = Array.isArray(category) ? category[0] : category;
+
     let query = `
-      SELECT 
+      SELECT
         e.id,
         e.expense_no,
         e.expense_category,
@@ -502,7 +505,7 @@ function getExpensesByCategory(req: Request, res: Response): void {
       WHERE e.expense_category = ?
     `;
 
-    const params: (string | number)[] = [category];
+    const params: (string | number)[] = [categoryParam];
 
     if (from_date && to_date) {
       query += ' AND e.expense_date BETWEEN ? AND ?';

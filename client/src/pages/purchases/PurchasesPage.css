@@ -1,13 +1,43 @@
 .purchases-page {
   padding: 24px;
+  width: 100%;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  .purchases-page {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 16px !important;
+  }
 }
 
 /* Statistics Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-lg);
   margin-bottom: var(--space-xl);
+}
+
+/* Responsive adjustments for different screen sizes */
+@media (max-width: 1400px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stat-card {

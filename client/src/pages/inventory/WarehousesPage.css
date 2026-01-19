@@ -1,0 +1,128 @@
+.warehouses-page {
+  padding: var(--space-lg);
+  width: 100%;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  .warehouses-page {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: var(--space-sm) !important;
+  }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+}
+
+.page-subtitle {
+  color: var(--neutral-400);
+  font-size: 14px;
+  margin-top: var(--space-xs);
+}
+
+/* Floating Add Button - Mobile Only */
+.floating-add-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary-500);
+  border: none;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1000;
+  animation: floatIn 0.3s ease;
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.floating-add-btn:hover {
+  background: var(--primary-600);
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+}
+
+.floating-add-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Warehouse-specific FAB color */
+.floating-add-btn.warehouse-fab {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+/* Hide on desktop */
+@media (min-width: 769px) {
+  .floating-add-btn {
+    display: none !important;
+  }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 413px) {
+  .floating-add-btn {
+    bottom: 16px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+}
+
+/* Table actions */
+.table-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* Loading spinner */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--neutral-200);
+  border-top-color: var(--primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* AG Grid theme overrides for warehouses */
+@media (max-width: 768px) {
+  .ag-theme-quartz {
+    display: none !important;
+  }
+}

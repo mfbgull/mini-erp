@@ -47,6 +47,16 @@ export default function CustomerDetailPage() {
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
+  
+  useEffect(() => {
+    if (isMobile) {
+      document.body.classList.add('has-bottom-nav');
+    }
+    return () => {
+      document.body.classList.remove('has-bottom-nav');
+    };
+  }, [isMobile]);
+
   const [activeTab, setActiveTab] = useState('overview');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);

@@ -158,12 +158,13 @@ function updateSupplier(req: Request, res: Response): void {
     }
 
     // Log supplier update using activity logger
-    logCRUD(ActionType.SUPPLIER_UPDATE, 'Supplier', parseInt(id, 10), `Updated supplier: ${supplier_name}`, (req as AuthRequest).user?.id);
+    const supplierId = Array.isArray(id) ? id[0] : id;
+    logCRUD(ActionType.SUPPLIER_UPDATE, 'Supplier', parseInt(supplierId, 10), `Updated supplier: ${supplier_name}`, (req as AuthRequest).user?.id);
 
     res.json({
       success: true,
       data: {
-        id: parseInt(id),
+        id: parseInt(supplierId, 10),
         supplier_name,
         contact_person,
         email,
@@ -210,8 +211,9 @@ function deleteSupplier(req: Request, res: Response): void {
     }
 
     // Log supplier deletion using activity logger
-    const existingSupplier = db.prepare('SELECT supplier_name, supplier_code FROM suppliers WHERE id = ?').get(id);
-    logCRUD(ActionType.SUPPLIER_DELETE, 'Supplier', parseInt(id, 10), `Deleted supplier: ${existingSupplier?.supplier_name || 'Unknown'} (${existingSupplier?.supplier_code || 'N/A'})`, (req as AuthRequest).user?.id);
+    const deleteId = Array.isArray(id) ? id[0] : id;
+    const existingSupplier = db.prepare('SELECT supplier_name, supplier_code FROM suppliers WHERE id = ?').get(deleteId) as { supplier_name?: string, supplier_code?: string } | undefined;
+    logCRUD(ActionType.SUPPLIER_DELETE, 'Supplier', parseInt(deleteId, 10), `Deleted supplier: ${existingSupplier?.supplier_name || 'Unknown'} (${existingSupplier?.supplier_code || 'N/A'})`, (req as AuthRequest).user?.id);
 
     res.json({
       success: true,

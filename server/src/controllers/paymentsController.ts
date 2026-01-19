@@ -413,7 +413,7 @@ function updatePayment(req: AuthRequest, res: Response): void {
     }
 
     // Log payment update using activity logger
-    logCRUD(ActionType.PAYMENT_UPDATE, 'Payment', parseInt(id, 10), `Updated payment: ${existingPayment.payment_no}`, req.user!.id, {
+    logCRUD(ActionType.PAYMENT_UPDATE, 'Payment', parseInt(Array.isArray(id) ? id[0] : id, 10), `Updated payment: ${existingPayment.payment_no}`, req.user!.id, {
       payment_no: existingPayment.payment_no,
       changes: Object.keys(req.body).filter(k => req.body[k] !== undefined)
     });
@@ -445,7 +445,7 @@ function deletePayment(req: AuthRequest, res: Response): void {
     }
 
     const transaction = db.transaction(() => {
-      const allocations = db.prepare('SELECT * FROM payment_allocations WHERE payment_id = ?').all(id);
+      const allocations = db.prepare('SELECT * FROM payment_allocations WHERE payment_id = ?').all(id) as Array<{ invoice_id: number }>;
 
       db.prepare('DELETE FROM payment_allocations WHERE payment_id = ?').run(id);
 
@@ -464,7 +464,8 @@ function deletePayment(req: AuthRequest, res: Response): void {
     transaction();
 
     // Log payment deletion using activity logger
-    logCRUD(ActionType.PAYMENT_DELETE, 'Payment', parseInt(id, 10), `Deleted payment: ${existingPayment.payment_no} - $${existingPayment.amount}`, req.user!.id, {
+    const paymentId = Array.isArray(id) ? id[0] : id;
+    logCRUD(ActionType.PAYMENT_DELETE, 'Payment', parseInt(paymentId, 10), `Deleted payment: ${existingPayment.payment_no} - $${existingPayment.amount}`, req.user!.id, {
       payment_no: existingPayment.payment_no,
       amount: existingPayment.amount
     });

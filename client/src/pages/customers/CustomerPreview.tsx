@@ -42,9 +42,9 @@ export default function CustomerPreview({
     }
   };
 
-  const hasCreditLimit = customer.credit_limit && customer.credit_limit > 0;
+  const hasCreditLimit = (customer.credit_limit || 0) > 0;
   const creditUtilization = hasCreditLimit 
-    ? ((customer.current_balance || 0) / customer.credit_limit) * 100 
+    ? ((customer.current_balance || 0) / (customer.credit_limit || 1)) * 100 
     : 0;
 
   return (
@@ -67,7 +67,7 @@ export default function CustomerPreview({
         {/* Content */}
         <div className="mobile-preview-content">
           {/* Key Stats */}
-          <div className="preview-stats-grid">
+          <div className={`preview-stats-grid ${!hasCreditLimit ? 'single-col' : ''}`}>
             <div className="preview-stat-card">
               <div className="stat-icon-wrapper balance">
                 <FileText size={20} />

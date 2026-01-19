@@ -504,6 +504,54 @@ function runActivityLogMigration(): void {
   }
 }
 
+function runRawMaterialsWarehouseMigration(): void {
+  try {
+    const columnCheck = db.prepare(`
+      SELECT COUNT(*) as count FROM pragma_table_info('productions')
+      WHERE name='raw_materials_warehouse_id'
+    `).get() as { count: number };
+
+    if (columnCheck.count === 0) {
+      console.log('Running raw materials warehouse migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-raw-materials-warehouse.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      console.log('✅ Raw materials warehouse migration completed!');
+    }
+  } catch (error: any) {
+    console.error('Raw materials warehouse migration error:', error.message);
+  }
+}
+
+function runProductionInputsWarehouseMigration(): void {
+  try {
+    const columnCheck = db.prepare(`
+      SELECT COUNT(*) as count FROM pragma_table_info('production_inputs')
+      WHERE name='warehouse_id'
+    `).get() as { count: number };
+
+    if (columnCheck.count === 0) {
+      console.log('Running production inputs warehouse migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-warehouse-to-production-inputs.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      console.log('✅ Production inputs warehouse migration completed!');
+    }
+  } catch (error: any) {
+    console.error('Production inputs warehouse migration error:', error.message);
+  }
+}
+
 initializeDatabase();
 runExpensesMigration();
 runPurchasesMigration();
@@ -512,5 +560,7 @@ runBOMMigration();
 runSalesMigration();
 runSupplierLedgerMigration();
 runActivityLogMigration();
+runRawMaterialsWarehouseMigration();
+runProductionInputsWarehouseMigration();
 
 export default db;

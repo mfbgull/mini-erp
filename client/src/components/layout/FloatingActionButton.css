@@ -1,0 +1,56 @@
+/* Floating Action Button for Quick Actions */
+.fab {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 10%;
+  background: var(--primary-500, #3b82f6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  z-index: 1000;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.fab:hover {
+  background: var(--primary-700, #1d4ed8);
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+/* Show FAB on all screen sizes */
+@media (max-width: 768px) {
+  .fab {
+    bottom: 24px;
+    right: 24px;
+  }
+  
+  body.has-bottom-nav .fab {
+    display: none;
+  }
+}
+
+/* Desktop positioning */
+@media (min-width: 769px) {
+  .fab {
+    bottom: 24px;
+    right: 24px;
+  }
+}
+
+/* Accessibility enhancements */
+.fab:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}

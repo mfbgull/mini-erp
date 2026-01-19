@@ -34,15 +34,16 @@ h4 { font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--neutral-9
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 240px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+  margin-left: 240px;
   transition: margin-left 0.3s ease;
 }
 
 .main-content.sidebar-collapsed {
   margin-left: 70px;
+  padding-bottom: 12px;
 }
 
 .app-header {
@@ -75,7 +76,13 @@ h4 { font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--neutral-9
 .content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-lg);
+}
+
+/* Hide scrollbar for content */
+.content::-webkit-scrollbar {
+  display: none;
 }
 
 /* Page Header - Two Column Layout */
@@ -180,9 +187,3 @@ h4 { font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--neutral-9
   font-weight: 500;
 }
 
-/* Import search modal and searchable select styles */
-@import '../components/common/SearchModal.css';
-@import '../components/common/SearchableSelect.css';
-
-/* Mobile-Responsive Enhancements */
-@import './mobile-responsive.css';

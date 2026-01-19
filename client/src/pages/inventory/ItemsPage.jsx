@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import { useNavigate } from 'react-router-dom';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import toast from 'react-hot-toast';
 import { AgGridReact } from 'ag-grid-react';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
+import { CompactItemCard } from '../../components/common/CompactItemCard';
 import './ItemsPage.css';
 
 export default function ItemsPage() {
@@ -15,6 +17,7 @@ export default function ItemsPage() {
   const [editingItem, setEditingItem] = useState(null);
   const { formatCurrency } = useSettings();
   const navigate = useNavigate();
+  const { isMobile } = useMobileDetection();
   const queryClient = useQueryClient();
 
   // Fetch items
@@ -411,7 +414,21 @@ export default function ItemsPage() {
         <div className="loading">
           <div className="spinner"></div>
         </div>
-      ) : (
+        ) : isMobile ? (
+        <div className="mobile-items-container">
+          {items.map((item) => (
+            <CompactItemCard
+              key={item.id}
+              item={item}
+              onEdit={(item) => {
+                setEditingItem(item);
+                setIsModalOpen(true);
+              }}
+              onDelete={handleDeleteItem}
+            />
+          ))}
+        </div>
+        ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
             rowData={items}

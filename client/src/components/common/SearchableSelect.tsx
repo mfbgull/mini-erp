@@ -135,22 +135,14 @@ export default function SearchableSelect({
       return;
     }
 
-    if (multiple && Array.isArray(value)) {
-      const selectedLabels = value
-        .map((v: string | number) => {
-          const opt = options.find(o => o.value === v);
-          return opt ? opt.label : null;
-        })
-        .filter(Boolean);
-      setSearchQuery(selectedLabels.join(', '));
-    } else if (!multiple) {
-      const selectedOption = options.find(opt => opt.value === value);
-      if (selectedOption) {
-        setSearchQuery(selectedOption.label);
-      } else if (!value) {
-        setSearchQuery('');
-      }
+    // Don't override search query if user is actively searching
+    if (searchQuery.trim() !== '') {
+      return;
     }
+
+    // For edit mode: clear search query so all options are visible
+    // This allows user to change the unit of measurement
+    setSearchQuery('');
   }, [value, options, multiple]);
 
   // Filter options to show available options
