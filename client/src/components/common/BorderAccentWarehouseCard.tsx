@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { MoreVertical, Edit, Trash2, Package, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Package, ArrowLeft } from 'lucide-react';
 import api from '../../utils/api';
 import './BorderAccentWarehouseCard.css';
 
@@ -8,7 +8,6 @@ interface BorderAccentWarehouseCardProps {
   warehouse: any;
   onEdit: (warehouse: any) => void;
   onDelete: (warehouse: any) => void;
-  onBack?: () => void;
   showItems?: boolean;
   onShowItemsChange?: (show: boolean) => void;
 }
@@ -17,32 +16,35 @@ export default function BorderAccentWarehouseCard({
   warehouse, 
   onEdit, 
   onDelete,
-  onBack,
   showItems: externalShowItems,
   onShowItemsChange
 }: BorderAccentWarehouseCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showItems, setShowItems] = useState(externalShowItems || false);
-  const internalShowItems = showItems;
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Sync internal state with external prop
+  useEffect(() => {
+    if (externalShowItems !== undefined) {
+      setIsExpanded(externalShowItems);
+    }
+  }, [externalShowItems]);
 
   // Fetch items for this warehouse
   const { data: items = [], isLoading: itemsLoading } = useQuery({
-    queryKey: ['items', warehouse.id],
+    queryKey: ['items', warehouse.id, isExpanded],
     queryFn: async () => {
       const response = await api.get('/inventory/items');
       return response.data.data.filter((item: any) => 
         item.warehouse_id == warehouse.id || item.warehouse == warehouse.id
       );
     },
-    enabled: internalShowItems
+    enabled: isExpanded
   });
 
   const handleCardClick = () => {
-    if (onShowItemsChange) {
-      onShowItemsChange(!externalShowItems);
-    } else {
-      setShowItems(!showItems);
-    }
+    const newState = !isExpanded;
+    setIsExpanded(newState);
+    onShowItemsChange?.(newState);
   };
 
   const handleMenuToggle = (e: React.MouseEvent) => {
@@ -72,27 +74,8 @@ export default function BorderAccentWarehouseCard({
   };
 
   const handleCloseItems = () => {
-    if (onShowItemsChange) {
-      onShowItemsChange(false);
-    } else {
-      setShowItems(false);
-    }
-  };
-
-  const handleEditFromModal = () => {
-    onEdit(warehouse);
-  };
-
-  const handleDeleteFromModal = () => {
-    onDelete(warehouse);
-  };
-
-  const handleViewItemsToggle = () => {
-    if (onShowItemsChange) {
-      onShowItemsChange(!externalShowItems);
-    } else {
-      setShowItems(!showItems);
-    }
+    setIsExpanded(false);
+    onShowItemsChange?.(false);
   };
 
   // Calculate stock value
@@ -143,7 +126,7 @@ export default function BorderAccentWarehouseCard({
         </div>
       </div>
 
-      {internalShowItems && (
+      {isExpanded && (
         <div className="warehouse-items-panel">
           {/* Header */}
           <div className="warehouse-items-header">
