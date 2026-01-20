@@ -5,61 +5,60 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 12px;
   position: relative;
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: minmax(28px, auto) minmax(28px, auto);
   padding: 12px;
-  gap: 12px;
+  gap: 8px 12px;
 }
 
 .card-content-clickable {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: minmax(28px, auto) minmax(28px, auto);
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 2;
   cursor: pointer;
-  min-width: 0;
-  padding-right: 12px;
 }
 
 .card-content-clickable:active {
   opacity: 0.7;
 }
 
-/* Left side - Item info */
-.item-info {
-  flex: 1;
-  min-width: 0;
-}
-
+/* Item Name - Row 1, Col 1 */
 .item-name {
+  grid-column: 1;
+  grid-row: 1;
   font-weight: 500;
   font-size: 15px;
   color: #1a1a1a;
-  margin: 0 0 4px 0;
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.4;
+  align-self: center;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
 }
 
-.item-code {
-  font-size: 12px;
-  color: #6c757d;
-  margin: 0;
-}
-
-/* Stock info */
-.stock-info {
-  text-align: right;
-  flex-shrink: 0;
+/* Stock Row - Row 2, both columns */
+.stock-row {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
 }
 
 .stock-label {
   font-size: 11px;
   color: #6c757d;
-  margin: 0 0 2px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .stock-value {
@@ -67,6 +66,7 @@
   font-size: 16px;
   color: #28a745;
   margin: 0;
+  flex-shrink: 0;
 }
 
 .stock-value.low-stock {
@@ -77,17 +77,21 @@
   color: #dc3545;
 }
 
-/* Menu */
+/* Right column - menu button - Row 1 */
 .menu-container {
-  position: relative;
-  flex-shrink: 0;
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
 }
 
 .menu-trigger {
   width: 32px;
-  height: 32px;
+  height: 28px;
   min-width: 32px;
-  min-height: 32px;
+  min-height: 28px;
   border: 2px solid red; /* DEBUG: Make button visible */
   background: #ffcccc;
   border-radius: 6px;

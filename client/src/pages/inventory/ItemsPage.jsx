@@ -10,11 +10,15 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import { CompactItemCard } from '../../components/common/CompactItemCard';
+import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
+import { Search, X } from 'lucide-react';
 import './ItemsPage.css';
 
 export default function ItemsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [openDetailsItem, setOpenDetailsItem] = useState(null);
   const { formatCurrency } = useSettings();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
@@ -28,6 +32,11 @@ export default function ItemsPage() {
       return response.data.data;
     }
   });
+
+  const filteredItems = items.filter(item =>
+    item.item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.item_code?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Calculate statistics
   const stats = {
@@ -286,11 +295,7 @@ export default function ItemsPage() {
       <div className="page-header">
         <div>
           <h1>Items</h1>
-          <p className="page-subtitle">Manage your product catalog and inventory items</p>
         </div>
-        <Button variant="primary" onClick={handleNewItem}>
-          + New Item
-        </Button>
       </div>
 
       {/* Summary Statistics Cards */}
@@ -410,28 +415,67 @@ export default function ItemsPage() {
         </button>
       </div>
 
+      <div className="search-section">
+        <div className="search-input-wrapper">
+          <Search className="search-icon" size={20} />
+          <input
+            type="text"
+            className="search-input-field"
+            placeholder="Search items by name or code..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button 
+              className="search-clear-btn"
+              onClick={() => setSearchTerm('')}
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="loading">
           <div className="spinner"></div>
         </div>
+        ) : filteredItems.length === 0 && searchTerm ? (
+          <div className="no-results">
+            <div className="no-results-icon">🔍</div>
+            <h3>No items found</h3>
+            <p>No items match "{searchTerm}"</p>
+            <Button variant="secondary" onClick={() => setSearchTerm('')}>Clear Search</Button>
+          </div>
         ) : isMobile ? (
-        <div className="mobile-items-container">
-          {items.map((item) => (
-            <CompactItemCard
-              key={item.id}
-              item={item}
-              onEdit={(item) => {
-                setEditingItem(item);
-                setIsModalOpen(true);
-              }}
-              onDelete={handleDeleteItem}
-            />
-          ))}
-        </div>
+        <>
+          <div className="mobile-items-container">
+            {filteredItems.map((item) => (
+              <BorderAccentItemCard
+                key={item.id}
+                item={item}
+                showDetails={openDetailsItem?.id === item.id}
+                onDetailsChange={(show) => setOpenDetailsItem(show ? item : null)}
+                onEdit={(item) => {
+                  setEditingItem(item);
+                  setIsModalOpen(true);
+                }}
+                onDelete={handleDeleteItem}
+              />
+            ))}
+          </div>
+          {openDetailsItem === null && (
+          <div className="mobile-action-bar">
+            <Button variant="primary" onClick={handleNewItem}>
+              + New Item
+            </Button>
+          </div>
+          )}
+        </>
         ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
-            rowData={items}
+            rowData={filteredItems}
             columnDefs={columnDefs}
             defaultColDef={{
               resizable: true,

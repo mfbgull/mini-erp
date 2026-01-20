@@ -200,20 +200,23 @@
   }
   
   .stat-card {
-    padding: var(--space-md) !important;
-    flex-direction: row !important;
+    padding: var(--space-sm) !important;
+    flex-direction: column !important;
     align-items: center !important;
-    gap: var(--space-md) !important;
+    justify-content: center !important;
+    gap: var(--space-xs) !important;
+    text-align: center !important;
   }
   
   .stat-card .kpi-icon {
-    width: 48px !important;
-    height: 48px !important;
-    font-size: 24px !important;
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.2rem !important;
+    margin-bottom: var(--space-xs) !important;
   }
   
   .stat-card .kpi-value {
-    font-size: 28px !important;
+    font-size: 1.2rem !important;
   }
   
   /* ============================================
