@@ -1,29 +1,48 @@
 import { useState } from 'react';
-import { MoreVertical, Edit, Trash2, Package } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { MoreVertical, Edit, Trash2, Package, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
+import api from '../../utils/api';
 import './BorderAccentWarehouseCard.css';
 
 interface BorderAccentWarehouseCardProps {
   warehouse: any;
   onEdit: (warehouse: any) => void;
   onDelete: (warehouse: any) => void;
-  showDetails?: boolean;
-  onDetailsChange?: (show: boolean) => void;
+  onBack?: () => void;
+  showItems?: boolean;
+  onShowItemsChange?: (show: boolean) => void;
 }
 
 export default function BorderAccentWarehouseCard({ 
   warehouse, 
   onEdit, 
-  onDelete, 
-  showDetails: externalShowDetails,
-  onDetailsChange 
+  onDelete,
+  onBack,
+  showItems: externalShowItems,
+  onShowItemsChange
 }: BorderAccentWarehouseCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const internalShowDetails = !externalShowDetails ? false : externalShowDetails;
-  const navigate = useNavigate();
+  const [showItems, setShowItems] = useState(externalShowItems || false);
+  const internalShowItems = showItems;
+
+  // Fetch items for this warehouse
+  const { data: items = [], isLoading: itemsLoading } = useQuery({
+    queryKey: ['items', warehouse.id],
+    queryFn: async () => {
+      const response = await api.get('/inventory/items');
+      return response.data.data.filter((item: any) => 
+        item.warehouse_id == warehouse.id || item.warehouse == warehouse.id
+      );
+    },
+    enabled: internalShowItems
+  });
 
   const handleCardClick = () => {
-    onDetailsChange?.(true);
+    if (onShowItemsChange) {
+      onShowItemsChange(!externalShowItems);
+    } else {
+      setShowItems(!showItems);
+    }
   };
 
   const handleMenuToggle = (e: React.MouseEvent) => {
@@ -52,24 +71,38 @@ export default function BorderAccentWarehouseCard({
     setMenuOpen(false);
   };
 
-  const handleCloseModal = () => {
-    onDetailsChange?.(false);
+  const handleCloseItems = () => {
+    if (onShowItemsChange) {
+      onShowItemsChange(false);
+    } else {
+      setShowItems(false);
+    }
   };
 
   const handleEditFromModal = () => {
-    onDetailsChange?.(false);
     onEdit(warehouse);
   };
 
   const handleDeleteFromModal = () => {
-    onDetailsChange?.(false);
     onDelete(warehouse);
   };
 
-  const handleViewItems = () => {
-    onDetailsChange?.(false);
-    navigate(`/inventory/items?warehouse=${warehouse.id}`);
+  const handleViewItemsToggle = () => {
+    if (onShowItemsChange) {
+      onShowItemsChange(!externalShowItems);
+    } else {
+      setShowItems(!showItems);
+    }
   };
+
+  // Calculate stock value
+  const totalStockValue = items.reduce((sum: number, item: any) => 
+    sum + (parseFloat(item.current_stock || 0) * parseFloat(item.standard_cost || 0)), 0
+  );
+
+  const totalStock = items.reduce((sum: number, item: any) => 
+    sum + parseFloat(item.current_stock || 0), 0
+  );
 
   return (
     <>
@@ -110,57 +143,69 @@ export default function BorderAccentWarehouseCard({
         </div>
       </div>
 
-      {internalShowDetails && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="hero-stock-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-handle"></div>
-            
-            <div className="modal-header">
-              <h3 className="modal-title">{warehouse.warehouse_name}</h3>
-              <p className="modal-code">{warehouse.warehouse_code}</p>
+      {internalShowItems && (
+        <div className="warehouse-items-panel">
+          {/* Header */}
+          <div className="warehouse-items-header">
+            <button className="warehouse-items-back-btn" onClick={handleCloseItems}>
+              <ArrowLeft size={18} />
+              Back to Warehouses
+            </button>
+            <div className="warehouse-items-title">
+              <Package size={20} />
+              <span>Items in: <strong>{warehouse.warehouse_name}</strong></span>
             </div>
-            
-            <div className="hero-stock-banner warehouse-banner">
-              <div className="stock-label">Location</div>
-              <div className="stock-value-container">
-                <span className="stock-value">{warehouse.location || 'N/A'}</span>
-              </div>
+          </div>
+
+          {/* Stats */}
+          <div className="warehouse-items-stats">
+            <div className="warehouse-item-stat">
+              <span className="stat-number">{items.length}</span>
+              <span className="stat-label">Total Items</span>
             </div>
-            
-            <div className="modal-content">
-              <div className="info-row">
-                <span className="info-label">Warehouse Code</span>
-                <span className="info-value">{warehouse.warehouse_code}</span>
+            <div className="warehouse-item-stat">
+              <span className="stat-number">{totalStock.toFixed(2)}</span>
+              <span className="stat-label">Total Stock</span>
+            </div>
+            <div className="warehouse-item-stat">
+              <span className="stat-number">Rs {totalStockValue.toFixed(2)}</span>
+              <span className="stat-label">Stock Value</span>
+            </div>
+          </div>
+
+          {/* Items List */}
+          <div className="warehouse-items-list">
+            {itemsLoading ? (
+              <div className="warehouse-items-loading">
+                <div className="spinner"></div>
+                <p>Loading items...</p>
               </div>
-              <div className="info-row">
-                <span className="info-label">Warehouse Name</span>
-                <span className="info-value">{warehouse.warehouse_name}</span>
+            ) : items.length === 0 ? (
+              <div className="warehouse-items-empty">
+                <Package size={48} />
+                <p>No items in this warehouse</p>
               </div>
-              <div className="info-row">
-                <span className="info-label">Location</span>
-                <span className="info-value">{warehouse.location || 'Not specified'}</span>
-              </div>
-              
-              {warehouse.description && (
-                <div className="description-box">
-                  <div className="description-label">Description</div>
-                  <p className="description-text">{warehouse.description}</p>
+            ) : (
+              items.map((item: any) => (
+                <div key={item.id} className="warehouse-item-card">
+                  <div className="warehouse-item-info">
+                    <span className="warehouse-item-name">{item.item_name}</span>
+                    <span className="warehouse-item-code">{item.item_code}</span>
+                  </div>
+                  <div className="warehouse-item-stock">
+                    <span className="stock-number">{parseFloat(item.current_stock || 0).toFixed(2)}</span>
+                    <span className="stock-unit">{item.unit_of_measure}</span>
+                  </div>
                 </div>
-              )}
-            </div>
-            
-            <div className="modal-actions">
-              <button className="action-btn view-items-btn" onClick={handleViewItems}>
-                <Package size={18} />
-                View Items
-              </button>
-              <button className="action-btn edit-btn" onClick={handleEditFromModal}>
-                Edit
-              </button>
-              <button className="action-btn delete-btn" onClick={handleDeleteFromModal}>
-                Delete
-              </button>
-            </div>
+              ))
+            )}
+          </div>
+
+          {/* FAB */}
+          <div className="warehouse-items-fab">
+            <button className="warehouse-fab-btn">
+              + New Item
+            </button>
           </div>
         </div>
       )}

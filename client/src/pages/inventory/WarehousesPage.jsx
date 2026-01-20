@@ -97,7 +97,7 @@ export default function WarehousesPage() {
           <h1>Warehouses</h1>
           <p className="page-subtitle">Manage storage locations</p>
         </div>
-        {!isMobile && (
+        {!isMobile && !openDetailsWarehouse && (
           <Button variant="primary" onClick={handleNew}>
             + New Warehouse
           </Button>
@@ -143,8 +143,8 @@ export default function WarehousesPage() {
               <BorderAccentWarehouseCard
                 key={warehouse.id}
                 warehouse={warehouse}
-                showDetails={openDetailsWarehouse?.id === warehouse.id}
-                onDetailsChange={(show) => setOpenDetailsWarehouse(show ? warehouse : null)}
+                showItems={openDetailsWarehouse?.id === warehouse.id}
+                onShowItemsChange={(show) => setOpenDetailsWarehouse(show ? warehouse : null)}
                 onEdit={(warehouse) => {
                   setEditingWarehouse(warehouse);
                   setIsModalOpen(true);
