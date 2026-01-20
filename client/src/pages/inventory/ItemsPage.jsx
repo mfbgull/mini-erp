@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import toast from 'react-hot-toast';
 import { AgGridReact } from 'ag-grid-react';
@@ -11,7 +11,7 @@ import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import { CompactItemCard } from '../../components/common/CompactItemCard';
 import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
-import { Search, X } from 'lucide-react';
+import { Search, X, ArrowLeft, Building2 } from 'lucide-react';
 import './ItemsPage.css';
 
 export default function ItemsPage() {
@@ -19,10 +19,33 @@ export default function ItemsPage() {
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [openDetailsItem, setOpenDetailsItem] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedWarehouse, setSelectedWarehouse] = useState(null);
   const { formatCurrency } = useSettings();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
   const queryClient = useQueryClient();
+
+  // Get warehouse filter from URL
+  const warehouseId = searchParams.get('warehouse');
+
+  // Fetch selected warehouse details if filtering by warehouse
+  useEffect(() => {
+    const fetchWarehouse = async () => {
+      if (warehouseId) {
+        try {
+          const response = await api.get(`/inventory/warehouses/${warehouseId}`);
+          setSelectedWarehouse(response.data.data);
+        } catch (error) {
+          console.error('Failed to fetch warehouse:', error);
+          setSelectedWarehouse(null);
+        }
+      } else {
+        setSelectedWarehouse(null);
+      }
+    };
+    fetchWarehouse();
+  }, [warehouseId]);
 
   // Fetch items
   const { data: items = [], isLoading } = useQuery({
@@ -33,38 +56,50 @@ export default function ItemsPage() {
     }
   });
 
-  const filteredItems = items.filter(item =>
-    item.item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.item_code?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter items by warehouse if specified
+  const filteredItems = items.filter(item => {
+    const matchesSearch = 
+      item.item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.item_code?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesWarehouse = warehouseId 
+      ? item.warehouse_id == warehouseId || item.warehouse === warehouseId
+      : true;
+    
+    return matchesSearch && matchesWarehouse;
+  });
 
-  // Calculate statistics
+  // Calculate statistics (filtered by warehouse if applicable)
+  const filteredForStats = warehouseId 
+    ? items.filter(item => item.warehouse_id == warehouseId || item.warehouse === warehouseId)
+    : items;
+
   const stats = {
-    totalItems: items.length,
-    totalStockValue: items.reduce((sum, item) =>
+    totalItems: filteredForStats.length,
+    totalStockValue: filteredForStats.reduce((sum, item) =>
       sum + (parseFloat(item.current_stock || 0) * parseFloat(item.standard_cost || 0)), 0
     ),
-    totalStock: items.reduce((sum, item) =>
+    totalStock: filteredForStats.reduce((sum, item) =>
       sum + parseFloat(item.current_stock || 0), 0
     ),
-    lowStockAlerts: items.filter(item =>
+    lowStockAlerts: filteredForStats.filter(item =>
       item.reorder_level > 0 && item.current_stock <= item.reorder_level
     ).length,
-    outOfStock: items.filter(item =>
+    outOfStock: filteredForStats.filter(item =>
       parseFloat(item.current_stock || 0) === 0
     ).length,
-    categories: new Set(items.map(item => item.category).filter(Boolean)).size,
-    rawMaterials: items.filter(item =>
+    categories: new Set(filteredForStats.map(item => item.category).filter(Boolean)).size,
+    rawMaterials: filteredForStats.filter(item =>
       item.is_raw_material === 1 || item.is_raw_material === true
     ).length,
-    finishedGoods: items.filter(item =>
+    finishedGoods: filteredForStats.filter(item =>
       item.is_finished_good === 1 || item.is_finished_good === true
     ).length
   };
 
   // Export to CSV
   const handleExport = () => {
-    if (items.length === 0) {
+    if (filteredItems.length === 0) {
       toast.error('No items to export');
       return;
     }
@@ -75,7 +110,7 @@ export default function ItemsPage() {
       'Raw Material', 'Finished Good', 'Purchased', 'Manufactured'
     ];
 
-    const rows = items.map(item => [
+    const rows = filteredItems.map(item => [
       item.item_code,
       item.item_name,
       item.category || '',
@@ -290,11 +325,32 @@ export default function ItemsPage() {
     setEditingItem(null);
   };
 
+  const handleClearWarehouseFilter = () => {
+    setSearchParams({});
+    setSelectedWarehouse(null);
+  };
+
   return (
     <div className="items-page">
       <div className="page-header">
         <div>
-          <h1>Items</h1>
+          {selectedWarehouse ? (
+            <>
+              <button 
+                className="back-to-warehouses-btn"
+                onClick={handleClearWarehouseFilter}
+              >
+                <ArrowLeft size={20} />
+                Back to Warehouses
+              </button>
+              <div className="warehouse-filter-info">
+                <Building2 size={20} />
+                <span>Items in: <strong>{selectedWarehouse.warehouse_name}</strong></span>
+              </div>
+            </>
+          ) : (
+            <h1>Items</h1>
+          )}
         </div>
       </div>
 
@@ -307,7 +363,7 @@ export default function ItemsPage() {
           <div className="stat-content">
             <div className="stat-label">Total Items</div>
             <div className="stat-value">{stats.totalItems}</div>
-            <div className="stat-subtitle">Active items in catalog</div>
+            <div className="stat-subtitle">{warehouseId ? `in ${selectedWarehouse?.warehouse_name || 'warehouse'}` : 'Active items in catalog'}</div>
           </div>
         </div>
 
@@ -440,14 +496,21 @@ export default function ItemsPage() {
         <div className="loading">
           <div className="spinner"></div>
         </div>
-        ) : filteredItems.length === 0 && searchTerm ? (
-          <div className="no-results">
-            <div className="no-results-icon">🔍</div>
-            <h3>No items found</h3>
-            <p>No items match "{searchTerm}"</p>
-            <Button variant="secondary" onClick={() => setSearchTerm('')}>Clear Search</Button>
-          </div>
-        ) : isMobile ? (
+      ) : filteredItems.length === 0 && searchTerm ? (
+        <div className="no-results">
+          <div className="no-results-icon">🔍</div>
+          <h3>No items found</h3>
+          <p>No items match "{searchTerm}"</p>
+          <Button variant="secondary" onClick={() => setSearchTerm('')}>Clear Search</Button>
+        </div>
+      ) : filteredItems.length === 0 && warehouseId ? (
+        <div className="no-results">
+          <div className="no-results-icon">📦</div>
+          <h3>No items in this warehouse</h3>
+          <p>This warehouse doesn't have any items yet.</p>
+          <Button variant="secondary" onClick={handleClearWarehouseFilter}>View All Items</Button>
+        </div>
+      ) : isMobile ? (
         <>
           <div className="mobile-items-container">
             {filteredItems.map((item) => (
@@ -472,7 +535,7 @@ export default function ItemsPage() {
           </div>
           )}
         </>
-        ) : (
+      ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
             rowData={filteredItems}

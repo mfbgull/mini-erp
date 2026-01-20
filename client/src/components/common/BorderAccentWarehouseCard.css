@@ -315,3 +315,16 @@
   background: #fee2e2;
   color: #dc2626;
 }
+
+.view-items-btn {
+  background: #10b981;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.view-items-btn:hover {
+  background: #059669;
+}

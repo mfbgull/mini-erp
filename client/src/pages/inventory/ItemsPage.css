@@ -428,3 +428,46 @@
     font-size: 0.55rem !important;
   }
 }
+
+/* Back to Warehouses Button */
+.back-to-warehouses-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: var(--space-sm);
+  transition: color 0.2s;
+}
+
+.back-to-warehouses-btn:hover {
+  color: #764ba2;
+}
+
+.warehouse-filter-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.warehouse-filter-info strong {
+  color: #1a1a1a;
+}
+
+/* Mobile responsive for back button */
+@media (max-width: 768px) {
+  .back-to-warehouses-btn {
+    font-size: 13px;
+  }
+  
+  .warehouse-filter-info {
+    font-size: 13px;
+  }
+}

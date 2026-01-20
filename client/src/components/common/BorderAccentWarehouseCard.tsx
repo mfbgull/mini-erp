@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Package } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './BorderAccentWarehouseCard.css';
 
 interface BorderAccentWarehouseCardProps {
@@ -19,6 +20,7 @@ export default function BorderAccentWarehouseCard({
 }: BorderAccentWarehouseCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const internalShowDetails = !externalShowDetails ? false : externalShowDetails;
+  const navigate = useNavigate();
 
   const handleCardClick = () => {
     onDetailsChange?.(true);
@@ -62,6 +64,11 @@ export default function BorderAccentWarehouseCard({
   const handleDeleteFromModal = () => {
     onDetailsChange?.(false);
     onDelete(warehouse);
+  };
+
+  const handleViewItems = () => {
+    onDetailsChange?.(false);
+    navigate(`/inventory/items?warehouse=${warehouse.id}`);
   };
 
   return (
@@ -143,6 +150,10 @@ export default function BorderAccentWarehouseCard({
             </div>
             
             <div className="modal-actions">
+              <button className="action-btn view-items-btn" onClick={handleViewItems}>
+                <Package size={18} />
+                View Items
+              </button>
               <button className="action-btn edit-btn" onClick={handleEditFromModal}>
                 Edit
               </button>
