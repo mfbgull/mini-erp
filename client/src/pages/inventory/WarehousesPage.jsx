@@ -1,15 +1,22 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import toast from 'react-hot-toast';
 import { AgGridReact } from 'ag-grid-react';
+import { Search, X } from 'lucide-react';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
+import BorderAccentWarehouseCard from '../../components/common/BorderAccentWarehouseCard';
+import './WarehousesPage.css';
 
 export default function WarehousesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [openDetailsWarehouse, setOpenDetailsWarehouse] = useState(null);
+  const { isMobile } = useMobileDetection();
   const queryClient = useQueryClient();
 
   const { data: warehouses = [], isLoading } = useQuery({
@@ -19,6 +26,12 @@ export default function WarehousesPage() {
       return response.data.data;
     }
   });
+
+  const filteredWarehouses = warehouses.filter(warehouse =>
+    warehouse.warehouse_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    warehouse.warehouse_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    warehouse.location?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const columnDefs = [
     {
@@ -53,26 +66,105 @@ export default function WarehousesPage() {
     setIsModalOpen(true);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingWarehouse(null);
+  };
+
+  const deleteMutation = useMutation({
+    mutationFn: async (warehouseId) => {
+      return api.delete(`/inventory/warehouses/${warehouseId}`);
+    },
+    onSuccess: () => {
+      toast.success('Warehouse deleted successfully!');
+      queryClient.invalidateQueries(['warehouses']);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to delete warehouse');
+    }
+  });
+
+  const handleDeleteWarehouse = (warehouse) => {
+    if (window.confirm(`Are you sure you want to delete warehouse: ${warehouse.warehouse_name}?`)) {
+      deleteMutation.mutate(warehouse.id);
+    }
+  };
+
   return (
-    <div className="items-page">
+    <div className="items-page warehouses-page">
       <div className="page-header">
         <div>
           <h1>Warehouses</h1>
           <p className="page-subtitle">Manage storage locations</p>
         </div>
-        <Button variant="primary" onClick={handleNew}>
-          + New Warehouse
-        </Button>
+        {!isMobile && (
+          <Button variant="primary" onClick={handleNew}>
+            + New Warehouse
+          </Button>
+        )}
+      </div>
+
+      <div className="search-section">
+        <div className="search-input-wrapper">
+          <Search className="search-icon" size={20} />
+          <input
+            type="text"
+            className="search-input-field"
+            placeholder="Search warehouses..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button 
+              className="search-clear-btn"
+              onClick={() => setSearchTerm('')}
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       {isLoading ? (
         <div className="loading">
           <div className="spinner"></div>
         </div>
+      ) : filteredWarehouses.length === 0 && searchTerm ? (
+        <div className="no-results">
+          <div className="no-results-icon">🔍</div>
+          <h3>No warehouses found</h3>
+          <p>No warehouses match "{searchTerm}"</p>
+          <Button variant="secondary" onClick={() => setSearchTerm('')}>Clear Search</Button>
+        </div>
+      ) : isMobile ? (
+        <>
+          <div className="mobile-warehouses-container">
+            {filteredWarehouses.map((warehouse) => (
+              <BorderAccentWarehouseCard
+                key={warehouse.id}
+                warehouse={warehouse}
+                showDetails={openDetailsWarehouse?.id === warehouse.id}
+                onDetailsChange={(show) => setOpenDetailsWarehouse(show ? warehouse : null)}
+                onEdit={(warehouse) => {
+                  setEditingWarehouse(warehouse);
+                  setIsModalOpen(true);
+                }}
+                onDelete={handleDeleteWarehouse}
+              />
+            ))}
+          </div>
+          {openDetailsWarehouse === null && (
+          <div className="mobile-action-bar">
+            <Button variant="primary" onClick={handleNew}>
+              + New Warehouse
+            </Button>
+          </div>
+          )}
+        </>
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
-            rowData={warehouses}
+            rowData={filteredWarehouses}
             columnDefs={columnDefs}
             defaultColDef={{
               resizable: true,
@@ -90,16 +182,16 @@ export default function WarehousesPage() {
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         title={editingWarehouse ? 'Edit Warehouse' : 'New Warehouse'}
         size="small"
       >
         <WarehouseForm
           warehouse={editingWarehouse}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleCloseModal}
           onSuccess={() => {
             queryClient.invalidateQueries(['warehouses']);
-            setIsModalOpen(false);
+            handleCloseModal();
           }}
         />
       </Modal>
@@ -112,7 +204,8 @@ function WarehouseForm({ warehouse, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     warehouse_code: warehouse?.warehouse_code || '',
     warehouse_name: warehouse?.warehouse_name || '',
-    location: warehouse?.location || ''
+    location: warehouse?.location || '',
+    description: warehouse?.description || ''
   });
 
   const mutation = useMutation({
@@ -166,6 +259,15 @@ function WarehouseForm({ warehouse, onClose, onSuccess }) {
         value={formData.location}
         onChange={handleChange}
         placeholder="Physical location or address"
+      />
+      <FormInput
+        label="Description"
+        name="description"
+        type="textarea"
+        value={formData.description}
+        onChange={handleChange}
+        placeholder="Optional description"
+        rows={3}
       />
 
       <div className="form-actions">
