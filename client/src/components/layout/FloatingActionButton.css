@@ -1,8 +1,8 @@
 /* Floating Action Button for Quick Actions */
 .fab {
   position: absolute;
-  bottom: 24px;
-  right: 24px;
+  bottom: 12px;
+  right: 12px;
   width: 56px;
   height: 56px;
   border-radius: 10%;
@@ -32,8 +32,8 @@
 /* Show FAB on all screen sizes */
 @media (max-width: 768px) {
   .fab {
-    bottom: 24px;
-    right: 24px;
+    bottom: 12px;
+    right: 12px;
   }
   
   body.has-bottom-nav .fab {
@@ -44,8 +44,8 @@
 /* Desktop positioning */
 @media (min-width: 769px) {
   .fab {
-    bottom: 24px;
-    right: 24px;
+    bottom: 12px;
+    right: 12px;
   }
 }
 

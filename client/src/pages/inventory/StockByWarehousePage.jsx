@@ -1,16 +1,22 @@
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { AgGridReact } from 'ag-grid-react';
+import { Filter } from 'lucide-react';
 import api from '../../utils/api';
+import CompactStockByWarehouseCardView from '../../components/common/CompactStockByWarehouseCard';
 import './StockByWarehousePage.css';
 
 export default function StockByWarehousePage() {
   const { formatCurrency } = useSettings();
+  const { isMobile } = useMobileDetection();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: stockBalances = [], isLoading } = useQuery({
+const { data: stockBalances = [], isLoading } = useQuery({
     queryKey: ['stock-balances'],
     queryFn: async () => {
       const response = await api.get('/inventory/stock-balances');
@@ -18,6 +24,17 @@ export default function StockByWarehousePage() {
       return response.data.filter(item => item.quantity > 0);
     }
   });
+
+  const filteredStockBalances = useMemo(() => {
+    if (!searchTerm) return stockBalances;
+    const term = searchTerm.toLowerCase();
+    return stockBalances.filter(item => 
+      item.item_code?.toLowerCase().includes(term) ||
+      item.item_name?.toLowerCase().includes(term) ||
+      item.warehouse_code?.toLowerCase().includes(term) ||
+      item.warehouse_name?.toLowerCase().includes(term)
+    );
+  }, [stockBalances, searchTerm]);
 
   // Calculate statistics
   const stats = {
@@ -232,10 +249,46 @@ export default function StockByWarehousePage() {
         </button>
       </div>
 
-      {isLoading ? (
+{isLoading ? (
         <div className="loading">
           <div className="spinner"></div>
         </div>
+      ) : isMobile ? (
+        <>
+          <div className="mobile-search-section">
+            <div className="search-input-wrapper">
+              <Filter size={18} />
+              <input
+                type="text"
+                className="search-input-field"
+                placeholder="Search stock by warehouse..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button 
+                  className="search-clear-btn"
+                  onClick={() => setSearchTerm('')}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+
+          <CompactStockByWarehouseCardView
+            stockData={filteredStockBalances}
+            onRowClick={(item) => {
+              navigate(`/inventory/items/${item.item_id}`);
+            }}
+          />
+
+          {filteredStockBalances.length > 0 && (
+            <div className="mobile-pagination-info">
+              Showing {filteredStockBalances.length} of {stockBalances.length} stock items
+            </div>
+          )}
+        </>
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
@@ -247,8 +300,8 @@ export default function StockByWarehousePage() {
               filter: false
             }}
             pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
+              paginationPageSize={20}
+              paginationPageSizeSelector={[10, 20, 50, 100]}
           />
         </div>
       )}

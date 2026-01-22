@@ -1,4 +1,4 @@
-/* Compact Stock By Warehouse Card Styles */
+/* Compact Stock By Warehouse Card Styles - Matching Stock Movement Card Design */
 .compact-mobile-cards-wrapper {
   display: flex;
   flex-direction: column;
@@ -45,162 +45,119 @@
 .compact-mobile-cards-container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   overflow: visible;
 }
 
-/* Compact Card */
+/* Compact Card - Matching Movement Card Style */
 .compact-mobile-card {
-  background: var(--neutral-100);
-  border: 1px solid var(--border-color);
+  background: white;
   border-radius: var(--radius-md);
-  padding: var(--space-sm) var(--space-md);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid var(--success);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
   cursor: pointer;
   position: relative;
   overflow: visible;
 }
 
 .compact-mobile-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-500);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .compact-mobile-card:active {
   transform: scale(0.99);
 }
 
-/* Stock-specific card styling */
-.compact-mobile-card.stock-card {
-  border-left: 4px solid var(--success);
-}
-
-.compact-mobile-card.stock-card:hover {
-  border-left-color: var(--primary-600);
-}
-
-/* Compact Card Content Layout */
-.compact-card-content {
+/* Card Header - Warehouse Info */
+.compact-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--space-md);
+  align-items: flex-start;
+  padding: var(--space-md);
+  background: var(--neutral-50);
+  border-bottom: 1px solid var(--neutral-100);
 }
 
-/* Left: Item Info */
-.compact-item-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.compact-item-name {
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--text-primary);
-  margin: 0 0 2px 0;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.compact-item-code {
-  font-size: 12px;
-  color: var(--text-tertiary);
-  margin: 0;
-  line-height: 1.2;
-}
-
-/* Right: Quantity + Warehouse */
-.compact-item-right {
+.compact-warehouse-info {
   display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  flex-shrink: 0;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* Stock Display */
-.compact-stock-display {
-  text-align: right;
-  min-width: 70px;
+.warehouse-code {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--neutral-900);
 }
 
-.stock-label {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 2px 0;
-}
-
-.stock-value {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.stock-unit {
-  font-size: 10px;
-  color: var(--text-tertiary);
-  margin: 2px 0 0 0;
-}
-
-.stock-normal {
-  color: var(--success);
-}
-
-.stock-low {
-  color: var(--warning);
-}
-
-.stock-out-of-stock {
-  color: var(--error);
-}
-
-/* Stock Warehouse Info */
-.stock-warehouse-info {
-  text-align: right;
-  min-width: 80px;
-}
-
-.warehouse-label {
-  display: block;
-  font-size: 10px;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.warehouse-value {
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  display: block;
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.warehouse-name {
+  font-size: 0.8rem;
+  color: var(--neutral-500);
 }
 
 .multi-badge {
-  margin-left: 4px;
-  font-size: 10px;
+  font-size: 0.75rem;
 }
 
-/* Stock Footer */
-.stock-footer {
-  margin-top: var(--space-sm);
-  padding-top: var(--space-sm);
-  border-top: 1px dashed var(--border-color);
+/* Card Body */
+.compact-card-body {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.compact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compact-item .item-name {
+  font-weight: 500;
+  color: var(--neutral-900);
+  font-size: 1rem;
+}
+
+.compact-item .item-code {
+  font-size: 0.8rem;
+  color: var(--neutral-500);
+  font-family: monospace;
+}
+
+.compact-quantity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.stock-qty {
+  color: var(--success);
+}
+
+.stock-unit {
+  font-size: 0.85rem;
+  color: var(--neutral-500);
+  font-weight: normal;
+}
+
+/* Card Footer - Value Display */
+.compact-card-footer {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--neutral-50);
+  border-top: 1px solid var(--neutral-100);
 }
 
 .stock-value-display {
-  font-size: 12px;
-  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  color: var(--neutral-500);
+  font-style: italic;
 }
 
 /* Mobile Empty State */
@@ -211,9 +168,9 @@
   justify-content: center;
   padding: var(--space-xl);
   text-align: center;
-  background: var(--neutral-100);
-  border: 1px solid var(--border-color);
+  background: white;
   border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .empty-icon {
@@ -225,61 +182,48 @@
 .empty-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--neutral-700);
   margin-bottom: var(--space-xs);
 }
 
 .empty-subtitle {
   font-size: 14px;
-  color: var(--text-tertiary);
+  color: var(--neutral-500);
 }
 
 /* Mobile Responsive */
 @media (max-width: 413px) {
-  .compact-item-name {
-    font-size: 14px;
+  .compact-item .item-name {
+    font-size: 0.95rem;
   }
 
-  .compact-item-code {
-    font-size: 11px;
+  .compact-item .item-code {
+    font-size: 0.75rem;
   }
 
-  .stock-value {
-    font-size: 14px;
+  .compact-quantity {
+    font-size: 1rem;
   }
 
-  .stock-warehouse-info {
-    min-width: 60px;
-  }
-
-  .warehouse-value {
-    max-width: 60px;
-  }
-
-  .compact-mobile-card {
-    padding: var(--space-sm);
-  }
-
-  .compact-item-right {
-    gap: var(--space-sm);
+  .stock-unit {
+    font-size: 0.8rem;
   }
 }
 
 @media (max-width: 360px) {
-  .compact-card-content {
-    gap: var(--space-sm);
+  .compact-card-header {
+    padding: var(--space-sm);
   }
 
-  .compact-item-right {
-    flex-direction: column;
-    gap: 4px;
+  .compact-card-body {
+    padding: var(--space-sm);
   }
 
-  .compact-stock-display {
-    text-align: left;
+  .warehouse-code {
+    font-size: 0.85rem;
   }
 
-  .stock-warehouse-info {
-    text-align: left;
+  .warehouse-name {
+    font-size: 0.75rem;
   }
 }

@@ -94,9 +94,9 @@ class WarehouseModel {
         i.standard_cost,
         COALESCE(sb.quantity, 0) * i.standard_cost as value
       FROM items i
-      LEFT JOIN stock_balances sb ON sb.item_id = i.id AND sb.warehouse_id = ?
+      INNER JOIN stock_balances sb ON sb.item_id = i.id AND sb.warehouse_id = ?
       WHERE i.is_active = 1
-      AND (sb.quantity > 0 OR sb.quantity IS NULL)
+      AND sb.quantity > 0
       ORDER BY i.item_name
     `).all(warehouseId) as StockSummary[];
   }

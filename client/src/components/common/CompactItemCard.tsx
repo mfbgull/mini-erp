@@ -14,8 +14,6 @@ export function CompactItemCard({ item, onEdit, onDelete }: CompactItemCardProps
   const [showDetails, setShowDetails] = useState(false);
   const { formatCurrency } = useSettings();
 
-  console.log('CompactItemCard rendered for:', item.item_name, 'showMenu:', showMenu);
-
   const isLowStock = item.reorder_level > 0 && item.current_stock <= item.reorder_level;
   const isOutOfStock = parseFloat(item.current_stock || 0) === 0;
 
@@ -46,50 +44,44 @@ export function CompactItemCard({ item, onEdit, onDelete }: CompactItemCardProps
   return (
     <>
       <div className="compact-item-card">
-        {/* Clickable content area */}
         <div className="card-content-clickable" onClick={handleCardClick}>
-          <div className="item-info">
-            <p className="item-name">{item.item_name}</p>
-            <p className="item-code">{item.item_code}</p>
+          <p className="item-name">{item.item_name}</p>
+
+          <div className="menu-container">
+            <button
+              type="button"
+              className="menu-trigger"
+              onClick={handleMenuToggle}
+            >
+              <MoreVertical className="menu-icon" />
+            </button>
+
+            {showMenu && (
+              <>
+                <div className="menu-backdrop" onClick={handleBackdropClick} />
+                <div className="dropdown-menu">
+                  <button type="button" className="dropdown-item" onClick={handleEdit}>
+                    <Edit className="dropdown-icon" />
+                    Edit
+                  </button>
+                  <button type="button" className="dropdown-item delete" onClick={handleDelete}>
+                    <Trash2 className="dropdown-icon" />
+                    Delete
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
-          <div className="stock-info">
-            <p className="stock-label">Stock</p>
+          <div className="stock-row">
+            <p className="stock-label">Stock:</p>
             <p className={`stock-value ${isOutOfStock ? 'out-of-stock' : isLowStock ? 'low-stock' : ''}`}>
-              {parseFloat(item.current_stock || 0).toFixed(2)}
+              {parseFloat(item.current_stock || 0).toFixed(2)} {item.unit_of_measure}
             </p>
           </div>
         </div>
-
-        {/* Menu button - separate from clickable area */}
-        <div className="menu-container">
-          <button
-            type="button"
-            className="menu-trigger"
-            onClick={handleMenuToggle}
-          >
-            <MoreVertical className="menu-icon" />
-          </button>
-
-          {showMenu && (
-            <>
-              <div className="menu-backdrop" onClick={handleBackdropClick} />
-              <div className="dropdown-menu" style={{ border: '3px solid blue' }}>
-                <button type="button" className="dropdown-item" onClick={handleEdit}>
-                  <Edit className="dropdown-icon" />
-                  Edit
-                </button>
-                <button type="button" className="dropdown-item delete" onClick={handleDelete}>
-                  <Trash2 className="dropdown-icon" />
-                  Delete
-                </button>
-              </div>
-            </>
-          )}
-        </div>
       </div>
 
-      {/* Details Modal */}
       {showDetails && (
         <div className="details-modal-overlay" onClick={() => setShowDetails(false)}>
           <div className="details-modal" onClick={(e) => e.stopPropagation()}>
@@ -148,13 +140,13 @@ export function CompactItemCard({ item, onEdit, onDelete }: CompactItemCardProps
                   </div>
                   {isLowStock && (
                     <div className="detail-item alert">
-                      <span className="detail-label">⚠️ Alert</span>
+                      <span className="detail-label">Alert</span>
                       <span className="detail-value">Below reorder level</span>
                     </div>
                   )}
                   {isOutOfStock && (
                     <div className="detail-item alert">
-                      <span className="detail-label">🚫 Alert</span>
+                      <span className="detail-label">Alert</span>
                       <span className="detail-value">Out of stock</span>
                     </div>
                   )}

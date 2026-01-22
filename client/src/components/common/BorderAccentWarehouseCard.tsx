@@ -29,17 +29,18 @@ export default function BorderAccentWarehouseCard({
     }
   }, [externalShowItems]);
 
-  // Fetch items for this warehouse
-  const { data: items = [], isLoading: itemsLoading } = useQuery({
-    queryKey: ['items', warehouse.id, isExpanded],
+  // Fetch warehouse details with stock summary
+  const { data: warehouseData, isLoading: warehouseLoading } = useQuery({
+    queryKey: ['warehouse', warehouse.id, isExpanded],
     queryFn: async () => {
-      const response = await api.get('/inventory/items');
-      return response.data.data.filter((item: any) => 
-        item.warehouse_id == warehouse.id || item.warehouse == warehouse.id
-      );
+      const response = await api.get(`/inventory/warehouses/${warehouse.id}`);
+      return response.data;
     },
     enabled: isExpanded
   });
+
+  const items = warehouseData?.stock_summary || [];
+  const itemsLoading = warehouseLoading;
 
   const handleCardClick = () => {
     const newState = !isExpanded;
@@ -80,11 +81,11 @@ export default function BorderAccentWarehouseCard({
 
   // Calculate stock value
   const totalStockValue = items.reduce((sum: number, item: any) => 
-    sum + (parseFloat(item.current_stock || 0) * parseFloat(item.standard_cost || 0)), 0
+    sum + (parseFloat(item.quantity || 0) * parseFloat(item.standard_cost || 0)), 0
   );
 
   const totalStock = items.reduce((sum: number, item: any) => 
-    sum + parseFloat(item.current_stock || 0), 0
+    sum + parseFloat(item.quantity || 0), 0
   );
 
   return (
@@ -176,7 +177,7 @@ export default function BorderAccentWarehouseCard({
                     <span className="warehouse-item-code">{item.item_code}</span>
                   </div>
                   <div className="warehouse-item-stock">
-                    <span className="stock-number">{parseFloat(item.current_stock || 0).toFixed(2)}</span>
+                    <span className="stock-number">{parseFloat(item.quantity || 0).toFixed(2)}</span>
                     <span className="stock-unit">{item.unit_of_measure}</span>
                   </div>
                 </div>

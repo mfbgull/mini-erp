@@ -2,9 +2,11 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useSettings } from '../../context/SettingsContext';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { AgGridReact } from 'ag-grid-react';
+import { Package, ArrowUp, ArrowDown, ArrowRight, Filter } from 'lucide-react';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -13,7 +15,9 @@ import './StockMovementPage.css';
 
 export default function StockMovementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const { formatCurrency } = useSettings();
+  const { isMobile } = useMobileDetection();
   const navigate = useNavigate();
 
   const { data: movements = [], isLoading } = useQuery({
@@ -56,6 +60,19 @@ export default function StockMovementPage() {
     }, {});
     return Object.entries(typeCount).sort((a, b) => b[1] - a[1])[0]?.[0] || 'None';
   }, [movements]);
+
+  // Filter movements for mobile view
+  const filteredMovements = useMemo(() => {
+    if (!searchTerm) return movements;
+    const term = searchTerm.toLowerCase();
+    return movements.filter(m => 
+      m.movement_no?.toLowerCase().includes(term) ||
+      m.item_name?.toLowerCase().includes(term) ||
+      m.item_code?.toLowerCase().includes(term) ||
+      m.warehouse_name?.toLowerCase().includes(term) ||
+      m.movement_type?.toLowerCase().includes(term)
+    );
+  }, [movements, searchTerm]);
 
   // Export to CSV
   const handleExport = () => {
@@ -164,9 +181,11 @@ export default function StockMovementPage() {
           <h1>Stock Movements</h1>
           <p className="page-subtitle">Track all stock transactions</p>
         </div>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-          + New Adjustment
-        </Button>
+        {!isMobile && (
+          <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+            + New Adjustment
+          </Button>
+        )}
       </div>
 
       {/* Summary Statistics Cards */}
@@ -319,7 +338,102 @@ export default function StockMovementPage() {
         <div className="loading">
           <div className="spinner"></div>
         </div>
+      ) : isMobile ? (
+        // Mobile card-based view
+        <>
+          <div className="mobile-search-section">
+            <div className="search-input-wrapper">
+              <Filter size={18} />
+              <input
+                type="text"
+                className="search-input-field"
+                placeholder="Search movements..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button 
+                  className="search-clear-btn"
+                  onClick={() => setSearchTerm('')}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="mobile-movements-container">
+            {filteredMovements.length === 0 ? (
+              <div className="no-results">
+                <div className="no-results-icon">📋</div>
+                <h3>No movements found</h3>
+                <p>{searchTerm ? `No movements match "${searchTerm}"` : 'No stock movements recorded'}</p>
+                {searchTerm && (
+                  <Button variant="secondary" onClick={() => setSearchTerm('')}>
+                    Clear Search
+                  </Button>
+                )}
+              </div>
+            ) : (
+              filteredMovements.map((movement) => (
+                <div key={movement.id} className="movement-card">
+                  <div className="movement-card-header">
+                    <div className="movement-info">
+                      <span className="movement-no">{movement.movement_no}</span>
+                      <span className="movement-date">
+                        {format(new Date(movement.movement_date), 'dd MMM yyyy')}
+                      </span>
+                    </div>
+                    <span className={`movement-type-badge type-${movement.movement_type.toLowerCase()}`}>
+                      {movement.movement_type}
+                    </span>
+                  </div>
+                  
+                  <div className="movement-card-body">
+                    <div className="movement-item">
+                      <span className="item-name">{movement.item_name}</span>
+                      <span className="item-code">{movement.item_code}</span>
+                    </div>
+                    <div className="movement-warehouse">
+                      <span className="warehouse-label">Warehouse:</span>
+                      <span className="warehouse-name">{movement.warehouse_name}</span>
+                    </div>
+                    <div className="movement-quantity">
+                      {movement.quantity >= 0 ? (
+                        <ArrowUp size={16} className="qty-in-icon" />
+                      ) : (
+                        <ArrowDown size={16} className="qty-out-icon" />
+                      )}
+                      <span className={movement.quantity >= 0 ? 'qty-in' : 'qty-out'}>
+                        {movement.quantity >= 0 ? '+' : ''}{parseFloat(movement.quantity).toFixed(2)} {movement.unit_of_measure}
+                      </span>
+                    </div>
+                  </div>
+
+                  {movement.remarks && (
+                    <div className="movement-card-footer">
+                      <span className="movement-remarks">{movement.remarks}</span>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {filteredMovements.length > 0 && (
+            <div className="mobile-pagination-info">
+              Showing {filteredMovements.length} of {movements.length} movements
+            </div>
+          )}
+
+          <div className="mobile-action-bar">
+            <Button variant="primary" onClick={() => setIsModalOpen(true)} className="fab-button">
+              + New Adjustment
+            </Button>
+          </div>
+        </>
       ) : (
+        // Desktop ag-grid view
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
             rowData={movements}

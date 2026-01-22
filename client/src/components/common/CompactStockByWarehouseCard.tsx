@@ -84,38 +84,29 @@ export default function CompactStockByWarehouseCardView({
               className="compact-mobile-card stock-card"
               onClick={() => onRowClick(item)}
             >
-              <div className="compact-card-content">
-                {/* Left: Item info */}
-                <div className="compact-item-info">
-                  <p className="compact-item-name">{item.item_name}</p>
-                  <p className="compact-item-code">{item.item_code}</p>
+              <div className="compact-card-header">
+                <div className="compact-warehouse-info">
+                  <span className="warehouse-code">{item.warehouse_code}</span>
+                  <span className="warehouse-name">{item.warehouse_name}</span>
                 </div>
+                {hasMultipleWarehouses && (
+                  <span className="multi-badge" title="Available in multiple warehouses">📍</span>
+                )}
+              </div>
 
-                {/* Right: Quantity + Warehouse */}
-                <div className="compact-item-right">
-                  <div className="compact-stock-display">
-                    <p className="stock-label">Quantity</p>
-                    <p className="stock-value stock-normal">
-                      {parseFloat(String(item.quantity || 0)).toFixed(2)}
-                    </p>
-                    <p className="stock-unit">{item.unit_of_measure}</p>
-                  </div>
-
-                  <div className="stock-warehouse-info">
-                    <span className="warehouse-label">Warehouse</span>
-                    <span className="warehouse-value">
-                      {item.warehouse_name}
-                      {hasMultipleWarehouses && (
-                        <span className="multi-badge" title="Available in multiple warehouses">📍</span>
-                      )}
-                    </span>
-                  </div>
+              <div className="compact-card-body">
+                <div className="compact-item">
+                  <span className="item-name">{item.item_name}</span>
+                  <span className="item-code">{item.item_code}</span>
+                </div>
+                <div className="compact-quantity">
+                  <span className="stock-qty">{parseFloat(String(item.quantity || 0)).toFixed(2)}</span>
+                  <span className="stock-unit">{item.unit_of_measure}</span>
                 </div>
               </div>
 
-              {/* Value footer */}
               {item.standard_cost && (
-                <div className="stock-footer">
+                <div className="compact-card-footer">
                   <span className="stock-value-display">
                     Value: {formatCurrency(item.standard_cost * item.quantity)}
                   </span>
