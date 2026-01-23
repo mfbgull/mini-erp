@@ -8,11 +8,13 @@ import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import './InvoiceViewPage.css';
 
 export default function InvoiceViewPage() {
   const { invoiceId } = useParams();
   const navigate = useNavigate();
+  const { isMobile } = useMobileDetection();
   const invoiceRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -130,10 +132,6 @@ export default function InvoiceViewPage() {
       {/* Toolbar */}
       <div className="invoice-view-toolbar no-print">
         <div className="toolbar-left">
-          <Button variant="secondary" onClick={() => navigate(-1)}>
-            <ArrowLeft size={18} />
-            Back
-          </Button>
           <h2 className="toolbar-title">Invoice {invoice.invoice_no}</h2>
         </div>
         <div className="toolbar-right">
@@ -166,6 +164,16 @@ export default function InvoiceViewPage() {
           />
         </div>
       </div>
+
+      {/* Mobile Action Bar */}
+      {isMobile && (
+        <div className="mobile-action-bar">
+          <Button variant="primary" onClick={() => navigate(-1)} className="fab-button">
+            <ArrowLeft size={18} />
+            Back
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

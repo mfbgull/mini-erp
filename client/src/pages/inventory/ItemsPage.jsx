@@ -11,6 +11,7 @@ import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import { CompactItemCard } from '../../components/common/CompactItemCard';
 import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
+import ItemPreview from './ItemPreview';
 import { Search, X, ArrowLeft, Building2 } from 'lucide-react';
 import './ItemsPage.css';
 
@@ -527,12 +528,18 @@ export default function ItemsPage() {
               />
             ))}
           </div>
-          {openDetailsItem === null && (
           <div className="mobile-action-bar">
             <Button variant="primary" onClick={handleNewItem}>
               + New Item
             </Button>
           </div>
+
+          {/* Item Details Overlay */}
+          {openDetailsItem && (
+            <ItemPreview
+              item={openDetailsItem}
+              onClose={() => setOpenDetailsItem(null)}
+            />
           )}
         </>
       ) : (

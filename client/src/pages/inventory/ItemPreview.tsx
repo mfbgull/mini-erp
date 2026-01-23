@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, Edit, Trash2 } from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
+import { X } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import './ItemPreview.css';
 
@@ -21,17 +21,52 @@ interface ItemPreviewProps {
     is_manufactured?: boolean;
   };
   onClose: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
 }
 
-export default function ItemPreview({ item, onClose, onEdit, onDelete }: ItemPreviewProps) {
+export default function ItemPreview({ item, onClose }: ItemPreviewProps) {
   const isLowStock = item.reorder_level > 0 && item.current_stock <= item.reorder_level;
   const isOutOfStock = item.current_stock === 0;
 
+  // Swipe down to close functionality
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [translateY, setTranslateY] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientY);
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (touchStart === null) return;
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - touchStart;
+    if (deltaY > 0) {
+      setTranslateY(deltaY);
+    }
+  }, [touchStart]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (translateY > 100) {
+      onClose();
+    }
+    setTouchStart(null);
+    setTranslateY(0);
+  }, [translateY, onClose]);
+
   return (
     <div className="item-preview-overlay" onClick={onClose}>
-      <div className="item-preview-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={containerRef}
+        className="item-preview-container"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{ transform: `translateY(${translateY}px)`, transition: translateY > 0 ? 'none' : 'transform 0.3s ease' }}
+      >
+        {/* Swipe indicator */}
+        <div className="swipe-indicator"></div>
+
         {/* Header */}
         <div className="item-preview-header">
           <div className="item-preview-title-section">
@@ -119,18 +154,6 @@ export default function ItemPreview({ item, onClose, onEdit, onDelete }: ItemPre
               <span className="alert-text">Out of stock</span>
             </div>
           )}
-        </div>
-
-        {/* Actions */}
-        <div className="item-preview-actions">
-          <button className="preview-action-btn edit-btn" onClick={onEdit}>
-            <Edit size={18} />
-            <span>Edit Item</span>
-          </button>
-          <button className="preview-action-btn delete-btn" onClick={onDelete}>
-            <Trash2 size={18} />
-            <span>Delete</span>
-          </button>
         </div>
       </div>
     </div>

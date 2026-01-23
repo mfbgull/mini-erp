@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { formatCurrency } from '../../utils/formatters';
 import './CompactStockByWarehouseCard.css';
 
 interface StockByWarehouse {
@@ -13,7 +12,6 @@ interface StockByWarehouse {
   warehouse_name: string;
   quantity: number;
   unit_of_measure: string;
-  standard_cost?: number;
 }
 
 interface CompactStockByWarehouseCardViewProps {
@@ -84,34 +82,19 @@ export default function CompactStockByWarehouseCardView({
               className="compact-mobile-card stock-card"
               onClick={() => onRowClick(item)}
             >
-              <div className="compact-card-header">
-                <div className="compact-warehouse-info">
-                  <span className="warehouse-code">{item.warehouse_code}</span>
-                  <span className="warehouse-name">{item.warehouse_name}</span>
+              <div className="compact-card-content">
+                <div className="compact-item-info">
+                  <span className="compact-item-name">{item.item_name}</span>
+                  <span className="compact-item-code">{item.item_code}</span>
+                </div>
+                <div className="compact-stock-info">
+                  <span className="compact-stock-qty">{parseFloat(String(item.quantity || 0)).toFixed(2)}</span>
+                  <span className="compact-stock-unit">{item.unit_of_measure}</span>
                 </div>
                 {hasMultipleWarehouses && (
-                  <span className="multi-badge" title="Available in multiple warehouses">📍</span>
+                  <span className="compact-multi-badge" title="Available in multiple warehouses">📍</span>
                 )}
               </div>
-
-              <div className="compact-card-body">
-                <div className="compact-item">
-                  <span className="item-name">{item.item_name}</span>
-                  <span className="item-code">{item.item_code}</span>
-                </div>
-                <div className="compact-quantity">
-                  <span className="stock-qty">{parseFloat(String(item.quantity || 0)).toFixed(2)}</span>
-                  <span className="stock-unit">{item.unit_of_measure}</span>
-                </div>
-              </div>
-
-              {item.standard_cost && (
-                <div className="compact-card-footer">
-                  <span className="stock-value-display">
-                    Value: {formatCurrency(item.standard_cost * item.quantity)}
-                  </span>
-                </div>
-              )}
             </div>
           );
         })}

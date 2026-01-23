@@ -19,7 +19,6 @@ export default function BorderAccentItemCard({
   onDetailsChange 
 }: BorderAccentItemCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const internalShowDetails = !externalShowDetails ? false : externalShowDetails;
   const isLowStock = item.reorder_level > 0 && item.current_stock <= item.reorder_level;
   const isOutOfStock = parseFloat(item.current_stock || 0) === 0;
   const { formatCurrency } = useSettings();
@@ -52,20 +51,6 @@ export default function BorderAccentItemCard({
     e.preventDefault();
     e.stopPropagation();
     setMenuOpen(false);
-  };
-
-  const handleCloseModal = () => {
-    onDetailsChange?.(false);
-  };
-
-  const handleEditFromModal = () => {
-    onDetailsChange?.(false);
-    onEdit(item);
-  };
-
-  const handleDeleteFromModal = () => {
-    onDetailsChange?.(false);
-    onDelete(item);
   };
 
   return (
@@ -108,77 +93,6 @@ export default function BorderAccentItemCard({
           </p>
         </div>
       </div>
-
-      {internalShowDetails && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="hero-stock-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-handle"></div>
-            
-            <div className="modal-header">
-              <h3 className="modal-title">{item.item_name}</h3>
-              <p className="modal-code">{item.item_code}</p>
-            </div>
-            
-            <div className="hero-stock-banner">
-              <div className="stock-label">Current Stock</div>
-              <div className="stock-value-container">
-                <span className="stock-value">{parseFloat(item.current_stock || 0).toFixed(2)}</span>
-                <span className="stock-unit">{item.unit_of_measure}</span>
-              </div>
-            </div>
-            
-            <div className="modal-content">
-              <div className="info-row">
-                <span className="info-label">Category</span>
-                <span className="info-value">{item.category || 'N/A'}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Unit of Measure</span>
-                <span className="info-value">{item.unit_of_measure}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Standard Cost</span>
-                <span className="info-value">{formatCurrency(item.standard_cost || 0)}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Stock Value</span>
-                <span className="info-value">{formatCurrency((item.current_stock || 0) * (item.standard_cost || 0))}</span>
-              </div>
-              
-              {item.description && (
-                <div className="description-box">
-                  <div className="description-label">Description</div>
-                  <p className="description-text">{item.description}</p>
-                </div>
-              )}
-              
-              <div className="type-badges">
-                {(item.is_raw_material === 1 || item.is_raw_material === true) && (
-                  <span className="badge raw-badge">Raw Material</span>
-                )}
-                {(item.is_purchased === 1 || item.is_purchased === true) && (
-                  <span className="badge purchased-badge">Purchased</span>
-                )}
-                {(item.is_finished_good === 1 || item.is_finished_good === true) && (
-                  <span className="badge finished-badge">Finished Good</span>
-                )}
-                {(item.is_manufactured === 1 || item.is_manufactured === true) && (
-                  <span className="badge manufactured-badge">Manufactured</span>
-                )}
-              </div>
-            </div>
-            
-            <div className="modal-actions">
-              <button className="action-btn edit-btn" onClick={handleEditFromModal}>
-                Edit
-              </button>
-              <button className="action-btn delete-btn" onClick={handleDeleteFromModal}>
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

@@ -31,6 +31,16 @@
   animation: slideUp 0.25s ease;
 }
 
+/* Swipe indicator */
+.swipe-indicator {
+  width: 40px;
+  height: 4px;
+  background: var(--neutral-300);
+  border-radius: 2px;
+  margin: var(--space-sm) auto;
+  margin-top: var(--space-md);
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
