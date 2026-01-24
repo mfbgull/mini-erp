@@ -44,13 +44,20 @@ function recordPurchase(req: AuthRequest, res: Response): void {
 
 function getPurchases(req: Request, res: Response): void {
   try {
+    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
+    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
+    const itemIdParam = Array.isArray(req.query.item_id) ? req.query.item_id[0] : req.query.item_id;
+    const warehouseIdParam = Array.isArray(req.query.warehouse_id) ? req.query.warehouse_id[0] : req.query.warehouse_id;
+    const supplierNameParam = Array.isArray(req.query.supplier_name) ? req.query.supplier_name[0] : req.query.supplier_name;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+
     const filters = {
-      start_date: req.query.start_date as string | undefined,
-      end_date: req.query.end_date as string | undefined,
-      item_id: req.query.item_id ? Number(req.query.item_id) : undefined,
-      warehouse_id: req.query.warehouse_id ? Number(req.query.warehouse_id) : undefined,
-      supplier_name: req.query.supplier_name as string | undefined,
-      limit: req.query.limit ? parseInt(String(req.query.limit)) : undefined
+      start_date: startDateParam as string | undefined,
+      end_date: endDateParam as string | undefined,
+      item_id: itemIdParam ? Number(itemIdParam) : undefined,
+      warehouse_id: warehouseIdParam ? Number(warehouseIdParam) : undefined,
+      supplier_name: supplierNameParam as string | undefined,
+      limit: limitParam ? parseInt(String(limitParam)) : undefined
     };
 
     const purchases = Purchase.getAll(filters, db);
@@ -116,7 +123,8 @@ function getPurchaseSummaryByDateRange(req: Request, res: Response): void {
 
 function getTopSuppliers(req: Request, res: Response): void {
   try {
-    const limit = req.query.limit ? parseInt(String(req.query.limit)) : 10;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const limit = limitParam ? parseInt(String(limitParam)) : 10;
     const suppliers = Purchase.getTopSuppliers(limit, db);
 
     res.json(suppliers);

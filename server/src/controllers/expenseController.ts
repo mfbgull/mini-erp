@@ -121,19 +121,26 @@ function createExpense(req: AuthRequest, res: Response): void {
 
 function getExpenses(req: Request, res: Response): void {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      category,
-      status,
-      vendor,
-      from_date,
-      to_date,
-      search
-    } = req.query;
+    const pageParam = Array.isArray(req.query.page) ? req.query.page[0] : req.query.page;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const categoryParam = Array.isArray(req.query.category) ? req.query.category[0] : req.query.category;
+    const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status;
+    const vendorParam = Array.isArray(req.query.vendor) ? req.query.vendor[0] : req.query.vendor;
+    const fromDateParam = Array.isArray(req.query.from_date) ? req.query.from_date[0] : req.query.from_date;
+    const toDateParam = Array.isArray(req.query.to_date) ? req.query.to_date[0] : req.query.to_date;
+    const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search;
 
-    const pageNum = parseInt(page as string) || 1;
-    const limitNum = parseInt(limit as string) || 10;
+    const page = pageParam as string || '1';
+    const limit = limitParam as string || '10';
+    const category = categoryParam as string;
+    const status = statusParam as string;
+    const vendor = vendorParam as string;
+    const from_date = fromDateParam as string;
+    const to_date = toDateParam as string;
+    const search = searchParam as string;
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
     const offset = (pageNum - 1) * limitNum;
 
     let query = `
@@ -393,7 +400,7 @@ function deleteExpense(req: AuthRequest, res: Response): void {
   try {
     const { id } = req.params;
 
-    const existingExpense = db.prepare('SELECT * FROM expenses WHERE id = ?').get(id);
+    const existingExpense = db.prepare('SELECT * FROM expenses WHERE id = ?').get(id) as any;
     if (!existingExpense) {
       res.status(404).json({
         success: false,
@@ -405,9 +412,9 @@ function deleteExpense(req: AuthRequest, res: Response): void {
     db.prepare('DELETE FROM expenses WHERE id = ?').run(id);
 
     // Log expense deletion using activity logger
-    logCRUD(ActionType.EXPENSE_DELETE, 'Expense', parseInt(id, 10), `Deleted expense: ${existingExpense.expense_no}`, req.user!.id, {
-      expense_no: existingExpense.expense_no,
-      amount: existingExpense.amount
+    logCRUD(ActionType.EXPENSE_DELETE, 'Expense', parseInt(id, 10), `Deleted expense: ${(existingExpense as any).expense_no}`, req.user!.id, {
+      expense_no: (existingExpense as any).expense_no,
+      amount: (existingExpense as any).amount
     });
 
     res.json({
@@ -425,7 +432,10 @@ function deleteExpense(req: AuthRequest, res: Response): void {
 
 function getExpensesByDateRange(req: Request, res: Response): void {
   try {
-    const { from_date, to_date } = req.query;
+    const fromDateParam = Array.isArray(req.query.from_date) ? req.query.from_date[0] : req.query.from_date;
+    const toDateParam = Array.isArray(req.query.to_date) ? req.query.to_date[0] : req.query.to_date;
+    const from_date = fromDateParam as string;
+    const to_date = toDateParam as string;
 
     if (!from_date || !to_date) {
       res.status(400).json({
@@ -481,7 +491,10 @@ function getExpensesByDateRange(req: Request, res: Response): void {
 function getExpensesByCategory(req: Request, res: Response): void {
   try {
     const { category } = req.params;
-    const { from_date, to_date } = req.query;
+    const fromDateParam = Array.isArray(req.query.from_date) ? req.query.from_date[0] : req.query.from_date;
+    const toDateParam = Array.isArray(req.query.to_date) ? req.query.to_date[0] : req.query.to_date;
+    const from_date = fromDateParam as string;
+    const to_date = toDateParam as string;
 
     const categoryParam = Array.isArray(category) ? category[0] : category;
 
@@ -517,7 +530,7 @@ function getExpensesByCategory(req: Request, res: Response): void {
     const expenses = db.prepare(query).all(...params);
 
     let totalQuery = 'SELECT SUM(amount) as total FROM expenses WHERE expense_category = ?';
-    const totalParams: (string | number)[] = [category];
+    const totalParams: (string | number)[] = [categoryParam];
 
     if (from_date && to_date) {
       totalQuery += ' AND expense_date BETWEEN ? AND ?';
@@ -546,7 +559,10 @@ function getExpensesByCategory(req: Request, res: Response): void {
 
 function getExpenseSummary(req: Request, res: Response): void {
   try {
-    const { from_date, to_date } = req.query;
+    const fromDateParam = Array.isArray(req.query.from_date) ? req.query.from_date[0] : req.query.from_date;
+    const toDateParam = Array.isArray(req.query.to_date) ? req.query.to_date[0] : req.query.to_date;
+    const from_date = fromDateParam as string;
+    const to_date = toDateParam as string;
 
     let query = `
       SELECT 
@@ -716,7 +732,7 @@ function updateExpenseCategory(req: AuthRequest, res: Response): void {
     );
 
     // Log expense category update using activity logger
-    logCRUD(ActionType.EXPENSE_CATEGORY_UPDATE, 'ExpenseCategory', parseInt(id, 10), `Updated expense category: ${existingCategory.category_name}`, req.user!.id);
+    logCRUD(ActionType.EXPENSE_CATEGORY_UPDATE, 'ExpenseCategory', parseInt(id, 10), `Updated expense category: ${(existingCategory as any).category_name}`, req.user!.id);
 
     const updatedCategory = db.prepare('SELECT * FROM expense_categories WHERE id = ?').get(id);
 
@@ -759,7 +775,7 @@ function deleteExpenseCategory(req: AuthRequest, res: Response): void {
     db.prepare('DELETE FROM expense_categories WHERE id = ?').run(id);
 
     // Log expense category deletion using activity logger
-    logCRUD(ActionType.EXPENSE_CATEGORY_DELETE, 'ExpenseCategory', parseInt(id, 10), `Deleted expense category: ${existingCategory.category_name}`, req.user!.id);
+    logCRUD(ActionType.EXPENSE_CATEGORY_DELETE, 'ExpenseCategory', parseInt(id, 10), `Deleted expense category: ${(existingCategory as any).category_name}`, req.user!.id);
 
     res.json({
       success: true,

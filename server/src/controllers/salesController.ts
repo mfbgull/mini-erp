@@ -81,8 +81,11 @@ function getSale(req: Request, res: Response): void {
 
 function getItemCustomerPriceHistory(req: Request, res: Response): void {
   try {
-    const item_id = req.query.item_id ? Number(req.query.item_id) : undefined;
-    const customer_id = req.query.customer_id ? Number(req.query.customer_id) : undefined;
+    const itemIdParam = Array.isArray(req.query.item_id) ? req.query.item_id[0] : req.query.item_id;
+    const customerIdParam = Array.isArray(req.query.customer_id) ? req.query.customer_id[0] : req.query.customer_id;
+
+    const item_id = itemIdParam ? Number(itemIdParam) : undefined;
+    const customer_id = customerIdParam ? Number(customerIdParam) : undefined;
 
     if (!item_id || !customer_id) {
       res.status(400).json({
@@ -139,7 +142,8 @@ function getSalesSummaryByDateRange(req: Request, res: Response): void {
 
 function getTopCustomers(req: Request, res: Response): void {
   try {
-    const limit = req.query.limit ? parseInt(String(req.query.limit)) : 10;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const limit = limitParam ? parseInt(String(limitParam)) : 10;
     const customers = SaleModel.getTopCustomers(limit, db);
 
     res.json(customers);

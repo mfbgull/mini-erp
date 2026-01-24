@@ -372,8 +372,9 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
                       <Button
                         variant="danger"
                         onClick={() => handleRemoveAllocation(allocation.invoice_id)}
+                        className="allocation-remove-btn"
                       >
-                        <Minus size={14} />
+                        ×
                       </Button>
                     </div>
                   );

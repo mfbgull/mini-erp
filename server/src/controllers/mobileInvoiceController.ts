@@ -191,31 +191,35 @@ export async function deleteDraft(req: AuthRequest, res: Response) {
  */
 export async function searchItems(req: AuthRequest, res: Response) {
     try {
-        const { q, limit = 20 } = req.query;
-        
+        const qParam = Array.isArray(req.query.q) ? req.query.q[0] : req.query.q;
+        const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+
+        const q = qParam as string;
+        const limit = limitParam as string || '20';
+
         let query = `
-            SELECT 
-                id, item_code, item_name, description, 
+            SELECT
+                id, item_code, item_name, description,
                 category, unit_of_measure, current_stock,
                 standard_selling_price as price, standard_cost as cost,
                 is_raw_material, is_finished_good, is_purchased
-            FROM items 
+            FROM items
             WHERE is_active = 1
         `;
-        
+
         const params: (string | number)[] = [];
-        
-        if (q && (q as string).trim().length > 0) {
-            const searchTerm = `%${(q as string).trim()}%`;
+
+        if (q && q.trim().length > 0) {
+            const searchTerm = `%${q.trim()}%`;
             query += ` AND (item_name LIKE ? OR item_code LIKE ? OR description LIKE ?)`;
             params.push(searchTerm, searchTerm, searchTerm);
         }
-        
+
         // Filter to only sellable items (finished goods or purchased items, not raw materials)
         query += ` AND (is_finished_good = 1 OR is_purchased = 1) AND is_raw_material = 0`;
-        
+
         query += ` ORDER BY item_name ASC LIMIT ?`;
-        params.push(parseInt(limit as string, 10));
+        params.push(parseInt(limit, 10));
         
         const items = db.prepare(query).all(...params);
         
@@ -235,7 +239,11 @@ export async function searchItems(req: AuthRequest, res: Response) {
  */
 export async function searchCustomers(req: AuthRequest, res: Response) {
     try {
-        const { q, limit = 20 } = req.query;
+        const qParam = Array.isArray(req.query.q) ? req.query.q[0] : req.query.q;
+        const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+
+        const q = qParam as string;
+        const limit = limitParam as string || '20';
         console.log('[searchCustomers] Query:', q, 'Limit:', limit);
 
         let query = `

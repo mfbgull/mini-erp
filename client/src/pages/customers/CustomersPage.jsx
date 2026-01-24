@@ -13,6 +13,7 @@ import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import CompactCustomerCardView from '../../components/common/CompactCustomerCard';
 import CustomerPreview from './CustomerPreview';
+import PaymentModal from '../../components/customers/PaymentModal';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import './CustomersPage.css';
 
@@ -22,6 +23,7 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 export default function CustomersPage() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const { formatCurrency } = useSettings();
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -321,7 +323,7 @@ export default function CustomersPage() {
           onEdit={handleEdit}
           onAddPayment={(customer) => {
             setSelectedCustomer(customer);
-            setIsModalOpen(true);
+            setIsPaymentModalOpen(true);
           }}
         />
       ) : (
@@ -375,10 +377,29 @@ export default function CustomersPage() {
             setIsModalOpen(true);
           }}
           onAddPayment={() => {
-            // Navigate to payment page or open payment modal
-            toast.info('Payment feature coming soon');
+            setIsPaymentModalOpen(true);
           }}
         />
+      )}
+
+      {/* Payment Modal */}
+      {selectedCustomer && isPaymentModalOpen && (
+        <Modal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          title={`Record Payment - ${selectedCustomer.customer_name}`}
+          size="large"
+        >
+          <PaymentModal
+            customerId={selectedCustomer.id}
+            customer={selectedCustomer}
+            onClose={() => setIsPaymentModalOpen(false)}
+            onSuccess={() => {
+              queryClient.invalidateQueries(['customers']);
+              setIsPaymentModalOpen(false);
+            }}
+          />
+        </Modal>
       )}
     </div>
   );

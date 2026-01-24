@@ -50,28 +50,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-sm);
   margin-bottom: var(--space-xs);
   background: white;
+  font-size: 0.9rem;
 }
 
 .invoice-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .invoice-no {
   font-weight: 600;
   color: var(--neutral-800);
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-xxs);
+  font-size: 0.95rem;
 }
 
 .invoice-details {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--neutral-600);
+  width: 100%;
 }
 
 .invoice-amount {
@@ -86,42 +91,78 @@
 .allocation-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: var(--space-sm);
+  align-items: flex-start;
+  padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--success);
   border-radius: var(--radius-sm);
   margin-bottom: var(--space-xs);
   background: color-mix(in srgb, var(--success), transparent 95%);
+  font-size: 0.9rem;
+  position: relative;
 }
 
 .allocation-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .allocation-invoice {
   font-weight: 600;
   color: var(--success-dark);
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-xxs);
+  font-size: 0.95rem;
 }
 
 .allocation-details {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
+  min-width: 140px;
+  justify-content: flex-end;
 }
 
 .allocation-details .form-input {
-  width: 120px;
+  width: 100px;
   margin: 0;
+  padding: var(--space-xxs) var(--space-xs);
+  font-size: 0.9rem;
 }
 
 .allocation-amount {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--neutral-600);
+  white-space: nowrap;
 }
 
 .allocation-input {
-  width: 120px;
+  width: 100px;
+  font-size: 0.9rem;
+}
+
+.allocation-item .btn.allocation-remove-btn {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  z-index: 1 !important;
+  background-color: var(--error) !important;
+  color: white !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  font-family: inherit !important;
 }
 
 .allocation-summary {
@@ -214,30 +255,66 @@
   .payment-modal {
     padding: var(--space-md);
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .allocation-header {
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-md);
   }
-  
+
   .invoice-item, .allocation-item {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
   }
-  
+
   .invoice-details {
     justify-content: flex-end;
-  }
-  
-  .allocation-details {
-    flex-direction: column;
-    align-items: flex-end;
+    flex-wrap: wrap;
     gap: var(--space-xs);
+  }
+
+  .allocation-details {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: var(--space-xs);
+  }
+
+  .allocation-details .form-input {
+    width: auto;
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .allocation-item .btn.allocation-remove-btn {
+    position: absolute !important;
+    top: 4px !important;
+    right: 4px !important;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    z-index: 1 !important;
+    background-color: var(--error) !important;
+    color: white !important;
+    border: none !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    font-family: inherit !important;
   }
 }

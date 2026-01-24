@@ -14,10 +14,10 @@
     box-sizing: border-box !important;
   }
 
-  .main-content.sidebar-collapsed {
-    margin-left: 0 !important;
-    padding-bottom: 12px !important;
-  }
+   .main-content.sidebar-collapsed {
+     margin-left: 0 !important;
+     padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+   }
 
    .content {
     padding: 0 !important;

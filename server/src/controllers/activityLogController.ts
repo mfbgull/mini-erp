@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 import activityLogModel from '../models/ActivityLog';
 import { logCRUD } from '../services/activityLogger';
 import { AuthRequest } from '../types';
+import { getQueryInteger } from '../utils/queryUtils';
 
 /**
  * Get activity logs with filters and pagination
@@ -85,7 +86,7 @@ export function getActivityStats(req: Request, res: Response): void {
 export function getUserActivity(req: Request, res: Response): void {
   try {
     const userId = parseInt(req.params.id, 10);
-    const limit = parseInt(req.query.limit as string, 10) || 100;
+    const limit = getQueryInteger(req.query.limit, 100);
 
     if (isNaN(userId)) {
       res.status(400).json({ error: 'Invalid user ID' });
@@ -112,7 +113,7 @@ export function getUserActivity(req: Request, res: Response): void {
 export function getEntityActivity(req: Request, res: Response): void {
   try {
     const { type, id } = req.params;
-    const limit = parseInt(req.query.limit as string, 10) || 50;
+    const limit = getQueryInteger(req.query.limit, 50);
 
     const entityId = parseInt(id, 10);
     if (isNaN(entityId)) {
@@ -139,7 +140,7 @@ export function getEntityActivity(req: Request, res: Response): void {
  */
 export function getRecentActivity(req: Request, res: Response): void {
   try {
-    const limit = parseInt(req.query.limit as string, 10) || 20;
+    const limit = getQueryInteger(req.query.limit, 20);
 
     const logs = activityLogModel.findRecent(limit);
 
@@ -195,22 +196,27 @@ export function getActions(req: Request, res: Response): void {
  */
 export function exportLogs(req: Request, res: Response): void {
   try {
-    const {
-      user_id,
-      entity_type,
-      action,
-      start_date,
-      end_date,
-      search
-    } = req.query;
+    const userIdParam = Array.isArray(req.query.user_id) ? req.query.user_id[0] : req.query.user_id;
+    const entityTypeParam = Array.isArray(req.query.entity_type) ? req.query.entity_type[0] : req.query.entity_type;
+    const actionParam = Array.isArray(req.query.action) ? req.query.action[0] : req.query.action;
+    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
+    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
+    const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search;
+
+    const user_id = userIdParam as string;
+    const entity_type = entityTypeParam as string;
+    const action = actionParam as string;
+    const start_date = startDateParam as string;
+    const end_date = endDateParam as string;
+    const search = searchParam as string;
 
     const filters = {
-      userId: user_id ? parseInt(user_id as string, 10) : undefined,
-      entityType: entity_type as string,
-      action: action as string,
-      startDate: start_date as string,
-      endDate: end_date as string,
-      search: search as string,
+      userId: user_id ? parseInt(user_id, 10) : undefined,
+      entityType: entity_type,
+      action: action,
+      startDate: start_date,
+      endDate: end_date,
+      search: search,
       limit: 10000
     };
 

@@ -45,12 +45,18 @@ function recordProduction(req: AuthRequest, res: Response): void {
 
 function getProductions(req: Request, res: Response): void {
   try {
+    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
+    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
+    const outputItemIdParam = Array.isArray(req.query.output_item_id) ? req.query.output_item_id[0] : req.query.output_item_id;
+    const warehouseIdParam = Array.isArray(req.query.warehouse_id) ? req.query.warehouse_id[0] : req.query.warehouse_id;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+
     const filters = {
-      start_date: req.query.start_date as string | undefined,
-      end_date: req.query.end_date as string | undefined,
-      output_item_id: req.query.output_item_id ? Number(req.query.output_item_id) : undefined,
-      warehouse_id: req.query.warehouse_id ? Number(req.query.warehouse_id) : undefined,
-      limit: req.query.limit ? parseInt(String(req.query.limit)) : undefined
+      start_date: startDateParam as string | undefined,
+      end_date: endDateParam as string | undefined,
+      output_item_id: outputItemIdParam ? Number(outputItemIdParam) : undefined,
+      warehouse_id: warehouseIdParam ? Number(warehouseIdParam) : undefined,
+      limit: limitParam ? parseInt(String(limitParam)) : undefined
     };
     res.json(ProductionModel.getAll(filters, db));
   } catch (error) {

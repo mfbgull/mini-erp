@@ -6,7 +6,23 @@ import db from '../config/database';
 
 function getPayments(req: Request, res: Response): void {
   try {
-    const { page = 1, limit = 10, search = '', customerId, fromDate, toDate, sortBy = 'payment_date', sortOrder = 'DESC' } = req.query;
+    const pageParam = Array.isArray(req.query.page) ? req.query.page[0] : req.query.page;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search;
+    const customerIdParam = Array.isArray(req.query.customerId) ? req.query.customerId[0] : req.query.customerId;
+    const fromDateParam = Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate;
+    const toDateParam = Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate;
+    const sortByParam = Array.isArray(req.query.sortBy) ? req.query.sortBy[0] : req.query.sortBy;
+    const sortOrderParam = Array.isArray(req.query.sortOrder) ? req.query.sortOrder[0] : req.query.sortOrder;
+
+    const page = pageParam as string || '1';
+    const limit = limitParam as string || '10';
+    const search = searchParam as string || '';
+    const customerId = customerIdParam as string;
+    const fromDate = fromDateParam as string;
+    const toDate = toDateParam as string;
+    const sortBy = (sortByParam as string) || 'payment_date';
+    const sortOrder = (sortOrderParam as string) || 'DESC';
 
     let query = `
       SELECT 
@@ -207,6 +223,13 @@ function createPayment(req: AuthRequest, res: Response): void {
 
     for (const alloc of invoice_allocations) {
       const parsedInvoiceId = parseInt(alloc.invoice_id, 10);
+      if (isNaN(parsedInvoiceId)) {
+        res.status(400).json({
+          success: false,
+          error: `Invalid invoice ID: ${alloc.invoice_id}`
+        });
+        return;
+      }
 
       const invoice = db.prepare(`
         SELECT id, customer_id, balance_amount, status
@@ -224,7 +247,7 @@ function createPayment(req: AuthRequest, res: Response): void {
 
       console.log('Payment validation - Invoice:', parsedInvoiceId, 'Invoice customer_id:', invoice.customer_id, typeof invoice.customer_id, 'Parsed customer_id:', parsedCustomerId, typeof parsedCustomerId);
 
-      if (invoice.customer_id !== parsedCustomerId) {
+      if (Number(invoice.customer_id) !== Number(parsedCustomerId)) {
         res.status(400).json({
           success: false,
           error: `Invoice ${parsedInvoiceId} does not belong to customer ${parsedCustomerId}`
@@ -232,7 +255,7 @@ function createPayment(req: AuthRequest, res: Response): void {
         return;
       }
 
-      if (alloc.amount <= 0) {
+      if (parseFloat(alloc.amount) <= 0) {
         res.status(400).json({
           success: false,
           error: `Allocation amount for invoice ${alloc.invoice_id} must be greater than 0`
@@ -241,8 +264,8 @@ function createPayment(req: AuthRequest, res: Response): void {
       }
     }
 
-    const totalAllocated = invoice_allocations.reduce((sum: number, alloc: any) => sum + parseFloat(alloc.amount), 0);
-    if (Math.abs(totalAllocated - parseFloat(amount)) > 0.01) {
+    const totalAllocated = invoice_allocations.reduce((sum: number, alloc: any) => sum + parseFloat(alloc.amount || '0'), 0);
+    if (Math.abs(totalAllocated - parseFloat(amount || '0')) > 0.01) {
       res.status(400).json({
         success: false,
         error: `Payment amount (${amount}) does not match total allocated amount (${totalAllocated})`
@@ -434,8 +457,35 @@ function updatePayment(req: AuthRequest, res: Response): void {
 function deletePayment(req: AuthRequest, res: Response): void {
   try {
     const { id } = req.params;
+    const parsedId = parseInt(id, 10);
 
-    const existingPayment = db.prepare('SELECT * FROM payments WHERE id = ?').get(id) as any;
+    console.log('Attempting to delete payment with ID:', id, 'Parsed as:', parsedId);
+
+    if (isNaN(parsedId)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid payment ID'
+      });
+      return;
+    }
+
+    // Query to check if payment exists
+    const paymentCheck = db.prepare('SELECT id FROM payments WHERE id = ?').get(parsedId);
+    console.log('Payment check result:', paymentCheck);
+
+    if (!paymentCheck) {
+      console.log('Payment with ID', parsedId, 'does not exist in database');
+      res.status(404).json({
+        success: false,
+        error: 'Payment not found'
+      });
+      return;
+    }
+
+    // If payment exists, fetch full details
+    const existingPayment = db.prepare('SELECT * FROM payments WHERE id = ?').get(parsedId) as any;
+    console.log('Found payment details:', existingPayment);
+
     if (!existingPayment) {
       res.status(404).json({
         success: false,
@@ -445,30 +495,58 @@ function deletePayment(req: AuthRequest, res: Response): void {
     }
 
     const transaction = db.transaction(() => {
-      const allocations = db.prepare('SELECT * FROM payment_allocations WHERE payment_id = ?').all(id) as Array<{ invoice_id: number }>;
+      console.log('Starting transaction to delete payment:', parsedId);
 
-      db.prepare('DELETE FROM payment_allocations WHERE payment_id = ?').run(id);
+      const allocations = db.prepare('SELECT * FROM payment_allocations WHERE payment_id = ?').all(parsedId) as Array<{ invoice_id: number }>;
+      console.log('Found allocations to delete:', allocations.length);
 
-      db.prepare('DELETE FROM payments WHERE id = ?').run(id);
+      const deleteAllocationsResult = db.prepare('DELETE FROM payment_allocations WHERE payment_id = ?').run(parsedId);
+      console.log('Deleted allocations result:', deleteAllocationsResult);
 
-      db.prepare('DELETE FROM customer_ledger WHERE reference_no = ?').run(existingPayment.payment_no);
+      const deletePaymentResult = db.prepare('DELETE FROM payments WHERE id = ?').run(parsedId);
+      console.log('Deleted payment result:', deletePaymentResult);
+
+      const deleteLedgerResult = db.prepare('DELETE FROM customer_ledger WHERE reference_no = ?').run(existingPayment.payment_no);
+      console.log('Deleted ledger entries result:', deleteLedgerResult);
 
       for (const alloc of allocations) {
-        ledgerUtils.calculateInvoiceBalance(alloc.invoice_id);
-        ledgerUtils.updateInvoiceStatus(alloc.invoice_id);
+        try {
+          ledgerUtils.calculateInvoiceBalance(alloc.invoice_id);
+          ledgerUtils.updateInvoiceStatus(alloc.invoice_id);
+        } catch (error) {
+          console.error(`Error updating invoice ${alloc.invoice_id} after payment deletion:`, error);
+          // Continue processing other allocations even if one fails
+        }
       }
 
-      ledgerUtils.updateCustomerBalance(existingPayment.customer_id);
+      try {
+        ledgerUtils.updateCustomerBalance(existingPayment.customer_id);
+      } catch (error) {
+        console.error(`Error updating customer ${existingPayment.customer_id} balance after payment deletion:`, error);
+      }
     });
 
-    transaction();
+    try {
+      transaction();
+    } catch (transactionError) {
+      console.error('Transaction failed during payment deletion:', transactionError);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete payment due to database error'
+      });
+      return;
+    }
 
     // Log payment deletion using activity logger
-    const paymentId = Array.isArray(id) ? id[0] : id;
-    logCRUD(ActionType.PAYMENT_DELETE, 'Payment', parseInt(paymentId, 10), `Deleted payment: ${existingPayment.payment_no} - $${existingPayment.amount}`, req.user!.id, {
-      payment_no: existingPayment.payment_no,
-      amount: existingPayment.amount
-    });
+    try {
+      logCRUD(ActionType.PAYMENT_DELETE, 'Payment', parsedId, `Deleted payment: ${existingPayment.payment_no} - $${existingPayment.amount}`, req.user!.id, {
+        payment_no: existingPayment.payment_no,
+        amount: existingPayment.amount
+      });
+    } catch (logError) {
+      console.error('Error logging payment deletion:', logError);
+      // Don't fail the operation if logging fails
+    }
 
     res.json({
       success: true,

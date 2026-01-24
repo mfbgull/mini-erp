@@ -328,7 +328,8 @@ function getStockSummary(req: Request, res: Response): void {
 function getItemLedger(req: Request, res: Response): void {
   try {
     const itemId = Number(req.params.itemId);
-    const warehouseId = req.query.warehouse_id ? Number(req.query.warehouse_id) : null;
+    const warehouseIdParam = Array.isArray(req.query.warehouse_id) ? req.query.warehouse_id[0] : req.query.warehouse_id;
+    const warehouseId = warehouseIdParam ? Number(warehouseIdParam) : null;
 
     const ledger = StockMovementModel.getItemLedger(itemId, warehouseId, db);
     res.json(ledger);

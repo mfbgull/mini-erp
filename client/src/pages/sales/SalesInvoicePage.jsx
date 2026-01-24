@@ -2,38 +2,75 @@ import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSettings } from '../../context/SettingsContext';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import toast from 'react-hot-toast';
-import { Printer, Download, Send, Plus, Trash2, Hash, Edit2, DollarSign, CreditCard, Eye } from 'lucide-react';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
+import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
+import { CompactItemCard } from '../../components/common/CompactItemCard';
+import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
+import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
 import PriceHistoryHint from '../../components/invoice/PriceHistoryHint';
-import './SalesInvoicePage.css';
+import { Search, ArrowLeft, Printer, Download, Edit2, Mail, Share2, Plus, Trash2, Eye, Send, Hash } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import './SalesPage.css';
 
 export default function SalesInvoicePage() {
+  const { id: invoiceId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { invoiceId } = useParams();
   const { formatCurrency, getCurrencySymbol } = useSettings();
+
+  // Customer action functions for mobile
+  const editCustomer = (customerId) => {
+    navigate(`/sales/invoice/${customerId}/edit`);
+  };
+
+  const deleteCustomer = (customerId) => {
+    if (window.confirm(`Are you sure you want to delete customer: ${customerId}?`)) {
+      // Call delete API
+      api.delete(`/sales/customers/${customerId}`)
+        .then(() => {
+          // Invalidate and refetch queries
+          queryClient.invalidateQueries(['sales']);
+        })
+        .catch((error) => {
+          toast.error('Failed to delete customer');
+          throw error;
+        });
+    }
+  };
+
+  // Add Customer action functions to window scope for mobile
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.editCustomer = editCustomer;
+      window.deleteCustomer = deleteCustomer;
+      window.viewCustomer = (customerId) => {
+        navigate(`/sales/invoice/${customerId}/view`);
+      };
+    }
+    return () => {
+      delete window.editCustomer;
+      delete window.deleteCustomer;
+      delete window.viewCustomer;
+    };
+  }, [navigate, queryClient]);
+
   const [invoice, setInvoice] = useState({
     invoice_no: '',
+    status: 'Unpaid',
+    invoice_date: new Date().toISOString().split('T')[0],
+    due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     customer_id: '',
     customer_name: '',
     customer_email: '',
     customer_phone: '',
     customer_address: '',
-    customer_current_balance: 0,
-    customer_credit_limit: 0,
-    customer_credit_utilization: 0,
-    invoice_date: new Date().toISOString().split('T')[0],
-    due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    status: 'Unpaid',
-    discountScope: 'item',
-    discount: {
-      type: 'flat',
-      value: 0
-    },
-    total_amount: 0,
+    discountScope: 'invoice',
+    discount: { type: 'flat', value: 0 },
     items: [
       {
         id: Date.now(),

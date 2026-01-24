@@ -5,7 +5,19 @@ import db from '../config/database';
 
 function getCustomers(req: Request, res: Response): void {
   try {
-    const { page = 1, limit = 10, search = '', sortBy = 'customer_name', sortOrder = 'ASC' } = req.query;
+    const pageParam = Array.isArray(req.query.page) ? req.query.page[0] : req.query.page;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search;
+    const sortByParam = Array.isArray(req.query.sortBy) ? req.query.sortBy[0] : req.query.sortBy;
+    const sortOrderParam = Array.isArray(req.query.sortOrder) ? req.query.sortOrder[0] : req.query.sortOrder;
+    const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status;
+
+    const page = pageParam as string || '1';
+    const limit = limitParam as string || '10';
+    const search = searchParam as string || '';
+    const sortBy = sortByParam as string || 'customer_name';
+    const sortOrder = sortOrderParam as string || 'ASC';
+    const status = statusParam as string;
 
     let query = `
       SELECT
@@ -29,7 +41,6 @@ function getCustomers(req: Request, res: Response): void {
       params.push(searchParam, searchParam, searchParam, searchParam);
     }
 
-    const status = req.query.status;
     if (status && status !== 'all') {
       if (status === 'active') {
         query += ' AND is_active = 1';
@@ -67,7 +78,8 @@ function getCustomers(req: Request, res: Response): void {
       }
     }
 
-    const total = db.prepare(countQuery).get(...countParams).total as number;
+    const result = db.prepare(countQuery).get(...countParams) as { total: number };
+    const total = result.total as number;
 
     res.json({
       success: true,
@@ -290,7 +302,7 @@ function updateCustomer(req: AuthRequest, res: Response): void {
     ).get(id);
 
     // Log customer update using activity logger
-    logCRUD(ActionType.CUSTOMER_UPDATE, 'Customer', parseInt(id, 10), `Updated customer: ${customer_name || existingCustomer.customer_name}`, req.user!.id, {
+    logCRUD(ActionType.CUSTOMER_UPDATE, 'Customer', parseInt(id, 10), `Updated customer: ${customer_name || (existingCustomer as any).customer_name}`, req.user!.id, {
       changes: Object.keys(req.body).filter(k => req.body[k] !== undefined)
     });
 
@@ -321,8 +333,10 @@ function deleteCustomer(req: AuthRequest, res: Response): void {
       return;
     }
 
-    const invoiceCount = db.prepare('SELECT COUNT(*) as count FROM invoices WHERE customer_id = ?').get(id).count as number;
-    const paymentCount = db.prepare('SELECT COUNT(*) as count FROM payments WHERE customer_id = ?').get(id).count as number;
+    const invoiceResult = db.prepare('SELECT COUNT(*) as count FROM invoices WHERE customer_id = ?').get(id) as { count: number };
+    const invoiceCount = invoiceResult.count as number;
+    const paymentResult = db.prepare('SELECT COUNT(*) as count FROM payments WHERE customer_id = ?').get(id) as { count: number };
+    const paymentCount = paymentResult.count as number;
 
     if (invoiceCount > 0 || paymentCount > 0) {
       res.status(400).json({
@@ -336,8 +350,8 @@ function deleteCustomer(req: AuthRequest, res: Response): void {
     stmt.run(id);
 
     // Log customer deactivation using activity logger
-    logCRUD(ActionType.CUSTOMER_DELETE, 'Customer', parseInt(id, 10), `Deactivated customer: ${existingCustomer.customer_name}`, req.user!.id, {
-      customer_code: existingCustomer.customer_code
+    logCRUD(ActionType.CUSTOMER_DELETE, 'Customer', parseInt(id, 10), `Deactivated customer: ${(existingCustomer as any).customer_name}`, req.user!.id, {
+      customer_code: (existingCustomer as any).customer_code
     });
 
     res.json({
@@ -356,7 +370,17 @@ function deleteCustomer(req: AuthRequest, res: Response): void {
 function getCustomerLedger(req: Request, res: Response): void {
   try {
     const { id } = req.params;
-    const { sortBy = 'transaction_date', sortOrder = 'DESC' } = req.query;
+    const sortByParam = Array.isArray(req.query.sortBy) ? req.query.sortBy[0] : req.query.sortBy;
+    const sortOrderParam = Array.isArray(req.query.sortOrder) ? req.query.sortOrder[0] : req.query.sortOrder;
+    const sortBy = (sortByParam as string) || 'transaction_date';
+    const sortOrder = (sortOrderParam as string) || 'DESC';
+
+    // Validate sort parameters to prevent SQL injection
+    const validSortColumns = ['transaction_date', 'id', 'transaction_type', 'reference_no'];
+    const validSortOrders = ['ASC', 'DESC'];
+
+    const validatedSortBy = validSortColumns.includes(sortBy) ? sortBy : 'transaction_date';
+    const validatedSortOrder = validSortOrders.includes(sortOrder.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
 
     const customer = db.prepare('SELECT id FROM customers WHERE id = ?').get(id);
     if (!customer) {
@@ -373,7 +397,7 @@ function getCustomerLedger(req: Request, res: Response): void {
         debit, credit, balance, description, created_at
       FROM customer_ledger
       WHERE customer_id = ?
-      ORDER BY ${sortBy} ${sortOrder}
+      ORDER BY ${validatedSortBy} ${validatedSortOrder}
     `;
 
     const ledgerEntries = db.prepare(query).all(id);
@@ -394,7 +418,10 @@ function getCustomerLedger(req: Request, res: Response): void {
 function getCustomerStatement(req: Request, res: Response): void {
   try {
     const { id } = req.params;
-    const { fromDate, toDate } = req.query;
+    const fromDateParam = Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate;
+    const toDateParam = Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate;
+    const fromDate = fromDateParam as string;
+    const toDate = toDateParam as string;
 
     const customer = db.prepare('SELECT id, customer_name FROM customers WHERE id = ?').get(id);
     if (!customer) {
@@ -476,7 +503,7 @@ function getCustomerBalance(req: Request, res: Response): void {
   try {
     const { id } = req.params;
 
-    const customer = db.prepare('SELECT id, customer_name, current_balance FROM customers WHERE id = ?').get(id);
+    const customer = db.prepare('SELECT id, customer_name, current_balance FROM customers WHERE id = ?').get(id) as { id: number; customer_name: string; current_balance: number } | undefined;
     if (!customer) {
       res.status(404).json({
         success: false,
@@ -490,7 +517,7 @@ function getCustomerBalance(req: Request, res: Response): void {
       data: {
         customerId: customer.id,
         customerName: customer.customer_name,
-        currentBalance: parseFloat(customer.current_balance)
+        currentBalance: parseFloat(String(customer.current_balance))
       }
     });
   } catch (error) {
@@ -505,10 +532,10 @@ function getCustomerBalance(req: Request, res: Response): void {
 function recalculateAllBalances(req: AuthRequest, res: Response): void {
   try {
     // Get all customers
-    const customers = db.prepare('SELECT id FROM customers').all();
-    
+    const customers = db.prepare('SELECT id FROM customers').all() as { id: number }[];
+
     let updatedCount = 0;
-    
+
     for (const customer of customers) {
       // Calculate balance from invoices
       const balanceResult = db.prepare(`
@@ -516,9 +543,9 @@ function recalculateAllBalances(req: AuthRequest, res: Response): void {
         FROM invoices
         WHERE customer_id = ? AND status IN ('Unpaid', 'Partially Paid', 'Overdue')
       `).get(customer.id) as { total_balance: number };
-      
+
       const newBalance = balanceResult.total_balance;
-      
+
       // Update customer balance
       db.prepare('UPDATE customers SET current_balance = ? WHERE id = ?').run(newBalance, customer.id);
       updatedCount++;

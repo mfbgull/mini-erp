@@ -2,7 +2,7 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosE
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://localhost:3011/api',  // Updated to match the actual server port
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
