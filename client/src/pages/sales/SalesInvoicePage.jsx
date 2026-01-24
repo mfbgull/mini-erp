@@ -12,7 +12,7 @@ import { CompactItemCard } from '../../components/common/CompactItemCard';
 import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
 import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
 import PriceHistoryHint from '../../components/invoice/PriceHistoryHint';
-import { Search, ArrowLeft, Printer, Download, Edit2, Mail, Share2, Plus, Trash2, Eye, Send, Hash } from 'lucide-react';
+import { Search, ArrowLeft, Printer, Download, Edit2, Mail, Share2, Plus, Trash2, Eye, Send, Hash, DollarSign } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import './SalesPage.css';
