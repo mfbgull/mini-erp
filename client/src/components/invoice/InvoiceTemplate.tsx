@@ -71,6 +71,24 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
     );
   }
 
+  // Helper function to validate invoice data
+  const validateInvoiceData = () => {
+    if (!invoice.invoice_no) {
+      console.warn('Invoice is missing invoice_no');
+    }
+    if (invoice.total_amount == null) {
+      console.warn('Invoice is missing total_amount');
+    }
+    if (!invoice.customer_name) {
+      console.warn('Invoice is missing customer_name');
+    }
+    if (!Array.isArray(invoice.items)) {
+      console.warn('Invoice items is not an array');
+    }
+  };
+
+  validateInvoiceData();
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     try {
@@ -96,11 +114,17 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
   const calculateItemTotal = (item: InvoiceItem) => {
     if (!item) return 0;
     try {
+      // Validate item properties before processing
+      if (item.quantity == null) {
+        console.warn('Item quantity is null or undefined:', item);
+        return 0;
+      }
+
       const quantity = safeParseFloat(item.quantity);
-      const rate = safeParseFloat(item.unit_price ?? item.rate);
-      const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
+      const rate = safeParseFloat(item.unit_price ?? item.rate ?? 0);
+      const taxRate = safeParseFloat(item.tax_rate ?? item.tax ?? 0);
       const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
-      const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
+      const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value ?? 0);
 
       let subtotal = quantity * rate;
 
@@ -112,7 +136,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
       subtotal += subtotal * (taxRate / 100);
 
-      return subtotal;
+      return Math.max(0, subtotal); // Ensure non-negative result
     } catch (error) {
       console.warn('Error calculating item total:', item, error);
       return 0;
@@ -121,11 +145,28 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
   const getSubtotal = () => {
     try {
-      return (invoice.items || []).reduce((sum, item) => {
-        if (!item) return sum;
-        const quantity = safeParseFloat(item.quantity);
-        const rate = safeParseFloat(item.unit_price ?? item.rate);
-        return sum + (quantity * rate);
+      if (!invoice.items || !Array.isArray(invoice.items)) {
+        console.warn('Invoice items is not an array, returning 0');
+        return 0;
+      }
+
+      return invoice.items.reduce((sum, item) => {
+        if (!item) {
+          console.warn('Skipping null/undefined item in subtotal calculation');
+          return sum;
+        }
+
+        const quantity = safeParseFloat(item.quantity ?? 0);
+        const rate = safeParseFloat(item.unit_price ?? item.rate ?? 0);
+        const itemSubtotal = quantity * rate;
+
+        // Validate the calculation result
+        if (isNaN(itemSubtotal) || !isFinite(itemSubtotal)) {
+          console.warn('Invalid subtotal calculation for item:', item);
+          return sum;
+        }
+
+        return sum + itemSubtotal;
       }, 0);
     } catch (error) {
       console.warn('Error calculating subtotal:', error);
@@ -137,31 +178,49 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
     try {
       let discount = 0;
 
-      (invoice.items || []).forEach(item => {
-        if (!item) return;
-        const quantity = safeParseFloat(item.quantity);
-        const rate = safeParseFloat(item.unit_price ?? item.rate);
-        const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
-        const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
-        const subtotal = quantity * rate;
+      if (invoice.items && Array.isArray(invoice.items)) {
+        for (const item of invoice.items) {
+          if (!item) {
+            console.warn('Skipping null/undefined item in discount calculation');
+            continue;
+          }
 
-        if (discountType === 'percentage') {
-          discount += subtotal * (discountValue / 100);
-        } else {
-          discount += discountValue;
-        }
-      });
+          const quantity = safeParseFloat(item.quantity ?? 0);
+          const rate = safeParseFloat(item.unit_price ?? item.rate ?? 0);
+          const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
+          const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value ?? 0);
+          const subtotal = quantity * rate;
 
-      if (invoice.discount_type && invoice.discount_value != null) {
-        const subtotal = getSubtotal();
-        if (invoice.discount_type === 'percentage') {
-          discount += subtotal * (safeParseFloat(invoice.discount_value) / 100);
-        } else {
-          discount += safeParseFloat(invoice.discount_value);
+          if (discountType === 'percentage') {
+            const itemDiscount = subtotal * (discountValue / 100);
+            if (isFinite(itemDiscount)) {
+              discount += itemDiscount;
+            }
+          } else {
+            if (isFinite(discountValue)) {
+              discount += discountValue;
+            }
+          }
         }
       }
 
-      return discount;
+      if (invoice.discount_type && invoice.discount_value != null) {
+        const subtotal = getSubtotal();
+        const discountValue = safeParseFloat(invoice.discount_value);
+
+        if (invoice.discount_type === 'percentage') {
+          const additionalDiscount = subtotal * (discountValue / 100);
+          if (isFinite(additionalDiscount)) {
+            discount += additionalDiscount;
+          }
+        } else {
+          if (isFinite(discountValue)) {
+            discount += discountValue;
+          }
+        }
+      }
+
+      return Math.max(0, discount); // Ensure non-negative result
     } catch (error) {
       console.warn('Error calculating total discount:', error);
       return 0;
@@ -170,13 +229,22 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
   const getTotalTax = () => {
     try {
-      return (invoice.items || []).reduce((sum, item) => {
-        if (!item) return sum;
-        const quantity = safeParseFloat(item.quantity);
-        const rate = safeParseFloat(item.unit_price ?? item.rate);
-        const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
+      if (!invoice.items || !Array.isArray(invoice.items)) {
+        console.warn('Invoice items is not an array, returning 0 for tax');
+        return 0;
+      }
+
+      return invoice.items.reduce((sum, item) => {
+        if (!item) {
+          console.warn('Skipping null/undefined item in tax calculation');
+          return sum;
+        }
+
+        const quantity = safeParseFloat(item.quantity ?? 0);
+        const rate = safeParseFloat(item.unit_price ?? item.rate ?? 0);
+        const taxRate = safeParseFloat(item.tax_rate ?? item.tax ?? 0);
         const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
-        const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
+        const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value ?? 0);
 
         let subtotal = quantity * rate;
         if (discountType === 'percentage') {
@@ -185,7 +253,14 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
           subtotal -= discountValue;
         }
 
-        return sum + (subtotal * (taxRate / 100));
+        const taxAmount = subtotal * (taxRate / 100);
+
+        if (isNaN(taxAmount) || !isFinite(taxAmount)) {
+          console.warn('Invalid tax calculation for item:', item);
+          return sum;
+        }
+
+        return sum + taxAmount;
       }, 0);
     } catch (error) {
       console.warn('Error calculating total tax:', error);
@@ -205,8 +280,9 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
     return statusMap[status] || 'status-unpaid';
   };
 
-  return (
-    <div className="invoice-template" ref={ref}>
+  try {
+    return (
+      <div className="invoice-template" ref={ref}>
       <div className="invoice-template-header">
         <div className="invoice-template-brand">
           <div className="invoice-template-logo">
@@ -366,6 +442,23 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       </div>
     </div>
   );
+} catch (error) {
+  console.error('Error in InvoiceTemplate rendering:', error);
+  return (
+    <div className="invoice-template">
+      <div className="error-message">
+        <h3>Error rendering invoice</h3>
+        <p>An error occurred while rendering the invoice template.</p>
+        <details style={{ marginTop: '10px' }}>
+          <summary>Error details</summary>
+          <pre style={{ fontSize: '12px', whiteSpace: 'pre-wrap' }}>
+            {error instanceof Error ? error.message : String(error)}
+          </pre>
+        </details>
+      </div>
+    </div>
+  );
+}
 });
 
 InvoiceTemplate.displayName = 'InvoiceTemplate';
