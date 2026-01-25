@@ -23,9 +23,12 @@ export default function InvoiceViewPage() {
     queryKey: ['invoice', invoiceId],
     queryFn: async () => {
       const response = await api.get(`/invoices/${invoiceId}`);
+      // The API returns the invoice object directly, not wrapped in a data property
       return response.data;
     },
-    enabled: !!invoiceId
+    enabled: !!invoiceId,
+    retry: 1, // Retry once if request fails
+    staleTime: 0, // Always fetch fresh data
   });
 
   // Fetch company settings

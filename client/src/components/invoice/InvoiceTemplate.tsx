@@ -62,13 +62,27 @@ const safeParseFloat = (value: any): number => {
 };
 
 const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invoice, company }, ref) => {
+  // Ensure invoice exists and has required fields
+  if (!invoice) {
+    return (
+      <div className="invoice-template">
+        <div className="error-message">No invoice data provided</div>
+      </div>
+    );
+  }
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.warn('Error formatting date:', dateString, error);
+      return dateString || '';
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -81,67 +95,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
   const calculateItemTotal = (item: InvoiceItem) => {
     if (!item) return 0;
-    const quantity = safeParseFloat(item.quantity);
-    const rate = safeParseFloat(item.unit_price ?? item.rate);
-    const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
-    const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
-    const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
-
-    let subtotal = quantity * rate;
-
-    if (discountType === 'percentage') {
-      subtotal -= subtotal * (discountValue / 100);
-    } else {
-      subtotal -= discountValue;
-    }
-
-    subtotal += subtotal * (taxRate / 100);
-
-    return subtotal;
-  };
-
-  const getSubtotal = () => {
-    return (invoice.items || []).reduce((sum, item) => {
-      if (!item) return sum;
-      const quantity = safeParseFloat(item.quantity);
-      const rate = safeParseFloat(item.unit_price ?? item.rate);
-      return sum + (quantity * rate);
-    }, 0);
-  };
-
-  const getTotalDiscount = () => {
-    let discount = 0;
-
-    (invoice.items || []).forEach(item => {
-      if (!item) return;
-      const quantity = safeParseFloat(item.quantity);
-      const rate = safeParseFloat(item.unit_price ?? item.rate);
-      const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
-      const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
-      const subtotal = quantity * rate;
-
-      if (discountType === 'percentage') {
-        discount += subtotal * (discountValue / 100);
-      } else {
-        discount += discountValue;
-      }
-    });
-
-    if (invoice.discount_type && invoice.discount_value) {
-      const subtotal = getSubtotal();
-      if (invoice.discount_type === 'percentage') {
-        discount += subtotal * (invoice.discount_value / 100);
-      } else {
-        discount += invoice.discount_value;
-      }
-    }
-
-    return discount;
-  };
-
-  const getTotalTax = () => {
-    return (invoice.items || []).reduce((sum, item) => {
-      if (!item) return sum;
+    try {
       const quantity = safeParseFloat(item.quantity);
       const rate = safeParseFloat(item.unit_price ?? item.rate);
       const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
@@ -149,14 +103,94 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
 
       let subtotal = quantity * rate;
+
       if (discountType === 'percentage') {
         subtotal -= subtotal * (discountValue / 100);
       } else {
         subtotal -= discountValue;
       }
 
-      return sum + (subtotal * (taxRate / 100));
-    }, 0);
+      subtotal += subtotal * (taxRate / 100);
+
+      return subtotal;
+    } catch (error) {
+      console.warn('Error calculating item total:', item, error);
+      return 0;
+    }
+  };
+
+  const getSubtotal = () => {
+    try {
+      return (invoice.items || []).reduce((sum, item) => {
+        if (!item) return sum;
+        const quantity = safeParseFloat(item.quantity);
+        const rate = safeParseFloat(item.unit_price ?? item.rate);
+        return sum + (quantity * rate);
+      }, 0);
+    } catch (error) {
+      console.warn('Error calculating subtotal:', error);
+      return 0;
+    }
+  };
+
+  const getTotalDiscount = () => {
+    try {
+      let discount = 0;
+
+      (invoice.items || []).forEach(item => {
+        if (!item) return;
+        const quantity = safeParseFloat(item.quantity);
+        const rate = safeParseFloat(item.unit_price ?? item.rate);
+        const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
+        const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
+        const subtotal = quantity * rate;
+
+        if (discountType === 'percentage') {
+          discount += subtotal * (discountValue / 100);
+        } else {
+          discount += discountValue;
+        }
+      });
+
+      if (invoice.discount_type && invoice.discount_value != null) {
+        const subtotal = getSubtotal();
+        if (invoice.discount_type === 'percentage') {
+          discount += subtotal * (safeParseFloat(invoice.discount_value) / 100);
+        } else {
+          discount += safeParseFloat(invoice.discount_value);
+        }
+      }
+
+      return discount;
+    } catch (error) {
+      console.warn('Error calculating total discount:', error);
+      return 0;
+    }
+  };
+
+  const getTotalTax = () => {
+    try {
+      return (invoice.items || []).reduce((sum, item) => {
+        if (!item) return sum;
+        const quantity = safeParseFloat(item.quantity);
+        const rate = safeParseFloat(item.unit_price ?? item.rate);
+        const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
+        const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
+        const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
+
+        let subtotal = quantity * rate;
+        if (discountType === 'percentage') {
+          subtotal -= subtotal * (discountValue / 100);
+        } else {
+          subtotal -= discountValue;
+        }
+
+        return sum + (subtotal * (taxRate / 100));
+      }, 0);
+    } catch (error) {
+      console.warn('Error calculating total tax:', error);
+      return 0;
+    }
   };
 
   const getStatusClass = (status: string) => {
@@ -188,8 +222,8 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
         </div>
         <div className="invoice-template-title-section">
           <h2 className="invoice-template-title">INVOICE</h2>
-          <div className="invoice-template-number">{invoice.invoice_no}</div>
-          <div className={`invoice-template-status ${getStatusClass(invoice.status)}`}>
+          <div className="invoice-template-number">{invoice.invoice_no || 'N/A'}</div>
+          <div className={`invoice-template-status ${getStatusClass(invoice.status || 'Unpaid')}`}>
             {invoice.status || 'Unpaid'}
           </div>
         </div>
@@ -198,7 +232,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       <div className="invoice-template-info">
         <div className="invoice-template-bill-to">
           <h3 className="info-label">Bill To</h3>
-          <p className="customer-name">{invoice.customer_name}</p>
+          <p className="customer-name">{invoice.customer_name || 'N/A'}</p>
           {invoice.customer_address && <p className="customer-detail">{invoice.customer_address}</p>}
           {invoice.customer_phone && <p className="customer-detail">{invoice.customer_phone}</p>}
           {invoice.customer_email && <p className="customer-detail">{invoice.customer_email}</p>}
@@ -206,11 +240,11 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
         <div className="invoice-template-details">
           <div className="detail-row">
             <span className="detail-label">Invoice Date</span>
-            <span className="detail-value">{formatDate(invoice.invoice_date)}</span>
+            <span className="detail-value">{formatDate(invoice.invoice_date || '')}</span>
           </div>
           <div className="detail-row">
             <span className="detail-label">Due Date</span>
-            <span className="detail-value">{formatDate(invoice.due_date)}</span>
+            <span className="detail-value">{formatDate(invoice.due_date || '')}</span>
           </div>
           <div className="detail-row">
             <span className="detail-label">Payment Terms</span>
@@ -232,33 +266,39 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
             </tr>
           </thead>
           <tbody>
-            {(invoice.items || []).map((item, index) => {
-              if (!item) return null;
-              const quantity = safeParseFloat(item.quantity);
-              const rate = safeParseFloat(item.unit_price ?? item.rate);
-              const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
-              const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
-              const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
+            {Array.isArray(invoice.items) ? (
+              invoice.items.map((item, index) => {
+                if (!item) return null;
+                const quantity = safeParseFloat(item.quantity);
+                const rate = safeParseFloat(item.unit_price ?? item.rate);
+                const discountType = item.discount_type ?? item.discount?.type ?? 'flat';
+                const discountValue = safeParseFloat(item.discount_value ?? item.discount?.value);
+                const taxRate = safeParseFloat(item.tax_rate ?? item.tax);
 
-              return (
-                <tr key={index}>
-                  <td className="col-item">
-                    <div className="item-name">{item.item_name || item.description}</div>
-                    {item.item_code && <div className="item-code">{item.item_code}</div>}
-                  </td>
-                  <td className="col-qty">{quantity}</td>
-                  <td className="col-rate">{formatCurrency(rate)}</td>
-                  <td className="col-discount">
-                    {discountValue > 0
-                      ? (discountType === 'percentage' ? `${discountValue}%` : formatCurrency(discountValue))
-                      : '-'
-                    }
-                  </td>
-                  <td className="col-tax">{taxRate > 0 ? `${taxRate}%` : '-'}</td>
-                  <td className="col-amount">{formatCurrency(calculateItemTotal(item))}</td>
-                </tr>
-              );
-            })}
+                return (
+                  <tr key={index}>
+                    <td className="col-item">
+                      <div className="item-name">{item.item_name || item.description || 'N/A'}</div>
+                      {item.item_code && <div className="item-code">{item.item_code}</div>}
+                    </td>
+                    <td className="col-qty">{quantity}</td>
+                    <td className="col-rate">{formatCurrency(rate)}</td>
+                    <td className="col-discount">
+                      {discountValue > 0
+                        ? (discountType === 'percentage' ? `${discountValue}%` : formatCurrency(discountValue))
+                        : '-'
+                      }
+                    </td>
+                    <td className="col-tax">{taxRate > 0 ? `${taxRate}%` : '-'}</td>
+                    <td className="col-amount">{formatCurrency(calculateItemTotal(item))}</td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={6} className="no-items">No items found</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -297,17 +337,17 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
           )}
           <div className="summary-row total">
             <span>Total</span>
-            <span>{formatCurrency(invoice.total_amount)}</span>
+            <span>{formatCurrency(safeParseFloat(invoice.total_amount || 0))}</span>
           </div>
-          {invoice.paid_amount && invoice.paid_amount > 0 && (
+          {invoice.paid_amount && safeParseFloat(invoice.paid_amount) > 0 && (
             <>
               <div className="summary-row paid">
                 <span>Paid</span>
-                <span>-{formatCurrency(invoice.paid_amount)}</span>
+                <span>-{formatCurrency(safeParseFloat(invoice.paid_amount || 0))}</span>
               </div>
               <div className="summary-row balance">
                 <span>Balance Due</span>
-                <span>{formatCurrency(invoice.balance_amount || 0)}</span>
+                <span>{formatCurrency(safeParseFloat(invoice.balance_amount || 0))}</span>
               </div>
             </>
           )}
