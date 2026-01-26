@@ -12,10 +12,10 @@ import { CompactItemCard } from '../../components/common/CompactItemCard';
 import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
 import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
 import PriceHistoryHint from '../../components/invoice/PriceHistoryHint';
-import { Search, ArrowLeft, Printer, Download, Edit2, Mail, Share2, Plus, Trash2, Eye, Send, Hash, DollarSign } from 'lucide-react';
+import { Search, ArrowLeft, Printer, Download, Edit2, Mail, Share2, Plus, Trash2, Eye, Send, Hash, DollarSign, CreditCard } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import './SalesPage.css';
+import './SalesInvoicePage.css';
 
 export default function SalesInvoicePage() {
   const { id: invoiceId } = useParams();
@@ -1650,25 +1650,25 @@ export default function SalesInvoicePage() {
                     <span>Payment Total:</span>
                     <span>
                       {formatCurrency(
-                        invoice.paymentMethods.reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0)
+                        (invoice.paymentMethods || []).reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0)
                       )}
                     </span>
                   </div>
                   <div className="payment-summary-row">
                     <span>Invoice Balance:</span>
-                    <span>{formatCurrency(invoiceId ? invoice.balance_amount : calculateTotal())}</span>
+                    <span>{formatCurrency(invoiceId ? (invoice.balance_amount || 0) : calculateTotal())}</span>
                   </div>
                   <div className="payment-summary-row">
                     <span>Remaining Balance:</span>
                     <span className={
-                      (invoiceId ? invoice.balance_amount : calculateTotal()) -
-                      invoice.paymentMethods.reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0) > 0
+                      (invoiceId ? (invoice.balance_amount || 0) : calculateTotal()) -
+                      (invoice.paymentMethods || []).reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0) > 0
                       ? 'text-red' : 'text-green'
                     }>
                       {formatCurrency(
                         Math.max(0,
-                          (invoiceId ? invoice.balance_amount : calculateTotal()) -
-                          invoice.paymentMethods.reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0)
+                          (invoiceId ? (invoice.balance_amount || 0) : calculateTotal()) -
+                          (invoice.paymentMethods || []).reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0)
                         )
                       )}
                     </span>

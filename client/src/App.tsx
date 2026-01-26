@@ -25,6 +25,7 @@ import ProductionPage from './pages/production/ProductionPage';
 import SalesPage from './pages/sales/SalesPage';
 import SalesInvoicePage from './pages/sales/SalesInvoicePage';
 import InvoiceViewPage from './pages/sales/InvoiceViewPage';
+import InvoiceRouter from './components/invoice/InvoiceRouter';
 import POSPage from './pages/pos/POSPage';
 import CustomersPage from './pages/customers/CustomersPage';
 import CustomerDetailPage from './pages/customers/CustomerDetailPage';
@@ -163,8 +164,9 @@ function AppLayout() {
               <Route path="/expenses" element={<ExpensesPage />} />
 <Route path="/sales" element={<SalesPage />} />
               <Route path="/sales/invoice" element={<SalesInvoicePage />} />
-              <Route path="/sales/invoice/:invoiceId" element={<SalesInvoicePage />} />
-              <Route path="/sales/invoice/:invoiceId/view" element={<InvoiceViewPage />} />
+              <Route path="/sales/invoice/:id" element={<InvoiceRouter />} />
+              <Route path="/sales/invoice/:id/view" element={<InvoiceViewPage />} />
+              <Route path="/sales/invoice/:id/edit" element={<SalesInvoicePage />} />
               <Route path="/invoices/create" element={<MobileInvoiceWizard />} />
               <Route path="/pos" element={<POSPage />} />
               <Route path="/settings" element={<SettingsPage />} />

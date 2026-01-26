@@ -12,7 +12,7 @@ import { useMobileDetection } from '../../hooks/useMobileDetection';
 import './InvoiceViewPage.css';
 
 export default function InvoiceViewPage() {
-  const { invoiceId } = useParams();
+  const { id: invoiceId } = useParams();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
   const invoiceRef = useRef(null);
@@ -138,7 +138,7 @@ export default function InvoiceViewPage() {
           <h2 className="toolbar-title">Invoice {invoice.invoice_no}</h2>
         </div>
         <div className="toolbar-right">
-          <Button variant="secondary" onClick={() => navigate(`/sales/invoice/${invoiceId}`)}>
+          <Button variant="secondary" onClick={() => navigate(`/sales/invoice/${invoiceId}?mode=edit`)}>
             <Edit2 size={18} />
             Edit
           </Button>

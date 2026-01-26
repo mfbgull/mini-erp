@@ -153,7 +153,7 @@ export default function SalesPage() {
           </button>
           <button
             className="action-btn edit-btn"
-            onClick={() => navigate(`/sales/invoice/${params.data.id}`)}
+            onClick={() => navigate(`/sales/invoice/${params.data.id}?mode=edit`)}
             title="Edit Invoice"
           >
             <Edit2 size={14} />
@@ -222,7 +222,7 @@ export default function SalesPage() {
           <CompactInvoiceCardView
             invoices={invoices}
             onView={(invoice) => setPreviewInvoice(invoice)}
-            onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}`)}
+            onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}?mode=edit`)}
             onDelete={handleDeleteInvoice}
           />
         ) : (
@@ -250,7 +250,7 @@ export default function SalesPage() {
         <InvoicePreview
           invoice={previewInvoice}
           onClose={() => setPreviewInvoice(null)}
-          onEdit={() => navigate(`/sales/invoice/${previewInvoice.id}`)}
+          onEdit={() => navigate(`/sales/invoice/${previewInvoice.id}?mode=edit`)}
           onDelete={() => handleDeleteInvoice(previewInvoice)}
         />
       )}
