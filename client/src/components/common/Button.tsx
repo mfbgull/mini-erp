@@ -1,4 +1,4 @@
-import { ReactNode, MouseEvent } from 'react';
+import { ReactNode, MouseEvent, memo } from 'react';
 import './Button.css';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'warning' | 'success';
@@ -14,7 +14,7 @@ interface ButtonProps {
   className?: string;
 }
 
-export default function Button({
+const Button = memo(function Button({
   children,
   variant = 'primary',
   type = 'button',
@@ -30,8 +30,10 @@ export default function Button({
       onClick={onClick}
       disabled={disabled || loading}
     >
-      {loading && <span className="spinner-small"></span>}
+      {loading ? <span className="spinner-small"></span> : null}
       {children}
     </button>
   );
-}
+});
+
+export default Button;

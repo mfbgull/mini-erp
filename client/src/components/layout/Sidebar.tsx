@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -11,7 +11,62 @@ interface NavItem {
   children?: NavItem[];
 }
 
-export default function Sidebar() {
+// Static navigation items - defined outside component to avoid recreation on every render
+const NAV_ITEMS: NavItem[] = [
+  { path: '/', label: 'Dashboard', icon: '📊' },
+  {
+    label: 'Inventory',
+    icon: '📦',
+    children: [
+      { path: '/inventory/items', label: 'Items' },
+      { path: '/inventory/warehouses', label: 'Warehouses' },
+      { path: '/inventory/stock-movements', label: 'Stock Movements' },
+      { path: '/inventory/stock-by-warehouse', label: 'Stock by Warehouse' }
+    ]
+  },
+  {
+    label: 'Sales',
+    icon: '💰',
+    children: [
+      { path: '/pos', label: 'POS Terminal' },
+      { path: '/sales', label: 'Sales' },
+      { path: '/sales/invoice', label: 'Create Invoice' },
+      { path: '/customers', label: 'Customers' }
+    ]
+  },
+  {
+    label: 'Reports',
+    icon: '📊',
+    children: [
+      { path: '/reports', label: 'Dashboard' },
+      { path: '/reports/accounts-receivable', label: 'A/R Reports' },
+      { path: '/reports/sales-summary', label: 'Sales Summary' },
+      { path: '/reports/stock-level', label: 'Stock Levels' },
+      { path: '/reports/low-stock', label: 'Low Stock Alert' },
+      { path: '/reports/profit-loss', label: 'Profit & Loss' },
+      { path: '/reports/cash-flow', label: 'Cash Flow' },
+      { path: '/reports/expenses', label: 'Expenses Report' }
+    ]
+  },
+  {
+    label: 'Purchases',
+    icon: '🛒',
+    children: [
+      { path: '/purchases', label: 'Purchases' },
+      { path: '/purchase-orders', label: 'Purchase Orders' },
+      { path: '/purchase-orders/create', label: 'Create PO' },
+      { path: '/suppliers', label: 'Suppliers' }
+    ]
+  },
+  { path: '/bom', label: 'Bill of Materials', icon: '📋' },
+  { path: '/production', label: 'Production', icon: '🏭' },
+  { path: '/expenses', label: 'Expenses', icon: '💸' },
+  { path: '/activity-log', label: 'Activity Log', icon: '📝' },
+  { path: '/integrations', label: 'Integrations', icon: '🔗' },
+  { path: '/settings', label: 'Settings', icon: '⚙️' }
+];
+
+const Sidebar = memo(function Sidebar() {
   const { user, logout } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebarCollapsed');
@@ -57,60 +112,6 @@ export default function Sidebar() {
     }
   };
 
-  const navItems: NavItem[] = [
-    { path: '/', label: 'Dashboard', icon: '📊' },
-    {
-      label: 'Inventory',
-      icon: '📦',
-      children: [
-        { path: '/inventory/items', label: 'Items' },
-        { path: '/inventory/warehouses', label: 'Warehouses' },
-        { path: '/inventory/stock-movements', label: 'Stock Movements' },
-        { path: '/inventory/stock-by-warehouse', label: 'Stock by Warehouse' }
-      ]
-    },
-    {
-      label: 'Sales',
-      icon: '💰',
-      children: [
-        { path: '/pos', label: 'POS Terminal' },
-        { path: '/sales', label: 'Sales' },
-        { path: '/sales/invoice', label: 'Create Invoice' },
-        { path: '/customers', label: 'Customers' }
-      ]
-    },
-    {
-      label: 'Reports',
-      icon: '📊',
-      children: [
-        { path: '/reports', label: 'Dashboard' },
-        { path: '/reports/accounts-receivable', label: 'A/R Reports' },
-        { path: '/reports/sales-summary', label: 'Sales Summary' },
-        { path: '/reports/stock-level', label: 'Stock Levels' },
-        { path: '/reports/low-stock', label: 'Low Stock Alert' },
-        { path: '/reports/profit-loss', label: 'Profit & Loss' },
-        { path: '/reports/cash-flow', label: 'Cash Flow' },
-        { path: '/reports/expenses', label: 'Expenses Report' }
-      ]
-    },
-    {
-      label: 'Purchases',
-      icon: '🛒',
-      children: [
-        { path: '/purchases', label: 'Purchases' },
-        { path: '/purchase-orders', label: 'Purchase Orders' },
-        { path: '/purchase-orders/create', label: 'Create PO' },
-        { path: '/suppliers', label: 'Suppliers' }
-      ]
-    },
-    { path: '/bom', label: 'Bill of Materials', icon: '📋' },
-    { path: '/production', label: 'Production', icon: '🏭' },
-    { path: '/expenses', label: 'Expenses', icon: '💸' },
-    { path: '/activity-log', label: 'Activity Log', icon: '📝' },
-    { path: '/integrations', label: 'Integrations', icon: '🔗' },
-    { path: '/settings', label: 'Settings', icon: '⚙️' }
-  ];
-
   return (
     <>
       {/* Mobile Menu Toggle Button */}
@@ -151,7 +152,7 @@ export default function Sidebar() {
         </div>
 
         <nav className="sidebar-menu">
-          {navItems.map((item, index) => (
+          {NAV_ITEMS.map((item, index) => (
             item.children ? (
               <div
                 key={index}
@@ -171,15 +172,15 @@ export default function Sidebar() {
               >
                 <div className="nav-section-title" title={isCollapsed && !isMobile ? item.label : ''}>
                   <span>{item.icon}</span>
-                  {(!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen) && <span className="nav-label">{item.label}</span>}
+                  {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? <span className="nav-label">{item.label}</span> : null}
                 </div>
                 <div
                   className={`nav-children ${isCollapsed && !isMobile ? 'dropdown' : ''}`}
                   style={isCollapsed && !isMobile && activeDropdown === index && dropdownTop ? { top: dropdownTop } : {}}
                 >
-                  {isCollapsed && !isMobile && (
+                  {isCollapsed && !isMobile ? (
                     <div className="dropdown-header">{item.label}</div>
-                  )}
+                  ) : null}
                   {item.children.map((child) => (
                     <NavLink
                       key={child.path}
@@ -202,7 +203,7 @@ export default function Sidebar() {
                 onClick={handleNavClick}
               >
                 <span className="nav-icon">{item.icon}</span>
-                {(!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen) && <span className="nav-label">{item.label}</span>}
+                {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? <span className="nav-label">{item.label}</span> : null}
               </NavLink>
             )
           ))}
@@ -211,20 +212,22 @@ export default function Sidebar() {
         <div className="sidebar-footer">
           <div className="user-info">
             <div className="user-avatar">{user?.full_name?.charAt(0)}</div>
-            {(!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen) && (
+            {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? (
               <div className="user-details">
                 <div className="user-name">{user?.full_name}</div>
                 <div className="user-role tiny">{user?.role}</div>
               </div>
-            )}
+            ) : null}
           </div>
-          {(!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen) && (
+          {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? (
             <button className="logout-btn" onClick={logout} title="Logout">
               🚪
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     </>
   );
-}
+});
+
+export default Sidebar;

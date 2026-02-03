@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { useQuery } from '@tanstack/react-query';
@@ -34,159 +34,180 @@ ChartJS.register(
   Legend
 );
 
+// Helper function to get last 7 days - defined outside component to avoid recreation
+const getLast7Days = () => {
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    days.push(date.toISOString().split('T')[0]);
+  }
+  return days;
+};
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [showInvoiceWizard, setShowInvoiceWizard] = useState(false);
 
-  // Fetch real data
-  const { data: items = [] } = useQuery({
-    queryKey: ['dashboard-items'],
+  // Parallel data fetching - all queries fire simultaneously
+  const { data: dashboardData, isLoading } = useQuery({
+    queryKey: ['dashboard-data'],
     queryFn: async () => {
-      const response = await api.get('/inventory/items');
-      return response.data.data || [];
-    }
+      const [
+        itemsResponse,
+        salesResponse,
+        purchasesResponse,
+        productionsResponse,
+        stockBalancesResponse
+      ] = await Promise.all([
+        api.get('/inventory/items'),
+        api.get('/invoices'),
+        api.get('/purchases'),
+        api.get('/productions'),
+        api.get('/inventory/stock-balances')
+      ]);
+
+      return {
+        items: itemsResponse.data.data || [],
+        sales: salesResponse.data.data || [],
+        purchases: purchasesResponse.data || [],
+        productions: productionsResponse.data || [],
+        stockBalances: (stockBalancesResponse.data || []).filter(sb => sb.quantity > 0)
+      };
+    },
+    // Stale time to prevent unnecessary refetches
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const { data: sales = [] } = useQuery({
-    queryKey: ['dashboard-sales'],
-    queryFn: async () => {
-      const response = await api.get('/invoices');
-      return response.data.data || [];
-    }
-  });
+  // Extract data with defaults
+  const items = dashboardData?.items || [];
+  const sales = dashboardData?.sales || [];
+  const purchases = dashboardData?.purchases || [];
+  const productions = dashboardData?.productions || [];
+  const stockBalances = dashboardData?.stockBalances || [];
 
-  const { data: purchases = [] } = useQuery({
-    queryKey: ['dashboard-purchases'],
-    queryFn: async () => {
-      const response = await api.get('/purchases');
-      return response.data;
-    }
-  });
+  // Memoized statistics calculations
+  const stats = useMemo(() => {
+    const itemsArray = Array.isArray(items) ? items : [];
+    const salesArray = Array.isArray(sales) ? sales : [];
+    const purchasesArray = Array.isArray(purchases) ? purchases : [];
+    const stockBalancesArray = Array.isArray(stockBalances) ? stockBalances : [];
 
-  const { data: productions = [] } = useQuery({
-    queryKey: ['dashboard-productions'],
-    queryFn: async () => {
-      const response = await api.get('/productions');
-      return response.data;
-    }
-  });
+    const totalItems = itemsArray.length;
+    const totalStockValue = itemsArray.reduce((sum, item) =>
+      sum + (parseFloat(item.current_stock || 0) * parseFloat(item.standard_cost || 0)), 0
+    );
+    const totalSalesRevenue = salesArray.reduce((sum, sale) =>
+      sum + parseFloat(sale.total_amount || 0), 0
+    );
+    const totalPurchases = purchasesArray.reduce((sum, purchase) =>
+      sum + parseFloat(purchase.total_cost || 0), 0
+    );
+    const lowStockItems = itemsArray.filter(item =>
+      item.reorder_level > 0 && item.current_stock <= item.reorder_level
+    );
 
-  const { data: stockBalances = [] } = useQuery({
-    queryKey: ['dashboard-stock-balances'],
-    queryFn: async () => {
-      const response = await api.get('/inventory/stock-balances');
-      return response.data.filter(sb => sb.quantity > 0);
-    }
-  });
+    return {
+      totalItems,
+      totalStockValue,
+      totalSalesRevenue,
+      totalPurchases,
+      lowStockItems,
+      warehouseCount: stockBalancesArray.length
+    };
+  }, [items, sales, purchases, stockBalances]);
 
-  // Calculate statistics
-  const totalItems = (Array.isArray(items) ? items : []).length;
-  const totalStockValue = (Array.isArray(items) ? items : []).reduce((sum, item) =>
-    sum + (parseFloat(item.current_stock || 0) * parseFloat(item.standard_cost || 0)), 0
-  );
-  const totalSalesRevenue = (Array.isArray(sales) ? sales : []).reduce((sum, sale) =>
-    sum + parseFloat(sale.total_amount || 0), 0
-  );
-  const totalPurchases = (Array.isArray(purchases) ? purchases : []).reduce((sum, purchase) =>
-    sum + parseFloat(purchase.total_cost || 0), 0
-  );
-  const lowStockItems = (Array.isArray(items) ? items : []).filter(item =>
-    item.reorder_level > 0 && item.current_stock <= item.reorder_level
-  );
+  // Memoized category data for chart
+  const stockByCategoryData = useMemo(() => {
+    const itemsArray = Array.isArray(items) ? items : [];
+    const categoryData = itemsArray.reduce((acc, item) => {
+      if (!acc[item.category]) acc[item.category] = 0;
+      acc[item.category] += parseFloat(item.current_stock || 0);
+      return acc;
+    }, {});
 
-  // Stock by Category Chart Data
-  const categoryData = (Array.isArray(items) ? items : []).reduce((acc, item) => {
-    if (!acc[item.category]) acc[item.category] = 0;
-    acc[item.category] += parseFloat(item.current_stock || 0);
-    return acc;
-  }, {});
+    return {
+      labels: Object.keys(categoryData),
+      datasets: [{
+        label: 'Stock Quantity',
+        data: Object.values(categoryData),
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.6)',
+          'rgba(255, 99, 132, 0.6)',
+          'rgba(255, 206, 86, 0.6)',
+          'rgba(75, 192, 192, 0.6)',
+          'rgba(153, 102, 255, 0.6)',
+          'rgba(255, 159, 64, 0.6)'
+        ],
+        borderColor: [
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 99, 132, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+      }]
+    };
+  }, [items]);
 
-  const stockByCategoryData = {
-    labels: Object.keys(categoryData),
-    datasets: [{
-      label: 'Stock Quantity',
-      data: Object.values(categoryData),
-      backgroundColor: [
-        'rgba(54, 162, 235, 0.6)',
-        'rgba(255, 99, 132, 0.6)',
-        'rgba(255, 206, 86, 0.6)',
-        'rgba(75, 192, 192, 0.6)',
-        'rgba(153, 102, 255, 0.6)',
-        'rgba(255, 159, 64, 0.6)'
-      ],
-      borderColor: [
-        'rgba(54, 162, 235, 1)',
-        'rgba(255, 99, 132, 1)',
-        'rgba(255, 206, 86, 1)',
-        'rgba(75, 192, 192, 1)',
-        'rgba(153, 102, 255, 1)',
-        'rgba(255, 159, 64, 1)'
-      ],
-      borderWidth: 1
-    }]
-  };
+  // Memoized sales vs purchases trend data
+  const salesPurchasesTrendData = useMemo(() => {
+    const salesArray = Array.isArray(sales) ? sales : [];
+    const purchasesArray = Array.isArray(purchases) ? purchases : [];
+    const last7Days = getLast7Days();
 
-  // Sales vs Purchases Trend (last 7 days)
-  const getLast7Days = () => {
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      days.push(date.toISOString().split('T')[0]);
-    }
-    return days;
-  };
+    const salesByDay = last7Days.map(day =>
+      salesArray.filter(s => s.sale_date === day)
+        .reduce((sum, s) => sum + parseFloat(s.total_amount || 0), 0)
+    );
+    const purchasesByDay = last7Days.map(day =>
+      purchasesArray.filter(p => p.purchase_date === day)
+        .reduce((sum, p) => sum + parseFloat(p.total_cost || 0), 0)
+    );
 
-  const last7Days = getLast7Days();
-  const salesArray = Array.isArray(sales) ? sales : [];
-  const purchasesArray = Array.isArray(purchases) ? purchases : [];
-  const salesByDay = last7Days.map(day =>
-    salesArray.filter(s => s.sale_date === day)
-      .reduce((sum, s) => sum + parseFloat(s.total_amount || 0), 0)
-  );
-  const purchasesByDay = last7Days.map(day =>
-    purchasesArray.filter(p => p.purchase_date === day)
-      .reduce((sum, p) => sum + parseFloat(p.total_cost || 0), 0)
-  );
+    return {
+      labels: last7Days.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+      datasets: [
+        {
+          label: 'Sales',
+          data: salesByDay,
+          borderColor: 'rgb(75, 192, 192)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          tension: 0.4
+        },
+        {
+          label: 'Purchases',
+          data: purchasesByDay,
+          borderColor: 'rgb(255, 99, 132)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          tension: 0.4
+        }
+      ]
+    };
+  }, [sales, purchases]);
 
-  const salesPurchasesTrendData = {
-    labels: last7Days.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
-    datasets: [
-      {
-        label: 'Sales',
-        data: salesByDay,
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        tension: 0.4
-      },
-      {
-        label: 'Purchases',
-        data: purchasesByDay,
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        tension: 0.4
-      }
-    ]
-  };
+  // Memoized production chart data
+  const productionChartData = useMemo(() => {
+    const productionsArray = Array.isArray(productions) ? productions : [];
+    const productionData = productionsArray.slice(0, 5).reduce((acc, prod) => {
+      if (!acc[prod.output_item_name]) acc[prod.output_item_name] = 0;
+      acc[prod.output_item_name] += parseFloat(prod.output_quantity || 0);
+      return acc;
+    }, {});
 
-  // Production Output Chart
-  const productionsArray = Array.isArray(productions) ? productions : [];
-  const productionData = productionsArray.slice(0, 5).reduce((acc, prod) => {
-    if (!acc[prod.output_item_name]) acc[prod.output_item_name] = 0;
-    acc[prod.output_item_name] += parseFloat(prod.output_quantity || 0);
-    return acc;
-  }, {});
-
-  const productionChartData = {
-    labels: Object.keys(productionData),
-    datasets: [{
-      label: 'Production Output',
-      data: Object.values(productionData),
-      backgroundColor: 'rgba(153, 102, 255, 0.6)',
-      borderColor: 'rgba(153, 102, 255, 1)',
-      borderWidth: 1
-    }]
-  };
+    return {
+      labels: Object.keys(productionData),
+      datasets: [{
+        label: 'Production Output',
+        data: Object.values(productionData),
+        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+        borderColor: 'rgba(153, 102, 255, 1)',
+        borderWidth: 1
+      }]
+    };
+  }, [productions]);
 
   const { formatCurrency } = useSettings();
 
@@ -204,15 +225,15 @@ export default function Dashboard() {
         <div className="kpi-card">
           <div className="kpi-content">
             <div className="kpi-label">Total Items</div>
-            <div className="kpi-value">{totalItems}</div>
-            <div className="kpi-subtitle">{(Array.isArray(stockBalances) ? stockBalances : []).length} warehouses with stock</div>
+            <div className="kpi-value">{stats.totalItems}</div>
+            <div className="kpi-subtitle">{stats.warehouseCount} warehouses with stock</div>
           </div>
         </div>
 
         <div className="kpi-card">
           <div className="kpi-content">
             <div className="kpi-label">Stock Value</div>
-            <div className="kpi-value">{formatCurrency(totalStockValue)}</div>
+            <div className="kpi-value">{formatCurrency(stats.totalStockValue)}</div>
             <div className="kpi-subtitle">Current inventory worth</div>
           </div>
         </div>
@@ -220,15 +241,15 @@ export default function Dashboard() {
         <div className="kpi-card">
           <div className="kpi-content">
             <div className="kpi-label">Sales Revenue</div>
-            <div className="kpi-value">{formatCurrency(totalSalesRevenue)}</div>
-            <div className="kpi-subtitle">{salesArray.length} total sales</div>
+            <div className="kpi-value">{formatCurrency(stats.totalSalesRevenue)}</div>
+            <div className="kpi-subtitle">{Array.isArray(sales) ? sales.length : 0} total sales</div>
           </div>
         </div>
 
         <div className="kpi-card">
           <div className="kpi-content">
             <div className="kpi-label">Production</div>
-            <div className="kpi-value">{productionsArray.length}</div>
+            <div className="kpi-value">{Array.isArray(productions) ? productions.length : 0}</div>
             <div className="kpi-subtitle">Total production runs</div>
           </div>
         </div>
@@ -277,11 +298,11 @@ export default function Dashboard() {
         {/* Low Stock Alerts */}
         <div className="alert-card">
           <h3>⚠️ Low Stock Alerts</h3>
-          {lowStockItems.length === 0 ? (
+          {stats.lowStockItems.length === 0 ? (
             <p className="no-alerts">All items are well stocked!</p>
           ) : (
             <div className="alert-list">
-              {lowStockItems.slice(0, 5).map(item => (
+              {stats.lowStockItems.slice(0, 5).map(item => (
                 <Link to="/inventory/items" key={item.id} className="alert-item">
                   <div>
                     <div className="alert-item-name">{item.item_name}</div>

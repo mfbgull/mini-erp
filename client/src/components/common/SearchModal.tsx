@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { Search, X, Command } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,57 +13,66 @@ interface Page {
   category: string;
 }
 
-const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
+// Static pages array - defined outside component to avoid recreation on every render
+const PAGES: Page[] = [
+  { name: 'Dashboard', path: '/', category: 'General' },
+  { name: 'Inventory Items', path: '/inventory/items', category: 'Inventory' },
+  { name: 'Warehouses', path: '/inventory/warehouses', category: 'Inventory' },
+  { name: 'Stock Movements', path: '/inventory/stock-movements', category: 'Inventory' },
+  { name: 'Stock by Warehouse', path: '/inventory/stock-by-warehouse', category: 'Inventory' },
+  { name: 'Purchases', path: '/purchases', category: 'Purchasing' },
+  { name: 'Bill of Materials', path: '/bom', category: 'Production' },
+  { name: 'Production', path: '/production', category: 'Production' },
+  { name: 'Sales', path: '/sales', category: 'Sales' },
+  { name: 'Point of Sale', path: '/pos', category: 'Sales' },
+  { name: 'Customers', path: '/customers', category: 'Sales' },
+  { name: 'Reports Dashboard', path: '/reports', category: 'Reports' },
+  { name: 'Accounts Receivable', path: '/reports/accounts-receivable', category: 'Reports' },
+  { name: 'Sales Summary', path: '/reports/sales-summary', category: 'Reports' },
+  { name: 'Sales by Customer', path: '/reports/sales-by-customer', category: 'Reports' },
+  { name: 'Sales by Item', path: '/reports/sales-by-item', category: 'Reports' },
+  { name: 'Stock Level', path: '/reports/stock-level', category: 'Reports' },
+  { name: 'Stock Valuation', path: '/reports/stock-valuation', category: 'Reports' },
+  { name: 'Low Stock', path: '/reports/low-stock', category: 'Reports' },
+  { name: 'Inventory Movement', path: '/reports/inventory-movement', category: 'Reports' },
+  { name: 'Profit & Loss', path: '/reports/profit-loss', category: 'Reports' },
+  { name: 'Cash Flow', path: '/reports/cash-flow', category: 'Reports' },
+  { name: 'Customer Statements', path: '/reports/customer-statements', category: 'Reports' },
+  { name: 'Top Debtors', path: '/reports/top-debtors', category: 'Reports' },
+  { name: 'DSO Report', path: '/reports/dso', category: 'Reports' },
+  { name: 'Purchase Summary', path: '/reports/purchase-summary', category: 'Reports' },
+  { name: 'Supplier Analysis', path: '/reports/supplier-analysis', category: 'Reports' },
+  { name: 'Production Summary', path: '/reports/production-summary', category: 'Reports' },
+  { name: 'BOM Usage', path: '/reports/bom-usage', category: 'Reports' },
+  { name: 'Settings', path: '/settings', category: 'General' }
+];
+
+const SearchModal = memo(function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  const pages: Page[] = [
-    { name: 'Dashboard', path: '/', category: 'General' },
-    { name: 'Inventory Items', path: '/inventory/items', category: 'Inventory' },
-    { name: 'Warehouses', path: '/inventory/warehouses', category: 'Inventory' },
-    { name: 'Stock Movements', path: '/inventory/stock-movements', category: 'Inventory' },
-    { name: 'Stock by Warehouse', path: '/inventory/stock-by-warehouse', category: 'Inventory' },
-    { name: 'Purchases', path: '/purchases', category: 'Purchasing' },
-    { name: 'Bill of Materials', path: '/bom', category: 'Production' },
-    { name: 'Production', path: '/production', category: 'Production' },
-    { name: 'Sales', path: '/sales', category: 'Sales' },
-    { name: 'Point of Sale', path: '/pos', category: 'Sales' },
-    { name: 'Customers', path: '/customers', category: 'Sales' },
-    { name: 'Reports Dashboard', path: '/reports', category: 'Reports' },
-    { name: 'Accounts Receivable', path: '/reports/accounts-receivable', category: 'Reports' },
-    { name: 'Sales Summary', path: '/reports/sales-summary', category: 'Reports' },
-    { name: 'Sales by Customer', path: '/reports/sales-by-customer', category: 'Reports' },
-    { name: 'Sales by Item', path: '/reports/sales-by-item', category: 'Reports' },
-    { name: 'Stock Level', path: '/reports/stock-level', category: 'Reports' },
-    { name: 'Stock Valuation', path: '/reports/stock-valuation', category: 'Reports' },
-    { name: 'Low Stock', path: '/reports/low-stock', category: 'Reports' },
-    { name: 'Inventory Movement', path: '/reports/inventory-movement', category: 'Reports' },
-    { name: 'Profit & Loss', path: '/reports/profit-loss', category: 'Reports' },
-    { name: 'Cash Flow', path: '/reports/cash-flow', category: 'Reports' },
-    { name: 'Customer Statements', path: '/reports/customer-statements', category: 'Reports' },
-    { name: 'Top Debtors', path: '/reports/top-debtors', category: 'Reports' },
-    { name: 'DSO Report', path: '/reports/dso', category: 'Reports' },
-    { name: 'Purchase Summary', path: '/reports/purchase-summary', category: 'Reports' },
-    { name: 'Supplier Analysis', path: '/reports/supplier-analysis', category: 'Reports' },
-    { name: 'Production Summary', path: '/reports/production-summary', category: 'Reports' },
-    { name: 'BOM Usage', path: '/reports/bom-usage', category: 'Reports' },
-    { name: 'Settings', path: '/settings', category: 'General' }
-  ];
-
-  const filteredPages = pages.filter(page =>
-    page.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    page.path.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    page.category.toLowerCase().includes(searchTerm.toLowerCase())
+  // Memoized filtered pages - only recalculate when searchTerm changes
+  const filteredPages = useMemo(() =>
+    PAGES.filter(page =>
+      page.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      page.path.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      page.category.toLowerCase().includes(searchTerm.toLowerCase())
+    ),
+    [searchTerm]
   );
 
-  const groupedPages = filteredPages.reduce((acc: Record<string, Page[]>, page) => {
-    if (!acc[page.category]) {
-      acc[page.category] = [];
-    }
-    acc[page.category].push(page);
-    return acc;
-  }, {});
+  // Memoized grouped pages - only recalculate when filteredPages changes
+  const groupedPages = useMemo(() =>
+    filteredPages.reduce((acc: Record<string, Page[]>, page) => {
+      if (!acc[page.category]) {
+        acc[page.category] = [];
+      }
+      acc[page.category].push(page);
+      return acc;
+    }, {}),
+    [filteredPages]
+  );
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -167,6 +176,6 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
       </div>
     </div>
   );
-};
+});
 
 export default SearchModal;
