@@ -166,7 +166,7 @@ function AppLayout() {
               <Route path="/sales/invoice" element={<SalesInvoicePage />} />
               <Route path="/sales/invoice/:id" element={<InvoiceRouter />} />
               <Route path="/sales/invoice/:id/view" element={<InvoiceViewPage />} />
-              <Route path="/sales/invoice/:id/edit" element={<SalesInvoicePage />} />
+              <Route path="/sales/invoice/:id/edit" element={<InvoiceRouter defaultMode="edit" />} />
               <Route path="/invoices/create" element={<MobileInvoiceWizard />} />
               <Route path="/pos" element={<POSPage />} />
               <Route path="/settings" element={<SettingsPage />} />

@@ -1,8 +1,10 @@
 import React from 'react';
 import { useParams, useSearchParams, Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
 import SalesInvoicePage from '../../pages/sales/SalesInvoicePage';
+import MobileInvoiceEditForm from '../../pages/invoice/MobileInvoiceEditForm';
 import InvoiceViewPage from '../../pages/sales/InvoiceViewPage';
 import './InvoiceRouter.css';
 
@@ -13,11 +15,12 @@ interface InvoiceRouterProps {
 export default function InvoiceRouter({ defaultMode = 'view' }: InvoiceRouterProps) {
   const { id: invoiceId } = useParams();
   const [searchParams] = useSearchParams();
-  
+  const { isMobile } = useMobileDetection();
+
   // Get mode from URL parameters
   const mode = searchParams.get('mode') || defaultMode;
   const action = searchParams.get('action');
-  
+
   // Fetch invoice data to determine if it exists
   const { data: invoice, isLoading, error } = useQuery({
     queryKey: ['invoice', invoiceId],
@@ -54,7 +57,7 @@ export default function InvoiceRouter({ defaultMode = 'view' }: InvoiceRouterPro
     if (mode === 'view') {
       return false;
     }
-    
+
     // Action-based routing
     if (action === 'edit') {
       return true;
@@ -62,12 +65,12 @@ export default function InvoiceRouter({ defaultMode = 'view' }: InvoiceRouterPro
     if (action === 'view' || action === 'print' || action === 'download' || action === 'email') {
       return false;
     }
-    
+
     // Business logic routing based on invoice status
     if (invoice.status === 'Draft') {
       return true;
     }
-    
+
     // Edit mode for unpaid invoices if user has edit permissions
     if (invoice.status === 'Unpaid') {
       // Check if user came from edit context (referrer analysis)
@@ -78,12 +81,12 @@ export default function InvoiceRouter({ defaultMode = 'view' }: InvoiceRouterPro
       // For unpaid invoices, default to edit mode to allow modifications
       return true;
     }
-    
+
     // Default to view mode for paid/completed invoices
     if (['Paid', 'Partially Paid', 'Cancelled'].includes(invoice.status)) {
       return false;
     }
-    
+
     // If no specific status match, use defaultMode
     return defaultMode === 'edit';
   };
@@ -92,6 +95,10 @@ export default function InvoiceRouter({ defaultMode = 'view' }: InvoiceRouterPro
 
   // Render appropriate component
   if (showEdit) {
+    // Use mobile-optimized form on mobile devices
+    if (isMobile) {
+      return <MobileInvoiceEditForm />;
+    }
     return <SalesInvoicePage />;
   } else {
     return <InvoiceViewPage />;
