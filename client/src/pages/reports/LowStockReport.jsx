@@ -27,6 +27,27 @@ export default function LowStockReport() {
   const { formatCurrency } = useSettings();
   const gridRef = useRef(null);
 
+  // Fetch warehouses for filter
+  const { data: warehouses = [] } = useQuery({
+    queryKey: ['warehouses'],
+    queryFn: async () => {
+      const response = await api.get('/inventory/warehouses');
+      return response.data.data || [];
+    }
+  });
+
+  // Fetch low stock report
+  const { data: reportData, isLoading, refetch } = useQuery({
+    queryKey: ['lowStock', warehouseId],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (warehouseId) params.append('warehouseId', warehouseId);
+
+      const response = await api.get(`/reports/low-stock?${params}`);
+      return response.data.data;
+    }
+  });
+
   // Safely size columns when grid is visible
   useEffect(() => {
     const gridElement = gridRef.current?.querySelector('.ag-theme-quartz');
@@ -51,27 +72,6 @@ export default function LowStockReport() {
     observer.observe(gridElement);
     return () => observer.disconnect();
   }, [reportData]);
-
-  // Fetch warehouses for filter
-  const { data: warehouses = [] } = useQuery({
-    queryKey: ['warehouses'],
-    queryFn: async () => {
-      const response = await api.get('/inventory/warehouses');
-      return response.data.data || [];
-    }
-  });
-
-  // Fetch low stock report
-  const { data: reportData, isLoading, refetch } = useQuery({
-    queryKey: ['lowStock', warehouseId],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (warehouseId) params.append('warehouseId', warehouseId);
-
-      const response = await api.get(`/reports/low-stock?${params}`);
-      return response.data.data;
-    }
-  });
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();
