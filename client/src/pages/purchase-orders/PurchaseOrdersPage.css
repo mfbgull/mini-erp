@@ -686,3 +686,241 @@
   margin: var(--space-xs) 0;
 }
 
+/* Mobile Purchase Order Cards */
+.mobile-po-list {
+  display: none; /* Hidden by default, shown on mobile */
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.po-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.po-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.po-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.po-no {
+  font-weight: bold;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.po-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.po-status.status-draft {
+  background: var(--neutral-200);
+  color: var(--neutral-600);
+}
+
+.po-status.status-submitted {
+  background: #3b82f6;
+  color: white;
+}
+
+.po-status.status-partial {
+  background: #f59e0b;
+  color: white;
+}
+
+.po-status.status-completed {
+  background: #10b981;
+  color: white;
+}
+
+.po-status.status-cancelled {
+  background: #ef4444;
+  color: white;
+}
+
+.po-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 5px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.detail-value {
+  text-align: right;
+  color: var(--text-primary);
+  flex: 1;
+  word-break: break-word;
+  text-align: right;
+}
+
+.po-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.po-actions .btn {
+  flex: 1;
+  margin: 0 2px;
+}
+
+/* Mobile Responsive Styles for Purchase Orders Table */
+@media (max-width: 768px) {
+  .purchase-orders-page {
+    padding: 16px;
+  }
+
+  /* AG Grid desktop view - hide on mobile */
+  .desktop-view {
+    display: none !important;
+  }
+
+  /* Mobile PO list - show on mobile */
+  .mobile-po-list {
+    display: flex !important;
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--space-sm);
+  }
+
+  .summary-card {
+    padding: var(--space-sm);
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .summary-content {
+    text-align: center;
+    width: 100%;
+  }
+
+  .summary-label {
+    font-size: 0.7rem;
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+
+  .summary-value {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+    line-height: 1.2;
+  }
+
+  .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+  }
+
+  .filters-bar label {
+    align-self: flex-start;
+  }
+
+  .filters-bar select {
+    width: 100%;
+  }
+
+  .ag-theme-quartz {
+    height: auto !important;
+    min-height: 400px;
+  }
+
+  .ag-root-wrapper {
+    border: none !important;
+  }
+
+  .ag-header {
+    display: none !important;
+  }
+
+  .ag-center-cols-container {
+    width: 100% !important;
+  }
+
+  .ag-row {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .ag-cell {
+    padding: 8px 4px !important;
+    border: none !important;
+    border-right: 1px solid var(--border-color) !important;
+    word-break: break-word;
+  }
+
+  .ag-cell:last-child {
+    border-right: none !important;
+  }
+
+  /* Specific styling for mobile view */
+  .ag-theme-quartz .ag-root-wrapper,
+  .ag-theme-quartz .ag-root {
+    height: auto !important;
+    min-height: 400px;
+  }
+
+  .ag-theme-quartz .ag-header {
+    display: none;
+  }
+
+  .ag-theme-quartz .ag-center-cols-container {
+    width: 100% !important;
+  }
+
+  .ag-theme-quartz .ag-cell {
+    padding: 10px 8px !important;
+    font-size: 14px;
+  }
+
+  .ag-theme-quartz .ag-row {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .actions-cell {
+    display: none !important;
+  }
+}
+

@@ -364,7 +364,8 @@ export default function PurchaseOrdersPage() {
             </select>
           </div>
 
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
+          {/* Desktop view - AG Grid */}
+          <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
             <AgGridReact
               rowData={pos}
               columnDefs={columnDefs}
@@ -377,6 +378,67 @@ export default function PurchaseOrdersPage() {
               paginationPageSize={20}
               paginationPageSizeSelector={[10, 20, 50, 100]}
             />
+          </div>
+
+          {/* Mobile view - Card layout */}
+          <div className="mobile-po-list">
+            {pos.map((po) => (
+              <div
+                key={po.id}
+                className="po-card"
+                onClick={() => navigate(`/purchase-orders/${po.id}`)}
+              >
+                <div className="po-header">
+                  <div className="po-no">{po.po_no}</div>
+                  <div className={`po-status ${po.status.replace(/\s+/g, '-').toLowerCase()}`}>
+                    {po.status}
+                  </div>
+                </div>
+
+                <div className="po-details">
+                  <div className="detail-row">
+                    <span className="detail-label">Date:</span>
+                    <span className="detail-value">{format(new Date(po.po_date), 'dd MMM yyyy')}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Supplier:</span>
+                    <span className="detail-value">{po.supplier_name}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Total:</span>
+                    <span className="detail-value">{formatCurrency(parseFloat(po.total_amount))}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Warehouse:</span>
+                    <span className="detail-value">{po.warehouse_name}</span>
+                  </div>
+                </div>
+
+                <div className="po-actions">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/purchase-orders/${po.id}`);
+                    }}
+                  >
+                    View
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/purchase-orders/${po.id}/edit`);
+                    }}
+                  >
+                    Edit
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </>
       )}

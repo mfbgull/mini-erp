@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useActivityLogs, useEntityTypes, useActions, useUsers, useActivityStats } from '../context/ActivityLogContext';
 import DataTable from '../components/common/DataTable';
 import Button from '../components/common/Button';
+import Modal from '../components/common/Modal';
 import { format } from 'date-fns';
 import './ActivityLog.css';
 
@@ -20,6 +21,8 @@ export default function ActivityLog() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 50;
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const { data: logsData, isLoading, refetch } = useActivityLogs({
     ...filters,
@@ -51,6 +54,11 @@ export default function ActivityLog() {
     window.open(`/api/activity-logs/export?${params.toString()}`, '_blank');
   };
 
+  const handleRowClick = (activity: any) => {
+    setSelectedActivity(activity);
+    setShowDetailsModal(true);
+  };
+
   const columns = [
     {
       key: 'created_at',
@@ -77,7 +85,13 @@ export default function ActivityLog() {
     {
       key: 'description',
       label: 'Description',
-      sortable: false
+      sortable: false,
+      render: (value: string, row: any) => (
+        <div className="mobile-description">
+          <span className="description-text">{value}</span>
+          <span className="view-details">View Details</span>
+        </div>
+      )
     },
     {
       key: 'log_level',
@@ -234,6 +248,8 @@ export default function ActivityLog() {
         <DataTable
           columns={columns}
           data={logsData?.data || []}
+          onRowClick={handleRowClick}
+          className="activity-log-table"
         />
       </div>
 
@@ -265,6 +281,67 @@ export default function ActivityLog() {
           <div className="spinner"></div>
           Loading activity logs...
         </div>
+      )}
+
+      {/* Activity Details Modal */}
+      {selectedActivity && (
+        <Modal
+          isOpen={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+          title="Activity Details"
+          size="large"
+        >
+          <div className="activity-details-card">
+            <div className="detail-row">
+              <div className="detail-label">Timestamp</div>
+              <div className="detail-value">{format(new Date(selectedActivity.created_at), 'yyyy-MM-dd HH:mm:ss')}</div>
+            </div>
+
+            <div className="detail-row">
+              <div className="detail-label">User</div>
+              <div className="detail-value">{selectedActivity.username || 'System'}</div>
+            </div>
+
+            <div className="detail-row">
+              <div className="detail-label">Action</div>
+              <div className="detail-value">{selectedActivity.action}</div>
+            </div>
+
+            <div className="detail-row">
+              <div className="detail-label">Entity</div>
+              <div className="detail-value">{selectedActivity.entity_type}</div>
+            </div>
+
+            <div className="detail-row">
+              <div className="detail-label">Description</div>
+              <div className="detail-value">{selectedActivity.description}</div>
+            </div>
+
+            <div className="detail-row">
+              <div className="detail-label">Level</div>
+              <div className="detail-value">
+                <span className={`log-level ${selectedActivity.log_level?.toLowerCase() || 'info'}`}>
+                  {selectedActivity.log_level}
+                </span>
+              </div>
+            </div>
+
+            <div className="detail-row">
+              <div className="detail-label">Entity ID</div>
+              <div className="detail-value">{selectedActivity.entity_id}</div>
+            </div>
+
+            <div className="detail-row">
+              <div className="detail-label">IP Address</div>
+              <div className="detail-value">{selectedActivity.ip_address}</div>
+            </div>
+
+            <div className="detail-row">
+              <div className="detail-label">User Agent</div>
+              <div className="detail-value">{selectedActivity.user_agent}</div>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );

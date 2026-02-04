@@ -365,27 +365,84 @@ export default function ExpensesReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.expenses && reportData.expenses.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.expenses}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                params.api.sizeColumnsToFit({
-                  defaultMinWidth: 100,
-                  columnLimits: []
-                });
-              }}
-            />
-          </div>
+          <>
+            {/* Desktop view - AG Grid */}
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.expenses}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  // Check if the grid is visible before sizing columns
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
+                    }
+                  }, 100); // Small delay to ensure grid is rendered
+                }}
+              />
+            </div>
+
+            {/* Mobile view - Card layout */}
+            <div className="mobile-expenses-list">
+              {reportData.expenses.map((expense) => (
+                <div
+                  key={expense.id}
+                  className="expense-card"
+                >
+                  <div className="expense-header">
+                    <div className="expense-no">{expense.expense_no}</div>
+                    <div className={`expense-status status-${expense.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                      {expense.status}
+                    </div>
+                  </div>
+
+                  <div className="expense-details">
+                    <div className="detail-row">
+                      <span className="detail-label">Category:</span>
+                      <span className="detail-value">{expense.expense_category}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Description:</span>
+                      <span className="detail-value">{expense.description}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Amount:</span>
+                      <span className="detail-value expense-amount">{formatCurrency(expense.amount)}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Date:</span>
+                      <span className="detail-value">{new Date(expense.expense_date).toLocaleDateString()}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Vendor:</span>
+                      <span className="detail-value">{expense.vendor_name}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Payment Method:</span>
+                      <span className="detail-value">{expense.payment_method}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <FileText size={48} />

@@ -291,3 +291,249 @@
   margin: 0;
   color: var(--text-secondary);
 }
+
+/* Mobile Expense Report Cards */
+.mobile-expenses-list {
+  display: none; /* Hidden by default, shown on mobile */
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.expense-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.expense-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.expense-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.expense-no {
+  font-weight: bold;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.expense-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.expense-status.status-paid {
+  background: #D4EDDA;
+  color: #155724;
+}
+
+.expense-status.status-approved {
+  background: #D1ECF1;
+  color: #0C5460;
+}
+
+.expense-status.status-pending {
+  background: #F8D7DA;
+  color: #721C24;
+}
+
+.expense-status.status-cancelled {
+  background: #F8F9FA;
+  color: #6C757D;
+}
+
+.expense-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 5px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.detail-value {
+  text-align: right;
+  color: var(--text-primary);
+  flex: 1;
+  word-break: break-word;
+  text-align: right;
+}
+
+.expense-amount {
+  font-weight: bold;
+  color: var(--error);
+}
+
+/* Mobile Responsive Styles for Expenses Report Table */
+@media (max-width: 768px) {
+  .expenses-report {
+    padding: 16px;
+    height: auto;
+  }
+
+  /* AG Grid desktop view - hide on mobile */
+  .desktop-view {
+    display: none !important;
+  }
+
+  /* Mobile expense list - show on mobile */
+  .mobile-expenses-list {
+    display: flex !important;
+  }
+
+  .expenses-report .report-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .expenses-report .export-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .expenses-report .report-filters {
+    padding: 15px;
+  }
+
+  .expenses-report .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .expenses-report .filter-row > * {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .expenses-report .date-range-inputs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .expenses-report .date-input {
+    min-width: 100% !important;
+  }
+
+  .expenses-report .report-summary {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+
+  .expenses-report .summary-card {
+    padding: 15px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    text-align: center !important;
+  }
+
+  .expenses-report .summary-content {
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .expenses-report .summary-icon {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.2rem !important;
+    margin-bottom: var(--space-xs) !important;
+  }
+
+  .expenses-report .summary-value {
+    font-size: 1.2rem !important;
+  }
+
+  .expenses-report .category-breakdown {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .expenses-report .ag-theme-quartz {
+    height: auto !important;
+    min-height: 400px;
+  }
+
+  .expenses-report .ag-root-wrapper {
+    border: none !important;
+  }
+
+  .expenses-report .ag-header {
+    display: none !important;
+  }
+
+  .expenses-report .ag-center-cols-container {
+    width: 100% !important;
+  }
+
+  .expenses-report .ag-row {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .expenses-report .ag-cell {
+    padding: 8px 4px !important;
+    border: none !important;
+    border-right: 1px solid var(--border-color) !important;
+    word-break: break-word;
+  }
+
+  .expenses-report .ag-cell:last-child {
+    border-right: none !important;
+  }
+
+  /* Specific styling for mobile view */
+  .expenses-report .ag-theme-quartz .ag-root-wrapper,
+  .expenses-report .ag-theme-quartz .ag-root {
+    height: auto !important;
+    min-height: 400px;
+  }
+
+  .expenses-report .ag-theme-quartz .ag-header {
+    display: none;
+  }
+
+  .expenses-report .ag-theme-quartz .ag-center-cols-container {
+    width: 100% !important;
+  }
+
+  .expenses-report .ag-theme-quartz .ag-cell {
+    padding: 10px 8px !important;
+    font-size: 14px;
+  }
+
+  .expenses-report .ag-theme-quartz .ag-row {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+}

@@ -184,15 +184,15 @@ export default function ExpensesPage() {
   const handleEdit = (expense) => {
     setSelectedExpense(expense);
     setExpenseForm({
-      expense_category: expense.expense_category,
-      description: expense.description,
-      amount: expense.amount,
-      expense_date: expense.expense_date,
-      payment_method: expense.payment_method,
-      reference_no: expense.reference_no,
-      vendor_name: expense.vendor_name,
-      project: expense.project,
-      status: expense.status
+      expense_category: expense.expense_category || '',
+      description: expense.description || '',
+      amount: expense.amount !== null && expense.amount !== undefined ? expense.amount.toString() : '',
+      expense_date: expense.expense_date || new Date().toISOString().split('T')[0],
+      payment_method: expense.payment_method || '',
+      reference_no: expense.reference_no || '',
+      vendor_name: expense.vendor_name || '',
+      project: expense.project || '',
+      status: expense.status || 'Approved'
     });
     setShowExpenseModal(true);
   };
@@ -543,27 +543,97 @@ export default function ExpensesPage() {
             <div className="spinner"></div>
           </div>
         ) : expenses.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={expenses}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                params.api.sizeColumnsToFit({
-                  defaultMinWidth: 100,
-                  columnLimits: []
-                });
-              }}
-            />
-          </div>
+          <>
+            {/* Desktop view - AG Grid */}
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={expenses}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  // Check if the grid is visible before sizing columns
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
+                    }
+                  }, 100); // Small delay to ensure grid is rendered
+                }}
+              />
+            </div>
+
+            {/* Mobile view - Card layout */}
+            <div className="mobile-expenses-list">
+              {expenses.map((expense) => (
+                <div key={expense.id} className="expense-card">
+                  <div className="expense-header">
+                    <div className="expense-no">{expense.expense_no}</div>
+                    <div className="expense-category">{expense.expense_category}</div>
+                  </div>
+
+                  <div className="expense-details">
+                    <div className="detail-row">
+                      <span className="detail-label">Description:</span>
+                      <span className="detail-value">{expense.description}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Amount:</span>
+                      <span className="detail-value amount">{formatCurrency(expense.amount)}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Date:</span>
+                      <span className="detail-value">{new Date(expense.expense_date).toLocaleDateString()}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Vendor:</span>
+                      <span className="detail-value">{expense.vendor_name}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Status:</span>
+                      <span className={`status-badge ${
+                        expense.status.toLowerCase() === 'paid' ? 'status-paid' :
+                        expense.status.toLowerCase() === 'approved' ? 'status-partially-paid' :
+                        expense.status.toLowerCase() === 'pending' ? 'status-unpaid' : 'status-cancelled'
+                      }`}>
+                        {expense.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="expense-actions">
+                    <button
+                      className="action-btn edit-btn"
+                      onClick={() => handleEdit(expense)}
+                      title="Edit Expense"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      className="action-btn delete-btn"
+                      onClick={() => handleDelete(expense.id)}
+                      title="Delete Expense"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <FileText size={48} />

@@ -119,3 +119,93 @@
   padding: 4px 8px;
   font-size: 11px;
 }
+
+/* Mobile Responsive Table */
+@media (max-width: 768px) {
+  .data-table-container {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: visible !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .data-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 14px !important;
+  }
+
+  .data-table thead {
+    display: none !important;
+  }
+
+  .data-table tbody tr {
+    display: flex !important;
+    flex-direction: column !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    background: var(--card-bg) !important;
+    margin-bottom: var(--space-sm) !important;
+    box-shadow: var(--shadow-sm) !important;
+    overflow: hidden !important;
+  }
+
+  .data-table tbody tr:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* For activity log, hide all columns except description on mobile */
+  .data-table.activity-log-table tbody tr td:not(:nth-child(5)) {
+    display: none !important;
+  }
+
+  /* Show the description column on mobile */
+  .data-table.activity-log-table tbody tr td:nth-child(5) {
+    display: block !important;
+    padding: var(--space-sm) var(--space-md) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
+  .data-table.activity-log-table tbody tr td:nth-child(5)::before {
+    content: attr(data-label) !important;
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    color: var(--text-tertiary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* For other tables, use the default mobile view */
+  .data-table:not(.activity-log-table) td {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: var(--space-sm) var(--space-md) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+
+  .data-table:not(.activity-log-table) td::before {
+    content: attr(data-label) !important;
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    color: var(--text-tertiary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .data-table tbody tr.clickable {
+    cursor: pointer !important;
+  }
+
+  .data-table tbody tr.clickable:hover {
+    background: var(--neutral-50) !important;
+  }
+}

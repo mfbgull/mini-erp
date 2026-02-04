@@ -403,22 +403,104 @@ export default function BOMPage() {
           <div className="spinner"></div>
         </div>
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
-            rowData={boms}
-            columnDefs={columnDefs}
-            defaultColDef={{
-              resizable: true,
-              sortable: false,
-              filter: false
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            onRowClicked={(params) => handleRowClick(params.data)}
-            rowSelection={{ mode: 'singleRow' }}
-          />
-        </div>
+        <>
+          {/* Desktop view - AG Grid */}
+          <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+            <AgGridReact
+              rowData={boms}
+              columnDefs={columnDefs}
+              defaultColDef={{
+                resizable: true,
+                sortable: false,
+                filter: false
+              }}
+              pagination={true}
+              paginationPageSize={20}
+              paginationPageSizeSelector={[10, 20, 50, 100]}
+              onRowClicked={(params) => handleRowClick(params.data)}
+              rowSelection={{ mode: 'singleRow' }}
+            />
+          </div>
+
+          {/* Mobile view - Card layout */}
+          <div className="mobile-bom-list">
+            {boms.map((bom) => (
+              <div
+                key={bom.id}
+                className="bom-card"
+                onClick={() => handleRowClick(bom)}
+              >
+                <div className="bom-header">
+                  <div className="bom-no">{bom.bom_no}</div>
+                  <div className={`status-badge ${bom.is_active ? 'active' : 'inactive'}`}>
+                    {bom.is_active ? 'Active' : 'Inactive'}
+                  </div>
+                </div>
+
+                <div className="bom-details">
+                  <div className="detail-row">
+                    <span className="detail-label">BOM Name:</span>
+                    <span className="detail-value">{bom.bom_name}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Finished Item:</span>
+                    <span className="detail-value">{bom.finished_item_name}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Output Qty:</span>
+                    <span className="detail-value">{bom.quantity} {bom.finished_uom}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Raw Materials:</span>
+                    <span className="detail-value">{bom.items?.length || 0} items</span>
+                  </div>
+                </div>
+
+                <div className="bom-actions">
+                  <Button
+                    variant={bom.is_active ? "warning" : "secondary"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleBomStatus(bom);
+                    }}
+                    disabled={toggleBomStatusMutation.isPending}
+                  >
+                    {bom.is_active ? 'Deactivate' : 'Activate'}
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        // Fetch full BOM details including items
+                        const response = await api.get(`/boms/${bom.id}`);
+                        setEditingBOM(response.data);
+                        setIsModalOpen(true);
+                      } catch (error) {
+                        toast.error('Failed to load BOM details');
+                      }
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteBom(bom);
+                    }}
+                    disabled={deleteBomMutation.isPending}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       <Modal

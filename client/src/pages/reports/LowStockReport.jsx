@@ -254,21 +254,66 @@ export default function LowStockReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData && reportData.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-            />
-          </div>
+          <>
+            {/* Desktop view - AG Grid */}
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+              />
+            </div>
+
+            {/* Mobile view - Card layout */}
+            <div className="mobile-low-stock-list">
+              {reportData.map((item) => (
+                <div
+                  key={item.id || item.item_code}
+                  className="low-stock-card"
+                >
+                  <div className="low-stock-header">
+                    <div className="item-name">{item.item_name}</div>
+                    <div className="item-code">{item.item_code}</div>
+                  </div>
+
+                  <div className="low-stock-details">
+                    <div className="detail-row">
+                      <span className="detail-label">Category:</span>
+                      <span className="detail-value">{item.item_category}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Current Stock:</span>
+                      <span className="detail-value current-stock">{item.current_stock} {item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Minimum Stock:</span>
+                      <span className="detail-value">{item.minimum_stock} {item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Shortage:</span>
+                      <span className="detail-value shortage">{item.shortage} {item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Reorder Level:</span>
+                      <span className="detail-value">{item.reorder_level} {item.unit_of_measure}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <AlertTriangle size={48} />

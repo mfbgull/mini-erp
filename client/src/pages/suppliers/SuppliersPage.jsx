@@ -247,27 +247,114 @@ export default function SuppliersPage() {
           <div className="spinner"></div>
         </div>
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
-            rowData={filteredSuppliers}
-            columnDefs={columnDefs}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            rowSelection={{ mode: 'singleRow' }}
-            onGridReady={(params) => {
-              params.api.sizeColumnsToFit({
-                defaultMinWidth: 100,
-                columnLimits: []
-              });
-            }}
-          />
-        </div>
+        <>
+          {/* Desktop view - AG Grid */}
+          <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+            <AgGridReact
+              rowData={filteredSuppliers}
+              columnDefs={columnDefs}
+              defaultColDef={{
+                resizable: true,
+                sortable: true,
+                filter: true
+              }}
+              pagination={true}
+              paginationPageSize={20}
+              paginationPageSizeSelector={[10, 20, 50, 100]}
+              rowSelection={{ mode: 'singleRow' }}
+              onGridReady={(params) => {
+                // Check if the grid is visible before sizing columns
+                setTimeout(() => {
+                  if (params.api && params.columnApi) {
+                    const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                    if (gridElement && gridElement.clientWidth > 0) {
+                      params.columnApi.autoSizeAllColumns();
+                    }
+                  }
+                }, 100); // Small delay to ensure grid is rendered
+              }}
+            />
+          </div>
+
+          {/* Mobile view - Card layout */}
+          <div className="mobile-supplier-list">
+            {filteredSuppliers.map((supplier) => (
+              <div
+                key={supplier.id}
+                className="supplier-card"
+                onClick={() => handleView(supplier)}
+              >
+                <div className="supplier-header">
+                  <div className="supplier-code">{supplier.supplier_code}</div>
+                  <div className={`supplier-status ${supplier.is_active ? 'status-active' : 'status-inactive'}`}>
+                    {supplier.is_active ? 'Active' : 'Inactive'}
+                  </div>
+                </div>
+
+                <div className="supplier-details">
+                  <div className="detail-row">
+                    <span className="detail-label">Supplier:</span>
+                    <span className="detail-value">{supplier.supplier_name}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Contact:</span>
+                    <span className="detail-value">{supplier.contact_person || 'N/A'}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Phone:</span>
+                    <span className="detail-value">{supplier.phone || 'N/A'}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Email:</span>
+                    <span className="detail-value">{supplier.email || 'N/A'}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Terms:</span>
+                    <span className="detail-value">{supplier.payment_terms || 'Net 30'}</span>
+                  </div>
+                </div>
+
+                <div className="supplier-actions">
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleView(supplier);
+                    }}
+                  >
+                    View
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(supplier);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(supplier.id, supplier.supplier_name);
+                    }}
+                    disabled={deleteMutation.isPending}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Supplier Form Modal */}

@@ -1,0 +1,525 @@
+client/src/components/common/CompactMobileCard.tsx:export default function CompactMobileCardView({
+client/src/components/common/DataTable.tsx:export default function DataTable({ columns, data, onRowClick }: DataTableProps) {
+client/src/components/common/ThemeToggle.tsx:export default ThemeToggle;
+client/src/components/common/BorderAccentItemCard.tsx:export default function BorderAccentItemCard({ 
+client/src/components/common/BorderAccentWarehouseCard.tsx:export default function BorderAccentWarehouseCard({ 
+client/src/components/common/Modal.tsx:export default function Modal({ isOpen, onClose, title, children, size = 'medium' }: ModalProps) {
+client/src/components/common/DropdownMenu.tsx:export interface DropdownMenuItem {
+client/src/components/common/DropdownMenu.tsx:export default function DropdownMenu({ trigger, items, align = 'end' }: DropdownMenuProps) {
+client/src/components/common/CompactPurchaseCard.tsx:export default function CompactPurchaseCardView({
+client/src/components/common/CompactItemCard.tsx:export function CompactItemCard({ item, onEdit, onDelete }: CompactItemCardProps) {
+client/src/components/common/CompactLedgerCard.tsx:export function CompactLedgerCard({ entry, onView, formatCurrency }: CompactLedgerCardProps) {
+client/src/components/common/CompactLedgerCard.tsx:export default function CompactLedgerCardView({ 
+client/src/components/common/CompactInvoiceCard.tsx:export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete }: CompactInvoiceCardProps) {
+client/src/components/common/CompactInvoiceCard.tsx:export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDelete }: { 
+client/src/components/common/FormInput.tsx:export default function FormInput({
+client/src/components/common/MobileItemCardView.tsx:export default function MobileItemCardView({
+client/src/components/common/MobileItemCardView.tsx:export default MobileItemCardView;
+client/src/components/common/MobileInvoiceCardView_Simple.tsx:export default function MobileInvoiceCardView({
+client/src/components/common/Button.tsx:export default function Button({
+client/src/components/common/CompactStockMovementCard.tsx:export default function CompactStockMovementCardView({
+client/src/components/common/CompactStockByWarehouseCard.tsx:export default function CompactStockByWarehouseCardView({
+client/src/components/common/DateRangePicker.jsx:export default DateRangePicker;
+client/src/components/common/CompactCustomerCard.tsx:export default function CompactCustomerCardView({
+client/src/components/common/SearchModal.tsx:export default SearchModal;
+client/src/components/common/SearchableSelect.tsx:export default function SearchableSelect({
+client/src/components/common/MobileInvoiceCardView.tsx:export default function MobileInvoiceCardView({ invoices, onView, onEdit }: MobileInvoiceCardViewProps) {
+client/src/components/common/MobileInvoiceCardView.tsx:export default MobileInvoiceCardView;
+client/src/components/common/MobileItemCardView_Simple.tsx:export default function MobileItemCardView({
+client/src/components/common/CompactWarehouseCard.tsx:export default function CompactWarehouseCardView({
+client/src/components/common/CompactPaymentCard.tsx:export function CompactPaymentCard({ payment, onView, onEdit, onDelete }: CompactPaymentCardProps) {
+client/src/components/common/CompactPaymentCard.tsx:export default function CompactPaymentCardView({ 
+client/src/components/common/MobileCardView.tsx:export default function MobileCardView({
+client/src/components/common/MobileCardView.tsx:export default MobileCardView;
+client/src/components/common/MobileCardView_Simple.tsx:export default function MobileCardView({
+client/src/components/invoice/InvoiceRouter.tsx:export default function InvoiceRouter({ defaultMode = 'view' }: InvoiceRouterProps) {
+client/src/components/invoice/InvoiceWizard.tsx:export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
+client/src/components/invoice/InvoiceTemplate.tsx:export default InvoiceTemplate;
+client/src/components/invoice/InvoiceNavigationExamples.tsx:export default function InvoiceNavigationExamples() {
+client/src/components/invoice/InvoiceActionBar.tsx:export default function InvoiceActionBar({
+client/src/components/invoice/PriceHistoryHint.tsx:export default function PriceHistoryHint({ history, currentPrice, onClose }: PriceHistoryHintProps) {
+client/src/components/invoice/InvoiceDebugger.tsx:export default function InvoiceDebugger({ invoiceId }: InvoiceDebuggerProps) {
+client/src/components/invoice/PriceHistoryHint.jsx.bak:export default function PriceHistoryHint({ itemId, customerId, currentPrice, onClose }) {
+client/src/components/customers/PaymentModal.tsx:export default function PaymentModal({ customerId, customer, onClose, onSuccess }: PaymentModalProps) {
+client/src/components/layout/QuickActionsPanel.tsx:export default function QuickActionsPanel({ isOpen, onClose }: QuickActionsPanelProps) {
+client/src/components/layout/FloatingActionButton.tsx:export default function FloatingActionButton() {
+client/src/components/layout/Sidebar.tsx:export default function Sidebar() {
+client/src/hooks/useInvoiceNavigation.ts:export interface InvoiceNavigationOptions {
+client/src/hooks/useInvoiceNavigation.ts:export function useInvoiceNavigation() {
+client/src/hooks/useMobileDetection.ts:export function useMobileDetection() {
+client/src/context/ActivityLogContext.tsx:export function ActivityLogProvider({ children }: { children: React.ReactNode }) {
+client/src/context/ActivityLogContext.tsx:export function useActivityLog() {
+client/src/context/ActivityLogContext.tsx:export function useActivityLogs(filters: ActivityLogFilters) {
+client/src/context/ActivityLogContext.tsx:export function useActivityStats(startDate?: string, endDate?: string) {
+client/src/context/ActivityLogContext.tsx:export function useRecentActivity(limit: number = 20) {
+client/src/context/ActivityLogContext.tsx:export function useEntityTypes() {
+client/src/context/ActivityLogContext.tsx:export function useActions() {
+client/src/context/ActivityLogContext.tsx:export function useUsers() {
+client/src/context/SearchContext.tsx:export const useSearch = (): SearchContextType => {
+client/src/context/SearchContext.tsx:export const SearchProvider = ({ children }: SearchProviderProps) => {
+client/src/context/AuthContext.tsx:export const AuthProvider = ({ children }: AuthProviderProps) => {
+client/src/context/AuthContext.tsx:export const useAuth = (): AuthContextType => {
+client/src/context/InvoiceContext.tsx:export interface InvoiceItem {
+client/src/context/InvoiceContext.tsx:export interface InvoiceCustomer {
+client/src/context/InvoiceContext.tsx:export interface PaymentDetails {
+client/src/context/InvoiceContext.tsx:export interface InvoiceDraft {
+client/src/context/InvoiceContext.tsx:export function InvoiceProvider({ children }: InvoiceProviderProps) {
+client/src/context/InvoiceContext.tsx:export function useInvoice() {
+client/src/context/InvoiceContext.tsx:export function useAutoSaveDraft(intervalMs: number = 30000) {
+client/src/context/SettingsContext.tsx:export const useSettings = (): SettingsContextType => {
+client/src/context/SettingsContext.tsx:export const SettingsProvider = ({ children }: SettingsProviderProps) => {
+client/src/context/ThemeContext.tsx:export const THEMES = {
+client/src/context/ThemeContext.tsx:export type ThemeType = typeof THEMES[keyof typeof THEMES];
+client/src/context/ThemeContext.tsx:export const THEME_NAMES: Record<ThemeType, string> = {
+client/src/context/ThemeContext.tsx:export const THEME_ICONS: Record<ThemeType, string> = {
+client/src/context/ThemeContext.tsx:export const THEME_DESCRIPTIONS: Record<ThemeType, string> = {
+client/src/context/ThemeContext.tsx:export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+client/src/context/ThemeContext.tsx:export const useTheme = (): ThemeContextType => {
+client/src/context/ThemeContext.tsx:export default ThemeContext;
+client/src/utils/formatters.ts:export const formatCurrency = (amount: number): string => {
+client/src/utils/formatters.ts:export const formatDate = (dateString: string): string => {
+client/src/utils/formatters.ts:export const formatDateTime = (dateString: string): string => {
+client/src/utils/formatters.ts:export const formatPercentage = (value: number, decimals = 1): string => {
+client/src/utils/formatters.ts:export const formatNumber = (value: number, decimals = 2): string => {
+client/src/utils/exportUtils.ts:export const exportToPDF = (
+client/src/utils/exportUtils.ts:export const exportToExcel = (
+client/src/utils/exportUtils.ts:export const formatCurrencyForExport = (value: number, currency: string = 'USD'): string => {
+client/src/utils/exportUtils.ts:export const formatDateForExport = (dateString: string): string => {
+client/src/utils/invoiceApi.ts:export interface SearchResult {
+client/src/utils/invoiceApi.ts:export interface TaxRate {
+client/src/utils/invoiceApi.ts:export interface PaymentTerm {
+client/src/utils/invoiceApi.ts:export interface DraftData {
+client/src/utils/invoiceApi.ts:export interface InvoiceSubmitData {
+client/src/utils/invoiceApi.ts:export interface InvoiceItemData {
+client/src/utils/invoiceApi.ts:export interface PaymentData {
+client/src/utils/invoiceApi.ts:export const mobileInvoiceApi = {
+client/src/utils/invoiceApi.ts:export default mobileInvoiceApi;
+client/src/utils/format.ts:export const formatCurrency = (amount: number | string, settings: CurrencySettings | null = null): string => {
+client/src/utils/format.ts:export const formatCurrencyWithDefaultSettings = (amount: number | string): string => {
+client/src/utils/api.ts:export default api;
+client/src/pages/invoice/components/StickyFooter.tsx:export default function StickyFooter({ 
+client/src/pages/invoice/InvoiceStep4Payment.tsx:export default function InvoiceStep4Payment() {
+client/src/pages/invoice/InvoiceStep5Review.tsx:export default function InvoiceStep5Review() {
+client/src/pages/invoice/MobileInvoiceEditForm.tsx:export default MobileInvoiceEditForm;
+client/src/pages/invoice/MobileInvoiceWizard.tsx:export default function MobileInvoiceWizard() {
+client/src/pages/invoice/InvoiceStep1Customer.tsx:export default function InvoiceStep1Customer() {
+client/src/pages/invoice/InvoiceStep3AddItem.tsx:export default function InvoiceStep3AddItem() {
+client/src/pages/invoice/InvoiceStep2Items.tsx:export default function InvoiceStep2Items() {
+client/src/pages/expenses/ExpensesPage.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/expenses/ExpensesPage.jsx:export default function ExpensesPage() {
+client/src/pages/expenses/ExpensesPage.jsx:      console.error('No data to export');
+client/src/pages/expenses/ExpensesPage.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/expenses/ExpensesPage.jsx:    const exportColumns = [
+client/src/pages/expenses/ExpensesPage.jsx:      exportToPDF(
+client/src/pages/expenses/ExpensesPage.jsx:        exportColumns,
+client/src/pages/expenses/ExpensesPage.jsx:      exportToExcel(
+client/src/pages/expenses/ExpensesPage.jsx:        exportColumns,
+client/src/pages/expenses/ExpensesPage.jsx:          <div className="export-buttons">
+client/src/pages/expenses/ExpensesPage.jsx:              className="export-btn"
+client/src/pages/expenses/ExpensesPage.jsx:              className="export-btn"
+client/src/pages/expenses/Expenses.css:.export-buttons {
+client/src/pages/expenses/Expenses.css:.export-btn {
+client/src/pages/expenses/Expenses.css:  .export-buttons {
+client/src/pages/customers/CustomerStatement.jsx:export default function CustomerStatement() {
+client/src/pages/customers/CustomersPage.jsx:export default function CustomersPage() {
+client/src/pages/customers/CustomerDetailPage.css:.export-btn {
+client/src/pages/customers/CustomerDetailPage.css:.export-btn:hover {
+client/src/pages/customers/CustomerDetailPage.css:.export-btn:active {
+client/src/pages/customers/CustomerDetailPage.css:  .export-btn span {
+client/src/pages/customers/CustomerDetailPage.jsx:export default function CustomerDetailPage() {
+client/src/pages/customers/CustomerDetailPage.jsx:  const exportToCSV = () => {
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.error('No data to export');
+client/src/pages/customers/CustomerDetailPage.jsx:    toast.success('CSV exported successfully');
+client/src/pages/customers/CustomerDetailPage.jsx:  const exportToPDF = async () => {
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.error('No data to export');
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.loading('Generating PDF...', { id: 'pdf-export' });
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.success('PDF exported successfully', { id: 'pdf-export' });
+client/src/pages/customers/CustomerDetailPage.jsx:      console.error('PDF export error:', error);
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.error('Failed to export PDF', { id: 'pdf-export' });
+client/src/pages/customers/CustomerDetailPage.jsx:  const exportToImage = async () => {
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.error('No content to export');
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.loading('Generating image...', { id: 'image-export' });
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.success('Image exported successfully', { id: 'image-export' });
+client/src/pages/customers/CustomerDetailPage.jsx:      console.error('Image export error:', error);
+client/src/pages/customers/CustomerDetailPage.jsx:      toast.error('Failed to export image. Try using Print instead.', { id: 'image-export' });
+client/src/pages/customers/CustomerDetailPage.jsx:          <button className="export-btn" onClick={exportToCSV} title="Export to CSV">
+client/src/pages/customers/CustomerDetailPage.jsx:          <button className="export-btn" onClick={exportToPDF} title="Export to PDF">
+client/src/pages/customers/CustomerDetailPage.jsx:          <button className="export-btn" onClick={exportToImage} title="Export to Image">
+client/src/pages/customers/CustomerDetailPage.jsx:          <button className="export-btn" onClick={handlePrint} title="Print">
+client/src/pages/customers/CustomerDetailPage.jsx.backup:export default function CustomerDetailPage() {
+client/src/pages/customers/CustomerDetailPage.jsx.backup:  const exportToCSV = () => {
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.error('No data to export');
+client/src/pages/customers/CustomerDetailPage.jsx.backup:    toast.success('CSV exported successfully');
+client/src/pages/customers/CustomerDetailPage.jsx.backup:  const exportToPDF = async () => {
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.error('No data to export');
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.loading('Generating PDF...', { id: 'pdf-export' });
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.success('PDF exported successfully', { id: 'pdf-export' });
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      console.error('PDF export error:', error);
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.error('Failed to export PDF', { id: 'pdf-export' });
+client/src/pages/customers/CustomerDetailPage.jsx.backup:  const exportToImage = async () => {
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.error('No content to export');
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.loading('Generating image...', { id: 'image-export' });
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.success('Image exported successfully', { id: 'image-export' });
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      console.error('Image export error:', error);
+client/src/pages/customers/CustomerDetailPage.jsx.backup:      toast.error('Failed to export image. Try using Print instead.', { id: 'image-export' });
+client/src/pages/customers/CustomerDetailPage.jsx.backup:          <button className="export-btn" onClick={exportToCSV} title="Export to CSV">
+client/src/pages/customers/CustomerDetailPage.jsx.backup:          <button className="export-btn" onClick={exportToPDF} title="Export to PDF">
+client/src/pages/customers/CustomerDetailPage.jsx.backup:          <button className="export-btn" onClick={exportToImage} title="Export to Image">
+client/src/pages/customers/CustomerDetailPage.jsx.backup:          <button className="export-btn" onClick={handlePrint} title="Print">
+client/src/pages/customers/CustomerPreview.tsx:export default function CustomerPreview({
+client/src/pages/customers/CustomerDetailPage.css.backup:.export-btn {
+client/src/pages/customers/CustomerDetailPage.css.backup:.export-btn:hover {
+client/src/pages/customers/CustomerDetailPage.css.backup:.export-btn:active {
+client/src/pages/customers/CustomerDetailPage.css.backup:  .export-btn span {
+client/src/pages/sales/SalesPage.jsx:export default function SalesPage() {
+client/src/pages/sales/InvoiceReturn.tsx:export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: InvoiceReturnProps) {
+client/src/pages/sales/SalesPreview.tsx:export default function SalesPreview({ invoice, onClose, onView, onEdit }: SalesPreviewProps) {
+client/src/pages/sales/InvoiceViewPage.jsx:export default function InvoiceViewPage() {
+client/src/pages/sales/InvoiceViewPage.jsx:      console.error('PDF export error:', error);
+client/src/pages/sales/InvoicePreview.tsx:export default function InvoicePreview({ invoice, onClose, onEdit, onDelete }: InvoicePreviewProps) {
+client/src/pages/sales/SalesInvoicePage.jsx:export default function SalesInvoicePage() {
+client/src/pages/SettingsPage.jsx:export default function SettingsPage() {
+client/src/pages/bom/BOMPage.jsx:export default function BOMPage() {
+client/src/pages/bom/BOMPage.jsx:      toast.error('No BOMs to export');
+client/src/pages/bom/BOMPage.jsx:    toast.success('BOMs exported successfully!');
+client/src/pages/production/ProductionPage.jsx:export default function ProductionPage() {
+client/src/pages/IntegrationsPage.jsx:export default function IntegrationsPage() {
+client/src/pages/ActivityLog.tsx:export default function ActivityLog() {
+client/src/pages/ActivityLog.tsx:    window.open(`/api/activity-logs/export?${params.toString()}`, '_blank');
+client/src/pages/inventory/StockMovementPage.jsx:export default function StockMovementPage() {
+client/src/pages/inventory/StockMovementPage.jsx:      toast.error('No movements to export');
+client/src/pages/inventory/StockMovementPage.jsx:    toast.success('Movements exported successfully!');
+client/src/pages/inventory/StockByWarehousePage.tsx:export default function StockByWarehousePage() {
+client/src/pages/inventory/StockByWarehousePage.tsx:      toast.error('No stock data to export');
+client/src/pages/inventory/StockByWarehousePage.tsx:    toast.success('Stock data exported successfully!');
+client/src/pages/inventory/WarehousePreview.tsx:export default function WarehousePreview({ warehouse, onClose, onEdit, onDelete }: WarehousePreviewProps) {
+client/src/pages/inventory/WarehousesPage.jsx:export default function WarehousesPage() {
+client/src/pages/inventory/ItemPreview.tsx:export default function ItemPreview({ item, onClose }: ItemPreviewProps) {
+client/src/pages/inventory/ItemsPage.jsx:export default function ItemsPage() {
+client/src/pages/inventory/ItemsPage.jsx:      toast.error('No items to export');
+client/src/pages/inventory/ItemsPage.jsx:    link.setAttribute('download', `items-export-${new Date().toISOString().split('T')[0]}.csv`);
+client/src/pages/inventory/ItemsPage.jsx:    toast.success('Items exported successfully!');
+client/src/pages/inventory/StockByWarehousePreview.tsx:export default function StockByWarehousePreview({ stockData, onClose }: StockByWarehousePreviewProps) {
+client/src/pages/inventory/WarehouseForm.tsx:export default function WarehouseForm({ warehouse, onClose, onSuccess }: WarehouseFormProps) {
+client/src/pages/inventory/ItemForm.tsx:export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
+client/src/pages/inventory/StockMovementPreview.tsx:export default function StockMovementPreview({ movement, onClose }: StockMovementPreviewProps) {
+client/src/pages/Dashboard.jsx:export default function Dashboard() {
+client/src/pages/purchases/PurchasePreview.tsx:export default function PurchasePreview({
+client/src/pages/purchases/PurchasesPage.jsx:export default function PurchasesPage() {
+client/src/pages/purchases/PurchasesPage.jsx:      toast.error('No purchases to export');
+client/src/pages/purchases/PurchasesPage.jsx:    toast.success('Purchases exported successfully!');
+client/src/pages/purchase-orders/PurchaseOrderFormPage.jsx:export default function PurchaseOrderFormPage({ mode }) {
+client/src/pages/purchase-orders/PurchaseOrdersPage.jsx:export default function PurchaseOrdersPage() {
+client/src/pages/purchase-orders/PurchaseOrderDetailPage.jsx:export default function PurchaseOrderDetailPage() {
+client/src/pages/suppliers/SupplierDetailPage.jsx:export default function SupplierDetailPage() {
+client/src/pages/suppliers/SupplierFormPage.jsx:export default function SupplierFormPage({ mode }) {
+client/src/pages/suppliers/SuppliersPage.jsx:export default function SuppliersPage() {
+client/src/pages/Login.tsx:export default function Login() {
+client/src/pages/pos/POSPage.jsx:export default function POSPage() {
+client/src/pages/reports/CustomerStatementsReport.css:.customer-statements-report .export-buttons {
+client/src/pages/reports/CustomerStatementsReport.css:.customer-statements-report .export-btn {
+client/src/pages/reports/CustomerStatementsReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/CustomerStatementsReport.jsx:export default function CustomerStatementsReport() {
+client/src/pages/reports/CustomerStatementsReport.jsx:      console.error('No data to export');
+client/src/pages/reports/CustomerStatementsReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/CustomerStatementsReport.jsx:    const exportColumns = [
+client/src/pages/reports/CustomerStatementsReport.jsx:      exportToPDF(
+client/src/pages/reports/CustomerStatementsReport.jsx:        exportColumns,
+client/src/pages/reports/CustomerStatementsReport.jsx:      exportToExcel(
+client/src/pages/reports/CustomerStatementsReport.jsx:        exportColumns,
+client/src/pages/reports/CustomerStatementsReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/CustomerStatementsReport.jsx:            className="export-btn"
+client/src/pages/reports/CustomerStatementsReport.jsx:            className="export-btn"
+client/src/pages/reports/SalesByItemReport.css:.sales-by-item-report .export-buttons {
+client/src/pages/reports/SalesByItemReport.css:.sales-by-item-report .export-btn {
+client/src/pages/reports/PurchaseSummaryReport.css:.purchase-summary-report .export-buttons {
+client/src/pages/reports/PurchaseSummaryReport.css:.purchase-summary-report .export-btn {
+client/src/pages/reports/ProductionSummaryReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/ProductionSummaryReport.jsx:export default function ProductionSummaryReport() {
+client/src/pages/reports/ProductionSummaryReport.jsx:      console.error('No data to export');
+client/src/pages/reports/ProductionSummaryReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/ProductionSummaryReport.jsx:    const exportColumns = [
+client/src/pages/reports/ProductionSummaryReport.jsx:      exportToPDF(
+client/src/pages/reports/ProductionSummaryReport.jsx:        exportColumns,
+client/src/pages/reports/ProductionSummaryReport.jsx:      exportToExcel(
+client/src/pages/reports/ProductionSummaryReport.jsx:        exportColumns,
+client/src/pages/reports/ProductionSummaryReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/ProductionSummaryReport.jsx:            className="export-btn"
+client/src/pages/reports/ProductionSummaryReport.jsx:            className="export-btn"
+client/src/pages/reports/StockValuationReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/StockValuationReport.jsx:export default function StockValuationReport() {
+client/src/pages/reports/StockValuationReport.jsx:      console.error('No data to export');
+client/src/pages/reports/StockValuationReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/StockValuationReport.jsx:    const exportColumns = [
+client/src/pages/reports/StockValuationReport.jsx:      exportToPDF(
+client/src/pages/reports/StockValuationReport.jsx:        exportColumns,
+client/src/pages/reports/StockValuationReport.jsx:      exportToExcel(
+client/src/pages/reports/StockValuationReport.jsx:        exportColumns,
+client/src/pages/reports/StockValuationReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/StockValuationReport.jsx:            className="export-btn"
+client/src/pages/reports/StockValuationReport.jsx:            className="export-btn"
+client/src/pages/reports/ExpensesReport.css:.expenses-report .export-buttons {
+client/src/pages/reports/ExpensesReport.css:.expenses-report .export-btn {
+client/src/pages/reports/ReportsDashboard.jsx:export default function ReportsDashboard() {
+client/src/pages/reports/PurchaseSummaryReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/PurchaseSummaryReport.jsx:export default function PurchaseSummaryReport() {
+client/src/pages/reports/PurchaseSummaryReport.jsx:      console.error('No data to export');
+client/src/pages/reports/PurchaseSummaryReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/PurchaseSummaryReport.jsx:    const exportColumns = [
+client/src/pages/reports/PurchaseSummaryReport.jsx:      exportToPDF(
+client/src/pages/reports/PurchaseSummaryReport.jsx:        exportColumns,
+client/src/pages/reports/PurchaseSummaryReport.jsx:      exportToExcel(
+client/src/pages/reports/PurchaseSummaryReport.jsx:        exportColumns,
+client/src/pages/reports/PurchaseSummaryReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/PurchaseSummaryReport.jsx:            className="export-btn"
+client/src/pages/reports/PurchaseSummaryReport.jsx:            className="export-btn"
+client/src/pages/reports/ProductionSummaryReport.css:.production-summary-report .export-buttons {
+client/src/pages/reports/ProductionSummaryReport.css:.production-summary-report .export-btn {
+client/src/pages/reports/InventoryMovementReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/InventoryMovementReport.jsx:export default function InventoryMovementReport() {
+client/src/pages/reports/InventoryMovementReport.jsx:      console.error('No data to export');
+client/src/pages/reports/InventoryMovementReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/InventoryMovementReport.jsx:    const exportColumns = [
+client/src/pages/reports/InventoryMovementReport.jsx:      exportToPDF(
+client/src/pages/reports/InventoryMovementReport.jsx:        exportColumns,
+client/src/pages/reports/InventoryMovementReport.jsx:      exportToExcel(
+client/src/pages/reports/InventoryMovementReport.jsx:        exportColumns,
+client/src/pages/reports/InventoryMovementReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/InventoryMovementReport.jsx:            className="export-btn"
+client/src/pages/reports/InventoryMovementReport.jsx:            className="export-btn"
+client/src/pages/reports/BOMUsageReport.css:.bom-usage-report .export-buttons {
+client/src/pages/reports/BOMUsageReport.css:.bom-usage-report .export-btn {
+client/src/pages/reports/ARReportsPage.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/ARReportsPage.jsx:export default function ARReportsPage() {
+client/src/pages/reports/ARReportsPage.jsx:          const exportColumns = [
+client/src/pages/reports/ARReportsPage.jsx:            exportToPDF(
+client/src/pages/reports/ARReportsPage.jsx:              exportColumns,
+client/src/pages/reports/ARReportsPage.jsx:            exportToExcel(
+client/src/pages/reports/ARReportsPage.jsx:              exportColumns,
+client/src/pages/reports/ARReportsPage.jsx:          const exportData = [
+client/src/pages/reports/ARReportsPage.jsx:          const exportColumns = [
+client/src/pages/reports/ARReportsPage.jsx:            exportToPDF(
+client/src/pages/reports/ARReportsPage.jsx:              exportData,
+client/src/pages/reports/ARReportsPage.jsx:              exportColumns,
+client/src/pages/reports/ARReportsPage.jsx:            exportToExcel(
+client/src/pages/reports/ARReportsPage.jsx:              exportData,
+client/src/pages/reports/ARReportsPage.jsx:              exportColumns,
+client/src/pages/reports/ARReportsPage.jsx:          const exportColumns = [
+client/src/pages/reports/ARReportsPage.jsx:            exportToPDF(
+client/src/pages/reports/ARReportsPage.jsx:              exportColumns,
+client/src/pages/reports/ARReportsPage.jsx:            exportToExcel(
+client/src/pages/reports/ARReportsPage.jsx:              exportColumns,
+client/src/pages/reports/ARReportsPage.jsx:          const exportData = [
+client/src/pages/reports/ARReportsPage.jsx:          const exportColumns = [
+client/src/pages/reports/ARReportsPage.jsx:            exportToPDF(
+client/src/pages/reports/ARReportsPage.jsx:              exportData,
+client/src/pages/reports/ARReportsPage.jsx:              exportColumns,
+client/src/pages/reports/ARReportsPage.jsx:            exportToExcel(
+client/src/pages/reports/ARReportsPage.jsx:              exportData,
+client/src/pages/reports/ARReportsPage.jsx:              exportColumns,
+client/src/pages/reports/ARReportsPage.jsx:        console.error('Unknown report type for export');
+client/src/pages/reports/ARReportsPage.jsx:          <div className="export-buttons">
+client/src/pages/reports/ARReportsPage.jsx:              className="export-btn"
+client/src/pages/reports/ARReportsPage.jsx:              className="export-btn"
+client/src/pages/reports/StockValuationReport.css:.stock-valuation-report .export-buttons {
+client/src/pages/reports/StockValuationReport.css:.stock-valuation-report .export-btn {
+client/src/pages/reports/CashFlowReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/CashFlowReport.jsx:export default function CashFlowReport() {
+client/src/pages/reports/CashFlowReport.jsx:      console.error('No data to export');
+client/src/pages/reports/CashFlowReport.jsx:    // Prepare data for export
+client/src/pages/reports/CashFlowReport.jsx:    const exportData = [
+client/src/pages/reports/CashFlowReport.jsx:    // Column definitions for export
+client/src/pages/reports/CashFlowReport.jsx:    const exportColumns = [
+client/src/pages/reports/CashFlowReport.jsx:      exportToPDF(
+client/src/pages/reports/CashFlowReport.jsx:        exportData,
+client/src/pages/reports/CashFlowReport.jsx:        exportColumns,
+client/src/pages/reports/CashFlowReport.jsx:      exportToExcel(
+client/src/pages/reports/CashFlowReport.jsx:        exportData,
+client/src/pages/reports/CashFlowReport.jsx:        exportColumns,
+client/src/pages/reports/CashFlowReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/CashFlowReport.jsx:            className="export-btn"
+client/src/pages/reports/CashFlowReport.jsx:            className="export-btn"
+client/src/pages/reports/SalesSummaryReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/SalesSummaryReport.jsx:export default function SalesSummaryReport() {
+client/src/pages/reports/SalesSummaryReport.jsx:      console.error('No data to export');
+client/src/pages/reports/SalesSummaryReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/SalesSummaryReport.jsx:    const exportColumns = [
+client/src/pages/reports/SalesSummaryReport.jsx:      exportToPDF(
+client/src/pages/reports/SalesSummaryReport.jsx:        exportColumns,
+client/src/pages/reports/SalesSummaryReport.jsx:      exportToExcel(
+client/src/pages/reports/SalesSummaryReport.jsx:        exportColumns,
+client/src/pages/reports/SalesSummaryReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/SalesSummaryReport.jsx:            className="export-btn"
+client/src/pages/reports/SalesSummaryReport.jsx:            className="export-btn"
+client/src/pages/reports/SalesByCustomerReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/SalesByCustomerReport.jsx:export default function SalesByCustomerReport() {
+client/src/pages/reports/SalesByCustomerReport.jsx:      console.error('No data to export');
+client/src/pages/reports/SalesByCustomerReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/SalesByCustomerReport.jsx:    const exportColumns = [
+client/src/pages/reports/SalesByCustomerReport.jsx:      exportToPDF(
+client/src/pages/reports/SalesByCustomerReport.jsx:        exportColumns,
+client/src/pages/reports/SalesByCustomerReport.jsx:      exportToExcel(
+client/src/pages/reports/SalesByCustomerReport.jsx:        exportColumns,
+client/src/pages/reports/SalesByCustomerReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/SalesByCustomerReport.jsx:            className="export-btn"
+client/src/pages/reports/SalesByCustomerReport.jsx:            className="export-btn"
+client/src/pages/reports/DSOReport.css:.dso-report .export-buttons {
+client/src/pages/reports/DSOReport.css:.dso-report .export-btn {
+client/src/pages/reports/SupplierAnalysisReport.css:.supplier-analysis-report .export-buttons {
+client/src/pages/reports/SupplierAnalysisReport.css:.supplier-analysis-report .export-btn {
+client/src/pages/reports/SalesByItemReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/SalesByItemReport.jsx:export default function SalesByItemReport() {
+client/src/pages/reports/SalesByItemReport.jsx:      console.error('No data to export');
+client/src/pages/reports/SalesByItemReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/SalesByItemReport.jsx:    const exportColumns = [
+client/src/pages/reports/SalesByItemReport.jsx:      exportToPDF(
+client/src/pages/reports/SalesByItemReport.jsx:        exportColumns,
+client/src/pages/reports/SalesByItemReport.jsx:      exportToExcel(
+client/src/pages/reports/SalesByItemReport.jsx:        exportColumns,
+client/src/pages/reports/SalesByItemReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/SalesByItemReport.jsx:            className="export-btn"
+client/src/pages/reports/SalesByItemReport.jsx:            className="export-btn"
+client/src/pages/reports/TopDebtorsReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/TopDebtorsReport.jsx:export default function TopDebtorsReport() {
+client/src/pages/reports/TopDebtorsReport.jsx:      console.error('No data to export');
+client/src/pages/reports/TopDebtorsReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/TopDebtorsReport.jsx:    const exportColumns = [
+client/src/pages/reports/TopDebtorsReport.jsx:      exportToPDF(
+client/src/pages/reports/TopDebtorsReport.jsx:        exportColumns,
+client/src/pages/reports/TopDebtorsReport.jsx:      exportToExcel(
+client/src/pages/reports/TopDebtorsReport.jsx:        exportColumns,
+client/src/pages/reports/TopDebtorsReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/TopDebtorsReport.jsx:            className="export-btn"
+client/src/pages/reports/TopDebtorsReport.jsx:            className="export-btn"
+client/src/pages/reports/InventoryReports.css:.export-btn {
+client/src/pages/reports/LowStockReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/LowStockReport.jsx:export default function LowStockReport() {
+client/src/pages/reports/LowStockReport.jsx:      console.error('No data to export');
+client/src/pages/reports/LowStockReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/LowStockReport.jsx:    const exportColumns = [
+client/src/pages/reports/LowStockReport.jsx:      exportToPDF(
+client/src/pages/reports/LowStockReport.jsx:        exportColumns,
+client/src/pages/reports/LowStockReport.jsx:      exportToExcel(
+client/src/pages/reports/LowStockReport.jsx:        exportColumns,
+client/src/pages/reports/LowStockReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/LowStockReport.jsx:            className="export-btn"
+client/src/pages/reports/LowStockReport.jsx:            className="export-btn"
+client/src/pages/reports/ARReportsPage.css:.export-buttons {
+client/src/pages/reports/ARReportsPage.css:.export-btn {
+client/src/pages/reports/ExpensesReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/ExpensesReport.jsx:export default function ExpensesReport() {
+client/src/pages/reports/ExpensesReport.jsx:      console.error('No data to export');
+client/src/pages/reports/ExpensesReport.jsx:    // Column definitions for export (only essential fields)
+client/src/pages/reports/ExpensesReport.jsx:    const exportColumns = [
+client/src/pages/reports/ExpensesReport.jsx:    const exportOptions = {
+client/src/pages/reports/ExpensesReport.jsx:      exportToPDF(
+client/src/pages/reports/ExpensesReport.jsx:        exportColumns,
+client/src/pages/reports/ExpensesReport.jsx:        exportOptions
+client/src/pages/reports/ExpensesReport.jsx:      exportToExcel(
+client/src/pages/reports/ExpensesReport.jsx:        exportColumns,
+client/src/pages/reports/ExpensesReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/ExpensesReport.jsx:            className="export-btn"
+client/src/pages/reports/ExpensesReport.jsx:            className="export-btn"
+client/src/pages/reports/DSOReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/DSOReport.jsx:export default function DSOReport() {
+client/src/pages/reports/DSOReport.jsx:      console.error('No data to export');
+client/src/pages/reports/DSOReport.jsx:    // Prepare data for export
+client/src/pages/reports/DSOReport.jsx:    const exportData = [
+client/src/pages/reports/DSOReport.jsx:    // Column definitions for export
+client/src/pages/reports/DSOReport.jsx:    const exportColumns = [
+client/src/pages/reports/DSOReport.jsx:      exportToPDF(
+client/src/pages/reports/DSOReport.jsx:        exportData,
+client/src/pages/reports/DSOReport.jsx:        exportColumns,
+client/src/pages/reports/DSOReport.jsx:      exportToExcel(
+client/src/pages/reports/DSOReport.jsx:        exportData,
+client/src/pages/reports/DSOReport.jsx:        exportColumns,
+client/src/pages/reports/DSOReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/DSOReport.jsx:            className="export-btn"
+client/src/pages/reports/DSOReport.jsx:            className="export-btn"
+client/src/pages/reports/SupplierAnalysisReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/SupplierAnalysisReport.jsx:export default function SupplierAnalysisReport() {
+client/src/pages/reports/SupplierAnalysisReport.jsx:      console.error('No data to export');
+client/src/pages/reports/SupplierAnalysisReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/SupplierAnalysisReport.jsx:    const exportColumns = [
+client/src/pages/reports/SupplierAnalysisReport.jsx:      exportToPDF(
+client/src/pages/reports/SupplierAnalysisReport.jsx:        exportColumns,
+client/src/pages/reports/SupplierAnalysisReport.jsx:      exportToExcel(
+client/src/pages/reports/SupplierAnalysisReport.jsx:        exportColumns,
+client/src/pages/reports/SupplierAnalysisReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/SupplierAnalysisReport.jsx:            className="export-btn"
+client/src/pages/reports/SupplierAnalysisReport.jsx:            className="export-btn"
+client/src/pages/reports/FinancialReports.css:.export-buttons {
+client/src/pages/reports/FinancialReports.css:.export-btn {
+client/src/pages/reports/FinancialReports.css:.export-btn {
+client/src/pages/reports/TopDebtorsReport.css:.top-debtors-report .export-buttons {
+client/src/pages/reports/TopDebtorsReport.css:.top-debtors-report .export-btn {
+client/src/pages/reports/SalesReports.css:.export-buttons {
+client/src/pages/reports/SalesReports.css:.export-btn {
+client/src/pages/reports/InventoryMovementReport.css:.inventory-movement-report .export-buttons {
+client/src/pages/reports/InventoryMovementReport.css:.inventory-movement-report .export-btn {
+client/src/pages/reports/ProfitLossReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/ProfitLossReport.jsx:export default function ProfitLossReport() {
+client/src/pages/reports/ProfitLossReport.jsx:      console.error('No data to export');
+client/src/pages/reports/ProfitLossReport.jsx:    // Prepare data for export
+client/src/pages/reports/ProfitLossReport.jsx:    const exportData = [
+client/src/pages/reports/ProfitLossReport.jsx:    // Column definitions for export
+client/src/pages/reports/ProfitLossReport.jsx:    const exportColumns = [
+client/src/pages/reports/ProfitLossReport.jsx:      exportToPDF(
+client/src/pages/reports/ProfitLossReport.jsx:        exportData,
+client/src/pages/reports/ProfitLossReport.jsx:        exportColumns,
+client/src/pages/reports/ProfitLossReport.jsx:      exportToExcel(
+client/src/pages/reports/ProfitLossReport.jsx:        exportData,
+client/src/pages/reports/ProfitLossReport.jsx:        exportColumns,
+client/src/pages/reports/ProfitLossReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/ProfitLossReport.jsx:            className="export-btn"
+client/src/pages/reports/ProfitLossReport.jsx:            className="export-btn"
+client/src/pages/reports/BOMUsageReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/BOMUsageReport.jsx:export default function BOMUsageReport() {
+client/src/pages/reports/BOMUsageReport.jsx:      console.error('No data to export');
+client/src/pages/reports/BOMUsageReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/BOMUsageReport.jsx:    const exportColumns = [
+client/src/pages/reports/BOMUsageReport.jsx:      exportToPDF(
+client/src/pages/reports/BOMUsageReport.jsx:        exportColumns,
+client/src/pages/reports/BOMUsageReport.jsx:      exportToExcel(
+client/src/pages/reports/BOMUsageReport.jsx:        exportColumns,
+client/src/pages/reports/BOMUsageReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/BOMUsageReport.jsx:            className="export-btn"
+client/src/pages/reports/BOMUsageReport.jsx:            className="export-btn"
+client/src/pages/reports/StockLevelReport.jsx:import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+client/src/pages/reports/StockLevelReport.jsx:export default function StockLevelReport() {
+client/src/pages/reports/StockLevelReport.jsx:      console.error('No data to export');
+client/src/pages/reports/StockLevelReport.jsx:    // Column definitions for export (matching the grid columns)
+client/src/pages/reports/StockLevelReport.jsx:    const exportColumns = [
+client/src/pages/reports/StockLevelReport.jsx:      exportToPDF(
+client/src/pages/reports/StockLevelReport.jsx:        exportColumns,
+client/src/pages/reports/StockLevelReport.jsx:      exportToExcel(
+client/src/pages/reports/StockLevelReport.jsx:        exportColumns,
+client/src/pages/reports/StockLevelReport.jsx:        <div className="export-buttons">
+client/src/pages/reports/StockLevelReport.jsx:            className="export-btn"
+client/src/pages/reports/StockLevelReport.jsx:            className="export-btn"
+client/src/types/index.ts:export interface Customer {
+client/src/types/index.ts:export interface Item {
+client/src/types/index.ts:export type InvoiceStatus =
+client/src/types/index.ts:export type DiscountType = 'flat' | 'percentage';
+client/src/types/index.ts:export interface Discount {
+client/src/types/index.ts:export interface InvoiceItem {
+client/src/types/index.ts:export interface InvoicePayment {
+client/src/types/index.ts:export interface Invoice {
+client/src/types/index.ts:export interface CompanyInfo {
+client/src/types/index.ts:export interface PaymentMethod {
+client/src/types/index.ts:export interface Payment {
+client/src/types/index.ts:export interface BOMItem {
+client/src/types/index.ts:export interface BOM {
+client/src/types/index.ts:export interface Production {
+client/src/types/index.ts:export interface PriceHistory {
+client/src/types/index.ts:export interface ApiResponse<T> {
+client/src/types/index.ts:export interface PaginatedResponse<T> {
+client/src/types/index.ts:export interface SelectOption {
+client/src/types/index.ts:export interface TableColumn<T> {
+client/src/App.tsx:export default function App() {
+client/src/types.ts:export interface Customer {
+client/src/types.ts:export interface Invoice {
+client/src/types.ts:export interface InvoiceItem {
+client/src/types.ts:export interface Purchase {
+client/src/types.ts:export interface Item {
+client/src/types.ts:export interface Warehouse {

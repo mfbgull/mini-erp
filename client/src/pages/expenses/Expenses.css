@@ -237,6 +237,114 @@
   color: var(--text-secondary);
 }
 
+/* Mobile Expense Cards */
+.mobile-expenses-list {
+  display: none; /* Hidden by default, shown on mobile */
+  flex-direction: column;
+  gap: 15px;
+}
+
+.expense-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: var(--shadow-sm);
+}
+
+.expense-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.expense-no {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.expense-category {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.expense-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 5px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.detail-value {
+  text-align: right;
+  color: var(--text-primary);
+  flex: 1;
+  word-break: break-word;
+  text-align: right;
+}
+
+.amount {
+  font-weight: bold;
+  color: var(--error);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-paid {
+  background: #D4EDDA;
+  color: #155724;
+}
+
+.status-partially-paid {
+  background: #D1ECF1;
+  color: #0C5460;
+}
+
+.status-unpaid {
+  background: #F8D7DA;
+  color: #721C24;
+}
+
+.status-cancelled {
+  background: #F8F9FA;
+  color: #6C757D;
+}
+
+.expense-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
  /* Expense Form */
 .expense-form {
   display: flex;
@@ -325,22 +433,95 @@
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .expenses-actions {
     flex-direction: column;
   }
-  
+
   .export-buttons {
     width: 100%;
     justify-content: center;
   }
-  
+
   .form-row {
     flex-direction: column;
   }
-  
+
   .filter-row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  /* AG Grid desktop view - hide on mobile */
+  .desktop-view {
+    display: none !important;
+  }
+
+  /* Mobile expense list - show on mobile */
+  .mobile-expenses-list {
+    display: flex !important;
+  }
+
+  .expenses-content .ag-theme-quartz {
+    height: auto !important;
+    min-height: 300px;
+  }
+
+  /* AG Grid mobile optimizations - fallback if displayed */
+  .ag-root-wrapper {
+    border: none !important;
+  }
+
+  .ag-header {
+    display: none !important;
+  }
+
+  .ag-center-cols-container {
+    width: 100% !important;
+  }
+
+  .ag-row {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .ag-cell {
+    padding: 8px 4px !important;
+    border: none !important;
+    border-right: 1px solid var(--border-color) !important;
+    word-break: break-word;
+  }
+
+  .ag-cell:last-child {
+    border-right: none !important;
+  }
+
+  /* Specific styling for mobile view */
+  .ag-theme-quartz .ag-root-wrapper,
+  .ag-theme-quartz .ag-root {
+    height: auto !important;
+    min-height: 400px;
+  }
+
+  .ag-theme-quartz .ag-header {
+    display: none;
+  }
+
+  .ag-theme-quartz .ag-center-cols-container {
+    width: 100% !important;
+  }
+
+  .ag-theme-quartz .ag-cell {
+    padding: 10px 8px !important;
+    font-size: 14px;
+  }
+
+  .ag-theme-quartz .ag-row {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
 }

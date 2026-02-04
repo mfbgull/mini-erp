@@ -12,9 +12,10 @@ interface DataTableProps {
   columns: Column[];
   data: any[];
   onRowClick?: (row: any) => void;
+  className?: string;
 }
 
-export default function DataTable({ columns, data, onRowClick }: DataTableProps) {
+export default function DataTable({ columns, data, onRowClick, className }: DataTableProps) {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -41,7 +42,7 @@ export default function DataTable({ columns, data, onRowClick }: DataTableProps)
 
   return (
     <div className="data-table-container">
-      <table className="data-table">
+      <table className={`data-table ${className || ''}`}>
         <thead>
           <tr>
             {columns.map((col) => (
@@ -75,8 +76,8 @@ export default function DataTable({ columns, data, onRowClick }: DataTableProps)
                 className={onRowClick ? 'clickable' : ''}
               >
                 {columns.map((col) => (
-                  <td 
-                    key={col.key} 
+                  <td
+                    key={col.key}
                     data-label={col.label}
                   >
                     {col.render ? col.render(row[col.key], row) : row[col.key]}

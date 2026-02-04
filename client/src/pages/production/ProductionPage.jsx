@@ -166,7 +166,9 @@ export default function ProductionPage() {
               <div className="summary-value">{productions.length}</div>
             </div>
           </div>
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
+
+          {/* Desktop view - AG Grid */}
+          <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
             <AgGridReact
               rowData={productions}
               columnDefs={columnDefs}
@@ -181,6 +183,60 @@ export default function ProductionPage() {
               onRowClicked={(params) => handleRowClick(params.data)}
               rowSelection={{ mode: 'singleRow' }}
             />
+          </div>
+
+          {/* Mobile view - Card layout */}
+          <div className="mobile-production-list">
+            {productions.map((production) => (
+              <div
+                key={production.id}
+                className="production-card"
+                onClick={() => handleRowClick(production)}
+              >
+                <div className="production-header">
+                  <div className="production-no">{production.production_no}</div>
+                  <div className="production-date">{format(new Date(production.production_date), 'dd MMM yyyy')}</div>
+                </div>
+
+                <div className="production-details">
+                  <div className="detail-row">
+                    <span className="detail-label">Output Item:</span>
+                    <span className="detail-value">{production.output_item_name}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Quantity:</span>
+                    <span className="detail-value production-output">
+                      {parseFloat(production.output_quantity).toFixed(2)} {production.output_uom}
+                    </span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Warehouse:</span>
+                    <span className="detail-value">{production.finished_goods_warehouse_name}</span>
+                  </div>
+
+                  <div className="detail-row">
+                    <span className="detail-label">Remarks:</span>
+                    <span className="detail-value">{production.remarks || '—'}</span>
+                  </div>
+                </div>
+
+                <div className="production-actions">
+                  <Button
+                    variant="danger"
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProduction(production);
+                    }}
+                    disabled={deleteProductionMutation.isPending}
+                  >
+                    {deleteProductionMutation.isPending ? 'Deleting...' : 'Delete'}
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </>
       )}
