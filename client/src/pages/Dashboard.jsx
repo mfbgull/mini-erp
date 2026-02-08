@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { Package, DollarSign, ShoppingCart, Factory, BarChart3, ClipboardList, AlertTriangle } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -297,7 +298,7 @@ export default function Dashboard() {
       <div className="dashboard-bottom">
         {/* Low Stock Alerts */}
         <div className="alert-card">
-          <h3>⚠️ Low Stock Alerts</h3>
+          <h3><AlertTriangle size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Low Stock Alerts</h3>
           {stats.lowStockItems.length === 0 ? (
             <p className="no-alerts">All items are well stocked!</p>
           ) : (
@@ -347,27 +348,27 @@ export default function Dashboard() {
           <h3>Quick Actions</h3>
           <div className="quick-actions-grid">
             <Link to="/inventory/items" className="quick-action-btn">
-              <span className="action-icon">📦</span>
+              <Package className="action-icon" size={28} strokeWidth={1.5} />
               <span>New Item</span>
             </Link>
             <Link to="/sales" className="quick-action-btn">
-              <span className="action-icon">💰</span>
+              <DollarSign className="action-icon" size={28} strokeWidth={1.5} />
               <span>Record Sale</span>
             </Link>
             <Link to="/purchases" className="quick-action-btn">
-              <span className="action-icon">🛒</span>
+              <ShoppingCart className="action-icon" size={28} strokeWidth={1.5} />
               <span>New Purchase</span>
             </Link>
             <Link to="/production" className="quick-action-btn">
-              <span className="action-icon">🏭</span>
+              <Factory className="action-icon" size={28} strokeWidth={1.5} />
               <span>Production</span>
             </Link>
             <Link to="/inventory/stock-movements" className="quick-action-btn">
-              <span className="action-icon">📊</span>
+              <BarChart3 className="action-icon" size={28} strokeWidth={1.5} />
               <span>Stock Movement</span>
             </Link>
             <Link to="/bom" className="quick-action-btn">
-              <span className="action-icon">📋</span>
+              <ClipboardList className="action-icon" size={28} strokeWidth={1.5} />
               <span>BOM</span>
             </Link>
           </div>

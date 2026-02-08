@@ -306,7 +306,12 @@
 }
 
 .action-icon {
-  font-size: 1.8rem;
+  color: var(--primary);
+  transition: color 0.2s ease;
+}
+
+.quick-action-btn:hover .action-icon {
+  color: white;
 }
 
 /* Responsive Design */
