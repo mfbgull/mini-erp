@@ -14,7 +14,12 @@ import {
   PieChart,
   Wallet,
   Target,
-  TrendingDown
+  TrendingDown,
+  TrendingUp as TrendingUpIcon,
+  Bell,
+  Gem,
+  ClipboardList,
+  Banknote
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../utils/api';
@@ -225,7 +230,7 @@ export default function ReportsDashboard() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-            📈
+            <TrendingUpIcon size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Sales</div>
@@ -236,7 +241,7 @@ export default function ReportsDashboard() {
 
         <div className="stat-card" style={{ borderColor: stats.pendingPayments > 0 ? '#f97316' : undefined }}>
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }}>
-            💰
+            <DollarSign size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Outstanding</div>
@@ -247,7 +252,7 @@ export default function ReportsDashboard() {
 
         <div className="stat-card alert">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
-            ⚠️
+            <AlertTriangle size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Overdue</div>
@@ -258,7 +263,7 @@ export default function ReportsDashboard() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
-            📦
+            <Package size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Items</div>
@@ -269,7 +274,7 @@ export default function ReportsDashboard() {
 
         <div className="stat-card" style={{ borderColor: stats.lowStockItems > 0 ? '#f59e0b' : undefined }}>
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-            🔔
+            <Bell size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Low Stock</div>
@@ -280,7 +285,7 @@ export default function ReportsDashboard() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
-            💎
+            <Gem size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Inventory Value</div>
@@ -293,27 +298,27 @@ export default function ReportsDashboard() {
       {/* Quick Actions - ItemsPage Style */}
       <div className="quick-actions">
         <Link to="/reports/sales-summary" className="quick-action-btn">
-          <span className="action-icon">📊</span>
+          <BarChart3 className="action-icon" size={24} />
           <span className="action-text">Sales Summary</span>
         </Link>
         <Link to="/reports/accounts-receivable" className="quick-action-btn">
-          <span className="action-icon">📋</span>
+          <ClipboardList className="action-icon" size={24} />
           <span className="action-text">AR Aging</span>
         </Link>
         <Link to="/reports/low-stock" className="quick-action-btn">
-          <span className="action-icon">⚠️</span>
+          <AlertTriangle className="action-icon" size={24} />
           <span className="action-text">Low Stock</span>
         </Link>
         <Link to="/reports/profit-loss" className="quick-action-btn">
-          <span className="action-icon">📈</span>
+          <TrendingUp className="action-icon" size={24} />
           <span className="action-text">P&L Report</span>
         </Link>
         <Link to="/reports/stock-valuation" className="quick-action-btn">
-          <span className="action-icon">💰</span>
+          <DollarSign className="action-icon" size={24} />
           <span className="action-text">Stock Value</span>
         </Link>
         <Link to="/reports/cash-flow" className="quick-action-btn">
-          <span className="action-icon">💵</span>
+          <Banknote className="action-icon" size={24} />
           <span className="action-text">Cash Flow</span>
         </Link>
       </div>
