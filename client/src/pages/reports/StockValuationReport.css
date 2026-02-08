@@ -179,3 +179,208 @@
   margin: 0;
   color: var(--text-secondary);
 }
+
+/* Mobile Stock Valuation Cards */
+.mobile-stock-valuation-list {
+  display: none; /* Hidden by default, shown on mobile */
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.stock-valuation-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.stock-valuation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stock-valuation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.item-name {
+  font-weight: bold;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.item-code {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.stock-valuation-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 5px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.detail-value {
+  text-align: right;
+  color: var(--text-primary);
+  flex: 1;
+  word-break: break-word;
+  text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stock-valuation-report {
+    padding: 16px;
+  }
+
+  /* AG Grid desktop view - hide on mobile */
+  .desktop-view {
+    display: none !important;
+  }
+
+  /* Mobile stock valuation list - show on mobile */
+  .mobile-stock-valuation-list {
+    display: flex !important;
+  }
+
+  .stock-valuation-report .report-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+  }
+
+  .stock-valuation-report .export-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stock-valuation-report .report-filters {
+    padding: 15px;
+  }
+
+  .stock-valuation-report .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stock-valuation-report .filter-row > * {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .stock-valuation-report .report-summary {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+
+  .stock-valuation-report .summary-card {
+    padding: 15px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    text-align: center !important;
+  }
+
+  .stock-valuation-report .summary-content {
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  .stock-valuation-report .summary-icon {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.2rem !important;
+    margin-bottom: var(--space-xs) !important;
+  }
+
+  .stock-valuation-report .summary-value {
+    font-size: 1.2rem !important;
+  }
+
+  .stock-valuation-report .ag-theme-quartz {
+    height: auto !important;
+    min-height: 400px;
+  }
+
+  .stock-valuation-report .ag-root-wrapper {
+    border: none !important;
+  }
+
+  .stock-valuation-report .ag-header {
+    display: none !important;
+  }
+
+  .stock-valuation-report .ag-center-cols-container {
+    width: 100% !important;
+  }
+
+  .stock-valuation-report .ag-row {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .stock-valuation-report .ag-cell {
+    padding: 8px 4px !important;
+    border: none !important;
+    border-right: 1px solid var(--border-color) !important;
+    word-break: break-word;
+  }
+
+  .stock-valuation-report .ag-cell:last-child {
+    border-right: none !important;
+  }
+
+  /* Specific styling for mobile view */
+  .stock-valuation-report .ag-theme-quartz .ag-root-wrapper,
+  .stock-valuation-report .ag-theme-quartz .ag-root {
+    height: auto !important;
+    min-height: 400px;
+  }
+
+  .stock-valuation-report .ag-theme-quartz .ag-header {
+    display: none;
+  }
+
+  .stock-valuation-report .ag-theme-quartz .ag-center-cols-container {
+    width: 100% !important;
+  }
+
+  .stock-valuation-report .ag-theme-quartz .ag-cell {
+    padding: 10px 8px !important;
+    font-size: 14px;
+  }
+
+  .stock-valuation-report .ag-theme-quartz .ag-row {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+}
