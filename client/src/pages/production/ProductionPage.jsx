@@ -8,6 +8,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import SearchableSelect from '../../components/common/SearchableSelect';
+import { AlertTriangle } from 'lucide-react';
 import './ProductionPage.css';
 
 export default function ProductionPage() {
@@ -702,11 +703,11 @@ function ProductionForm({ onClose, onSuccess }) {
                           <span className={isSufficient ? 'stock-sufficient' : 'stock-insufficient'}>
                             Stock: {stockAvailable} {item.unit_of_measure}
                           </span>
-                          {!isSufficient && (
-                            <span className="insufficient-warning">
-                              ⚠ Insufficient stock
-                            </span>
-                          )}
+                            {!isSufficient && (
+                              <span className="insufficient-warning">
+                                <AlertTriangle size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />Insufficient stock
+                              </span>
+                            )}
                         </div>
                       </div>
                     </li>

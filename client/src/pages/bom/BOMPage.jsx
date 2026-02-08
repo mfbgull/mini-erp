@@ -9,6 +9,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import SearchableSelect from '../../components/common/SearchableSelect';
+import { ClipboardList, CheckCircle, Wrench, BarChart3, Factory, CalendarDays, Layers, Zap, AlertTriangle, Download, Package } from 'lucide-react';
 import './BOMPage.css';
 
 export default function BOMPage() {
@@ -264,7 +265,7 @@ export default function BOMPage() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            📋
+            <ClipboardList size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total BOMs</div>
@@ -275,7 +276,7 @@ export default function BOMPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
-            ✅
+            <CheckCircle size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Active BOMs</div>
@@ -286,7 +287,7 @@ export default function BOMPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            🔧
+            <Wrench size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Materials</div>
@@ -297,7 +298,7 @@ export default function BOMPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            📊
+            <BarChart3 size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Avg Materials</div>
@@ -308,7 +309,7 @@ export default function BOMPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            🏭
+            <Factory size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Finished Goods</div>
@@ -319,7 +320,7 @@ export default function BOMPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            📅
+            <CalendarDays size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Recently Updated</div>
@@ -330,7 +331,7 @@ export default function BOMPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            🔝
+            <Layers size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Complex BOMs</div>
@@ -341,7 +342,7 @@ export default function BOMPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            🔩
+            <Zap size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Simple BOMs</div>
@@ -352,7 +353,7 @@ export default function BOMPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)' }}>
-            ⚠️
+            <AlertTriangle size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Inactive BOMs</div>
@@ -365,35 +366,35 @@ export default function BOMPage() {
       {/* Quick Actions */}
       <div className="quick-actions">
         <button className="quick-action-btn" onClick={handleExport}>
-          <span className="action-icon">📥</span>
+          <Download className="action-icon" size={24} />
           <span className="action-text">Export to CSV</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/bom-usage')}
         >
-          <span className="action-icon">📊</span>
+          <BarChart3 className="action-icon" size={24} />
           <span className="action-text">BOM Usage Report</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/production')}
         >
-          <span className="action-icon">🏭</span>
+          <Factory className="action-icon" size={24} />
           <span className="action-text">Production</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/inventory/stock-movements')}
         >
-          <span className="action-icon">📋</span>
+          <ClipboardList className="action-icon" size={24} />
           <span className="action-text">Stock Movements</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/inventory/items')}
         >
-          <span className="action-icon">📦</span>
+          <Package className="action-icon" size={24} />
           <span className="action-text">Items</span>
         </button>
       </div>
