@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Eye, Edit2 } from 'lucide-react';
+import { X, Eye, Edit2, Check, AlertTriangle, XCircle, MinusCircle, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../utils/formatters';
 import './SalesPreview.css';
@@ -26,12 +26,12 @@ export default function SalesPreview({ invoice, onClose, onView, onEdit }: Sales
 
   const getStatusInfo = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'paid': return { icon: '✓', color: '#15803d', bg: '#dcfce7' };
-      case 'partial': 
-      case 'partially paid': return { icon: '~', color: '#b45309', bg: '#fef3c7' };
-      case 'overdue': return { icon: '⚠', color: '#dc2626', bg: '#fee2e2' };
-      case 'cancelled': return { icon: '✕', color: '#6b7280', bg: '#f3f4f6' };
-      default: return { icon: '○', color: '#0369a1', bg: '#e0f2fe' };
+      case 'paid': return { icon: Check, color: '#15803d', bg: '#dcfce7' };
+      case 'partial':
+      case 'partially paid': return { icon: MinusCircle, color: '#b45309', bg: '#fef3c7' };
+      case 'overdue': return { icon: AlertTriangle, color: '#dc2626', bg: '#fee2e2' };
+      case 'cancelled': return { icon: XCircle, color: '#6b7280', bg: '#f3f4f6' };
+      default: return { icon: Info, color: '#0369a1', bg: '#e0f2fe' };
     }
   };
 
@@ -47,7 +47,7 @@ export default function SalesPreview({ invoice, onClose, onView, onEdit }: Sales
         >
           <div className="sales-preview-title-section">
             <div className="invoice-status-large">
-              <span className="status-icon">{statusInfo.icon}</span>
+              <span className="status-icon"><statusInfo.icon size={20} color={statusInfo.color} /></span>
               <span className="status-label" style={{ color: statusInfo.color }}>{invoice.status || 'Pending'}</span>
             </div>
             <span className="sales-preview-code">{invoice.invoice_no}</span>
@@ -105,7 +105,7 @@ export default function SalesPreview({ invoice, onClose, onView, onEdit }: Sales
 
           {/* Info Notice */}
           <div className="sales-info-notice">
-            <span className="notice-icon">ℹ️</span>
+            <span className="notice-icon"><Info size={16} /></span>
             <span className="notice-text">
               View full invoice details to see line items and payment history.
             </span>

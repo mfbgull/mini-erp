@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Edit2, Trash2 } from 'lucide-react';
+import { X, Edit2, Trash2, Check, AlertTriangle, MinusCircle, Circle, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../utils/formatters';
 import './InvoicePreview.css';
@@ -64,9 +64,9 @@ export default function InvoicePreview({ invoice, onClose, onEdit, onDelete }: I
           }}
         >
           <span className="status-icon">
-            {invoice.status?.toLowerCase() === 'paid' ? '✓' : 
-             invoice.status?.toLowerCase() === 'overdue' ? '⚠' :
-             invoice.status?.toLowerCase() === 'partial' ? '~' : '○'}
+            {invoice.status?.toLowerCase() === 'paid' ? <Check size={18} color={statusInfo.color} /> :
+             invoice.status?.toLowerCase() === 'overdue' ? <AlertTriangle size={18} color={statusInfo.color} /> :
+             invoice.status?.toLowerCase() === 'partial' ? <MinusCircle size={18} color={statusInfo.color} /> : <Circle size={18} color={statusInfo.color} />}
           </span>
           <span className="status-label" style={{ color: statusInfo.color }}>
             {invoice.status || 'Pending'}
@@ -144,7 +144,7 @@ export default function InvoicePreview({ invoice, onClose, onEdit, onDelete }: I
           {/* Overdue Alert */}
           {isOverdue && parseFloat(String(invoice.balance_amount || 0)) > 0 && (
             <div className="stock-alert error preview-alert">
-              <span className="alert-icon">⚠️</span>
+              <AlertCircle className="alert-icon" size={18} />
               <span className="alert-text">Invoice is overdue - balance due</span>
             </div>
           )}
