@@ -480,10 +480,15 @@ function ARAgingReport({ data, loading, asOfDate, formatCurrency }) {
             paginationPageSizeSelector={[10, 15, 25, 50]}
             rowSelection={{ mode: 'singleRow' }}
             onGridReady={(params) => {
-              params.api.sizeColumnsToFit({
-                defaultMinWidth: 100,
-                columnLimits: []
-              });
+              // Check if the grid is visible before sizing columns
+              setTimeout(() => {
+                if (params.api && params.columnApi) {
+                  const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                  if (gridElement && gridElement.clientWidth > 0) {
+                    params.columnApi.autoSizeAllColumns();
+                  }
+                }
+              }, 100); // Small delay to ensure grid is rendered
             }}
           />
         </div>
@@ -677,10 +682,15 @@ function TopDebtorsReport({ data, loading, formatCurrency }) {
           paginationPageSizeSelector={[10, 20, 50, 100]}
           rowSelection="single"
           onGridReady={(params) => {
-            params.api.sizeColumnsToFit({
-              defaultMinWidth: 100,
-              columnLimits: []
-            });
+            // Check if the grid is visible before sizing columns
+            setTimeout(() => {
+              if (params.api && params.columnApi) {
+                const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                if (gridElement && gridElement.clientWidth > 0) {
+                  params.columnApi.autoSizeAllColumns();
+                }
+              }
+            }, 100); // Small delay to ensure grid is rendered
           }}
         />
       </div>
