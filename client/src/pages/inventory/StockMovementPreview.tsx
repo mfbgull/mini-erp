@@ -1,5 +1,5 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Download, Upload, Factory, ArrowLeftRight, Settings, ClipboardList, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import './StockMovementPreview.css';
 
@@ -24,12 +24,12 @@ export default function StockMovementPreview({ movement, onClose }: StockMovemen
 
   const getMovementTypeInfo = (type: string) => {
     switch (type) {
-      case 'PURCHASE': return { icon: '📥', label: 'Purchase', color: '#22c55e', bg: '#dcfce7' };
-      case 'SALE': return { icon: '📤', label: 'Sale', color: '#ef4444', bg: '#fee2e2' };
-      case 'PRODUCTION': return { icon: '🏭', label: 'Production', color: '#8b5cf6', bg: '#ede9fe' };
-      case 'TRANSFER': return { icon: '🔄', label: 'Transfer', color: '#3b82f6', bg: '#dbeafe' };
-      case 'ADJUSTMENT': return { icon: '⚙️', label: 'Adjustment', color: '#f59e0b', bg: '#fef3c7' };
-      default: return { icon: '📋', label: type, color: '#6b7280', bg: '#f3f4f6' };
+      case 'PURCHASE': return { icon: Download, label: 'Purchase', color: '#22c55e', bg: '#dcfce7' };
+      case 'SALE': return { icon: Upload, label: 'Sale', color: '#ef4444', bg: '#fee2e2' };
+      case 'PRODUCTION': return { icon: Factory, label: 'Production', color: '#8b5cf6', bg: '#ede9fe' };
+      case 'TRANSFER': return { icon: ArrowLeftRight, label: 'Transfer', color: '#3b82f6', bg: '#dbeafe' };
+      case 'ADJUSTMENT': return { icon: Settings, label: 'Adjustment', color: '#f59e0b', bg: '#fef3c7' };
+      default: return { icon: ClipboardList, label: type, color: '#6b7280', bg: '#f3f4f6' };
     }
   };
 
@@ -45,7 +45,7 @@ export default function StockMovementPreview({ movement, onClose }: StockMovemen
         >
           <div className="movement-preview-title-section">
             <div className="movement-type-large">
-              <span className="type-icon">{typeInfo.icon}</span>
+              <span className="type-icon"><typeInfo.icon size={24} color={typeInfo.color} /></span>
               <span className="type-label" style={{ color: typeInfo.color }}>{typeInfo.label}</span>
             </div>
             <span className="movement-preview-code">#{movement.movement_no}</span>
@@ -102,7 +102,7 @@ export default function StockMovementPreview({ movement, onClose }: StockMovemen
 
           {/* Info Notice */}
           <div className="movement-info-notice">
-            <span className="notice-icon">ℹ️</span>
+            <span className="notice-icon"><Info size={16} /></span>
             <span className="notice-text">
               This {movement.movement_type.toLowerCase()} movement has been recorded and stock levels updated.
             </span>

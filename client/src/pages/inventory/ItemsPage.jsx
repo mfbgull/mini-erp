@@ -12,7 +12,7 @@ import FormInput from '../../components/common/FormInput';
 import { CompactItemCard } from '../../components/common/CompactItemCard';
 import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
 import ItemPreview from './ItemPreview';
-import { Search, X, ArrowLeft, Building2 } from 'lucide-react';
+import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet } from 'lucide-react';
 import './ItemsPage.css';
 
 export default function ItemsPage() {
@@ -359,7 +359,7 @@ export default function ItemsPage() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            📦
+            <Package size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Items</div>
@@ -370,7 +370,7 @@ export default function ItemsPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            💰
+            <DollarSign size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Stock Value</div>
@@ -381,7 +381,7 @@ export default function ItemsPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            📊
+            <BarChart3 size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Stock</div>
@@ -392,7 +392,7 @@ export default function ItemsPage() {
 
         <div className="stat-card" style={{ borderColor: stats.lowStockAlerts > 0 ? '#f5576c' : undefined }}>
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            ⚠️
+            <AlertTriangle size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Low Stock</div>
@@ -403,7 +403,7 @@ export default function ItemsPage() {
 
         <div className="stat-card" style={{ borderColor: stats.outOfStock > 0 ? '#dc3545' : undefined }}>
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)' }}>
-            🚫
+            <Ban size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Out of Stock</div>
@@ -414,7 +414,7 @@ export default function ItemsPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
-            📁
+            <FolderOpen size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Categories</div>
@@ -425,7 +425,7 @@ export default function ItemsPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            🔩
+            <Wrench size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Raw Materials</div>
@@ -436,7 +436,7 @@ export default function ItemsPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            🏭
+            <Factory size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Finished Goods</div>
@@ -449,25 +449,25 @@ export default function ItemsPage() {
       {/* Quick Actions */}
       <div className="quick-actions">
         <button className="quick-action-btn" onClick={handleExport}>
-          <span className="action-icon">📥</span>
+          <Download className="action-icon" size={24} />
           <span className="action-text">Export to CSV</span>
         </button>
         <button className="quick-action-btn" onClick={handleImport}>
-          <span className="action-icon">📥</span>
+          <Upload className="action-icon" size={24} />
           <span className="action-text">Import Items</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/low-stock')}
         >
-          <span className="action-icon">⚠️</span>
+          <AlertTriangle className="action-icon" size={24} />
           <span className="action-text">Low Stock Report</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/stock-valuation')}
         >
-          <span className="action-icon">💰</span>
+          <Wallet className="action-icon" size={24} />
           <span className="action-text">Stock Valuation</span>
         </button>
       </div>
@@ -499,14 +499,14 @@ export default function ItemsPage() {
         </div>
       ) : filteredItems.length === 0 && searchTerm ? (
         <div className="no-results">
-          <div className="no-results-icon">🔍</div>
+          <Search className="no-results-icon" size={48} />
           <h3>No items found</h3>
           <p>No items match "{searchTerm}"</p>
           <Button variant="secondary" onClick={() => setSearchTerm('')}>Clear Search</Button>
         </div>
       ) : filteredItems.length === 0 && warehouseId ? (
         <div className="no-results">
-          <div className="no-results-icon">📦</div>
+          <Package className="no-results-icon" size={48} />
           <h3>No items in this warehouse</h3>
           <p>This warehouse doesn't have any items yet.</p>
           <Button variant="secondary" onClick={handleClearWarehouseFilter}>View All Items</Button>

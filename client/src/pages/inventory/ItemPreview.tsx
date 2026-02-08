@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { X } from 'lucide-react';
+import { X, AlertTriangle, Ban } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import './ItemPreview.css';
 
@@ -143,14 +143,14 @@ export default function ItemPreview({ item, onClose }: ItemPreviewProps) {
           {/* Stock Alerts */}
           {isLowStock && (
             <div className="stock-alert preview-alert">
-              <span className="alert-icon">⚠️</span>
+              <AlertTriangle className="alert-icon" size={18} />
               <span className="alert-text">Low stock: below reorder level</span>
             </div>
           )}
 
           {isOutOfStock && (
             <div className="stock-alert error preview-alert">
-              <span className="alert-icon">🚫</span>
+              <Ban className="alert-icon" size={18} />
               <span className="alert-text">Out of stock</span>
             </div>
           )}
