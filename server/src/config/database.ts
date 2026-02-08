@@ -552,6 +552,30 @@ function runProductionInputsWarehouseMigration(): void {
   }
 }
 
+function runMobileInvoiceMigration(): void {
+  try {
+    const taxRatesTableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='tax_rates'
+    `).get() as { name: string } | undefined;
+
+    if (!taxRatesTableCheck) {
+      console.log('Running mobile invoice tables migration...');
+
+      const mobileInvoiceSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-mobile-invoice-tables.sql'),
+        'utf8'
+      );
+
+      db.exec(mobileInvoiceSQL);
+
+      console.log('✅ Mobile invoice tables migration completed!');
+    }
+  } catch (error: any) {
+    console.error('Mobile invoice migration error:', error.message);
+  }
+}
+
 initializeDatabase();
 runExpensesMigration();
 runPurchasesMigration();
@@ -562,5 +586,6 @@ runSupplierLedgerMigration();
 runActivityLogMigration();
 runRawMaterialsWarehouseMigration();
 runProductionInputsWarehouseMigration();
+runMobileInvoiceMigration();
 
 export default db;
