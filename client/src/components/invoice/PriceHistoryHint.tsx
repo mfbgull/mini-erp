@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { DollarSign, AlertTriangle, Info, ArrowRight, ArrowUp, ArrowDown, Check } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import './PriceHistoryHint.css';
 
@@ -133,7 +134,7 @@ export default function PriceHistoryHint({ history, currentPrice, onClose }: Pri
 
       <div className="hint-content">
         <div className="hint-header">
-          <span className="hint-icon">💰</span>
+          <DollarSign className="hint-icon" size={20} />
           <h4>Price History</h4>
         </div>
 
@@ -159,7 +160,7 @@ export default function PriceHistoryHint({ history, currentPrice, onClose }: Pri
         {difference && (
           <div className={`price-difference ${difference.same ? 'same' : difference.increased ? 'increased' : 'decreased'}`}>
             <span className="diff-icon">
-              {difference.same ? '→' : difference.increased ? '↑' : '↓'}
+              {difference.same ? <ArrowRight size={16} /> : difference.increased ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
             </span>
             <span className="diff-text">
               {difference.same
@@ -186,7 +187,7 @@ export default function PriceHistoryHint({ history, currentPrice, onClose }: Pri
 
         {difference && !difference.same && (
           <div className={`price-recommendation ${difference.increased ? 'warning' : 'info'}`}>
-            <span className="rec-icon">{difference.increased ? '⚠️' : 'ℹ️'}</span>
+            <span className="rec-icon">{difference.increased ? <AlertTriangle size={16} /> : <Info size={16} />}</span>
             <span className="rec-text">
               {difference.increased
                 ? 'Price increased. Confirm with customer if this is intentional.'
@@ -198,7 +199,7 @@ export default function PriceHistoryHint({ history, currentPrice, onClose }: Pri
         {/* Countdown timer - show countdown when not hovering */}
         {isHovering ? (
           <div className="countdown-timer keep-open">
-            ✓ Tooltip will stay open while hovering - move mouse away to close
+            <Check size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} /> Tooltip will stay open while hovering - move mouse away to close
           </div>
         ) : !isHovering && countdown !== null && countdown > 0 ? (
           <div className="countdown-timer">

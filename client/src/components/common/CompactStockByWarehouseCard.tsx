@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Package, MapPin } from 'lucide-react';
 import './CompactStockByWarehouseCard.css';
 
 interface StockByWarehouse {
@@ -45,7 +45,7 @@ export default function CompactStockByWarehouseCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">📦</div>
+          <Package className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching stock' : 'No stock found'}
           </div>
@@ -92,7 +92,7 @@ export default function CompactStockByWarehouseCardView({
                   <span className="compact-stock-unit">{item.unit_of_measure}</span>
                 </div>
                 {hasMultipleWarehouses && (
-                  <span className="compact-multi-badge" title="Available in multiple warehouses">📍</span>
+                  <span className="compact-multi-badge" title="Available in multiple warehouses"><MapPin size={14} /></span>
                 )}
               </div>
             </div>

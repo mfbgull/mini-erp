@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, ClipboardList } from 'lucide-react';
 import './MobileCardView.css';
 
 interface Customer {
@@ -41,7 +41,7 @@ export default function MobileCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">📋</div>
+          <ClipboardList className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching customers' : 'No customers found'}
           </div>

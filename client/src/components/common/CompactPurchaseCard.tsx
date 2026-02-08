@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Eye, Edit2, Plus } from 'lucide-react';
+import { Search, Eye, Edit2, Plus, ShoppingCart } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../utils/formatters';
 import './CompactPurchaseCard.css';
@@ -55,7 +55,7 @@ export default function CompactPurchaseCardView({
         </div>
         
         <div className="mobile-empty-state">
-          <div className="empty-icon">🛒</div>
+          <ShoppingCart className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching purchases' : 'No purchases found'}
           </div>

@@ -6,7 +6,7 @@ import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { AgGridReact } from 'ag-grid-react';
-import { Package, ArrowUp, ArrowDown, ArrowRight, Filter } from 'lucide-react';
+import { Package, ArrowUp, ArrowDown, ArrowRight, Filter, ClipboardList } from 'lucide-react';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -365,7 +365,7 @@ export default function StockMovementPage() {
           <div className="mobile-movements-container">
             {filteredMovements.length === 0 ? (
               <div className="no-results">
-                <div className="no-results-icon">📋</div>
+                <ClipboardList className="no-results-icon" size={48} />
                 <h3>No movements found</h3>
                 <p>{searchTerm ? `No movements match "${searchTerm}"` : 'No stock movements recorded'}</p>
                 {searchTerm && (

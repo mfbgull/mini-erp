@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, FileText } from 'lucide-react';
 import './MobileCardView.css';
 
 interface Invoice {
@@ -48,7 +48,7 @@ export default function MobileInvoiceCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">📄</div>
+          <FileText className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching invoices' : 'No invoices found'}
           </div>

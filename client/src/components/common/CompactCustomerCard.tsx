@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Eye, Edit2, CreditCard } from 'lucide-react';
+import { Search, Eye, Edit2, CreditCard, Users } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import './CompactCustomerCard.css';
 
@@ -64,7 +64,7 @@ export default function CompactCustomerCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">👥</div>
+          <Users className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching customers' : 'No customers found'}
           </div>

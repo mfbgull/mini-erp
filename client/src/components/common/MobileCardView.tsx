@@ -1,5 +1,6 @@
 import { Customer } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
+import { ClipboardList } from 'lucide-react';
 
 interface MobileCardViewProps {
   customers: Customer[];
@@ -17,7 +18,7 @@ export default function MobileCardView({
   if (customers.length === 0) {
     return (
       <div className="mobile-empty-state">
-        <div className="empty-icon">📋</div>
+        <ClipboardList className="empty-icon" size={48} />
         <div className="empty-title">No customers found</div>
         <div className="empty-subtitle">Create your first customer to get started</div>
       </div>

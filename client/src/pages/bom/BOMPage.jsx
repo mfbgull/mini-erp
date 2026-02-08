@@ -9,7 +9,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import SearchableSelect from '../../components/common/SearchableSelect';
-import { ClipboardList, CheckCircle, Wrench, BarChart3, Factory, CalendarDays, Layers, Zap, AlertTriangle, Download, Package } from 'lucide-react';
+import { ClipboardList, CheckCircle, Wrench, BarChart3, Factory, CalendarDays, Layers, Zap, AlertTriangle, Download, Package, X } from 'lucide-react';
 import './BOMPage.css';
 
 export default function BOMPage() {
@@ -749,7 +749,7 @@ function BOMForm({ bom, onClose, onSuccess }) {
                         onClick={() => removeBOMItem(index)}
                         title="Remove"
                       >
-                        ✕
+                        <X size={18} />
                       </button>
                     )}
                   </div>

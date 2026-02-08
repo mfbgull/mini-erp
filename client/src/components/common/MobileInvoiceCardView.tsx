@@ -1,5 +1,6 @@
 import { Invoice } from '../../types';
 import { formatCurrency, formatDate } from '../../utils/formatters';
+import { FileText } from 'lucide-react';
 
 interface MobileInvoiceCardViewProps {
   invoices: Invoice[];
@@ -11,7 +12,7 @@ export default function MobileInvoiceCardView({ invoices, onView, onEdit }: Mobi
   if (invoices.length === 0) {
     return (
       <div className="mobile-empty-state">
-        <div className="empty-icon">📄</div>
+        <FileText className="empty-icon" size={48} />
         <div className="empty-title">No invoices found</div>
         <div className="empty-subtitle">Create your first invoice to get started</div>
       </div>

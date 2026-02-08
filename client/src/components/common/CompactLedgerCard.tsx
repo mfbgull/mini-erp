@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreVertical, Eye, X } from 'lucide-react';
+import { MoreVertical, Eye, X, FileText, CreditCard, Scale, BarChart3, TrendingDown, TrendingUp, ClipboardList } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../utils/formatters';
 import './CompactLedgerCard.css';
@@ -38,13 +38,13 @@ export function CompactLedgerCard({ entry, onView, formatCurrency }: CompactLedg
 
   const getTypeIcon = (type: string) => {
     switch (type?.toLowerCase()) {
-      case 'invoice': return '📄';
-      case 'payment': return '💳';
-      case 'adjustment': return '⚖️';
-      case 'opening_balance': return '📊';
-      case 'credit_note': return '📉';
-      case 'debit_note': return '📈';
-      default: return '📋';
+      case 'invoice': return <FileText size={16} />;
+      case 'payment': return <CreditCard size={16} />;
+      case 'adjustment': return <Scale size={16} />;
+      case 'opening_balance': return <BarChart3 size={16} />;
+      case 'credit_note': return <TrendingDown size={16} />;
+      case 'debit_note': return <TrendingUp size={16} />;
+      default: return <ClipboardList size={16} />;
     }
   };
 
@@ -230,7 +230,7 @@ export default function CompactLedgerCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">📊</div>
+          <BarChart3 className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching entries' : 'No ledger entries found'}
           </div>

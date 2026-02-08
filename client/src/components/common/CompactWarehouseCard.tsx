@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Search, MoreVertical, Edit, Trash2, Factory } from 'lucide-react';
 import DropdownMenu from './DropdownMenu';
 import './CompactWarehouseCard.css';
 
@@ -45,7 +45,7 @@ export default function CompactWarehouseCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">🏭</div>
+          <Factory className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching warehouses' : 'No warehouses found'}
           </div>

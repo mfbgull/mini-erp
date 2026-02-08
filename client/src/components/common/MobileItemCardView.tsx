@@ -1,5 +1,6 @@
 import { Item } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
+import { Package, AlertTriangle, Ban } from 'lucide-react';
 
 interface MobileItemCardViewProps {
   items: Item[];
@@ -17,7 +18,7 @@ export default function MobileItemCardView({
   if (items.length === 0) {
     return (
       <div className="mobile-empty-state">
-        <div className="empty-icon">📦</div>
+        <Package className="empty-icon" size={48} />
         <div className="empty-title">No items found</div>
         <div className="empty-subtitle">Create your first item to get started</div>
       </div>
@@ -104,14 +105,14 @@ export default function MobileItemCardView({
 
               {isLowStock && (
                 <div className="stock-alert">
-                  <span className="alert-icon">⚠️</span>
+                  <AlertTriangle className="alert-icon" size={16} />
                   <span className="alert-text">Low stock: below reorder level</span>
                 </div>
               )}
 
               {isOutOfStock && (
                 <div className="stock-alert error">
-                  <span className="alert-icon">🚫</span>
+                  <Ban className="alert-icon" size={16} />
                   <span className="alert-text">Out of stock</span>
                 </div>
               )}

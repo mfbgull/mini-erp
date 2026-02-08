@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Search, MoreVertical, Edit, Trash2, Package } from 'lucide-react';
 import DropdownMenu from './DropdownMenu';
 import './CompactMobileCard.css';
 
@@ -70,7 +70,7 @@ export default function CompactMobileCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">📦</div>
+          <Package className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching items' : 'No items found'}
           </div>

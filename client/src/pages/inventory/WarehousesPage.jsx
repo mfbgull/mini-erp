@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import toast from 'react-hot-toast';
 import { AgGridReact } from 'ag-grid-react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Factory } from 'lucide-react';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -131,7 +131,7 @@ export default function WarehousesPage() {
         </div>
       ) : filteredWarehouses.length === 0 && searchTerm ? (
         <div className="no-results">
-          <div className="no-results-icon">🔍</div>
+          <Factory className="no-results-icon" size={48} />
           <h3>No warehouses found</h3>
           <p>No warehouses match "{searchTerm}"</p>
           <Button variant="secondary" onClick={() => setSearchTerm('')}>Clear Search</Button>

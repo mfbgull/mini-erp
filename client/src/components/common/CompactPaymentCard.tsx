@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreVertical, Eye, Edit2, Trash2, X } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, Trash2, X, CreditCard } from 'lucide-react';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../utils/formatters';
 import './CompactPaymentCard.css';
@@ -240,7 +240,7 @@ export default function CompactPaymentCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">💳</div>
+          <CreditCard className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching payments' : 'No payments found'}
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Download, Upload, Factory, ArrowLeftRight, Settings, ClipboardList } from 'lucide-react';
 import { format } from 'date-fns';
 import './CompactStockMovementCard.css';
 
@@ -47,12 +47,12 @@ export default function CompactStockMovementCardView({
 
   const getMovementTypeIcon = (type: string) => {
     switch (type) {
-      case 'PURCHASE': return '📥';
-      case 'SALE': return '📤';
-      case 'PRODUCTION': return '🏭';
-      case 'TRANSFER': return '🔄';
-      case 'ADJUSTMENT': return '⚙️';
-      default: return '📋';
+      case 'PURCHASE': return <Download size={16} />;
+      case 'SALE': return <Upload size={16} />;
+      case 'PRODUCTION': return <Factory size={16} />;
+      case 'TRANSFER': return <ArrowLeftRight size={16} />;
+      case 'ADJUSTMENT': return <Settings size={16} />;
+      default: return <ClipboardList size={16} />;
     }
   };
 
@@ -70,7 +70,7 @@ export default function CompactStockMovementCardView({
           />
         </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">📋</div>
+          <ClipboardList className="empty-icon" size={48} />
           <div className="empty-title">
             {searchTerm ? 'No matching movements' : 'No movements found'}
           </div>

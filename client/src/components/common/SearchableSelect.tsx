@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo, ChangeEvent } from 'react';
+import { Check } from 'lucide-react';
 import './SearchableSelect.css';
 
 interface SelectOption {
@@ -214,7 +215,7 @@ export default function SearchableSelect({
                   <div className="option-content">
                     <span>{option.label}</span>
                     {isOptionSelected(option.value) && (
-                      <span className="checkmark">✓</span>
+                      <Check className="checkmark" size={16} />
                     )}
                   </div>
                 ) : (

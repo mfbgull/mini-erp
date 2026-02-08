@@ -1,4 +1,5 @@
 import { useTheme, THEMES } from '../../context/ThemeContext';
+import { Palette, Diamond } from 'lucide-react';
 import './ThemeToggle.css';
 
 const ThemeToggle = () => {
@@ -13,7 +14,7 @@ const ThemeToggle = () => {
         aria-label="Toggle theme"
       >
         <span className="theme-toggle-icon">
-          {currentTheme === THEMES.ERPNEXT ? '🎨' : '🔷'}
+          {currentTheme === THEMES.ERPNEXT ? <Palette size={18} /> : <Diamond size={18} />}
         </span>
         <span className="theme-toggle-label">
           {themeName}
