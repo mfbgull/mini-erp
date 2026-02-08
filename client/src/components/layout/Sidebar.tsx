@@ -1,22 +1,26 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Menu, X, ChevronLeft, ChevronRight, LogOut,
+  LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
+  ClipboardList, Factory, Receipt, FileText, Link2, Settings
+} from 'lucide-react';
 import './Sidebar.css';
 
 interface NavItem {
   path?: string;
   label: string;
-  icon?: string;
+  icon?: React.ReactNode;
   children?: NavItem[];
 }
 
 // Static navigation items - defined outside component to avoid recreation on every render
 const NAV_ITEMS: NavItem[] = [
-  { path: '/', label: 'Dashboard', icon: '📊' },
+  { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
   {
     label: 'Inventory',
-    icon: '📦',
+    icon: <Package size={20} strokeWidth={1.5} />,
     children: [
       { path: '/inventory/items', label: 'Items' },
       { path: '/inventory/warehouses', label: 'Warehouses' },
@@ -26,7 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     label: 'Sales',
-    icon: '💰',
+    icon: <DollarSign size={20} strokeWidth={1.5} />,
     children: [
       { path: '/pos', label: 'POS Terminal' },
       { path: '/sales', label: 'Sales' },
@@ -36,7 +40,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     label: 'Reports',
-    icon: '📊',
+    icon: <BarChart3 size={20} strokeWidth={1.5} />,
     children: [
       { path: '/reports', label: 'Dashboard' },
       { path: '/reports/accounts-receivable', label: 'A/R Reports' },
@@ -50,7 +54,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     label: 'Purchases',
-    icon: '🛒',
+    icon: <ShoppingCart size={20} strokeWidth={1.5} />,
     children: [
       { path: '/purchases', label: 'Purchases' },
       { path: '/purchase-orders', label: 'Purchase Orders' },
@@ -58,12 +62,12 @@ const NAV_ITEMS: NavItem[] = [
       { path: '/suppliers', label: 'Suppliers' }
     ]
   },
-  { path: '/bom', label: 'Bill of Materials', icon: '📋' },
-  { path: '/production', label: 'Production', icon: '🏭' },
-  { path: '/expenses', label: 'Expenses', icon: '💸' },
-  { path: '/activity-log', label: 'Activity Log', icon: '📝' },
-  { path: '/integrations', label: 'Integrations', icon: '🔗' },
-  { path: '/settings', label: 'Settings', icon: '⚙️' }
+  { path: '/bom', label: 'Bill of Materials', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
+  { path: '/production', label: 'Production', icon: <Factory size={20} strokeWidth={1.5} /> },
+  { path: '/expenses', label: 'Expenses', icon: <Receipt size={20} strokeWidth={1.5} /> },
+  { path: '/activity-log', label: 'Activity Log', icon: <FileText size={20} strokeWidth={1.5} /> },
+  { path: '/integrations', label: 'Integrations', icon: <Link2 size={20} strokeWidth={1.5} /> },
+  { path: '/settings', label: 'Settings', icon: <Settings size={20} strokeWidth={1.5} /> }
 ];
 
 const Sidebar = memo(function Sidebar() {
@@ -171,7 +175,7 @@ const Sidebar = memo(function Sidebar() {
                 }}
               >
                 <div className="nav-section-title" title={isCollapsed && !isMobile ? item.label : ''}>
-                  <span>{item.icon}</span>
+                  <span className="nav-icon">{item.icon}</span>
                   {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? <span className="nav-label">{item.label}</span> : null}
                 </div>
                 <div
@@ -221,7 +225,7 @@ const Sidebar = memo(function Sidebar() {
           </div>
           {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? (
             <button className="logout-btn" onClick={logout} title="Logout">
-              🚪
+              <LogOut size={18} strokeWidth={1.5} />
             </button>
           ) : null}
         </div>
