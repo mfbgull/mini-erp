@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { AgGridReact } from 'ag-grid-react';
-import { Plus } from 'lucide-react';
+import { Plus, ShoppingCart, DollarSign, BarChart3, Building2, Package, TrendingUp, Gem, CalendarDays, Download, ClipboardList, Wallet } from 'lucide-react';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -178,7 +178,7 @@ export default function PurchasesPage() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            🛒
+            <ShoppingCart size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Purchases</div>
@@ -189,7 +189,7 @@ export default function PurchasesPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            💰
+            <DollarSign size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Value</div>
@@ -200,7 +200,7 @@ export default function PurchasesPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            📊
+            <BarChart3 size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Quantity</div>
@@ -211,7 +211,7 @@ export default function PurchasesPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
-            🏢
+            <Building2 size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Suppliers</div>
@@ -222,7 +222,7 @@ export default function PurchasesPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            📦
+            <Package size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Items</div>
@@ -233,7 +233,7 @@ export default function PurchasesPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            📈
+            <TrendingUp size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Average Value</div>
@@ -244,7 +244,7 @@ export default function PurchasesPage() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            💎
+            <Gem size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Largest Purchase</div>
@@ -259,7 +259,7 @@ export default function PurchasesPage() {
 
         <div className="stat-card" style={{ borderColor: stats.recentPurchases > 0 ? '#f5af19' : undefined }}>
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)' }}>
-            📅
+            <CalendarDays size={24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Recent (30 Days)</div>
@@ -272,35 +272,35 @@ export default function PurchasesPage() {
       {/* Quick Actions */}
       <div className="quick-actions">
         <button className="quick-action-btn" onClick={handleExport}>
-          <span className="action-icon">📥</span>
+          <Download className="action-icon" size={24} />
           <span className="action-text">Export to CSV</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/purchase-summary')}
         >
-          <span className="action-icon">📊</span>
+          <ClipboardList className="action-icon" size={24} />
           <span className="action-text">Purchase Summary</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/stock-valuation')}
         >
-          <span className="action-icon">💰</span>
+          <Wallet className="action-icon" size={24} />
           <span className="action-text">Stock Valuation</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/inventory/stock-movements')}
         >
-          <span className="action-icon">📋</span>
+          <BarChart3 className="action-icon" size={24} />
           <span className="action-text">Stock Movements</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/inventory/items')}
         >
-          <span className="action-icon">📦</span>
+          <Package className="action-icon" size={24} />
           <span className="action-text">Items</span>
         </button>
       </div>
