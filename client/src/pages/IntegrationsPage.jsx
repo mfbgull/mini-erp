@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import api from '../utils/api';
 import FormInput from '../components/common/FormInput';
 import Button from '../components/common/Button';
+import { Mail, MessageSquare, Cloud, CheckCircle, ArrowRightLeft, FileText } from 'lucide-react';
 import './SettingsPage.css';
 
 export default function IntegrationsPage() {
@@ -237,7 +238,7 @@ export default function IntegrationsPage() {
           <div className="section-header">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h2>📧 Email Service (SendGrid)</h2>
+                <h2><Mail size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Email Service (SendGrid)</h2>
                 <p className="section-description">Send invoices, POs, and notifications via email</p>
               </div>
               {settings?.email && <span className={`badge ${getBadgeClass(settings.email.configured)}`}>{getStatusBadge(settings.email.configured)}</span>}
@@ -330,7 +331,7 @@ export default function IntegrationsPage() {
           <div className="section-header">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h2>📱 SMS Notifications (Twilio)</h2>
+                <h2><MessageSquare size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />SMS Notifications (Twilio)</h2>
                 <p className="section-description">Send SMS alerts for low stock, payments, and orders</p>
               </div>
               {settings?.notifications && <span className={`badge ${getBadgeClass(settings.notifications.configured)}`}>{getStatusBadge(settings.notifications.configured)}</span>}
@@ -422,7 +423,7 @@ export default function IntegrationsPage() {
           <div className="section-header">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h2>🌤️ Weather (Weatherstack)</h2>
+                <h2><Cloud size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Weather (Weatherstack)</h2>
                 <p className="section-description">Get weather data for delivery planning</p>
               </div>
               {settings?.weather && <span className={`badge ${getBadgeClass(settings.weather.configured)}`}>{getStatusBadge(settings.weather.configured)}</span>}
@@ -479,7 +480,7 @@ export default function IntegrationsPage() {
           <div className="section-header">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h2>✅ Data Validation (Numverify)</h2>
+                <h2><CheckCircle size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Data Validation (Numverify)</h2>
                 <p className="section-description">Validate phone numbers for customers and suppliers</p>
               </div>
               {settings?.validation && <span className={`badge ${getBadgeClass(settings.validation.configured)}`}>{getStatusBadge(settings.validation.configured)}</span>}
@@ -526,7 +527,7 @@ export default function IntegrationsPage() {
           <div className="section-header">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h2>💱 Currency Exchange (Fixer)</h2>
+                <h2><ArrowRightLeft size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Currency Exchange (Fixer)</h2>
                 <p className="section-description">Real-time currency exchange rates and conversion</p>
               </div>
               {settings?.currency && <span className={`badge ${getBadgeClass(settings.currency.configured)}`}>{getStatusBadge(settings.currency.configured)}</span>}
@@ -592,7 +593,7 @@ export default function IntegrationsPage() {
           <div className="section-header">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h2>🧾 Tax Calculation (TaxJar)</h2>
+                <h2><FileText size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Tax Calculation (TaxJar)</h2>
                 <p className="section-description">Automatic tax calculation by location</p>
               </div>
               {settings?.tax && <span className={`badge ${getBadgeClass(settings.tax.configured)}`}>{getStatusBadge(settings.tax.configured)}</span>}

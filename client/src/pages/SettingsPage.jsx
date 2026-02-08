@@ -5,6 +5,7 @@ import api from '../utils/api';
 import FormInput from '../components/common/FormInput';
 import Button from '../components/common/Button';
 import { useTheme, THEMES, THEME_NAMES, THEME_ICONS, THEME_DESCRIPTIONS } from '../context/ThemeContext';
+import { DollarSign, Building2, Palette, Lightbulb, Eye, Check } from 'lucide-react';
 import './SettingsPage.css';
 
 export default function SettingsPage() {
@@ -108,7 +109,7 @@ export default function SettingsPage() {
         {/* Currency Settings */}
         <div className="settings-section">
           <div className="section-header">
-            <h2>💰 Currency Settings</h2>
+            <h2><DollarSign size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Currency Settings</h2>
             <p className="section-description">Configure currency display preferences</p>
           </div>
           <div className="settings-grid">
@@ -147,7 +148,7 @@ export default function SettingsPage() {
         {/* Company Settings */}
         <div className="settings-section">
           <div className="section-header">
-            <h2>🏢 Company Settings</h2>
+            <h2><Building2 size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Company Settings</h2>
             <p className="section-description">Basic company information</p>
           </div>
           <div className="settings-grid">
@@ -166,7 +167,7 @@ export default function SettingsPage() {
         {/* Display Settings */}
         <div className="settings-section">
           <div className="section-header">
-            <h2>🎨 Display Settings</h2>
+            <h2><Palette size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Display Settings</h2>
             <p className="section-description">Customize how information is displayed</p>
           </div>
           <div className="settings-grid">
@@ -191,7 +192,7 @@ export default function SettingsPage() {
         {/* Tooltip Settings */}
         <div className="settings-section">
           <div className="section-header">
-            <h2>💡 Tooltip Settings</h2>
+            <h2><Lightbulb size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Tooltip Settings</h2>
             <p className="section-description">Configure tooltip behavior</p>
           </div>
           <div className="settings-grid">
@@ -213,7 +214,7 @@ export default function SettingsPage() {
         {/* Theme Selection */}
         <div className="settings-section">
           <div className="section-header">
-            <h2>🎨 Theme Selection</h2>
+            <h2><Palette size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Theme Selection</h2>
             <p className="section-description">Choose your preferred visual theme</p>
           </div>
           <div className="theme-selector">
@@ -229,7 +230,7 @@ export default function SettingsPage() {
                   <div className="theme-option-description">{THEME_DESCRIPTIONS[theme]}</div>
                 </div>
                 {currentTheme === theme && (
-                  <div className="theme-option-check">✓</div>
+                  <div className="theme-option-check"><Check size={16} /></div>
                 )}
               </div>
             ))}
@@ -239,7 +240,7 @@ export default function SettingsPage() {
         {/* Preview Section */}
         <div className="settings-section preview-section">
           <div className="section-header">
-            <h2>👁️ Preview</h2>
+            <h2><Eye size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Preview</h2>
             <p className="section-description">See how your settings will look</p>
           </div>
           <div className="preview-content">
