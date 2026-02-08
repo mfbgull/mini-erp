@@ -354,27 +354,91 @@ export default function StockLevelReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.stockLevels && reportData.stockLevels.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.stockLevels}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                params.api.sizeColumnsToFit({
-                  defaultMinWidth: 100,
-                  columnLimits: []
-                });
-              }}
-            />
-          </div>
+          <>
+            {/* Desktop view - AG Grid */}
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.stockLevels}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  // Check if the grid is visible before sizing columns
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
+                    }
+                  }, 100); // Small delay to ensure grid is rendered
+                }}
+              />
+            </div>
+
+            {/* Mobile view - Card layout */}
+            <div className="mobile-stock-level-list">
+              {reportData.stockLevels.map((item) => (
+                <div
+                  key={item.id || item.item_code}
+                  className="stock-level-card"
+                >
+                  <div className="stock-level-header">
+                    <div className="item-name">{item.item_name}</div>
+                    <div className="item-code">{item.item_code}</div>
+                  </div>
+
+                  <div className="stock-level-details">
+                    <div className="detail-row">
+                      <span className="detail-label">Category:</span>
+                      <span className="detail-value">{item.item_category}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">UOM:</span>
+                      <span className="detail-value">{item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Current Stock:</span>
+                      <span className="detail-value">{item.current_stock} {item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Minimum Stock:</span>
+                      <span className="detail-value">{item.minimum_stock} {item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Reorder Level:</span>
+                      <span className="detail-value">{item.reorder_level} {item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Selling Price:</span>
+                      <span className="detail-value">{formatCurrency(item.standard_selling_price)}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Status:</span>
+                      <span className={`detail-value status-badge ${
+                        item.stock_status.toLowerCase().replace(/\s+/g, '-')
+                      }`}>
+                        {item.stock_status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <Package size={48} />

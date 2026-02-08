@@ -88,10 +88,14 @@ export default function SalesSummaryReport() {
         if (entry.contentRect.width > 0) {
           const gridApi = gridRef.current?.api;
           if (gridApi) {
-            gridApi.sizeColumnsToFit({
-              defaultMinWidth: 100,
-              columnLimits: []
-            });
+            // Check if the grid is actually visible in the DOM
+            const viewportElement = gridApi.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+            if (viewportElement && viewportElement.clientWidth > 0) {
+              gridApi.sizeColumnsToFit({
+                defaultMinWidth: 100,
+                columnLimits: []
+              });
+            }
           }
           observer.disconnect();
           break;

@@ -343,21 +343,82 @@ export default function StockValuationReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.stockValuation && reportData.stockValuation.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.stockValuation}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-            />
-          </div>
+          <>
+            {/* Desktop view - AG Grid */}
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.stockValuation}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  // Check if the grid is visible before sizing columns
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
+                    }
+                  }, 100); // Small delay to ensure grid is rendered
+                }}
+              />
+            </div>
+
+            {/* Mobile view - Card layout */}
+            <div className="mobile-stock-valuation-list">
+              {reportData.stockValuation.map((item, index) => (
+                <div
+                  key={`${item.id || item.item_code}-${index}`}
+                  className="stock-valuation-card"
+                >
+                  <div className="stock-valuation-header">
+                    <div className="item-name">{item.item_name}</div>
+                    <div className="item-code">{item.item_code}</div>
+                  </div>
+
+                  <div className="stock-valuation-details">
+                    <div className="detail-row">
+                      <span className="detail-label">Category:</span>
+                      <span className="detail-value">{item.item_category}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">UOM:</span>
+                      <span className="detail-value">{item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Current Stock:</span>
+                      <span className="detail-value">{item.current_stock} {item.unit_of_measure}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Unit Cost:</span>
+                      <span className="detail-value">{formatCurrency(item.unit_cost)}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Total Value:</span>
+                      <span className="detail-value">{formatCurrency(item.total_value)}</span>
+                    </div>
+
+                    <div className="detail-row">
+                      <span className="detail-label">Valuation Method:</span>
+                      <span className="detail-value">{item.valuation_method}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <Package size={48} />
