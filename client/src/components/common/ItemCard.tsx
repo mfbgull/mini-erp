@@ -142,7 +142,12 @@ export function ItemCard({ item, onEdit, onDelete }: ItemCardProps) {
         }}
       >
         <div className="item-card-content">
-          <h3 className="item-card-name">{item.item_name}</h3>
+          <div className="item-card-info">
+            <h3 className="item-card-name">{item.item_name}</h3>
+            <span className={`item-card-stock ${isOutOfStock ? 'out-of-stock' : isLowStock ? 'low-stock' : ''}`}>
+              {parseFloat(String(item.current_stock || 0)).toFixed(2)} {item.unit_of_measure}
+            </span>
+          </div>
           
           <div className="item-card-menu" ref={menuRef}>
             <button

@@ -150,13 +150,26 @@
 
 /* Item Form */
 .item-form {
-  min-width: 500px;
+  min-width: auto;
+  max-width: 100%;
 }
 
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .form-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .form-section {
@@ -288,22 +301,22 @@
   margin-bottom: var(--space-lg);
 }
 
-/* Mobile Items Container - Full width, single column */
 .mobile-items-container {
-  width: 100% !important;
-  max-width: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+  overflow-x: hidden;
 }
 
-/* Ensure item cards are full width on mobile */
 .mobile-items-container .item-card {
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {

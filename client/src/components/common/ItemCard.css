@@ -27,15 +27,36 @@
   gap: var(--space-md, 16px);
 }
 
+.item-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs, 8px);
+  flex: 1;
+  min-width: 0;
+}
+
 .item-card-name {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary, #164e63);
   margin: 0;
-  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.item-card-stock {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--neutral-600, #4b5563);
+}
+
+.item-card-stock.low-stock {
+  color: var(--warning, #f59e0b);
+}
+
+.item-card-stock.out-of-stock {
+  color: var(--error, #ef4444);
 }
 
 .item-card-menu {
@@ -76,7 +97,7 @@
   box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.08));
   border: 1px solid var(--border-color, #e5e7eb);
   min-width: 160px;
-  z-index: 1000;
+  z-index: 9999;
   overflow: hidden;
 }
 
