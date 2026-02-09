@@ -665,7 +665,30 @@
 
 @media (max-width: 480px) {
   .expenses-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .summary-card {
+    padding: 12px;
+  }
+
+  .summary-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .summary-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .summary-value {
+    font-size: 16px;
+  }
+
+  .summary-label {
+    font-size: 11px;
   }
 
   .expenses-actions {
