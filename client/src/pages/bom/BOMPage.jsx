@@ -10,7 +10,7 @@ import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import SearchableSelect from '../../components/common/SearchableSelect';
 import { BOMCard } from '../../components/bom/BOMCard';
-import { ClipboardList, CheckCircle, Wrench, BarChart3, Factory, CalendarDays, Layers, Zap, AlertTriangle, Download, Package, X } from 'lucide-react';
+import { ClipboardList, CheckCircle, Factory, AlertTriangle, Download, Package, X } from 'lucide-react';
 import './BOMPage.css';
 
 export default function BOMPage() {
@@ -159,17 +159,7 @@ export default function BOMPage() {
   const stats = {
     totalBOMs: boms.length,
     activeBOMs: boms.filter(b => b.is_active === 1 || b.is_active === true).length,
-    totalMaterials: boms.reduce((sum, b) => sum + (b.items?.length || 0), 0),
-    avgMaterialsPerBOM: boms.length > 0
-      ? boms.reduce((sum, b) => sum + (b.items?.length || 0), 0) / boms.length
-      : 0,
-    uniqueFinishedGoods: new Set(boms.map(b => b.finished_item_id).filter(Boolean)).size,
-    recentlyUpdated: boms.filter(b => {
-      const updatedDate = new Date(b.updated_at);
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      return updatedDate >= oneMonthAgo;
-    }).length
+    uniqueFinishedGoods: new Set(boms.map(b => b.finished_item_id).filter(Boolean)).size
   };
 
   // Export to CSV
@@ -267,28 +257,6 @@ export default function BOMPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            <Wrench size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Total Materials</div>
-            <div className="stat-value">{stats.totalMaterials}</div>
-            <div className="stat-subtitle">Across all BOMs</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            <BarChart3 size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Avg Materials</div>
-            <div className="stat-value">{stats.avgMaterialsPerBOM.toFixed(1)}</div>
-            <div className="stat-subtitle">Per BOM</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
             <Factory size={24} color="white" />
           </div>
@@ -296,39 +264,6 @@ export default function BOMPage() {
             <div className="stat-label">Finished Goods</div>
             <div className="stat-value">{stats.uniqueFinishedGoods}</div>
             <div className="stat-subtitle">Unique products</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            <CalendarDays size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Recently Updated</div>
-            <div className="stat-value">{stats.recentlyUpdated}</div>
-            <div className="stat-subtitle">Last 30 days</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            <Layers size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Complex BOMs</div>
-            <div className="stat-value">{boms.filter(b => b.items?.length > 5).length}</div>
-            <div className="stat-subtitle">6+ materials</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            <Zap size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Simple BOMs</div>
-            <div className="stat-value">{boms.filter(b => b.items?.length <= 3).length}</div>
-            <div className="stat-subtitle">≤3 materials</div>
           </div>
         </div>
 
