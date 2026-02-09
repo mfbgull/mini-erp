@@ -9,9 +9,7 @@ import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
-import { CompactItemCard } from '../../components/common/CompactItemCard';
-import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
-import ItemPreview from './ItemPreview';
+import { ItemCard } from '../../components/common/ItemCard';
 import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet } from 'lucide-react';
 import './ItemsPage.css';
 
@@ -19,7 +17,6 @@ export default function ItemsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [openDetailsItem, setOpenDetailsItem] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
   const { formatCurrency } = useSettings();
@@ -513,11 +510,9 @@ export default function ItemsPage() {
         <>
           <div className="mobile-items-container">
             {filteredItems.map((item) => (
-              <BorderAccentItemCard
+              <ItemCard
                 key={item.id}
                 item={item}
-                showDetails={openDetailsItem?.id === item.id}
-                onDetailsChange={(show) => setOpenDetailsItem(show ? item : null)}
                 onEdit={(item) => {
                   setEditingItem(item);
                   setIsModalOpen(true);
@@ -531,14 +526,6 @@ export default function ItemsPage() {
               + New Item
             </Button>
           </div>
-
-          {/* Item Details Overlay */}
-          {openDetailsItem && (
-            <ItemPreview
-              item={openDetailsItem}
-              onClose={() => setOpenDetailsItem(null)}
-            />
-          )}
         </>
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
