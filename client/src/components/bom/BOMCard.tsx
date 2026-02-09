@@ -350,11 +350,13 @@ export function BOMCard({ bom, onEdit, onToggleStatus, onDelete }: BOMCardProps)
               <button
                 type="button"
                 className="bom-action-btn bom-action-primary"
-                onClick={() => {
+                onClick={async () => {
                   setShowDetails(false);
-                  onEdit(detailedBom || bom);
+                  const bomToEdit = detailedBom || bom;
+                  if (bomToEdit && bomToEdit.id) {
+                    await onEdit(bomToEdit);
+                  }
                 }}
-                disabled={isLoading}
               >
                 <Edit size={18} />
                 Edit BOM

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import { useNavigate } from 'react-router-dom';
@@ -463,6 +463,38 @@ function BOMForm({ bom, onClose, onSuccess }) {
     quantity: bom?.quantity || 1,
     description: bom?.description || ''
   });
+
+  const [bomItems, setBOMItems] = useState(() => {
+    if (bom?.items && bom.items.length > 0) {
+      return bom.items.map(item => ({
+        item_id: item.item_id?.toString() || '',
+        quantity: item.quantity?.toString() || ''
+      }));
+    }
+    return [{ item_id: '', quantity: '' }];
+  });
+
+  useEffect(() => {
+    if (bom?.items && bom.items.length > 0) {
+      setBOMItems(bom.items.map(item => ({
+        item_id: item.item_id?.toString() || '',
+        quantity: item.quantity?.toString() || ''
+      })));
+    } else {
+      setBOMItems([{ item_id: '', quantity: '' }]);
+    }
+  }, [bom?.id]);
+
+  useEffect(() => {
+    if (bom) {
+      setFormData({
+        bom_name: bom.bom_name || '',
+        finished_item_id: bom.finished_item_id || '',
+        quantity: bom.quantity || 1,
+        description: bom.description || ''
+      });
+    }
+  }, [bom?.id]);
 
   const { data: items = [], isLoading: itemsLoading } = useQuery({
     queryKey: ['items'],
