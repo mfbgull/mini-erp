@@ -8,25 +8,15 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import SearchableSelect from '../../components/common/SearchableSelect';
-import { AlertTriangle } from 'lucide-react';
+import { ProductionCard } from '../../components/production/ProductionCard';
+import { AlertTriangle, Search, Factory, ClipboardList, Calendar } from 'lucide-react';
 import './ProductionPage.css';
 
 export default function ProductionPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [editingProduction, setEditingProduction] = useState(null);
   const queryClient = useQueryClient();
-
-  const deleteProductionMutation = useMutation({
-    mutationFn: async (productionId) => {
-      return api.delete(`/productions/${productionId}`);
-    },
-    onSuccess: () => {
-      toast.success('Production record deleted successfully!');
-      queryClient.invalidateQueries(['productions']);
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to delete production record');
-    }
-  });
 
   const { data: productions = [], isLoading, error, isError } = useQuery({
     queryKey: ['productions'],
@@ -43,10 +33,44 @@ export default function ProductionPage() {
     }
   });
 
+  const filteredProductions = productions.filter(production =>
+    production.production_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    production.output_item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    production.finished_goods_warehouse_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const deleteProductionMutation = useMutation({
+    mutationFn: async (productionId) => {
+      return api.delete(`/productions/${productionId}`);
+    },
+    onSuccess: () => {
+      toast.success('Production record deleted successfully!');
+      queryClient.invalidateQueries(['productions']);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to delete production record');
+    }
+  });
+
   const handleDeleteProduction = (production) => {
     if (window.confirm(`Are you sure you want to delete production: ${production.production_no}?`)) {
       deleteProductionMutation.mutate(production.id);
     }
+  };
+
+  const handleEditProduction = async (production) => {
+    try {
+      const response = await api.get(`/productions/${production.id}`);
+      setEditingProduction(response.data);
+      setIsModalOpen(true);
+    } catch (error) {
+      toast.error('Failed to load production details');
+    }
+  };
+
+  const handleNew = () => {
+    setEditingProduction(null);
+    setIsModalOpen(true);
   };
 
   const columnDefs = [
@@ -133,10 +157,6 @@ export default function ProductionPage() {
     );
   };
 
-  const handleNew = () => {
-    setIsModalOpen(true);
-  };
-
   return (
     <div className="production-page">
       <div className="page-header">
@@ -161,17 +181,83 @@ export default function ProductionPage() {
         </div>
       ) : (
         <>
-          <div className="summary-cards">
-            <div className="summary-card">
-              <div className="summary-label">Total Productions</div>
-              <div className="summary-value">{productions.length}</div>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                <ClipboardList size={24} color="white" />
+              </div>
+              <div className="stat-content">
+                <div className="stat-label">Total Productions</div>
+                <div className="stat-value">{productions.length}</div>
+                <div className="stat-subtitle">All records</div>
+              </div>
             </div>
+
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
+                <Factory size={24} color="white" />
+              </div>
+              <div className="stat-content">
+                <div className="stat-label">This Month</div>
+                <div className="stat-value">
+                  {productions.filter(p => {
+                    const prodDate = new Date(p.production_date);
+                    const now = new Date();
+                    return prodDate.getMonth() === now.getMonth() && prodDate.getFullYear() === now.getFullYear();
+                  }).length}
+                </div>
+                <div className="stat-subtitle">Productions</div>
+              </div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
+                <Calendar size={24} color="white" />
+              </div>
+              <div className="stat-content">
+                <div className="stat-label">This Week</div>
+                <div className="stat-value">
+                  {productions.filter(p => {
+                    const prodDate = new Date(p.production_date);
+                    const now = new Date();
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    return prodDate >= weekAgo;
+                  }).length}
+                </div>
+                <div className="stat-subtitle">Productions</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="production-search-container">
+            <div className="search-box">
+              <Search size={20} className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search by production #, item, or warehouse..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              {searchTerm && (
+                <button
+                  className="search-clear"
+                  onClick={() => setSearchTerm('')}
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <span className="search-results-count">
+              {filteredProductions.length} of {productions.length} productions
+            </span>
           </div>
 
           {/* Desktop view - AG Grid */}
           <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
             <AgGridReact
-              rowData={productions}
+              rowData={filteredProductions}
               columnDefs={columnDefs}
               defaultColDef={{
                 resizable: true,
@@ -181,79 +267,52 @@ export default function ProductionPage() {
               pagination={true}
               paginationPageSize={20}
               paginationPageSizeSelector={[10, 20, 50, 100]}
-              onRowClicked={(params) => handleRowClick(params.data)}
               rowSelection={{ mode: 'singleRow' }}
             />
           </div>
 
-          {/* Mobile view - Card layout */}
           <div className="mobile-production-list">
-            {productions.map((production) => (
-              <div
+            {filteredProductions.map((production) => (
+              <ProductionCard
                 key={production.id}
-                className="production-card"
-                onClick={() => handleRowClick(production)}
-              >
-                <div className="production-header">
-                  <div className="production-no">{production.production_no}</div>
-                  <div className="production-date">{format(new Date(production.production_date), 'dd MMM yyyy')}</div>
-                </div>
-
-                <div className="production-details">
-                  <div className="detail-row">
-                    <span className="detail-label">Output Item:</span>
-                    <span className="detail-value">{production.output_item_name}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Quantity:</span>
-                    <span className="detail-value production-output">
-                      {parseFloat(production.output_quantity).toFixed(2)} {production.output_uom}
-                    </span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Warehouse:</span>
-                    <span className="detail-value">{production.finished_goods_warehouse_name}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Remarks:</span>
-                    <span className="detail-value">{production.remarks || '—'}</span>
-                  </div>
-                </div>
-
-                <div className="production-actions">
-                  <Button
-                    variant="danger"
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteProduction(production);
-                    }}
-                    disabled={deleteProductionMutation.isPending}
-                  >
-                    {deleteProductionMutation.isPending ? 'Deleting...' : 'Delete'}
-                  </Button>
-                </div>
-              </div>
+                production={production}
+                onEdit={handleEditProduction}
+                onDelete={handleDeleteProduction}
+              />
             ))}
           </div>
+
+          {filteredProductions.length === 0 && (
+            <div className="no-results">
+              <p>No productions found matching "{searchTerm}"</p>
+              <Button variant="secondary" onClick={() => setSearchTerm('')}>
+                Clear Search
+              </Button>
+            </div>
+          )}
         </>
       )}
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Record Production"
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingProduction(null);
+        }}
+        title={editingProduction ? "Edit Production" : "Record Production"}
         size="large"
       >
         <ProductionForm
-          onClose={() => setIsModalOpen(false)}
+          production={editingProduction}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingProduction(null);
+          }}
           onSuccess={() => {
             queryClient.invalidateQueries(['productions']);
             queryClient.invalidateQueries(['items']);
             setIsModalOpen(false);
+            setEditingProduction(null);
           }}
         />
       </Modal>
@@ -261,16 +320,30 @@ export default function ProductionPage() {
   );
 }
 
-function ProductionForm({ onClose, onSuccess }) {
+function ProductionForm({ production, onClose, onSuccess }) {
+  const isEdit = !!production;
   const [selectedBOMId, setSelectedBOMId] = useState('');
   const [formData, setFormData] = useState({
-    output_item_id: '',
-    output_quantity: '',
-    warehouse_id: '', // Finished goods warehouse
-    raw_materials_warehouse_id: '', // Raw materials warehouse
-    production_date: new Date().toISOString().split('T')[0],
-    remarks: ''
+    output_item_id: production?.output_item_id || '',
+    output_quantity: production?.output_quantity || '',
+    warehouse_id: production?.finished_goods_warehouse_id || '',
+    raw_materials_warehouse_id: production?.raw_materials_warehouse_id || '',
+    production_date: production?.production_date || new Date().toISOString().split('T')[0],
+    remarks: production?.remarks || ''
   });
+
+  useEffect(() => {
+    if (production) {
+      setFormData({
+        output_item_id: production.output_item_id || '',
+        output_quantity: production.output_quantity || '',
+        warehouse_id: production.finished_goods_warehouse_id || '',
+        raw_materials_warehouse_id: production.raw_materials_warehouse_id || '',
+        production_date: production.production_date || new Date().toISOString().split('T')[0],
+        remarks: production.remarks || ''
+      });
+    }
+  }, [production?.id]);
 
   const [calculatedInputItems, setCalculatedInputItems] = useState([]);
 
