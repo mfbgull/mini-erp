@@ -355,11 +355,10 @@ export default function ItemsPage() {
         </div>
       </div>
 
-      {/* Summary Statistics Cards */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            <Package size={24} color="white" />
+          <div className="stat-icon">
+            <Package size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Items</div>
@@ -369,8 +368,8 @@ export default function ItemsPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            <DollarSign size={24} color="white" />
+          <div className="stat-icon">
+            <DollarSign size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Stock Value</div>
@@ -380,8 +379,8 @@ export default function ItemsPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            <BarChart3 size={24} color="white" />
+          <div className="stat-icon">
+            <BarChart3 size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Stock</div>
@@ -391,8 +390,8 @@ export default function ItemsPage() {
         </div>
 
         <div className="stat-card" style={{ borderColor: stats.lowStockAlerts > 0 ? '#f5576c' : undefined }}>
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            <AlertTriangle size={24} color="white" />
+          <div className="stat-icon">
+            <AlertTriangle size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Low Stock</div>
@@ -402,8 +401,8 @@ export default function ItemsPage() {
         </div>
 
         <div className="stat-card" style={{ borderColor: stats.outOfStock > 0 ? '#dc3545' : undefined }}>
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)' }}>
-            <Ban size={24} color="white" />
+          <div className="stat-icon">
+            <Ban size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Out of Stock</div>
@@ -413,8 +412,8 @@ export default function ItemsPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
-            <FolderOpen size={24} color="white" />
+          <div className="stat-icon">
+            <FolderOpen size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Categories</div>
@@ -424,8 +423,8 @@ export default function ItemsPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            <Wrench size={24} color="white" />
+          <div className="stat-icon">
+            <Wrench size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Raw Materials</div>
@@ -435,8 +434,8 @@ export default function ItemsPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            <Factory size={24} color="white" />
+          <div className="stat-icon">
+            <Factory size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Finished Goods</div>
@@ -446,7 +445,6 @@ export default function ItemsPage() {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="quick-actions">
         <button className="quick-action-btn" onClick={handleExport}>
           <Download className="action-icon" size={24} />
