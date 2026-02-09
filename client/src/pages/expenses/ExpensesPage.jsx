@@ -29,6 +29,7 @@ import DateRangePicker from '../../components/common/DateRangePicker';
 import Modal from '../../components/common/Modal';
 import SearchableSelect from '../../components/common/SearchableSelect';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+import { ExpenseCard } from '../../components/expenses/ExpenseCard';
 import './Expenses.css';
 
 // Register AG Grid modules
@@ -58,6 +59,7 @@ export default function ExpensesPage() {
     vendor: '',
     status: ''
   });
+  const [searchTerm, setSearchTerm] = useState('');
   
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
@@ -202,6 +204,17 @@ export default function ExpensesPage() {
       deleteExpenseMutation.mutate(id);
     }
   };
+
+  const filteredExpenses = expenses.filter(expense => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      (expense.expense_no?.toLowerCase() || '').includes(search) ||
+      (expense.expense_category?.toLowerCase() || '').includes(search) ||
+      (expense.description?.toLowerCase() || '').includes(search) ||
+      (expense.vendor_name?.toLowerCase() || '').includes(search)
+    );
+  });
 
   const handleExport = (format = 'pdf') => {
     if (!expenses || expenses.length === 0) {
@@ -419,6 +432,16 @@ export default function ExpensesPage() {
         </div>
 
         <div className="expenses-filters">
+          <div className="search-box">
+            <Search size={18} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search expenses..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
           <Button
             variant="secondary"
             onClick={() => setShowFilters(!showFilters)}
@@ -547,7 +570,7 @@ export default function ExpensesPage() {
             {/* Desktop view - AG Grid */}
             <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
               <AgGridReact
-                rowData={expenses}
+                rowData={filteredExpenses}
                 columnDefs={columnDefs}
                 defaultColDef={{
                   resizable: true,
@@ -574,63 +597,14 @@ export default function ExpensesPage() {
 
             {/* Mobile view - Card layout */}
             <div className="mobile-expenses-list">
-              {expenses.map((expense) => (
-                <div key={expense.id} className="expense-card">
-                  <div className="expense-header">
-                    <div className="expense-no">{expense.expense_no}</div>
-                    <div className="expense-category">{expense.expense_category}</div>
-                  </div>
-
-                  <div className="expense-details">
-                    <div className="detail-row">
-                      <span className="detail-label">Description:</span>
-                      <span className="detail-value">{expense.description}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Amount:</span>
-                      <span className="detail-value amount">{formatCurrency(expense.amount)}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Date:</span>
-                      <span className="detail-value">{new Date(expense.expense_date).toLocaleDateString()}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Vendor:</span>
-                      <span className="detail-value">{expense.vendor_name}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Status:</span>
-                      <span className={`status-badge ${
-                        expense.status.toLowerCase() === 'paid' ? 'status-paid' :
-                        expense.status.toLowerCase() === 'approved' ? 'status-partially-paid' :
-                        expense.status.toLowerCase() === 'pending' ? 'status-unpaid' : 'status-cancelled'
-                      }`}>
-                        {expense.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="expense-actions">
-                    <button
-                      className="action-btn edit-btn"
-                      onClick={() => handleEdit(expense)}
-                      title="Edit Expense"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      className="action-btn delete-btn"
-                      onClick={() => handleDelete(expense.id)}
-                      title="Delete Expense"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
+              {filteredExpenses.map((expense) => (
+                <ExpenseCard
+                  key={expense.id}
+                  expense={expense}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  formatCurrency={formatCurrency}
+                />
               ))}
             </div>
           </>
