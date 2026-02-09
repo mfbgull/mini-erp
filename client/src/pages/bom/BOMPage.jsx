@@ -10,7 +10,7 @@ import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import SearchableSelect from '../../components/common/SearchableSelect';
 import { BOMCard } from '../../components/bom/BOMCard';
-import { ClipboardList, CheckCircle, Factory, AlertTriangle, Download, Package, X } from 'lucide-react';
+import { ClipboardList, CheckCircle, Factory, AlertTriangle, Download, Package, X, BarChart3 } from 'lucide-react';
 import './BOMPage.css';
 
 export default function BOMPage() {
