@@ -9,12 +9,13 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import SearchableSelect from '../../components/common/SearchableSelect';
+import { BOMCard } from '../../components/bom/BOMCard';
 import { ClipboardList, CheckCircle, Wrench, BarChart3, Factory, CalendarDays, Layers, Zap, AlertTriangle, Download, Package, X } from 'lucide-react';
 import './BOMPage.css';
 
 export default function BOMPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedBOM, setSelectedBOM] = useState(null);
+  const [editingBOM, setEditingBOM] = useState(null);
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
   const navigate = useNavigate();
@@ -47,8 +48,6 @@ export default function BOMPage() {
       toast.error(error.response?.data?.error || 'Failed to update BOM status');
     }
   });
-
-  const [editingBOM, setEditingBOM] = useState(null);
 
   const columnDefs = [
     {
@@ -227,24 +226,6 @@ export default function BOMPage() {
     }
   };
 
-  const handleRowClick = async (bom) => {
-    try {
-      const response = await api.get(`/boms/${bom.id}`);
-      setSelectedBOM(response.data);
-      toast.success(
-        <div>
-          <strong>{response.data.bom_no}</strong><br/>
-          <small>Materials: {response.data.items.map(i =>
-            `${i.quantity} ${i.unit_of_measure} ${i.item_name}`
-          ).join(', ')}</small>
-        </div>,
-        { duration: 5000 }
-      );
-    } catch (error) {
-      toast.error('Failed to load BOM details');
-    }
-  };
-
   const handleNew = () => {
     setIsModalOpen(true);
   };
@@ -418,87 +399,28 @@ export default function BOMPage() {
               pagination={true}
               paginationPageSize={20}
               paginationPageSizeSelector={[10, 20, 50, 100]}
-              onRowClicked={(params) => handleRowClick(params.data)}
               rowSelection={{ mode: 'singleRow' }}
             />
           </div>
 
-          {/* Mobile view - Card layout */}
+          {/* Mobile view - Card layout with new BOMCard component */}
           <div className="mobile-bom-list">
             {boms.map((bom) => (
-              <div
+              <BOMCard
                 key={bom.id}
-                className="bom-card"
-                onClick={() => handleRowClick(bom)}
-              >
-                <div className="bom-header">
-                  <div className="bom-no">{bom.bom_no}</div>
-                  <div className={`status-badge ${bom.is_active ? 'active' : 'inactive'}`}>
-                    {bom.is_active ? 'Active' : 'Inactive'}
-                  </div>
-                </div>
-
-                <div className="bom-details">
-                  <div className="detail-row">
-                    <span className="detail-label">BOM Name:</span>
-                    <span className="detail-value">{bom.bom_name}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Finished Item:</span>
-                    <span className="detail-value">{bom.finished_item_name}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Output Qty:</span>
-                    <span className="detail-value">{bom.quantity} {bom.finished_uom}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Raw Materials:</span>
-                    <span className="detail-value">{bom.items?.length || 0} items</span>
-                  </div>
-                </div>
-
-                <div className="bom-actions">
-                  <Button
-                    variant={bom.is_active ? "warning" : "secondary"}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleBomStatus(bom);
-                    }}
-                    disabled={toggleBomStatusMutation.isPending}
-                  >
-                    {bom.is_active ? 'Deactivate' : 'Activate'}
-                  </Button>
-                  <Button
-                    variant="primary"
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      try {
-                        // Fetch full BOM details including items
-                        const response = await api.get(`/boms/${bom.id}`);
-                        setEditingBOM(response.data);
-                        setIsModalOpen(true);
-                      } catch (error) {
-                        toast.error('Failed to load BOM details');
-                      }
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteBom(bom);
-                    }}
-                    disabled={deleteBomMutation.isPending}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
+                bom={bom}
+                onEdit={async (bom) => {
+                  try {
+                    const response = await api.get(`/boms/${bom.id}`);
+                    setEditingBOM(response.data);
+                    setIsModalOpen(true);
+                  } catch (error) {
+                    toast.error('Failed to load BOM details');
+                  }
+                }}
+                onToggleStatus={handleToggleBomStatus}
+                onDelete={handleDeleteBom}
+              />
             ))}
           </div>
         </>
@@ -527,16 +449,7 @@ export default function BOMPage() {
         />
       </Modal>
 
-      {selectedBOM && (
-        <Modal
-          isOpen={!!selectedBOM}
-          onClose={() => setSelectedBOM(null)}
-          title={`BOM Details: ${selectedBOM.bom_no}`}
-          size="medium"
-        >
-          <BOMDetails bom={selectedBOM} />
-        </Modal>
-      )}
+
     </div>
   );
 }
