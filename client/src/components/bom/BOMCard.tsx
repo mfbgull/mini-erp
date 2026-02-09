@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { MoreVertical, Edit, X, Power, Trash2 } from 'lucide-react';
+import { MoreVertical, Edit, X, Power, Trash2, Loader2 } from 'lucide-react';
+import api from '../../utils/api';
 import './BOMCard.css';
 
 interface BOMItem {
@@ -35,6 +36,8 @@ interface BOMCardProps {
 export function BOMCard({ bom, onEdit, onToggleStatus, onDelete }: BOMCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [detailedBom, setDetailedBom] = useState<BOM | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -103,9 +106,18 @@ export function BOMCard({ bom, onEdit, onToggleStatus, onDelete }: BOMCardProps)
     }
   }, [showDetails]);
 
-  const handleCardClick = () => {
+  const handleCardClick = async () => {
     if (!showMenu) {
+      setIsLoading(true);
       setShowDetails(true);
+      try {
+        const response = await api.get(`/boms/${bom.id}`);
+        setDetailedBom(response.data);
+      } catch (error) {
+        console.error('Failed to load BOM details:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -205,15 +217,15 @@ export function BOMCard({ bom, onEdit, onToggleStatus, onDelete }: BOMCardProps)
 
       {/* Details Modal */}
       {showDetails && (
-        <div 
-          className="bom-modal-overlay" 
+        <div
+          className="bom-modal-overlay"
           onClick={() => setShowDetails(false)}
           role="dialog"
           aria-modal="true"
           aria-labelledby="bom-modal-title"
         >
-          <div 
-            className="bom-modal" 
+          <div
+            className="bom-modal"
             onClick={(e) => e.stopPropagation()}
             ref={cardRef}
           >
@@ -221,10 +233,10 @@ export function BOMCard({ bom, onEdit, onToggleStatus, onDelete }: BOMCardProps)
             <div className="bom-modal-header">
               <div className="bom-modal-title-section">
                 <h2 id="bom-modal-title" className="bom-modal-title">
-                  {bom.bom_name}
+                  {detailedBom?.bom_name || bom.bom_name}
                 </h2>
-                <span className={`bom-status-badge ${bom.is_active ? 'active' : 'inactive'}`}>
-                  {bom.is_active ? 'Active' : 'Inactive'}
+                <span className={`bom-status-badge ${(detailedBom?.is_active ?? bom.is_active) ? 'active' : 'inactive'}`}>
+                  {(detailedBom?.is_active ?? bom.is_active) ? 'Active' : 'Inactive'}
                 </span>
               </div>
               <button
@@ -239,81 +251,90 @@ export function BOMCard({ bom, onEdit, onToggleStatus, onDelete }: BOMCardProps)
 
             {/* Modal Content */}
             <div className="bom-modal-content">
-              {/* Basic Info Section */}
-              <section className="bom-section">
-                <h3 className="bom-section-title">Basic Information</h3>
-                <div className="bom-details-grid">
-                  <div className="bom-detail-item">
-                    <span className="bom-detail-label">BOM Number</span>
-                    <span className="bom-detail-value">{bom.bom_no}</span>
-                  </div>
-                  <div className="bom-detail-item">
-                    <span className="bom-detail-label">Finished Item</span>
-                    <span className="bom-detail-value">{bom.finished_item_name}</span>
-                  </div>
-                  <div className="bom-detail-item">
-                    <span className="bom-detail-label">Output Quantity</span>
-                    <span className="bom-detail-value">{bom.quantity} {bom.finished_uom}</span>
-                  </div>
+              {isLoading ? (
+                <div className="bom-loading-state">
+                  <Loader2 size={32} className="bom-loading-spinner" />
+                  <p>Loading BOM details...</p>
                 </div>
-              </section>
-
-              {/* Description Section */}
-              {bom.description && (
-                <section className="bom-section">
-                  <h3 className="bom-section-title">Description</h3>
-                  <p className="bom-description">{bom.description}</p>
-                </section>
-              )}
-
-              {/* Raw Materials Section */}
-              <section className="bom-section">
-                <h3 className="bom-section-title">
-                  Raw Materials
-                  <span className="bom-item-count">({bom.items?.length || 0} items)</span>
-                </h3>
-                
-                {bom.items && bom.items.length > 0 ? (
-                  <div className="bom-items-list">
-                    {bom.items.map((item, index) => (
-                      <div key={item.id || index} className="bom-item-row">
-                        <div className="bom-item-info">
-                          <span className="bom-item-name">{item.item_name}</span>
-                          <span className="bom-item-code">{item.item_code}</span>
-                        </div>
-                        <span className="bom-item-qty">
-                          {item.quantity} {item.unit_of_measure}
-                        </span>
+              ) : (
+                <>
+                  {/* Basic Info Section */}
+                  <section className="bom-section">
+                    <h3 className="bom-section-title">Basic Information</h3>
+                    <div className="bom-details-grid">
+                      <div className="bom-detail-item">
+                        <span className="bom-detail-label">BOM Number</span>
+                        <span className="bom-detail-value">{detailedBom?.bom_no || bom.bom_no}</span>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="bom-no-items">No raw materials defined</p>
-                )}
-              </section>
-
-              {/* Metadata Section */}
-              {(bom.created_at || bom.updated_at) && (
-                <section className="bom-section bom-section-meta">
-                  <div className="bom-meta-grid">
-                    {bom.created_at && (
-                      <div className="bom-meta-item">
-                        <span className="bom-meta-label">Created</span>
-                        <span className="bom-meta-value">
-                          {new Date(bom.created_at).toLocaleDateString()}
-                        </span>
+                      <div className="bom-detail-item">
+                        <span className="bom-detail-label">Finished Item</span>
+                        <span className="bom-detail-value">{detailedBom?.finished_item_name || bom.finished_item_name}</span>
                       </div>
+                      <div className="bom-detail-item">
+                        <span className="bom-detail-label">Output Quantity</span>
+                        <span className="bom-detail-value">{detailedBom?.quantity || bom.quantity} {detailedBom?.finished_uom || bom.finished_uom}</span>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* Description Section */}
+                  {(detailedBom?.description || bom.description) && (
+                    <section className="bom-section">
+                      <h3 className="bom-section-title">Description</h3>
+                      <p className="bom-description">{detailedBom?.description || bom.description}</p>
+                    </section>
+                  )}
+
+                  {/* Raw Materials Section */}
+                  <section className="bom-section">
+                    <h3 className="bom-section-title">
+                      Raw Materials
+                      <span className="bom-item-count">({(detailedBom?.items || bom.items)?.length || 0} items)</span>
+                    </h3>
+
+                    {(detailedBom?.items || bom.items)?.length > 0 ? (
+                      <div className="bom-items-list">
+                        {(detailedBom?.items || bom.items).map((item, index) => (
+                          <div key={item.id || index} className="bom-item-row">
+                            <div className="bom-item-info">
+                              <span className="bom-item-name">{item.item_name}</span>
+                              <span className="bom-item-code">{item.item_code}</span>
+                            </div>
+                            <span className="bom-item-qty">
+                              {item.quantity} {item.unit_of_measure}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="bom-no-items">No raw materials defined</p>
                     )}
-                    {bom.updated_at && (
-                      <div className="bom-meta-item">
-                        <span className="bom-meta-label">Last Updated</span>
-                        <span className="bom-meta-value">
-                          {new Date(bom.updated_at).toLocaleDateString()}
-                        </span>
+                  </section>
+
+                  {/* Metadata Section */}
+                  {((detailedBom?.created_at || bom.created_at) || (detailedBom?.updated_at || bom.updated_at)) && (
+                    <section className="bom-section bom-section-meta">
+                      <div className="bom-meta-grid">
+                        {(detailedBom?.created_at || bom.created_at) && (
+                          <div className="bom-meta-item">
+                            <span className="bom-meta-label">Created</span>
+                            <span className="bom-meta-value">
+                              {new Date(detailedBom?.created_at || bom.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                        {(detailedBom?.updated_at || bom.updated_at) && (
+                          <div className="bom-meta-item">
+                            <span className="bom-meta-label">Last Updated</span>
+                            <span className="bom-meta-value">
+                              {new Date(detailedBom?.updated_at || bom.updated_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </section>
+                    </section>
+                  )}
+                </>
               )}
             </div>
 
@@ -331,8 +352,9 @@ export function BOMCard({ bom, onEdit, onToggleStatus, onDelete }: BOMCardProps)
                 className="bom-action-btn bom-action-primary"
                 onClick={() => {
                   setShowDetails(false);
-                  onEdit(bom);
+                  onEdit(detailedBom || bom);
                 }}
+                disabled={isLoading}
               >
                 <Edit size={18} />
                 Edit BOM
