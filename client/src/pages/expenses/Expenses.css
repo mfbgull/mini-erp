@@ -13,53 +13,54 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 10px;
+  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .expenses-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
 }
 
 .add-expense-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  height: 38px;
 }
 
 .export-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .export-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  height: 38px;
+}
+
+.expenses-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .filter-toggle {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  height: 38px;
+  white-space: nowrap;
 }
-
-  .expenses-filters {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-  }
-
-  .search-box {
-    width: 100%;
-  }
-
-  .search-input {
-    width: 100%;
-  }
 
 .search-box {
   position: relative;
@@ -69,25 +70,27 @@
 
 .search-box .search-icon {
   position: absolute;
-  left: 12px;
+  left: 10px;
   color: var(--text-secondary);
   pointer-events: none;
 }
 
 .search-input {
-  padding: 8px 12px 8px 40px;
+  padding: 8px 12px 8px 34px;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: 6px;
   background: var(--input-bg);
   color: var(--text-primary);
-  font-size: 14px;
-  width: 250px;
-  transition: border-color 0.2s ease;
+  font-size: 13px;
+  width: 200px;
+  height: 38px;
+  transition: all 0.2s ease;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
 }
 
 .search-input::placeholder {
@@ -196,52 +199,56 @@
 
 .expenses-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
   margin-bottom: 20px;
 }
 
 .summary-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 20px;
   display: flex;
-  align-items: center;
-  gap: 15px;
+  align-items: flex-start;
 }
 
 .summary-content {
   display: flex;
-  align-items: center;
-  gap: 15px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
 }
 
 .summary-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-light);
+  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
   color: var(--primary);
 }
 
 .summary-text {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .summary-value {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text-primary);
+  line-height: 1.2;
 }
 
 .summary-label {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
-  margin-top: 5px;
+  font-weight: 500;
 }
 
 .expenses-content {
@@ -470,6 +477,30 @@
 }
 
 /* Responsive */
+@media (max-width: 992px) {
+  .expenses-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .expenses-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .expenses-filters {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-input {
+    flex: 1;
+    width: auto;
+    min-width: 180px;
+  }
+}
+
 @media (max-width: 768px) {
   .expenses-controls {
     flex-direction: column;
@@ -477,12 +508,49 @@
   }
 
   .expenses-actions {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .export-buttons {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .expenses-filters {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .search-box {
+    flex: 1;
+  }
+
+  .search-input {
     width: 100%;
-    justify-content: center;
+  }
+
+  .expenses-summary {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 16px;
+  }
+
+  .summary-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .summary-value {
+    font-size: 18px;
+  }
+
+  .summary-label {
+    font-size: 12px;
   }
 
   .form-row {
@@ -592,5 +660,34 @@
 
   .form-actions button {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .expenses-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .expenses-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .export-buttons {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .export-buttons button {
+    flex: 1;
+  }
+
+  .expenses-filters {
+    flex-direction: column;
+  }
+
+  .filter-toggle {
+    width: 100%;
+    justify-content: center;
   }
 }
