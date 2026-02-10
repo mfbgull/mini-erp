@@ -64,7 +64,7 @@
   flex-shrink: 0;
 }
 
-.menu-trigger {
+.item-card-menu .menu-trigger {
   background: none;
   border: none;
   padding: var(--space-xs, 8px);
@@ -77,17 +77,17 @@
   justify-content: center;
 }
 
-.menu-trigger:hover {
+.item-card-menu .menu-trigger:hover {
   background: var(--neutral-100, #f3f4f6);
   color: var(--neutral-700, #374151);
 }
 
-.menu-trigger:focus {
+.item-card-menu .menu-trigger:focus {
   outline: 2px solid var(--primary-500, #0891b2);
   outline-offset: 2px;
 }
 
-.menu-dropdown {
+.item-card-menu .menu-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
@@ -101,7 +101,7 @@
   overflow: hidden;
 }
 
-.menu-item {
+.item-card-menu .menu-item {
   display: flex;
   align-items: center;
   gap: var(--space-sm, 12px);
@@ -116,24 +116,24 @@
   text-align: left;
 }
 
-.menu-item:hover {
+.item-card-menu .menu-item:hover {
   background: var(--neutral-50, #f9fafb);
 }
 
-.menu-item:focus {
+.item-card-menu .menu-item:focus {
   outline: none;
   background: var(--primary-100, #cffafe);
 }
 
-.menu-item-destructive {
+.item-card-menu .menu-item-destructive {
   color: var(--error, #ef4444);
 }
 
-.menu-item-destructive:hover {
+.item-card-menu .menu-item-destructive:hover {
   background: rgba(239, 68, 68, 0.1);
 }
 
-.menu-divider {
+.item-card-menu .menu-divider {
   height: 1px;
   background: var(--border-color, #e5e7eb);
   margin: var(--space-xs, 8px) 0;
