@@ -39,29 +39,37 @@ export default function ReportsDashboard() {
   });
 
   const { data: inventoryStats } = useQuery({
-    queryKey: ['reports', 'inventory-stats'],
+    queryKey: ['reports', 'stock-level'],
     queryFn: async () => {
-      const response = await api.get('/reports/inventory-stats');
+      const response = await api.get('/reports/stock-level');
+      return response.data;
+    }
+  });
+
+  const { data: stockValuation } = useQuery({
+    queryKey: ['reports', 'stock-valuation'],
+    queryFn: async () => {
+      const response = await api.get('/reports/stock-valuation');
       return response.data;
     }
   });
 
   const { data: arAging } = useQuery({
-    queryKey: ['reports', 'ar-aging'],
+    queryKey: ['reports', 'ar-summary'],
     queryFn: async () => {
-      const response = await api.get('/reports/accounts-receivable');
+      const response = await api.get('/reports/ar-summary');
       return response.data;
     }
   });
 
-  // Calculate summary stats
+  // Calculate summary stats - API returns { success: true, data: { ... } }
   const stats = {
-    totalSales: salesData?.totalSales || 0,
-    pendingPayments: arAging?.totalOutstanding || 0,
-    overduePayments: arAging?.overdue || 0,
-    totalItems: inventoryStats?.totalItems || 0,
-    lowStockItems: inventoryStats?.lowStock || 0,
-    inventoryValue: inventoryStats?.totalValue || 0
+    totalSales: salesData?.data?.summary?.totalSales || 0,
+    pendingPayments: arAging?.data?.totalOutstanding || 0,
+    overduePayments: arAging?.data?.overdue?.amount || 0,
+    totalItems: inventoryStats?.data?.summary?.totalItems || 0,
+    lowStockItems: inventoryStats?.data?.summary?.lowStock || 0,
+    inventoryValue: stockValuation?.data?.summary?.totalValue || 0
   };
 
   const reportCategories = [
