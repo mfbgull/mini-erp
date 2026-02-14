@@ -1,5 +1,14 @@
 // Core entity types for MiniERP
 
+// ============ User/Auth Types ============
+export interface User {
+  id: number;
+  username: string;
+  full_name: string;
+  email?: string;
+  role: 'admin' | 'user';
+}
+
 // ============ Customer Types ============
 export interface Customer {
   id: number;
