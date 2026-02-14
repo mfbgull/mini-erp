@@ -1,6 +1,8 @@
 import express, { Express } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import errorHandlerMiddleware from './middleware/errorHandler';
+import { apiLimiter } from './middleware/rateLimiter';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -27,10 +29,36 @@ import fs from 'fs';
 // Create Express app
 const app: Express = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+    },
+  },
+}));
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? (process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3010'])
+    : ['http://localhost:5173', 'http://localhost:3010', 'http://127.0.0.1:5173'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+
+// Body parsing middleware with limits
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Apply rate limiting to all API routes
+app.use('/api/', apiLimiter);
 
 // Request logging middleware (development)
 if (process.env.NODE_ENV !== 'production') {
@@ -112,9 +140,12 @@ if (process.env.NODE_ENV === 'production') {
 
   // SPA catch-all - serve index.html for all non-API routes
   // This enables client-side routing (React Router)
-  app.get('*', (req: express.Request, res: express.Response) => {
+  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // Skip API routes and health endpoint
+    if (req.path.startsWith('/api/') || req.path === '/health') {
+      return next();
+    }
     const indexPath = path.join(clientDistPath, 'index.html');
-
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
@@ -134,9 +165,12 @@ if (process.env.NODE_ENV === 'production') {
 
   // SPA catch-all - serve index.html for all non-API routes
   // This enables client-side routing (React Router)
-  app.get('*', (req: express.Request, res: express.Response) => {
+  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // Skip API routes and health endpoint
+    if (req.path.startsWith('/api/') || req.path === '/health') {
+      return next();
+    }
     const indexPath = path.join(normalizedPath, 'index.html');
-
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
