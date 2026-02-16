@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -8,9 +8,11 @@ import {
   XCircle,
   Download,
   Filter,
-  Eye,
-  Edit,
-  Plus
+  X,
+  Tag,
+  Hash,
+  DollarSign,
+  AlertCircle
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -28,7 +30,30 @@ export default function StockLevelReport() {
   const [categoryId, setCategoryId] = useState('');
   const [showZeroStock, setShowZeroStock] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (item) => {
+    setSelectedItem(item);
+    setShowDetailModal(true);
+  };
 
   // Fetch warehouses for filter
   const { data: warehouses = [] } = useQuery({
@@ -365,6 +390,7 @@ export default function StockLevelReport() {
                   sortable: true,
                   filter: true
                 }}
+                getRowId={(params) => params.data.id || params.data.item_code || `row-${params.node.rowIndex}`}
                 pagination={true}
                 paginationPageSize={20}
                 paginationPageSizeSelector={[10, 20, 50, 100]}
@@ -383,57 +409,24 @@ export default function StockLevelReport() {
               />
             </div>
 
-            {/* Mobile view - Card layout */}
             <div className="mobile-stock-level-list">
-              {reportData.stockLevels.map((item) => (
+              {reportData.stockLevels.map((item, index) => (
                 <div
-                  key={item.id || item.item_code}
+                  key={item.id || item.item_code || `stock-${index}`}
                   className="stock-level-card"
+                  onClick={() => handleCardClick(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(item);
+                    }
+                  }}
                 >
-                  <div className="stock-level-header">
-                    <div className="item-name">{item.item_name}</div>
-                    <div className="item-code">{item.item_code}</div>
-                  </div>
-
-                  <div className="stock-level-details">
-                    <div className="detail-row">
-                      <span className="detail-label">Category:</span>
-                      <span className="detail-value">{item.item_category}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">UOM:</span>
-                      <span className="detail-value">{item.unit_of_measure}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Current Stock:</span>
-                      <span className="detail-value">{item.current_stock} {item.unit_of_measure}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Minimum Stock:</span>
-                      <span className="detail-value">{item.minimum_stock} {item.unit_of_measure}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Reorder Level:</span>
-                      <span className="detail-value">{item.reorder_level} {item.unit_of_measure}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Selling Price:</span>
-                      <span className="detail-value">{formatCurrency(item.standard_selling_price)}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Status:</span>
-                      <span className={`detail-value status-badge ${
-                        item.stock_status.toLowerCase().replace(/\s+/g, '-')
-                      }`}>
-                        {item.stock_status}
-                      </span>
-                    </div>
+                  <div className="stock-level-card-content">
+                    <h3 className="stock-item-name">{item.item_name}</h3>
+                    <span className="stock-item-qty">{item.current_stock} {item.unit_of_measure}</span>
                   </div>
                 </div>
               ))}
@@ -447,6 +440,110 @@ export default function StockLevelReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedItem && (
+        <div
+          className="stock-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="stock-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="stock-modal-header">
+              <h2 className="stock-modal-title">{selectedItem.item_name}</h2>
+              <button
+                type="button"
+                className="stock-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="stock-modal-content">
+              <div className="stock-detail-section">
+                <div className="stock-details-grid">
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <Tag size={14} />
+                      Item Code
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.item_code || '-'}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <Package size={14} />
+                      Category
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.item_category || '-'}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <Hash size={14} />
+                      UOM
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.unit_of_measure || '-'}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <Package size={14} />
+                      Current Stock
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.current_stock} {selectedItem.unit_of_measure}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <AlertCircle size={14} />
+                      Minimum Stock
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.minimum_stock} {selectedItem.unit_of_measure}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <AlertTriangle size={14} />
+                      Reorder Level
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.reorder_level} {selectedItem.unit_of_measure}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <DollarSign size={14} />
+                      Selling Price
+                    </span>
+                    <span className="stock-detail-value">{formatCurrency(selectedItem.standard_selling_price || 0)}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">Status</span>
+                    <span className={`stock-detail-value status-badge ${selectedItem.stock_status?.toLowerCase().replace(/\s+/g, '-')}`}>
+                      {selectedItem.stock_status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="stock-modal-actions">
+              <button
+                type="button"
+                className="stock-action-btn stock-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

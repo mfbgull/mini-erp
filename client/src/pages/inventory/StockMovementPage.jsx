@@ -720,110 +720,64 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
           </Button>
         </div>
 
-        <div className="ag-theme-quartz" style={{ height: 300, width: '100%' }}>
-          <AgGridReact
-            rowData={lineItems}
-            columnDefs={[
-              {
-                headerName: '#',
-                valueGetter: 'node.rowIndex + 1',
-                width: 60,
-                cellStyle: { color: 'var(--neutral-500)' }
-              },
-              {
-                headerName: 'Item',
-                field: 'item_id',
-                flex: 2,
-                editable: true,
-                cellEditor: 'agSelectCellEditor',
-                cellEditorParams: {
-                  values: items.map(i => String(i.id))
-                },
-                valueFormatter: params => {
-                  if (!params.value) return '';
-                  const item = items.find(i => i.id === parseInt(params.value));
-                  return item ? `${item.item_code} - ${item.item_name}` : '';
-                },
-                valueParser: params => params.newValue ? String(params.newValue) : '',
-                onCellValueChanged: params => {
-                  const warehouseId = movementType === 'TRANSFER'
-                    ? formData.from_warehouse_id
-                    : formData.to_warehouse_id;
-                  params.data.available_stock = getItemStock(params.value, warehouseId);
-                  params.api.refreshCells({ rowNodes: [params.node], force: true });
-                }
-              },
-              {
-                headerName: 'Available Stock',
-                field: 'available_stock',
-                flex: 1,
-                valueGetter: params => {
-                  if (!params.data.item_id) return null;
-                  const warehouseId = movementType === 'TRANSFER'
-                    ? formData.from_warehouse_id
-                    : formData.to_warehouse_id;
-                  if (!warehouseId) return null;
-                  return getItemStock(params.data.item_id, warehouseId);
-                },
-                valueFormatter: params => {
-                  if (!params.data.item_id || !(formData.from_warehouse_id || formData.to_warehouse_id)) return '-';
-                  const item = items.find(i => i.id === parseInt(params.data.item_id));
-                  const stockValue = params.value !== null ? params.value : 0;
-                  return `${stockValue} ${item?.unit_of_measure || ''}`;
-                },
-                cellStyle: params => {
-                  const stockValue = params.value !== null ? params.value : 0;
-                  return {
-                    color: stockValue > 0 ? 'var(--success)' : params.data.item_id ? 'var(--error)' : 'var(--neutral-400)'
-                  };
-                }
-              },
-              {
-                headerName: 'Quantity',
-                field: 'quantity',
-                flex: 1,
-                editable: true,
-                cellEditor: 'agNumberCellEditor',
-                cellEditorParams: {
-                  precision: 2
-                }
-              },
-              {
-                headerName: '',
-                width: 60,
-                cellRenderer: (params) => (
-                  <button
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: lineItems.length === 1 ? 'var(--neutral-300)' : 'var(--error)',
-                      cursor: lineItems.length === 1 ? 'not-allowed' : 'pointer',
-                      fontSize: '18px',
-                      padding: '4px 8px'
-                    }}
-                    disabled={lineItems.length === 1}
-                    title="Remove row"
-                    onClick={() => removeLineItem(params.node.rowIndex)}
-                  >
-                    ×
-                  </button>
-                )
-              }
-            ]}
-            defaultColDef={{
-              sortable: false,
-              resizable: true
-            }}
-            domLayout="autoHeight"
-            suppressCellFocus={false}
-            singleClickEdit={true}
-            stopEditingWhenCellsLoseFocus={true}
-            onCellValueChanged={params => {
-              const updatedItems = [...lineItems];
-              updatedItems[params.node.rowIndex] = params.data;
-              setLineItems(updatedItems);
-            }}
-          />
+        <div className="line-items-list">
+          {lineItems.map((lineItem, index) => {
+            const warehouseId = movementType === 'TRANSFER'
+              ? formData.from_warehouse_id
+              : formData.to_warehouse_id;
+            const availableStock = getItemStock(lineItem.item_id, warehouseId);
+            const selectedItem = items.find(i => i.id === parseInt(lineItem.item_id));
+
+            return (
+              <div key={index} className="line-item-row">
+                <span className="line-item-index">{index + 1}</span>
+                <div className="line-item-fields">
+                  <FormInput
+                    label="Item"
+                    name={`item_id_${index}`}
+                    type="searchable-select"
+                    value={lineItem.item_id}
+                    onChange={(e) => handleLineItemChange(index, 'item_id', e.target.value)}
+                    options={items.map(i => ({
+                      value: i.id,
+                      label: `${i.item_code} - ${i.item_name}`
+                    }))}
+                    placeholder="Search items..."
+                    required
+                  />
+                  <div className="line-item-stock-qty">
+                    <div className="available-stock-display">
+                      <span className="stock-label">Available</span>
+                      <span className={`stock-value ${availableStock > 0 ? 'stock-positive' : lineItem.item_id ? 'stock-zero' : ''}`}>
+                        {lineItem.item_id && warehouseId
+                          ? `${availableStock} ${selectedItem?.unit_of_measure || ''}`
+                          : '-'}
+                      </span>
+                    </div>
+                    <FormInput
+                      label="Quantity"
+                      name={`quantity_${index}`}
+                      type="number"
+                      step="0.01"
+                      value={lineItem.quantity}
+                      onChange={(e) => handleLineItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="line-item-remove"
+                  disabled={lineItems.length === 1}
+                  title="Remove row"
+                  onClick={() => removeLineItem(index)}
+                >
+                  ×
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
 

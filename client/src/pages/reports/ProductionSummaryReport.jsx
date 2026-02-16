@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -12,7 +12,8 @@ import {
   Filter,
   BarChart3,
   CheckCircle,
-  XCircle
+  XCircle,
+  X
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -32,7 +33,30 @@ export default function ProductionSummaryReport() {
     toDate: new Date().toISOString().split('T')[0]
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedProduction, setSelectedProduction] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (production) => {
+    setSelectedProduction(production);
+    setShowDetailModal(true);
+  };
 
   // Fetch production summary report
   const { data: reportData, isLoading, refetch } = useQuery({
@@ -283,32 +307,58 @@ export default function ProductionSummaryReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.production && reportData.production.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.production || []}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                // Check if the grid is visible before sizing columns
-                setTimeout(() => {
-                  if (params.api && params.columnApi) {
-                    const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-                    if (gridElement && gridElement.clientWidth > 0) {
-                      params.columnApi.autoSizeAllColumns();
+          <>
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.production || []}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
                     }
-                  }
-                }, 100); // Small delay to ensure grid is rendered
-              }}
-            />
-          </div>
+                  }, 100);
+                }}
+              />
+            </div>
+
+            <div className="mobile-sales-list">
+              {reportData.production.map((production, index) => (
+                <div
+                  key={production.work_order_id || production.work_order_number || `production-${index}`}
+                  className="production-card"
+                  onClick={() => handleCardClick(production)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(production);
+                    }
+                  }}
+                >
+                  <div className="production-card-content">
+                    <h3 className="production-card-title">{production.work_order_number}</h3>
+                    <span className={`production-card-status ${production.status?.toLowerCase().replace(' ', '-')}`}>
+                      {production.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <Factory size={48} />
@@ -317,6 +367,77 @@ export default function ProductionSummaryReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedProduction && (
+        <div
+          className="production-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="production-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="production-modal-header">
+              <h2 className="production-modal-title">{selectedProduction.work_order_number}</h2>
+              <button
+                type="button"
+                className="production-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="production-modal-content">
+              <div className="production-detail-section">
+                <div className="production-details-grid">
+                  <div className="production-detail-item">
+                    <span className="production-detail-label">Item</span>
+                    <span className="production-detail-value">{selectedProduction.item_name || '-'}</span>
+                  </div>
+
+                  <div className="production-detail-item">
+                    <span className="production-detail-label">Planned Quantity</span>
+                    <span className="production-detail-value">{selectedProduction.planned_quantity}</span>
+                  </div>
+
+                  <div className="production-detail-item">
+                    <span className="production-detail-label">Completed Quantity</span>
+                    <span className="production-detail-value">{selectedProduction.completed_quantity || 0}</span>
+                  </div>
+
+                  <div className="production-detail-item">
+                    <span className="production-detail-label">Scrapped Quantity</span>
+                    <span className="production-detail-value">{selectedProduction.scrapped_quantity || 0}</span>
+                  </div>
+
+                  <div className="production-detail-item">
+                    <span className="production-detail-label">Status</span>
+                    <span className="production-detail-value">{selectedProduction.status || '-'}</span>
+                  </div>
+
+                  <div className="production-detail-item">
+                    <span className="production-detail-label">Date</span>
+                    <span className="production-detail-value">{selectedProduction.production_date ? new Date(selectedProduction.production_date).toLocaleDateString() : '-'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="production-modal-actions">
+              <button
+                type="button"
+                className="production-action-btn production-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

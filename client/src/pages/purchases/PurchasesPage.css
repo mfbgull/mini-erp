@@ -187,3 +187,89 @@
   color: var(--primary-700);
   font-size: 18px;
 }
+
+/* Mobile: Compact 2-column stats grid */
+.stats-grid-mobile {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.stats-grid-mobile .stat-card {
+  padding: var(--space-sm) var(--space-md);
+  gap: var(--space-sm);
+}
+
+.stats-grid-mobile .stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+}
+
+.stats-grid-mobile .stat-label {
+  font-size: 0.65rem;
+  margin-bottom: 2px;
+  letter-spacing: 0.3px;
+}
+
+.stats-grid-mobile .stat-value {
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+.stats-grid-mobile .stat-card:hover {
+  transform: none;
+}
+
+/* Mobile: Horizontal scrolling quick actions */
+.quick-actions-mobile {
+  display: flex !important;
+  overflow-x: auto;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-xs);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.quick-actions-mobile::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-actions-mobile .quick-action-btn {
+  flex: 0 0 auto;
+  min-width: 80px;
+  padding: var(--space-sm) var(--space-md);
+  gap: 4px;
+}
+
+.quick-actions-mobile .action-icon {
+  font-size: 1.1rem;
+}
+
+.quick-actions-mobile .action-text {
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Mobile: Purchase form rows stack */
+@media (max-width: 768px) {
+  .purchase-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .purchases-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .purchases-page .page-header .btn {
+    width: 100%;
+  }
+
+  .purchases-page .page-subtitle {
+    font-size: 0.8rem;
+  }
+}

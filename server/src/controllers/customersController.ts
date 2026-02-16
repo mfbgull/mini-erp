@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
+import { getRouteParam } from '../utils/queryUtils';
+import logger from '../utils/logger';
 
 function getCustomers(req: Request, res: Response): void {
   try {
@@ -49,7 +51,13 @@ function getCustomers(req: Request, res: Response): void {
       }
     }
 
-    query += ` ORDER BY ${sortBy} ${sortOrder}`;
+    // Validate and whitelist sort parameters to prevent SQL injection
+    const ALLOWED_SORT_COLUMNS = ['customer_name', 'customer_code', 'created_at', 'id', 'current_balance', 'credit_limit'];
+    const ALLOWED_SORT_ORDERS = ['ASC', 'DESC'];
+    const validatedSortBy = ALLOWED_SORT_COLUMNS.includes(sortBy) ? sortBy : 'customer_name';
+    const validatedSortOrder = ALLOWED_SORT_ORDERS.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'ASC';
+
+    query += ` ORDER BY ${validatedSortBy} ${validatedSortOrder}`;
 
     const offset = (Number(page) - 1) * Number(limit);
     query += ` LIMIT ? OFFSET ?`;
@@ -93,7 +101,7 @@ function getCustomers(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching customers:', error);
+    logger.error('Error fetching customers:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch customers'
@@ -134,7 +142,7 @@ function getCustomer(req: Request, res: Response): void {
       data: customer
     });
   } catch (error) {
-    console.error('Error fetching customer:', error);
+    logger.error('Error fetching customer:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch customer'
@@ -242,7 +250,7 @@ function createCustomer(req: AuthRequest, res: Response): void {
       message: 'Customer created successfully'
     });
   } catch (error) {
-    console.error('Error creating customer:', error);
+    logger.error('Error creating customer:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create customer'
@@ -252,7 +260,7 @@ function createCustomer(req: AuthRequest, res: Response): void {
 
 function updateCustomer(req: AuthRequest, res: Response): void {
   try {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id);
     const {
       customer_name,
       contact_person,
@@ -312,7 +320,7 @@ function updateCustomer(req: AuthRequest, res: Response): void {
       message: 'Customer updated successfully'
     });
   } catch (error) {
-    console.error('Error updating customer:', error);
+    logger.error('Error updating customer:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update customer'
@@ -322,7 +330,7 @@ function updateCustomer(req: AuthRequest, res: Response): void {
 
 function deleteCustomer(req: AuthRequest, res: Response): void {
   try {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id);
 
     const existingCustomer = db.prepare('SELECT * FROM customers WHERE id = ?').get(id);
     if (!existingCustomer) {
@@ -359,7 +367,7 @@ function deleteCustomer(req: AuthRequest, res: Response): void {
       message: 'Customer deactivated successfully'
     });
   } catch (error) {
-    console.error('Error deleting customer:', error);
+    logger.error('Error deleting customer:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to delete customer'
@@ -407,7 +415,7 @@ function getCustomerLedger(req: Request, res: Response): void {
       data: ledgerEntries
     });
   } catch (error) {
-    console.error('Error fetching customer ledger:', error);
+    logger.error('Error fetching customer ledger:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch customer ledger'
@@ -491,7 +499,7 @@ function getCustomerStatement(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching customer statement:', error);
+    logger.error('Error fetching customer statement:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch customer statement'
@@ -521,7 +529,7 @@ function getCustomerBalance(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching customer balance:', error);
+    logger.error('Error fetching customer balance:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch customer balance'
@@ -556,7 +564,7 @@ function recalculateAllBalances(req: AuthRequest, res: Response): void {
       message: `Recalculated balances for ${updatedCount} customers`
     });
   } catch (error) {
-    console.error('Error recalculating balances:', error);
+    logger.error('Error recalculating balances:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to recalculate balances'

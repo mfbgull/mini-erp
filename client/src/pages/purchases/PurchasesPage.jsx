@@ -175,132 +175,134 @@ export default function PurchasesPage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <div className="stats-grid">
+      <div className={`stats-grid ${isMobile ? 'stats-grid-mobile' : ''}`}>
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            <ShoppingCart size={24} color="white" />
+            <ShoppingCart size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Purchases</div>
             <div className="stat-value">{stats.totalPurchases}</div>
-            <div className="stat-subtitle">All transactions</div>
+            {!isMobile && <div className="stat-subtitle">All transactions</div>}
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            <DollarSign size={24} color="white" />
+            <DollarSign size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Value</div>
             <div className="stat-value">{formatCurrency(stats.totalValue)}</div>
-            <div className="stat-subtitle">Purchase cost</div>
+            {!isMobile && <div className="stat-subtitle">Purchase cost</div>}
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            <BarChart3 size={24} color="white" />
+            <BarChart3 size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Quantity</div>
             <div className="stat-value">{parseFloat(stats.totalQuantity).toFixed(2)}</div>
-            <div className="stat-subtitle">Aggregate items</div>
+            {!isMobile && <div className="stat-subtitle">Aggregate items</div>}
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
-            <Building2 size={24} color="white" />
+            <Building2 size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Suppliers</div>
             <div className="stat-value">{stats.uniqueSuppliers}</div>
-            <div className="stat-subtitle">Unique vendors</div>
+            {!isMobile && <div className="stat-subtitle">Unique vendors</div>}
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            <Package size={24} color="white" />
+            <Package size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Items</div>
             <div className="stat-value">{stats.uniqueItems}</div>
-            <div className="stat-subtitle">Products purchased</div>
+            {!isMobile && <div className="stat-subtitle">Products purchased</div>}
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            <TrendingUp size={24} color="white" />
+            <TrendingUp size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Average Value</div>
             <div className="stat-value">{formatCurrency(stats.averagePurchaseValue)}</div>
-            <div className="stat-subtitle">Per purchase</div>
+            {!isMobile && <div className="stat-subtitle">Per purchase</div>}
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            <Gem size={24} color="white" />
+            <Gem size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Largest Purchase</div>
-            <div className="stat-value" style={{ fontSize: '1.4rem' }}>
+            <div className="stat-value" style={isMobile ? undefined : { fontSize: '1.4rem' }}>
               {stats.largestPurchase.total_cost ? formatCurrency(stats.largestPurchase.total_cost) : 'N/A'}
             </div>
-            <div className="stat-subtitle">
-              {stats.largestPurchase.total_cost ? `${formatCurrency(stats.largestPurchase.total_cost)} on ${format(new Date(stats.largestPurchase.purchase_date), 'MMM dd')}` : 'No purchases'}
-            </div>
+            {!isMobile && (
+              <div className="stat-subtitle">
+                {stats.largestPurchase.total_cost ? `${formatCurrency(stats.largestPurchase.total_cost)} on ${format(new Date(stats.largestPurchase.purchase_date), 'MMM dd')}` : 'No purchases'}
+              </div>
+            )}
           </div>
         </div>
 
         <div className="stat-card" style={{ borderColor: stats.recentPurchases > 0 ? '#f5af19' : undefined }}>
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)' }}>
-            <CalendarDays size={24} color="white" />
+            <CalendarDays size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
             <div className="stat-label">Recent (30 Days)</div>
             <div className="stat-value">{stats.recentPurchases}</div>
-            <div className="stat-subtitle">Last month</div>
+            {!isMobile && <div className="stat-subtitle">Last month</div>}
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="quick-actions">
+      <div className={`quick-actions ${isMobile ? 'quick-actions-mobile' : ''}`}>
         <button className="quick-action-btn" onClick={handleExport}>
-          <Download className="action-icon" size={24} />
-          <span className="action-text">Export to CSV</span>
+          <Download className="action-icon" size={isMobile ? 18 : 24} />
+          <span className="action-text">Export</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/purchase-summary')}
         >
-          <ClipboardList className="action-icon" size={24} />
-          <span className="action-text">Purchase Summary</span>
+          <ClipboardList className="action-icon" size={isMobile ? 18 : 24} />
+          <span className="action-text">Summary</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/stock-valuation')}
         >
-          <Wallet className="action-icon" size={24} />
-          <span className="action-text">Stock Valuation</span>
+          <Wallet className="action-icon" size={isMobile ? 18 : 24} />
+          <span className="action-text">Valuation</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/inventory/stock-movements')}
         >
-          <BarChart3 className="action-icon" size={24} />
-          <span className="action-text">Stock Movements</span>
+          <BarChart3 className="action-icon" size={isMobile ? 18 : 24} />
+          <span className="action-text">Movements</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/inventory/items')}
         >
-          <Package className="action-icon" size={24} />
+          <Package className="action-icon" size={isMobile ? 18 : 24} />
           <span className="action-text">Items</span>
         </button>
       </div>

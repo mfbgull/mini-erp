@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
 import SaleModel from '../models/Sale';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 // Direct sale manual entry removed - use POS system or invoices instead
 // function recordSale(req: AuthRequest, res: Response): void {
@@ -38,7 +39,7 @@ import db from '../config/database';
 
 //     res.status(201).json(sale);
 //   } catch (error) {
-//     console.error('Record sale error:', error);
+//     logger.error('Record sale error:', error);
 //     res.status(500).json({ error: 'Failed to record sale' });
 //   }
 // }
@@ -58,7 +59,7 @@ import db from '../config/database';
 
 //     res.json(sales);
 //   } catch (error) {
-//     console.error('Get sales error:', error);
+//     logger.error('Get sales error:', error);
 //     res.status(500).json({ error: 'Failed to get sales' });
 //   }
 // }
@@ -74,7 +75,7 @@ function getSale(req: Request, res: Response): void {
 
     res.json(sale);
   } catch (error) {
-    console.error('Get sale error:', error);
+    logger.error('Get sale error:', error);
     res.status(500).json({ error: 'Failed to get sale' });
   }
 }
@@ -102,7 +103,7 @@ function getItemCustomerPriceHistory(req: Request, res: Response): void {
       data: history || null
     });
   } catch (error) {
-    console.error('Error fetching price history:', error);
+    logger.error('Error fetching price history:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch price history'
@@ -117,7 +118,7 @@ function getSalesSummaryByItem(req: Request, res: Response): void {
 
     res.json(summary);
   } catch (error) {
-    console.error('Get sales summary by item error:', error);
+    logger.error('Get sales summary by item error:', error);
     res.status(500).json({ error: 'Failed to get sales summary by item' });
   }
 }
@@ -135,7 +136,7 @@ function getSalesSummaryByDateRange(req: Request, res: Response): void {
 
     res.json(summary);
   } catch (error) {
-    console.error('Get sales summary by date range error:', error);
+    logger.error('Get sales summary by date range error:', error);
     res.status(500).json({ error: 'Failed to get sales summary by date range' });
   }
 }
@@ -148,7 +149,7 @@ function getTopCustomers(req: Request, res: Response): void {
 
     res.json(customers);
   } catch (error) {
-    console.error('Get top customers error:', error);
+    logger.error('Get top customers error:', error);
     res.status(500).json({ error: 'Failed to get top customers' });
   }
 }
@@ -159,7 +160,7 @@ function deleteSale(req: AuthRequest, res: Response): void {
 
     res.json({ success: true, message: 'Sale deleted successfully' });
   } catch (error) {
-    console.error('Delete sale error:', error);
+    logger.error('Delete sale error:', error);
     res.status(500).json({ error: error.message || 'Failed to delete sale' });
   }
 }

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 function getSettings(req: Request, res: Response): void {
   try {
@@ -16,7 +17,7 @@ function getSettings(req: Request, res: Response): void {
 
     res.json(settingsObj);
   } catch (error) {
-    console.error('Get settings error:', error);
+    logger.error('Get settings error:', error);
     res.status(500).json({ error: 'Failed to fetch settings' });
   }
 }
@@ -33,7 +34,7 @@ function getSetting(req: Request, res: Response): void {
 
     res.json(setting);
   } catch (error) {
-    console.error('Get setting error:', error);
+    logger.error('Get setting error:', error);
     res.status(500).json({ error: 'Failed to fetch setting' });
   }
 }
@@ -66,7 +67,7 @@ function updateSetting(req: Request, res: Response): void {
     const updated = db.prepare('SELECT * FROM settings WHERE key = ?').get(key);
     res.json(updated);
   } catch (error) {
-    console.error('Update setting error:', error);
+    logger.error('Update setting error:', error);
     res.status(500).json({ error: 'Failed to update setting' });
   }
 }
@@ -116,15 +117,15 @@ function updateSettings(req: Request, res: Response): void {
 
     res.json(settingsObj);
   } catch (error) {
-    console.error('Update settings error:', error);
+    logger.error('Update settings error:', error);
     res.status(500).json({ error: 'Failed to update settings' });
   }
 }
 
 function initializeDefaults(): void {
   const defaults = [
-    { key: 'currency_symbol', value: '$', description: 'Currency symbol displayed throughout the application' },
-    { key: 'currency_code', value: 'USD', description: 'Currency code (e.g., USD, EUR, PKR)' },
+    { key: 'currency_symbol', value: 'Rs.', description: 'Currency symbol displayed throughout the application' },
+    { key: 'currency_code', value: 'PKR', description: 'Currency code (e.g., USD, EUR, PKR)' },
     { key: 'company_name', value: 'Mini ERP', description: 'Company name' },
     { key: 'date_format', value: 'MM/DD/YYYY', description: 'Date format preference' },
     { key: 'decimal_places', value: '2', description: 'Number of decimal places for currency' },

@@ -4,6 +4,8 @@ import { generateToken } from '../middleware/auth';
 import { AuthRequest } from '../types';
 import { logAuth, ActionType } from '../services/activityLogger';
 import db from '../config/database';
+import logger from '../utils/logger';
+import { sendSuccess, sendBadRequest, sendUnauthorized, sendNotFound, sendInternalError } from '../utils/apiResponse';
 
 function login(req: Request, res: Response): void {
   try {
@@ -11,7 +13,7 @@ function login(req: Request, res: Response): void {
     const ipAddress = req.ip || req.get('x-forwarded-for') || req.get('x-real-ip');
 
     if (!username || !password) {
-      res.status(400).json({ error: 'Username and password required' });
+      sendBadRequest(res, 'Username and password required');
       return;
     }
 
@@ -24,7 +26,7 @@ function login(req: Request, res: Response): void {
     if (!user) {
       // Log failed login attempt
       logAuth(ActionType.LOGIN_FAILED, undefined, `Failed login attempt for user: ${username}`, { username }, ipAddress);
-      res.status(401).json({ error: 'Invalid username or password' });
+      sendUnauthorized(res, 'Invalid username or password');
       return;
     }
 
@@ -33,7 +35,7 @@ function login(req: Request, res: Response): void {
     if (!passwordMatch) {
       // Log failed login attempt
       logAuth(ActionType.LOGIN_FAILED, user.id, `Failed login attempt for user: ${username}`, { username }, ipAddress);
-      res.status(401).json({ error: 'Invalid username or password' });
+      sendUnauthorized(res, 'Invalid username or password');
       return;
     }
 
@@ -47,14 +49,18 @@ function login(req: Request, res: Response): void {
 
     const { password_hash, ...userWithoutPassword } = user;
 
-    res.json({
-      success: true,
-      token,
-      user: userWithoutPassword
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
+
+    sendSuccess(res, { user: userWithoutPassword });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    logger.error('Login error:', error);
+    sendInternalError(res, 'Login failed');
   }
 }
 
@@ -66,10 +72,11 @@ function logout(req: AuthRequest, res: Response): void {
     // Log logout using activity logger
     logAuth(ActionType.LOGOUT, userId, `User ${username} logged out`);
 
-    res.json({ success: true, message: 'Logged out successfully' });
+    res.clearCookie('token');
+    sendSuccess(res, { message: 'Logged out successfully' });
   } catch (error) {
-    console.error('Logout error:', error);
-    res.status(500).json({ error: 'Logout failed' });
+    logger.error('Logout error:', error);
+    sendInternalError(res, 'Logout failed');
   }
 }
 
@@ -82,14 +89,14 @@ function getCurrentUser(req: AuthRequest, res: Response): void {
     `).get(req.user!.id);
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' });
+      sendNotFound(res, 'User');
       return;
     }
 
-    res.json(user);
+    sendSuccess(res, user);
   } catch (error) {
-    console.error('Get current user error:', error);
-    res.status(500).json({ error: 'Failed to get user info' });
+    logger.error('Get current user error:', error);
+    sendInternalError(res, 'Failed to get user info');
   }
 }
 
@@ -98,12 +105,12 @@ function changePassword(req: AuthRequest, res: Response): void {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      res.status(400).json({ error: 'Current and new password required' });
+      sendBadRequest(res, 'Current and new password required');
       return;
     }
 
     if (newPassword.length < 6) {
-      res.status(400).json({ error: 'New password must be at least 6 characters' });
+      sendBadRequest(res, 'New password must be at least 6 characters');
       return;
     }
 
@@ -116,7 +123,7 @@ function changePassword(req: AuthRequest, res: Response): void {
     const passwordMatch = bcrypt.compareSync(currentPassword, user.password_hash);
 
     if (!passwordMatch) {
-      res.status(401).json({ error: 'Current password is incorrect' });
+      sendUnauthorized(res, 'Current password is incorrect');
       return;
     }
 
@@ -131,10 +138,10 @@ function changePassword(req: AuthRequest, res: Response): void {
     // Log password change using activity logger
     logAuth(ActionType.PASSWORD_CHANGE, req.user!.id, 'Password changed successfully');
 
-    res.json({ success: true, message: 'Password changed successfully' });
+    sendSuccess(res, { message: 'Password changed successfully' });
   } catch (error) {
-    console.error('Change password error:', error);
-    res.status(500).json({ error: 'Failed to change password' });
+    logger.error('Change password error:', error);
+    sendInternalError(res, 'Failed to change password');
   }
 }
 

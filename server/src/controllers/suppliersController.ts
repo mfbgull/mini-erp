@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 function getSuppliers(req: Request, res: Response): void {
   try {
@@ -30,7 +31,7 @@ function getSuppliers(req: Request, res: Response): void {
       data: suppliers
     });
   } catch (error) {
-    console.error('Error fetching suppliers:', error);
+    logger.error('Error fetching suppliers:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch suppliers'
@@ -97,7 +98,7 @@ function createSupplier(req: Request, res: Response): void {
       }
     });
   } catch (error: any) {
-    console.error('Error creating supplier:', error);
+    logger.error('Error creating supplier:', error);
     if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
       res.status(400).json({
         success: false,
@@ -175,7 +176,7 @@ function updateSupplier(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error updating supplier:', error);
+    logger.error('Error updating supplier:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update supplier'
@@ -220,7 +221,7 @@ function deleteSupplier(req: Request, res: Response): void {
       message: 'Supplier deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting supplier:', error);
+    logger.error('Error deleting supplier:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to delete supplier'

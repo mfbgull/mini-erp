@@ -2,12 +2,13 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { AuthUser, AuthRequest } from '../types';
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
 
-if (!JWT_SECRET) {
-  console.error('FATAL ERROR: JWT_SECRET environment variable is required');
-  console.error('Set it with: export JWT_SECRET=$(openssl rand -base64 32)');
-  process.exit(1);
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET environment variable is not set. Server cannot start in production mode without a secure secret.');
+  }
+  console.warn('WARNING: JWT_SECRET not set, using default dev secret. Set JWT_SECRET in production!');
 }
 
 export function authenticateToken(
@@ -16,9 +17,9 @@ export function authenticateToken(
   next: NextFunction
 ): void {
   const authHeader = req.headers['authorization'];
-  const token = authHeader?.startsWith('Bearer ')
+  const token = req.cookies?.token || (authHeader?.startsWith('Bearer ')
     ? authHeader.slice(7)
-    : null;
+    : null);
 
   if (!token) {
     res.status(401).json({ error: 'Access token required' });
@@ -37,6 +38,12 @@ export function authenticateToken(
   } catch (err: any) {
     console.warn(`[Auth] Token verification failed: ${err.name} from IP ${req.ip}`);
     
+    // In production, return generic error to prevent information leakage
+    if (process.env.NODE_ENV === 'production') {
+      res.status(401).json({ error: 'Unauthorized', code: 'AUTH_FAILED' });
+      return;
+    }
+
     if (err.name === 'TokenExpiredError') {
       res.status(401).json({ error: 'Token expired', code: 'TOKEN_EXPIRED' });
     } else if (err.name === 'JsonWebTokenError') {

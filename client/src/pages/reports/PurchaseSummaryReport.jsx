@@ -10,7 +10,8 @@ import {
   Download,
   Filter,
   BarChart3,
-  Package
+  Package,
+  X
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -32,8 +33,31 @@ export default function PurchaseSummaryReport() {
   const [supplierId, setSupplierId] = useState('');
   const [itemId, setItemId] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedPurchase, setSelectedPurchase] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
   const gridRef = useRef(null);
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (purchase) => {
+    setSelectedPurchase(purchase);
+    setShowDetailModal(true);
+  };
 
   // Fetch suppliers for filter
   const { data: suppliers = [] } = useQuery({
@@ -383,21 +407,46 @@ export default function PurchaseSummaryReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.purchases && reportData.purchases.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.purchases || []}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-            />
-          </div>
+          <>
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.purchases || []}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+              />
+            </div>
+
+            <div className="mobile-sales-list">
+              {reportData.purchases.map((purchase, index) => (
+                <div
+                  key={purchase.po_id || purchase.po_number || `purchase-${index}`}
+                  className="purchase-card"
+                  onClick={() => handleCardClick(purchase)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(purchase);
+                    }
+                  }}
+                >
+                  <div className="purchase-card-content">
+                    <h3 className="purchase-card-title">{purchase.po_number}</h3>
+                    <span className="purchase-card-amount">{formatCurrency(purchase.total || 0)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <ShoppingCart size={48} />
@@ -406,6 +455,72 @@ export default function PurchaseSummaryReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedPurchase && (
+        <div
+          className="purchase-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="purchase-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="purchase-modal-header">
+              <h2 className="purchase-modal-title">{selectedPurchase.po_number}</h2>
+              <button
+                type="button"
+                className="purchase-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="purchase-modal-content">
+              <div className="purchase-detail-section">
+                <div className="purchase-details-grid">
+                  <div className="purchase-detail-item">
+                    <span className="purchase-detail-label">Supplier</span>
+                    <span className="purchase-detail-value">{selectedPurchase.supplier_name || '-'}</span>
+                  </div>
+
+                  <div className="purchase-detail-item">
+                    <span className="purchase-detail-label">Date</span>
+                    <span className="purchase-detail-value">{selectedPurchase.po_date ? new Date(selectedPurchase.po_date).toLocaleDateString() : '-'}</span>
+                  </div>
+
+                  <div className="purchase-detail-item">
+                    <span className="purchase-detail-label">Status</span>
+                    <span className="purchase-detail-value">{selectedPurchase.status || '-'}</span>
+                  </div>
+
+                  <div className="purchase-detail-item">
+                    <span className="purchase-detail-label">Total</span>
+                    <span className="purchase-detail-value">{formatCurrency(selectedPurchase.total || 0)}</span>
+                  </div>
+
+                  <div className="purchase-detail-item">
+                    <span className="purchase-detail-label">Items</span>
+                    <span className="purchase-detail-value">{selectedPurchase.items_count || 0}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="purchase-modal-actions">
+              <button
+                type="button"
+                className="purchase-action-btn purchase-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

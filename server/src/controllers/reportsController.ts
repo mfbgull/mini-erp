@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 function getARAgingReport(req: Request, res: Response): void {
   try {
@@ -108,7 +109,7 @@ function getARAgingReport(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching AR aging report:', error);
+    logger.error('Error fetching AR aging report:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch AR aging report'
@@ -176,7 +177,7 @@ function getCustomerStatements(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching customer statements:', error);
+    logger.error('Error fetching customer statements:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch customer statements'
@@ -211,7 +212,7 @@ function getTopDebtors(req: Request, res: Response): void {
       data: topDebtors
     });
   } catch (error) {
-    console.error('Error fetching top debtors:', error);
+    logger.error('Error fetching top debtors:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch top debtors'
@@ -223,12 +224,22 @@ function getDSOMetric(req: Request, res: Response): void {
   try {
     const { period = '30' } = req.query;
 
+    // Validate period is a positive integer to prevent SQL injection
+    const validatedPeriod = parseInt(period as string, 10);
+    if (isNaN(validatedPeriod) || validatedPeriod < 1 || validatedPeriod > 3650) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid period. Must be a number between 1 and 3650 days'
+      });
+      return;
+    }
+
     const periodInvoicesQuery = `
       SELECT 
         SUM(total_amount) as total_sales,
         COUNT(id) as total_invoices
       FROM invoices
-      WHERE invoice_date >= date('now', '-${period} days')
+      WHERE invoice_date >= date('now', '-${validatedPeriod} days')
     `;
 
     const periodInvoices = db.prepare(periodInvoicesQuery).get() as { total_sales: number; total_invoices: number };
@@ -264,7 +275,7 @@ function getDSOMetric(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error calculating DSO:', error);
+    logger.error('Error calculating DSO:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to calculate Days Sales Outstanding'
@@ -357,7 +368,7 @@ function getReceivablesSummary(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching receivables summary:', error);
+    logger.error('Error fetching receivables summary:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch receivables summary'
@@ -443,7 +454,7 @@ function getSalesSummary(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching sales summary:', error);
+    logger.error('Error fetching sales summary:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch sales summary'
@@ -497,7 +508,7 @@ function getSalesByCustomer(req: Request, res: Response): void {
       data: salesByCustomer
     });
   } catch (error) {
-    console.error('Error fetching sales by customer:', error);
+    logger.error('Error fetching sales by customer:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch sales by customer'
@@ -546,7 +557,7 @@ function getSalesByItem(req: Request, res: Response): void {
       data: salesByItem
     });
   } catch (error) {
-    console.error('Error fetching sales by item:', error);
+    logger.error('Error fetching sales by item:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch sales by item'
@@ -626,7 +637,7 @@ function getStockLevelReport(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching stock level report:', error);
+    logger.error('Error fetching stock level report:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch stock level report'
@@ -668,7 +679,7 @@ function getLowStockReport(req: Request, res: Response): void {
       data: lowStockItems
     });
   } catch (error) {
-    console.error('Error fetching low stock report:', error);
+    logger.error('Error fetching low stock report:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch low stock report'
@@ -723,7 +734,7 @@ function getStockValuationReport(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching stock valuation report:', error);
+    logger.error('Error fetching stock valuation report:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch stock valuation report'
@@ -811,7 +822,7 @@ function getInventoryMovementReport(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching inventory movement report:', error);
+    logger.error('Error fetching inventory movement report:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch inventory movement report'
@@ -904,7 +915,7 @@ function getProfitLossReport(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error calculating profit & loss:', error);
+    logger.error('Error calculating profit & loss:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to calculate profit & loss'
@@ -993,7 +1004,7 @@ function getCashFlowReport(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error calculating cash flow:', error);
+    logger.error('Error calculating cash flow:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to calculate cash flow'
@@ -1077,7 +1088,7 @@ function getPurchaseSummary(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching purchase summary:', error);
+    logger.error('Error fetching purchase summary:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch purchase summary'
@@ -1132,7 +1143,7 @@ function getSupplierAnalysis(req: Request, res: Response): void {
       data: suppliers
     });
   } catch (error) {
-    console.error('Error fetching supplier analysis:', error);
+    logger.error('Error fetching supplier analysis:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch supplier analysis'
@@ -1229,7 +1240,7 @@ function getProductionSummary(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching production summary:', error);
+    logger.error('Error fetching production summary:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch production summary'
@@ -1286,7 +1297,7 @@ function getBOMUsageReport(req: Request, res: Response): void {
       data: bomUsage
     });
   } catch (error) {
-    console.error('Error fetching BOM usage report:', error);
+    logger.error('Error fetching BOM usage report:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch BOM usage report'
@@ -1422,7 +1433,7 @@ function getExpensesReport(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching expenses report:', error);
+    logger.error('Error fetching expenses report:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expenses report'

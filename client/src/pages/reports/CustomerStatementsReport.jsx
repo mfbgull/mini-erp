@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -8,9 +8,10 @@ import {
   Calendar,
   Download,
   Filter,
-  Eye,
-  Edit,
-  Plus
+  X,
+  Receipt,
+  Hash,
+  TrendingUp
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -31,7 +32,30 @@ export default function CustomerStatementsReport() {
   });
   const [customerId, setCustomerId] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedStatement, setSelectedStatement] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (statement) => {
+    setSelectedStatement(statement);
+    setShowDetailModal(true);
+  };
 
   // Fetch customers for filter
   const { data: customers = [] } = useQuery({
@@ -242,32 +266,56 @@ export default function CustomerStatementsReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.statements && reportData.statements.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.statements}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                // Check if the grid is visible before sizing columns
-                setTimeout(() => {
-                  if (params.api && params.columnApi) {
-                    const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-                    if (gridElement && gridElement.clientWidth > 0) {
-                      params.columnApi.autoSizeAllColumns();
+          <>
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.statements}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
                     }
-                  }
-                }, 100); // Small delay to ensure grid is rendered
-              }}
-            />
-          </div>
+                  }, 100);
+                }}
+              />
+            </div>
+
+            <div className="mobile-statements-list">
+              {reportData.statements.map((statement, index) => (
+                <div
+                  key={`${statement.id || statement.customer_name}-${index}`}
+                  className="statement-card"
+                  onClick={() => handleCardClick(statement)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(statement);
+                    }
+                  }}
+                >
+                  <div className="statement-card-content">
+                    <h3 className="statement-customer">{statement.customer_name}</h3>
+                    <span className="statement-balance">{formatCurrency(statement.balance || 0)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <Users size={48} />
@@ -276,6 +324,95 @@ export default function CustomerStatementsReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedStatement && (
+        <div
+          className="statement-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="statement-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="statement-modal-header">
+              <h2 className="statement-modal-title">{selectedStatement.customer_name}</h2>
+              <button
+                type="button"
+                className="statement-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="statement-modal-content">
+              <div className="statement-detail-section">
+                <div className="statement-details-grid">
+                  <div className="statement-detail-item">
+                    <span className="statement-detail-label">
+                      <Hash size={14} />
+                      Customer Code
+                    </span>
+                    <span className="statement-detail-value">{selectedStatement.customer_code || '-'}</span>
+                  </div>
+
+                  <div className="statement-detail-item">
+                    <span className="statement-detail-label">
+                      <Receipt size={14} />
+                      Invoice Count
+                    </span>
+                    <span className="statement-detail-value">{selectedStatement.invoice_count || 0}</span>
+                  </div>
+
+                  <div className="statement-detail-item">
+                    <span className="statement-detail-label">
+                      <DollarSign size={14} />
+                      Total Amount
+                    </span>
+                    <span className="statement-detail-value">{formatCurrency(selectedStatement.total_amount || 0)}</span>
+                  </div>
+
+                  <div className="statement-detail-item">
+                    <span className="statement-detail-label">
+                      <DollarSign size={14} />
+                      Paid Amount
+                    </span>
+                    <span className="statement-detail-value">{formatCurrency(selectedStatement.paid_amount || 0)}</span>
+                  </div>
+
+                  <div className="statement-detail-item">
+                    <span className="statement-detail-label">
+                      <TrendingUp size={14} />
+                      Balance
+                    </span>
+                    <span className="statement-detail-value">{formatCurrency(selectedStatement.balance || 0)}</span>
+                  </div>
+
+                  <div className="statement-detail-item">
+                    <span className="statement-detail-label">
+                      <Calendar size={14} />
+                      Last Payment
+                    </span>
+                    <span className="statement-detail-value">{selectedStatement.last_payment_date ? new Date(selectedStatement.last_payment_date).toLocaleDateString() : '-'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="statement-modal-actions">
+              <button
+                type="button"
+                className="statement-action-btn statement-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

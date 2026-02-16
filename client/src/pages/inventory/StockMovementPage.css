@@ -360,3 +360,108 @@
   width: 100%;
   max-width: 200px;
 }
+
+/* Line Items Section */
+.line-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.line-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--neutral-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--neutral-200);
+}
+
+.line-item-index {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--neutral-200);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--neutral-600);
+  flex-shrink: 0;
+  margin-top: 28px;
+}
+
+.line-item-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.line-item-stock-qty {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.available-stock-display {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-md);
+  background: white;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-sm);
+}
+
+.available-stock-display .stock-label {
+  font-size: 0.75rem;
+  color: var(--neutral-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.available-stock-display .stock-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--neutral-400);
+}
+
+.available-stock-display .stock-value.stock-positive {
+  color: var(--success);
+}
+
+.available-stock-display .stock-value.stock-zero {
+  color: var(--error);
+}
+
+.line-item-remove {
+  background: none;
+  border: none;
+  color: var(--neutral-300);
+  cursor: not-allowed;
+  font-size: 20px;
+  padding: 4px 8px;
+  margin-top: 24px;
+  flex-shrink: 0;
+}
+
+.line-item-remove:not(:disabled) {
+  color: var(--error);
+  cursor: pointer;
+}
+
+.line-item-remove:not(:disabled):hover {
+  color: var(--error);
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .line-item-stock-qty {
+    grid-template-columns: 1fr;
+  }
+}

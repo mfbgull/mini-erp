@@ -2,11 +2,13 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
+import { getRouteParam } from '../utils/queryUtils';
+import logger from '../utils/logger';
 
 function createExpense(req: AuthRequest, res: Response): void {
   try {
-    console.log('Create expense request body:', req.body);
-    console.log('Authenticated user:', req.user);
+    logger.debug('Create expense request body:', req.body);
+    logger.debug('Authenticated user:', req.user);
 
     const {
       expense_category,
@@ -22,9 +24,9 @@ function createExpense(req: AuthRequest, res: Response): void {
 
     const userId = req.user!.id;
 
-    console.log('Validation check - expense_category:', expense_category, 'amount:', amount, 'expense_date:', expense_date);
+    logger.debug('Validation check - expense_category:', expense_category, 'amount:', amount, 'expense_date:', expense_date);
     if (!expense_category || !amount || !expense_date) {
-      console.log('Validation failed - missing required fields');
+      logger.debug('Validation failed - missing required fields');
       res.status(400).json({
         success: false,
         error: 'Expense category, amount, and expense date are required'
@@ -52,10 +54,10 @@ function createExpense(req: AuthRequest, res: Response): void {
     }
 
     const parsedAmount = parseFloat(amount);
-    console.log('Parsed amount:', parsedAmount, 'Original amount:', amount);
+    logger.debug('Parsed amount:', parsedAmount, 'Original amount:', amount);
 
     if (isNaN(parsedAmount)) {
-      console.log('Amount is not a valid number');
+      logger.debug('Amount is not a valid number');
       res.status(400).json({
         success: false,
         error: 'Amount must be a valid number'
@@ -111,7 +113,7 @@ function createExpense(req: AuthRequest, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error creating expense:', error);
+    logger.error('Error creating expense:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create expense'
@@ -248,7 +250,7 @@ function getExpenses(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching expenses:', error);
+    logger.error('Error fetching expenses:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expenses'
@@ -258,7 +260,7 @@ function getExpenses(req: Request, res: Response): void {
 
 function getExpenseById(req: Request, res: Response): void {
   try {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id);
 
     const expense = db.prepare(`
       SELECT 
@@ -294,7 +296,7 @@ function getExpenseById(req: Request, res: Response): void {
       data: expense
     });
   } catch (error) {
-    console.error('Error fetching expense:', error);
+    logger.error('Error fetching expense:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expense'
@@ -304,7 +306,7 @@ function getExpenseById(req: Request, res: Response): void {
 
 function updateExpense(req: AuthRequest, res: Response): void {
   try {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id);
     const {
       expense_category,
       description,
@@ -388,7 +390,7 @@ function updateExpense(req: AuthRequest, res: Response): void {
       data: updatedExpense
     });
   } catch (error) {
-    console.error('Error updating expense:', error);
+    logger.error('Error updating expense:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update expense'
@@ -398,7 +400,7 @@ function updateExpense(req: AuthRequest, res: Response): void {
 
 function deleteExpense(req: AuthRequest, res: Response): void {
   try {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id);
 
     const existingExpense = db.prepare('SELECT * FROM expenses WHERE id = ?').get(id) as any;
     if (!existingExpense) {
@@ -422,7 +424,7 @@ function deleteExpense(req: AuthRequest, res: Response): void {
       message: 'Expense deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting expense:', error);
+    logger.error('Error deleting expense:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to delete expense'
@@ -480,7 +482,7 @@ function getExpensesByDateRange(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching expenses by date range:', error);
+    logger.error('Error fetching expenses by date range:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expenses by date range'
@@ -549,7 +551,7 @@ function getExpensesByCategory(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching expenses by category:', error);
+    logger.error('Error fetching expenses by category:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expenses by category'
@@ -605,7 +607,7 @@ function getExpenseSummary(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching expense summary:', error);
+    logger.error('Error fetching expense summary:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expense summary'
@@ -632,7 +634,7 @@ function getExpenseCategories(req: Request, res: Response): void {
       data: categories
     });
   } catch (error) {
-    console.error('Error fetching expense categories:', error);
+    logger.error('Error fetching expense categories:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expense categories'
@@ -682,7 +684,7 @@ function createExpenseCategory(req: AuthRequest, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error creating expense category:', error);
+    logger.error('Error creating expense category:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create expense category'
@@ -692,7 +694,7 @@ function createExpenseCategory(req: AuthRequest, res: Response): void {
 
 function updateExpenseCategory(req: AuthRequest, res: Response): void {
   try {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id);
     const { category_name, description, is_active } = req.body;
 
     const existingCategory = db.prepare('SELECT * FROM expense_categories WHERE id = ?').get(id) as any;
@@ -742,7 +744,7 @@ function updateExpenseCategory(req: AuthRequest, res: Response): void {
       data: updatedCategory
     });
   } catch (error) {
-    console.error('Error updating expense category:', error);
+    logger.error('Error updating expense category:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update expense category'
@@ -752,7 +754,7 @@ function updateExpenseCategory(req: AuthRequest, res: Response): void {
 
 function deleteExpenseCategory(req: AuthRequest, res: Response): void {
   try {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id);
 
     const existingCategory = db.prepare('SELECT * FROM expense_categories WHERE id = ?').get(id) as any;
     if (!existingCategory) {
@@ -782,7 +784,7 @@ function deleteExpenseCategory(req: AuthRequest, res: Response): void {
       message: 'Expense category deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting expense category:', error);
+    logger.error('Error deleting expense category:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to delete expense category'
@@ -805,7 +807,7 @@ function getExpenseStatusOptions(req: Request, res: Response): void {
       data: statusOptions
     });
   } catch (error) {
-    console.error('Error fetching expense status options:', error);
+    logger.error('Error fetching expense status options:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expense status options'
@@ -830,7 +832,7 @@ function getExpensePaymentMethodOptions(req: Request, res: Response): void {
       data: paymentMethodOptions
     });
   } catch (error) {
-    console.error('Error fetching expense payment method options:', error);
+    logger.error('Error fetching expense payment method options:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch expense payment method options'

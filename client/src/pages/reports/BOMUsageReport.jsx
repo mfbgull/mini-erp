@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -9,9 +9,10 @@ import {
   Filter,
   BarChart3,
   List,
-  Eye,
-  Edit,
-  Plus
+  X,
+  CheckCircle,
+  Hash,
+  Layers
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -32,7 +33,30 @@ export default function BOMUsageReport() {
   });
   const [itemId, setItemId] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedBOM, setSelectedBOM] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (bom) => {
+    setSelectedBOM(bom);
+    setShowDetailModal(true);
+  };
 
   // Fetch items for filter
   const { data: items = [], isLoading: itemsLoading } = useQuery({
@@ -240,32 +264,56 @@ export default function BOMUsageReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.usage && reportData.usage.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.usage || []}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                // Check if the grid is visible before sizing columns
-                setTimeout(() => {
-                  if (params.api && params.columnApi) {
-                    const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-                    if (gridElement && gridElement.clientWidth > 0) {
-                      params.columnApi.autoSizeAllColumns();
+          <>
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.usage || []}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
                     }
-                  }
-                }, 100); // Small delay to ensure grid is rendered
-              }}
-            />
-          </div>
+                  }, 100);
+                }}
+              />
+            </div>
+
+            <div className="mobile-bom-usage-list">
+              {reportData.usage.map((bom, index) => (
+                <div
+                  key={`${bom.bom_id || bom.bom_name}-${index}`}
+                  className="bom-usage-card"
+                  onClick={() => handleCardClick(bom)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(bom);
+                    }
+                  }}
+                >
+                  <div className="bom-usage-card-content">
+                    <h3 className="bom-usage-name">{bom.bom_name}</h3>
+                    <span className="bom-usage-count">{bom.usage_count} uses</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <List size={48} />
@@ -274,6 +322,87 @@ export default function BOMUsageReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedBOM && (
+        <div
+          className="bom-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="bom-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bom-modal-header">
+              <h2 className="bom-modal-title">{selectedBOM.bom_name}</h2>
+              <button
+                type="button"
+                className="bom-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="bom-modal-content">
+              <div className="bom-detail-section">
+                <div className="bom-details-grid">
+                  <div className="bom-detail-item">
+                    <span className="bom-detail-label">
+                      <Package size={14} />
+                      Parent Item
+                    </span>
+                    <span className="bom-detail-value">{selectedBOM.parent_item_name || '-'}</span>
+                  </div>
+
+                  <div className="bom-detail-item">
+                    <span className="bom-detail-label">
+                      <Hash size={14} />
+                      Usage Count
+                    </span>
+                    <span className="bom-detail-value">{selectedBOM.usage_count}</span>
+                  </div>
+
+                  <div className="bom-detail-item">
+                    <span className="bom-detail-label">
+                      <Calendar size={14} />
+                      Last Used
+                    </span>
+                    <span className="bom-detail-value">{selectedBOM.last_used_date ? new Date(selectedBOM.last_used_date).toLocaleDateString() : '-'}</span>
+                  </div>
+
+                  <div className="bom-detail-item">
+                    <span className="bom-detail-label">
+                      <Layers size={14} />
+                      Total Components
+                    </span>
+                    <span className="bom-detail-value">{selectedBOM.total_components}</span>
+                  </div>
+
+                  <div className="bom-detail-item">
+                    <span className="bom-detail-label">
+                      <CheckCircle size={14} />
+                      Status
+                    </span>
+                    <span className="bom-detail-value">{selectedBOM.status || '-'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bom-modal-actions">
+              <button
+                type="button"
+                className="bom-action-btn bom-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

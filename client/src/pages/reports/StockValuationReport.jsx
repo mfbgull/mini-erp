@@ -8,9 +8,9 @@ import {
   CheckCircle,
   Download,
   Filter,
-  Eye,
-  Edit,
-  Plus
+  X,
+  Tag,
+  Hash
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -28,8 +28,31 @@ export default function StockValuationReport() {
   const [categoryId, setCategoryId] = useState('');
   const [valuationMethod, setValuationMethod] = useState('average-cost'); // average-cost, fifo, lifo
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
   const gridRef = useRef(null);
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (item) => {
+    setSelectedItem(item);
+    setShowDetailModal(true);
+  };
 
   // Fetch warehouses for filter
   const { data: warehouses = [] } = useQuery({
@@ -372,48 +395,24 @@ export default function StockValuationReport() {
               />
             </div>
 
-            {/* Mobile view - Card layout */}
             <div className="mobile-stock-valuation-list">
               {reportData.stockValuation.map((item, index) => (
                 <div
                   key={`${item.id || item.item_code}-${index}`}
                   className="stock-valuation-card"
+                  onClick={() => handleCardClick(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(item);
+                    }
+                  }}
                 >
-                  <div className="stock-valuation-header">
-                    <div className="item-name">{item.item_name}</div>
-                    <div className="item-code">{item.item_code}</div>
-                  </div>
-
-                  <div className="stock-valuation-details">
-                    <div className="detail-row">
-                      <span className="detail-label">Category:</span>
-                      <span className="detail-value">{item.item_category}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">UOM:</span>
-                      <span className="detail-value">{item.unit_of_measure}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Current Stock:</span>
-                      <span className="detail-value">{item.current_stock} {item.unit_of_measure}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Unit Cost:</span>
-                      <span className="detail-value">{formatCurrency(item.unit_cost)}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Total Value:</span>
-                      <span className="detail-value">{formatCurrency(item.total_value)}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Valuation Method:</span>
-                      <span className="detail-value">{item.valuation_method}</span>
-                    </div>
+                  <div className="stock-valuation-card-content">
+                    <h3 className="valuation-item-name">{item.item_name}</h3>
+                    <span className="valuation-item-value">{formatCurrency(item.total_value || 0)}</span>
                   </div>
                 </div>
               ))}
@@ -427,6 +426,100 @@ export default function StockValuationReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedItem && (
+        <div
+          className="stock-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="stock-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="stock-modal-header">
+              <h2 className="stock-modal-title">{selectedItem.item_name}</h2>
+              <button
+                type="button"
+                className="stock-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="stock-modal-content">
+              <div className="stock-detail-section">
+                <div className="stock-details-grid">
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <Tag size={14} />
+                      Item Code
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.item_code || '-'}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <Package size={14} />
+                      Category
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.item_category || '-'}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <Hash size={14} />
+                      UOM
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.unit_of_measure || '-'}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <Package size={14} />
+                      Current Stock
+                    </span>
+                    <span className="stock-detail-value">{selectedItem.current_stock} {selectedItem.unit_of_measure}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <DollarSign size={14} />
+                      Unit Cost
+                    </span>
+                    <span className="stock-detail-value">{formatCurrency(selectedItem.unit_cost || 0)}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">
+                      <DollarSign size={14} />
+                      Total Value
+                    </span>
+                    <span className="stock-detail-value">{formatCurrency(selectedItem.total_value || 0)}</span>
+                  </div>
+
+                  <div className="stock-detail-item">
+                    <span className="stock-detail-label">Valuation Method</span>
+                    <span className="stock-detail-value">{selectedItem.valuation_method || '-'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="stock-modal-actions">
+              <button
+                type="button"
+                className="stock-action-btn stock-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -8,9 +8,11 @@ import {
   Calendar,
   Download,
   Filter,
-  Eye,
-  Edit,
-  Plus
+  X,
+  Receipt,
+  Hash,
+  Clock,
+  TrendingUp
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -24,9 +26,32 @@ import './TopDebtorsReport.css';
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function TopDebtorsReport() {
-  const [limit, setLimit] = useState(10); // Top 10 debtors by default
+  const [limit, setLimit] = useState(10);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedDebtor, setSelectedDebtor] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (debtor) => {
+    setSelectedDebtor(debtor);
+    setShowDetailModal(true);
+  };
 
   // Fetch top debtors report
   const { data: reportData, isLoading, refetch } = useQuery({
@@ -238,32 +263,56 @@ export default function TopDebtorsReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData && reportData.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                // Check if the grid is visible before sizing columns
-                setTimeout(() => {
-                  if (params.api && params.columnApi) {
-                    const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-                    if (gridElement && gridElement.clientWidth > 0) {
-                      params.columnApi.autoSizeAllColumns();
+          <>
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
                     }
-                  }
-                }, 100); // Small delay to ensure grid is rendered
-              }}
-            />
-          </div>
+                  }, 100);
+                }}
+              />
+            </div>
+
+            <div className="mobile-debtors-list">
+              {reportData.map((debtor, index) => (
+                <div
+                  key={`${debtor.customer_id || debtor.customer_name}-${index}`}
+                  className="debtor-card"
+                  onClick={() => handleCardClick(debtor)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(debtor);
+                    }
+                  }}
+                >
+                  <div className="debtor-card-content">
+                    <h3 className="debtor-name">{debtor.customer_name}</h3>
+                    <span className="debtor-balance">{formatCurrency(debtor.balance || 0)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <Users size={48} />
@@ -272,6 +321,95 @@ export default function TopDebtorsReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedDebtor && (
+        <div
+          className="debtor-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="debtor-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="debtor-modal-header">
+              <h2 className="debtor-modal-title">{selectedDebtor.customer_name}</h2>
+              <button
+                type="button"
+                className="debtor-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="debtor-modal-content">
+              <div className="debtor-detail-section">
+                <div className="debtor-details-grid">
+                  <div className="debtor-detail-item">
+                    <span className="debtor-detail-label">
+                      <Receipt size={14} />
+                      Total Invoices
+                    </span>
+                    <span className="debtor-detail-value">{selectedDebtor.total_invoices || 0}</span>
+                  </div>
+
+                  <div className="debtor-detail-item">
+                    <span className="debtor-detail-label">
+                      <DollarSign size={14} />
+                      Total Amount
+                    </span>
+                    <span className="debtor-detail-value">{formatCurrency(selectedDebtor.total_amount || 0)}</span>
+                  </div>
+
+                  <div className="debtor-detail-item">
+                    <span className="debtor-detail-label">
+                      <DollarSign size={14} />
+                      Paid Amount
+                    </span>
+                    <span className="debtor-detail-value">{formatCurrency(selectedDebtor.paid_amount || 0)}</span>
+                  </div>
+
+                  <div className="debtor-detail-item">
+                    <span className="debtor-detail-label">
+                      <AlertTriangle size={14} />
+                      Balance
+                    </span>
+                    <span className="debtor-detail-value balance">{formatCurrency(selectedDebtor.balance || 0)}</span>
+                  </div>
+
+                  <div className="debtor-detail-item">
+                    <span className="debtor-detail-label">
+                      <Clock size={14} />
+                      Days Overdue
+                    </span>
+                    <span className="debtor-detail-value">{selectedDebtor.days_overdue || 0}</span>
+                  </div>
+
+                  <div className="debtor-detail-item">
+                    <span className="debtor-detail-label">
+                      <Calendar size={14} />
+                      Last Invoice
+                    </span>
+                    <span className="debtor-detail-value">{selectedDebtor.last_invoice_date ? new Date(selectedDebtor.last_invoice_date).toLocaleDateString() : '-'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="debtor-modal-actions">
+              <button
+                type="button"
+                className="debtor-action-btn debtor-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

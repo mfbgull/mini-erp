@@ -1,22 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import { Plus, Edit2, Trash2, Eye, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
+import { SupplierCard } from '../../components/common/SupplierCard';
 import './SuppliersPage.css';
 
-// Register AG Grid modules
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
-
 export default function SuppliersPage() {
-  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,14 +55,10 @@ export default function SuppliersPage() {
     }
   });
 
-  const handleDelete = (id, supplierName) => {
-    if (window.confirm(`Are you sure you want to delete supplier "${supplierName}"?`)) {
-      deleteMutation.mutate(id);
+  const handleDelete = (supplier) => {
+    if (window.confirm(`Are you sure you want to delete supplier "${supplier.supplier_name}"?`)) {
+      deleteMutation.mutate(supplier.id);
     }
-  };
-
-  const handleView = (supplier) => {
-    navigate(`/suppliers/${supplier.id}`);
   };
 
   const handleEdit = (supplier) => {
@@ -86,112 +75,6 @@ export default function SuppliersPage() {
     setIsModalOpen(false);
     setSelectedSupplier(null);
   };
-
-  const columnDefs = [
-    {
-      headerName: 'Supplier Code',
-      field: 'supplier_code',
-      filter: true,
-      width: 120,
-      cellRenderer: (params) => (
-        <span className="supplier-code">{params.value}</span>
-      )
-    },
-    {
-      headerName: 'Supplier Name',
-      field: 'supplier_name',
-      filter: true,
-      flex: 1,
-      cellRenderer: (params) => (
-        <div>
-          <div className="supplier-name">{params.value}</div>
-          {params.data.contact_person && (
-            <div className="contact-person">{params.data.contact_person}</div>
-          )}
-        </div>
-      )
-    },
-    {
-      headerName: 'Contact Info',
-      field: 'phone',
-      filter: true,
-      width: 180,
-      cellRenderer: (params) => (
-        <div>
-          {params.value && <div>{params.value}</div>}
-          {params.data.email && <div className="email">{params.data.email}</div>}
-        </div>
-      )
-    },
-    {
-      headerName: 'Address',
-      field: 'address',
-      filter: true,
-      width: 200,
-      cellRenderer: (params) => {
-        if (!params.value) return '-';
-        return (
-          <div className="address">
-            {params.value.split('\n').map((line, idx) => (
-              <div key={idx}>{line}</div>
-            ))}
-          </div>
-        );
-      }
-    },
-    {
-      headerName: 'Payment Terms',
-      field: 'payment_terms',
-      filter: true,
-      width: 120,
-      valueGetter: (params) => params.data.payment_terms || 'Net 30'
-    },
-    {
-      headerName: 'Status',
-      field: 'is_active',
-      filter: true,
-      width: 100,
-      cellRenderer: (params) => (
-        <span className={`status ${params.value ? 'status-active' : 'status-inactive'}`}>
-          {params.value ? 'Active' : 'Inactive'}
-        </span>
-      )
-    },
-    {
-      headerName: 'Actions',
-      field: 'actions',
-      width: 150,
-      cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            className="action-btn view-btn"
-            onClick={() => handleView(params.data)}
-            title="View Details"
-          >
-            <Eye size={16} />
-          </button>
-          <button
-            className="action-btn edit-btn"
-            onClick={() => handleEdit(params.data)}
-            title="Edit"
-          >
-            <Edit2 size={16} />
-          </button>
-          <button
-            className="action-btn delete-btn"
-            onClick={() => handleDelete(params.data.id, params.data.supplier_name)}
-            title="Delete"
-            disabled={deleteMutation.isPending}
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
-      ),
-      sortable: false,
-      filter: false,
-      pinned: 'right'
-    }
-  ];
 
   return (
     <div className="suppliers-page">
@@ -246,115 +129,21 @@ export default function SuppliersPage() {
         <div className="loading">
           <div className="spinner"></div>
         </div>
+      ) : filteredSuppliers.length === 0 ? (
+        <div className="no-suppliers">
+          <p>No suppliers found</p>
+        </div>
       ) : (
-        <>
-          {/* Desktop view - AG Grid */}
-          <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={filteredSuppliers}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                // Check if the grid is visible before sizing columns
-                setTimeout(() => {
-                  if (params.api && params.columnApi) {
-                    const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-                    if (gridElement && gridElement.clientWidth > 0) {
-                      params.columnApi.autoSizeAllColumns();
-                    }
-                  }
-                }, 100); // Small delay to ensure grid is rendered
-              }}
+        <div className="supplier-cards-grid">
+          {filteredSuppliers.map((supplier) => (
+            <SupplierCard
+              key={supplier.id}
+              supplier={supplier}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
             />
-          </div>
-
-          {/* Mobile view - Card layout */}
-          <div className="mobile-supplier-list">
-            {filteredSuppliers.map((supplier) => (
-              <div
-                key={supplier.id}
-                className="supplier-card"
-                onClick={() => handleView(supplier)}
-              >
-                <div className="supplier-header">
-                  <div className="supplier-code">{supplier.supplier_code}</div>
-                  <div className={`supplier-status ${supplier.is_active ? 'status-active' : 'status-inactive'}`}>
-                    {supplier.is_active ? 'Active' : 'Inactive'}
-                  </div>
-                </div>
-
-                <div className="supplier-details">
-                  <div className="detail-row">
-                    <span className="detail-label">Supplier:</span>
-                    <span className="detail-value">{supplier.supplier_name}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Contact:</span>
-                    <span className="detail-value">{supplier.contact_person || 'N/A'}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Phone:</span>
-                    <span className="detail-value">{supplier.phone || 'N/A'}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Email:</span>
-                    <span className="detail-value">{supplier.email || 'N/A'}</span>
-                  </div>
-
-                  <div className="detail-row">
-                    <span className="detail-label">Terms:</span>
-                    <span className="detail-value">{supplier.payment_terms || 'Net 30'}</span>
-                  </div>
-                </div>
-
-                <div className="supplier-actions">
-                  <Button
-                    variant="secondary"
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleView(supplier);
-                    }}
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(supplier);
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(supplier.id, supplier.supplier_name);
-                    }}
-                    disabled={deleteMutation.isPending}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
+          ))}
+        </div>
       )}
 
       {/* Supplier Form Modal */}
@@ -379,18 +168,17 @@ export default function SuppliersPage() {
 
 function SupplierForm({ supplier, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
-    supplier_code: '',
-    supplier_name: '',
-    contact_person: '',
-    email: '',
-    phone: '',
-    address: '',
-    payment_terms: 'Net 30',
-    is_active: 1
+    supplier_code: supplier?.supplier_code || '',
+    supplier_name: supplier?.supplier_name || '',
+    contact_person: supplier?.contact_person || '',
+    email: supplier?.email || '',
+    phone: supplier?.phone || '',
+    address: supplier?.address || '',
+    payment_terms: supplier?.payment_terms || 'Net 30',
+    is_active: supplier?.is_active ?? 1
   });
 
   const [errors, setErrors] = useState({});
-  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch next supplier code for new suppliers

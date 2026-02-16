@@ -1,5 +1,6 @@
 import rateLimit from 'express-rate-limit';
 import { Request, Response } from 'express';
+import logger from '../utils/logger';
 
 /**
  * Rate limiter for authentication endpoints
@@ -12,16 +13,16 @@ export const authLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   skipSuccessfulRequests: true, // Don't count successful requests
   handler: (req: Request, res: Response) => {
-    console.warn(`[Rate Limit] Login attempts exceeded for IP: ${req.ip}`);
+    logger.warn(`[Rate Limit] Login attempts exceeded for IP: ${req.ip}`);
     res.status(429).json({
       error: 'Too many login attempts. Please try again later.',
       retryAfter: Math.ceil(15 * 60) // seconds
     });
   },
   keyGenerator: (req: Request) => {
-    // Use IP address + username combination for more targeted limiting
-    const username = req.body?.username || '';
-    return `${req.ip}-${username}`;
+    // Use username for more targeted limiting (avoids IPv6 key issues)
+    const username = req.body?.username || 'unknown';
+    return username;
   }
 });
 
@@ -34,7 +35,7 @@ export const passwordChangeLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req: Request, res: Response) => {
-    console.warn(`[Rate Limit] Password change attempts exceeded for IP: ${req.ip}`);
+    logger.warn(`[Rate Limit] Password change attempts exceeded for IP: ${req.ip}`);
     res.status(429).json({
       error: 'Too many password change attempts. Please try again later.',
       retryAfter: Math.ceil(60 * 60)
@@ -56,7 +57,7 @@ export const apiLimiter = rateLimit({
     return req.path === '/health';
   },
   handler: (req: Request, res: Response) => {
-    console.warn(`[Rate Limit] API requests exceeded for IP: ${req.ip}`);
+    logger.warn(`[Rate Limit] API requests exceeded for IP: ${req.ip}`);
     res.status(429).json({
       error: 'Too many requests. Please slow down.',
       retryAfter: Math.ceil(60)
@@ -74,7 +75,7 @@ export const sensitiveOperationLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req: Request, res: Response) => {
-    console.warn(`[Rate Limit] Sensitive operation rate limit exceeded for IP: ${req.ip}`);
+    logger.warn(`[Rate Limit] Sensitive operation rate limit exceeded for IP: ${req.ip}`);
     res.status(429).json({
       error: 'Too many requests for this operation. Please try again later.',
       retryAfter: Math.ceil(60)

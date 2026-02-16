@@ -2,6 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import * as bcrypt from 'bcrypt';
+import logger from '../utils/logger';
 
 // Database file path - use DATABASE_PATH env var if set (Electron), otherwise default
 const dbDir = process.env.DATABASE_PATH || path.join(__dirname, '../../../database');
@@ -14,7 +15,7 @@ if (!fs.existsSync(dbDir)) {
 
 // Create database connection
 const db = new Database(dbPath, {
-  verbose: process.env.NODE_ENV === 'development' ? console.log : null
+  verbose: process.env.NODE_ENV === 'development' ? (msg: string) => logger.debug(msg) : undefined
 });
 
 // Enable foreign keys
@@ -25,7 +26,7 @@ db.pragma('journal_mode = WAL');
 
 // Initialize database with schema if tables don't exist
 function initializeDatabase(): void {
-  console.log('Checking database initialization...');
+  logger.info('Checking database initialization...');
 
   // Check if users table exists
   const tableCheck = db.prepare(`
@@ -34,7 +35,7 @@ function initializeDatabase(): void {
   `).get() as { name: string } | undefined;
 
   if (!tableCheck) {
-    console.log('Database not initialized. Running migration...');
+    logger.info('Database not initialized. Running migration...');
 
     const initSQL = fs.readFileSync(
       path.join(__dirname, '../migrations/init.sql'),
@@ -43,14 +44,14 @@ function initializeDatabase(): void {
 
     db.exec(initSQL);
 
-    console.log('✅ Database schema created successfully!');
+    logger.info('✅ Database schema created successfully!');
 
     createDefaultUser();
     createDefaultWarehouse();
 
-    console.log('✅ Database initialization complete!');
+    logger.info('✅ Database initialization complete!');
   } else {
-    console.log('✅ Database already initialized.');
+    logger.info('✅ Database already initialized.');
   }
 
   runInvoiceMigration();
@@ -70,7 +71,7 @@ function createDefaultUser(): void {
 
     stmt.run('admin', 'admin@minierp.local', passwordHash, 'Administrator', 'admin', 1);
 
-    console.log('✅ Default admin user created (username: admin, password: admin123)');
+    logger.info('✅ Default admin user created (username: admin, password: admin123)');
   }
 }
 
@@ -85,7 +86,7 @@ function createDefaultWarehouse(): void {
 
     stmt.run('WH-001', 'Main Warehouse', 'Default Location', 1);
 
-    console.log('✅ Default warehouse created (WH-001)');
+    logger.info('✅ Default warehouse created (WH-001)');
   }
 }
 
@@ -97,7 +98,7 @@ function runInvoiceMigration(): void {
     `).get() as { count: number };
 
     if (columnCheck.count === 0) {
-      console.log('Running invoice discount/tax migration...');
+      logger.info('Running invoice discount/tax migration...');
 
       const migrationSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-invoice-discount-tax-fields.sql'),
@@ -106,10 +107,10 @@ function runInvoiceMigration(): void {
 
       db.exec(migrationSQL);
 
-      console.log('✅ Invoice discount/tax migration completed!');
+      logger.info('✅ Invoice discount/tax migration completed!');
     }
   } catch (error: any) {
-    console.error('Invoice migration error:', error.message);
+    logger.error('Invoice migration error:', error.message);
   }
 }
 
@@ -129,9 +130,9 @@ function runCustomerARMigrations(): void {
       `).get(column.name) as { count: number } | undefined;
 
       if (!columnCheck || columnCheck.count === 0) {
-        console.log(`Adding missing column: ${column.name}...`);
+        logger.info(`Adding missing column: ${column.name}...`);
         db.exec(column.sql);
-        console.log(`✅ Added ${column.name} column successfully!`);
+        logger.info(`✅ Added ${column.name} column successfully!`);
       }
     }
 
@@ -141,7 +142,7 @@ function runCustomerARMigrations(): void {
     `).get() as { name: string } | undefined;
 
     if (!ledgerTableCheck) {
-      console.log('Running customer ledger migration...');
+      logger.info('Running customer ledger migration...');
 
       const ledgerSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/create-customer-ledger.sql'),
@@ -150,7 +151,7 @@ function runCustomerARMigrations(): void {
 
       db.exec(ledgerSQL);
 
-      console.log('✅ Customer ledger migration completed!');
+      logger.info('✅ Customer ledger migration completed!');
     }
 
     const allocationsTableCheck = db.prepare(`
@@ -159,7 +160,7 @@ function runCustomerARMigrations(): void {
     `).get() as { name: string } | undefined;
 
     if (!allocationsTableCheck) {
-      console.log('Running payment allocations migration...');
+      logger.info('Running payment allocations migration...');
 
       const allocationsSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/create-payment-allocations.sql'),
@@ -168,17 +169,17 @@ function runCustomerARMigrations(): void {
 
       db.exec(allocationsSQL);
 
-      console.log('✅ Payment allocations migration completed!');
+      logger.info('✅ Payment allocations migration completed!');
     }
 
-    console.log('Ensuring customer_id values are integers...');
+    logger.info('Ensuring customer_id values are integers...');
     db.exec(`
       UPDATE invoices SET customer_id = CAST(customer_id AS INTEGER) WHERE typeof(customer_id) = 'text';
       UPDATE payments SET customer_id = CAST(customer_id AS INTEGER) WHERE typeof(customer_id) = 'text';
     `);
-    console.log('✅ Customer ID type fix completed!');
+    logger.info('✅ Customer ID type fix completed!');
 
-    console.log('Recalculating invoice balances from payment allocations...');
+    logger.info('Recalculating invoice balances from payment allocations...');
     db.exec(`
       UPDATE invoices SET
         paid_amount = COALESCE((
@@ -198,9 +199,9 @@ function runCustomerARMigrations(): void {
       UPDATE invoices SET status = 'Partially Paid' WHERE balance_amount > 0 AND balance_amount < total_amount AND paid_amount > 0;
       UPDATE invoices SET status = 'Unpaid' WHERE paid_amount = 0 OR paid_amount IS NULL;
     `);
-    console.log('✅ Invoice balance recalculation completed!');
+    logger.info('✅ Invoice balance recalculation completed!');
 
-    console.log('Recalculating stock balances from movements...');
+    logger.info('Recalculating stock balances from movements...');
 
     const movementSums = db.prepare(`
       SELECT item_id, warehouse_id, SUM(quantity) as total_qty
@@ -215,7 +216,7 @@ function runCustomerARMigrations(): void {
         if (existing.quantity !== sum.total_qty) {
           const item = db.prepare('SELECT item_code FROM items WHERE id = ?').get(sum.item_id) as { item_code: string } | undefined;
           const wh = db.prepare('SELECT warehouse_code FROM warehouses WHERE id = ?').get(sum.warehouse_id) as { warehouse_code: string } | undefined;
-          console.log(`Fixing ${item?.item_code} in ${wh?.warehouse_code}: ${existing.quantity} -> ${sum.total_qty}`);
+          logger.info(`Fixing ${item?.item_code} in ${wh?.warehouse_code}: ${existing.quantity} -> ${sum.total_qty}`);
           db.prepare('UPDATE stock_balances SET quantity = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?').run(sum.total_qty, existing.id);
         }
       } else {
@@ -235,13 +236,13 @@ function runCustomerARMigrations(): void {
     `).all() as { id: number; item_code: string; warehouse_code: string }[];
 
     for (const orphan of orphanedBalances) {
-      console.log(`Removing orphaned balance: ${orphan.item_code} in ${orphan.warehouse_code}`);
+      logger.info(`Removing orphaned balance: ${orphan.item_code} in ${orphan.warehouse_code}`);
       db.prepare('DELETE FROM stock_balances WHERE id = ?').run(orphan.id);
     }
 
-    console.log('✅ Stock balances recalculated from movements!');
+    logger.info('✅ Stock balances recalculated from movements!');
 
-    console.log('Syncing item current_stock from stock_balances...');
+    logger.info('Syncing item current_stock from stock_balances...');
     db.exec(`
       UPDATE items SET current_stock = (
         SELECT COALESCE(SUM(quantity), 0)
@@ -249,9 +250,9 @@ function runCustomerARMigrations(): void {
         WHERE stock_balances.item_id = items.id
       )
     `);
-    console.log('✅ Item stock synced from warehouse balances!');
+    logger.info('✅ Item stock synced from warehouse balances!');
 
-    console.log('Fixing payment ledger descriptions...');
+    logger.info('Fixing payment ledger descriptions...');
     const paymentLedgerEntries = db.prepare(`
       SELECT cl.id, cl.reference_no, cl.description
       FROM customer_ledger cl
@@ -281,9 +282,9 @@ function runCustomerARMigrations(): void {
         }
       }
     }
-    console.log('✅ Payment ledger descriptions fixed!');
+    logger.info('✅ Payment ledger descriptions fixed!');
   } catch (error: any) {
-    console.error('Customer AR migration error:', error.message);
+    logger.error('Customer AR migration error:', error.message);
   }
 }
 
@@ -295,7 +296,7 @@ function runExpensesMigration(): void {
     `).get() as { name: string } | undefined;
 
     if (!expensesTableCheck) {
-      console.log('Running expenses migration...');
+      logger.info('Running expenses migration...');
 
       const expensesSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-expenses-table.sql'),
@@ -304,7 +305,7 @@ function runExpensesMigration(): void {
 
       db.exec(expensesSQL);
 
-      console.log('✅ Expenses migration completed!');
+      logger.info('✅ Expenses migration completed!');
     }
 
     const categoriesTableCheck = db.prepare(`
@@ -313,7 +314,7 @@ function runExpensesMigration(): void {
     `).get() as { name: string } | undefined;
 
     if (!categoriesTableCheck) {
-      console.log('Running expense categories migration...');
+      logger.info('Running expense categories migration...');
 
       const categorySQL = `
         CREATE TABLE IF NOT EXISTS expense_categories (
@@ -345,10 +346,10 @@ function runExpensesMigration(): void {
 
       db.exec(categorySQL);
 
-      console.log('✅ Expense categories migration completed!');
+      logger.info('✅ Expense categories migration completed!');
     }
   } catch (error: any) {
-    console.error('Expenses migration error:', error.message);
+    logger.error('Expenses migration error:', error.message);
   }
 }
 
@@ -360,7 +361,7 @@ function runPurchasesMigration(): void {
     `).get() as { name: string } | undefined;
 
     if (!purchasesTableCheck) {
-      console.log('Running purchases migration...');
+      logger.info('Running purchases migration...');
 
       const purchasesSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-purchases-table.sql'),
@@ -369,10 +370,10 @@ function runPurchasesMigration(): void {
 
       db.exec(purchasesSQL);
 
-      console.log('✅ Purchases migration completed!');
+      logger.info('✅ Purchases migration completed!');
     }
   } catch (error: any) {
-    console.error('Purchases migration error:', error.message);
+    logger.error('Purchases migration error:', error.message);
   }
 }
 
@@ -384,7 +385,7 @@ function runProductionsMigration(): void {
     `).get() as { name: string } | undefined;
 
     if (!productionsTableCheck) {
-      console.log('Running productions migration...');
+      logger.info('Running productions migration...');
 
       const productionsSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-production-tables.sql'),
@@ -393,10 +394,10 @@ function runProductionsMigration(): void {
 
       db.exec(productionsSQL);
 
-      console.log('✅ Productions migration completed!');
+      logger.info('✅ Productions migration completed!');
     }
   } catch (error: any) {
-    console.error('Productions migration error:', error.message);
+    logger.error('Productions migration error:', error.message);
   }
 }
 
@@ -408,7 +409,7 @@ function runBOMMigration(): void {
     `).get() as { name: string } | undefined;
 
     if (!bomTableCheck) {
-      console.log('Running BOM migration...');
+      logger.info('Running BOM migration...');
 
       const bomSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-bom-tables.sql'),
@@ -417,10 +418,10 @@ function runBOMMigration(): void {
 
       db.exec(bomSQL);
 
-      console.log('✅ BOM migration completed!');
+      logger.info('✅ BOM migration completed!');
     }
   } catch (error: any) {
-    console.error('BOM migration error:', error.message);
+    logger.error('BOM migration error:', error.message);
   }
 }
 
@@ -432,7 +433,7 @@ function runSalesMigration(): void {
     `).get() as { name: string } | undefined;
 
     if (!salesTableCheck) {
-      console.log('Running sales migration...');
+      logger.info('Running sales migration...');
 
       const salesSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-sales-table.sql'),
@@ -441,10 +442,10 @@ function runSalesMigration(): void {
 
       db.exec(salesSQL);
 
-      console.log('✅ Sales migration completed!');
+      logger.info('✅ Sales migration completed!');
     }
   } catch (error: any) {
-    console.error('Sales migration error:', error.message);
+    logger.error('Sales migration error:', error.message);
   }
 }
 
@@ -456,7 +457,7 @@ function runSupplierLedgerMigration(): void {
     `).get() as { name: string } | undefined;
 
     if (!supplierLedgerTableCheck) {
-      console.log('Running supplier ledger migration...');
+      logger.info('Running supplier ledger migration...');
 
       const supplierLedgerSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/create-supplier-ledger.sql'),
@@ -465,10 +466,10 @@ function runSupplierLedgerMigration(): void {
 
       db.exec(supplierLedgerSQL);
 
-      console.log('✅ Supplier ledger migration completed!');
+      logger.info('✅ Supplier ledger migration completed!');
     }
   } catch (error: any) {
-    console.error('Supplier ledger migration error:', error.message);
+    logger.error('Supplier ledger migration error:', error.message);
   }
 }
 
@@ -481,7 +482,7 @@ function runActivityLogMigration(): void {
     `).get() as { count: number };
 
     if (columnCheck.count === 0) {
-      console.log('Running activity log enhancement migration...');
+      logger.info('Running activity log enhancement migration...');
 
       // Add new columns
       db.exec(`ALTER TABLE activity_log ADD COLUMN log_level VARCHAR(20) DEFAULT 'INFO'`);
@@ -497,10 +498,10 @@ function runActivityLogMigration(): void {
       db.exec(`CREATE INDEX IF NOT EXISTS idx_activity_log_action ON activity_log(action)`);
       db.exec(`CREATE INDEX IF NOT EXISTS idx_activity_log_log_level ON activity_log(log_level)`);
 
-      console.log('✅ Activity log enhancement migration completed!');
+      logger.info('✅ Activity log enhancement migration completed!');
     }
   } catch (error: any) {
-    console.error('Activity log migration error:', error.message);
+    logger.error('Activity log migration error:', error.message);
   }
 }
 
@@ -512,7 +513,7 @@ function runRawMaterialsWarehouseMigration(): void {
     `).get() as { count: number };
 
     if (columnCheck.count === 0) {
-      console.log('Running raw materials warehouse migration...');
+      logger.info('Running raw materials warehouse migration...');
 
       const migrationSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-raw-materials-warehouse.sql'),
@@ -521,10 +522,10 @@ function runRawMaterialsWarehouseMigration(): void {
 
       db.exec(migrationSQL);
 
-      console.log('✅ Raw materials warehouse migration completed!');
+      logger.info('✅ Raw materials warehouse migration completed!');
     }
   } catch (error: any) {
-    console.error('Raw materials warehouse migration error:', error.message);
+    logger.error('Raw materials warehouse migration error:', error.message);
   }
 }
 
@@ -536,7 +537,7 @@ function runProductionInputsWarehouseMigration(): void {
     `).get() as { count: number };
 
     if (columnCheck.count === 0) {
-      console.log('Running production inputs warehouse migration...');
+      logger.info('Running production inputs warehouse migration...');
 
       const migrationSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-warehouse-to-production-inputs.sql'),
@@ -545,10 +546,10 @@ function runProductionInputsWarehouseMigration(): void {
 
       db.exec(migrationSQL);
 
-      console.log('✅ Production inputs warehouse migration completed!');
+      logger.info('✅ Production inputs warehouse migration completed!');
     }
   } catch (error: any) {
-    console.error('Production inputs warehouse migration error:', error.message);
+    logger.error('Production inputs warehouse migration error:', error.message);
   }
 }
 
@@ -560,7 +561,7 @@ function runMobileInvoiceMigration(): void {
     `).get() as { name: string } | undefined;
 
     if (!taxRatesTableCheck) {
-      console.log('Running mobile invoice tables migration...');
+      logger.info('Running mobile invoice tables migration...');
 
       const mobileInvoiceSQL = fs.readFileSync(
         path.join(__dirname, '../migrations/add-mobile-invoice-tables.sql'),
@@ -569,10 +570,10 @@ function runMobileInvoiceMigration(): void {
 
       db.exec(mobileInvoiceSQL);
 
-      console.log('✅ Mobile invoice tables migration completed!');
+      logger.info('✅ Mobile invoice tables migration completed!');
     }
   } catch (error: any) {
-    console.error('Mobile invoice migration error:', error.message);
+    logger.error('Mobile invoice migration error:', error.message);
   }
 }
 

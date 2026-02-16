@@ -12,8 +12,8 @@ declare global {
 
 export const formatCurrency = (amount: number | string, settings: CurrencySettings | null = null): string => {
   try {
-    const currencySymbol = settings?.currency_symbol || (typeof window !== 'undefined' ? window.defaultCurrency : '$');
-    const currencyCode = settings?.currency_code || 'USD';
+    const currencySymbol = settings?.currency_symbol || (typeof window !== 'undefined' ? window.defaultCurrency : 'Rs.');
+    const currencyCode = settings?.currency_code || 'PKR';
     const decimalPlaces = parseInt(settings?.decimal_places?.toString() || '2');
 
     const numAmount = parseFloat(amount.toString());
@@ -26,7 +26,7 @@ export const formatCurrency = (amount: number | string, settings: CurrencySettin
     return `${currencySymbol} ${formattedAmount}`;
   } catch (error) {
     console.warn('Error formatting currency:', error);
-    const fallbackSymbol = typeof window !== 'undefined' ? window.defaultCurrency : '$';
+    const fallbackSymbol = typeof window !== 'undefined' ? window.defaultCurrency : 'Rs.';
     return `${fallbackSymbol} ${parseFloat((amount || 0).toString()).toFixed(2)}`;
   }
 };

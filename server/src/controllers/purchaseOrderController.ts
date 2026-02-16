@@ -3,6 +3,7 @@ import { AuthRequest } from '../types';
 import PurchaseOrderModel from '../models/PurchaseOrder';
 import SupplierLedgerModel from '../models/SupplierLedger';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 function createPurchaseOrder(req: AuthRequest, res: Response): void {
   try {
@@ -59,7 +60,7 @@ function createPurchaseOrder(req: AuthRequest, res: Response): void {
 
     res.status(201).json(po);
   } catch (error: any) {
-    console.error('Create PO error:', error);
+    logger.error('Create PO error:', error);
     res.status(500).json({ error: error.message || 'Failed to create purchase order' });
   }
 }
@@ -84,7 +85,7 @@ function getPurchaseOrders(req: Request, res: Response): void {
 
     res.json(pos);
   } catch (error) {
-    console.error('Get POs error:', error);
+    logger.error('Get POs error:', error);
     res.status(500).json({ error: 'Failed to get purchase orders' });
   }
 }
@@ -103,7 +104,7 @@ function getPurchaseOrder(req: Request, res: Response): void {
 
     res.json({ ...po, items });
   } catch (error) {
-    console.error('Get PO error:', error);
+    logger.error('Get PO error:', error);
     res.status(500).json({ error: 'Failed to get purchase order' });
   }
 }
@@ -133,7 +134,7 @@ function updatePurchaseOrder(req: AuthRequest, res: Response): void {
 
     res.json(po);
   } catch (error: any) {
-    console.error('Update PO error:', error);
+    logger.error('Update PO error:', error);
     res.status(500).json({ error: error.message || 'Failed to update purchase order' });
   }
 }
@@ -144,7 +145,7 @@ function deletePurchaseOrder(req: AuthRequest, res: Response): void {
 
     res.json({ success: true, message: 'Purchase order deleted successfully' });
   } catch (error: any) {
-    console.error('Delete PO error:', error);
+    logger.error('Delete PO error:', error);
     res.status(500).json({ error: error.message || 'Failed to delete purchase order' });
   }
 }
@@ -178,7 +179,7 @@ function addLineItem(req: AuthRequest, res: Response): void {
 
     res.status(201).json(item);
   } catch (error: any) {
-    console.error('Add PO item error:', error);
+    logger.error('Add PO item error:', error);
     res.status(500).json({ error: error.message || 'Failed to add line item' });
   }
 }
@@ -212,7 +213,7 @@ function updateLineItem(req: Request, res: Response): void {
 
     res.json(item);
   } catch (error: any) {
-    console.error('Update PO item error:', error);
+    logger.error('Update PO item error:', error);
     res.status(500).json({ error: error.message || 'Failed to update line item' });
   }
 }
@@ -223,7 +224,7 @@ function deleteLineItem(req: Request, res: Response): void {
 
     res.json({ success: true, message: 'Line item deleted successfully' });
   } catch (error: any) {
-    console.error('Delete PO item error:', error);
+    logger.error('Delete PO item error:', error);
     res.status(500).json({ error: error.message || 'Failed to delete line item' });
   }
 }
@@ -247,7 +248,7 @@ function updateStatus(req: AuthRequest, res: Response): void {
 
     res.json(po);
   } catch (error: any) {
-    console.error('Update PO status error:', error);
+    logger.error('Update PO status error:', error);
     res.status(500).json({ error: error.message || 'Failed to update purchase order status' });
   }
 }
@@ -258,7 +259,7 @@ function getGoodsReceipts(req: Request, res: Response): void {
 
     res.json(receipts);
   } catch (error) {
-    console.error('Get goods receipts error:', error);
+    logger.error('Get goods receipts error:', error);
     res.status(500).json({ error: 'Failed to get goods receipts' });
   }
 }
@@ -318,7 +319,7 @@ function createGoodsReceipt(req: AuthRequest, res: Response): void {
 
     res.status(201).json(receipt);
   } catch (error: any) {
-    console.error('Create goods receipt error:', error);
+    logger.error('Create goods receipt error:', error);
     res.status(500).json({ error: error.message || 'Failed to create goods receipt' });
   }
 }
@@ -329,7 +330,7 @@ function getPendingOrders(req: Request, res: Response): void {
 
     res.json(pos);
   } catch (error) {
-    console.error('Get pending POs error:', error);
+    logger.error('Get pending POs error:', error);
     res.status(500).json({ error: 'Failed to get pending purchase orders' });
   }
 }
@@ -355,7 +356,7 @@ function getSummaryBySupplier(req: Request, res: Response): void {
       total_value: 0
     });
   } catch (error) {
-    console.error('Get PO summary error:', error);
+    logger.error('Get PO summary error:', error);
     res.status(500).json({ error: 'Failed to get purchase order summary' });
   }
 }
@@ -374,7 +375,7 @@ function getSupplierBalance(req: Request, res: Response): void {
     // Ensure balance is always a number (0 if no ledger entries exist)
     res.json({ supplier_id: Number(supplierId), balance: balance || 0 });
   } catch (error) {
-    console.error('Get supplier balance error:', error);
+    logger.error('Get supplier balance error:', error);
     res.status(500).json({ error: 'Failed to get supplier balance' });
   }
 }
@@ -392,7 +393,7 @@ function getSupplierTransactions(req: Request, res: Response): void {
 
     res.json(transactions);
   } catch (error) {
-    console.error('Get supplier transactions error:', error);
+    logger.error('Get supplier transactions error:', error);
     res.status(500).json({ error: 'Failed to get supplier transactions' });
   }
 }

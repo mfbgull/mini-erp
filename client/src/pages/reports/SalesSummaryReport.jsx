@@ -10,11 +10,11 @@ import {
   Download,
   Filter,
   BarChart3,
-  DollarSign
+  DollarSign,
+  X
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import SearchableSelect from '../../components/common/SearchableSelect';
@@ -22,8 +22,8 @@ import DateRangePicker from '../../components/common/DateRangePicker';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './SalesReports.css';
 
-// Register AG Grid modules
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+// Register AG Grid modules - AllCommunityModule required for Quartz theme
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default function SalesSummaryReport() {
   const [dateRange, setDateRange] = useState({
@@ -33,8 +33,31 @@ export default function SalesSummaryReport() {
   const [customerIds, setCustomerIds] = useState([]);
   const [itemIds, setItemIds] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedSale, setSelectedSale] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
   const gridRef = useRef(null);
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (sale) => {
+    setSelectedSale(sale);
+    setShowDetailModal(true);
+  };
 
   // Fetch customers for filter
   const { data: customers = [] } = useQuery({
@@ -382,21 +405,46 @@ export default function SalesSummaryReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.sales && reportData.sales.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.sales || []}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-            />
-          </div>
+          <>
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.sales || []}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+              />
+            </div>
+
+            <div className="mobile-sales-list">
+              {reportData.sales.map((sale, index) => (
+                <div
+                  key={sale.invoice_id || sale.invoice_number || `sale-${index}`}
+                  className="sales-summary-card"
+                  onClick={() => handleCardClick(sale)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(sale);
+                    }
+                  }}
+                >
+                  <div className="sales-summary-card-content">
+                    <h3 className="sales-summary-card-title">{sale.invoice_number}</h3>
+                    <span className="sales-summary-card-amount">{formatCurrency(sale.total || 0)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <BarChart3 size={48} />
@@ -405,6 +453,77 @@ export default function SalesSummaryReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedSale && (
+        <div
+          className="sales-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="sales-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sales-modal-header">
+              <h2 className="sales-modal-title">{selectedSale.invoice_number}</h2>
+              <button
+                type="button"
+                className="sales-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="sales-modal-content">
+              <div className="sales-detail-section">
+                <div className="sales-details-grid">
+                  <div className="sales-detail-item">
+                    <span className="sales-detail-label">Customer</span>
+                    <span className="sales-detail-value">{selectedSale.customer_name || '-'}</span>
+                  </div>
+
+                  <div className="sales-detail-item">
+                    <span className="sales-detail-label">Date</span>
+                    <span className="sales-detail-value">{selectedSale.invoice_date ? new Date(selectedSale.invoice_date).toLocaleDateString() : '-'}</span>
+                  </div>
+
+                  <div className="sales-detail-item">
+                    <span className="sales-detail-label">Status</span>
+                    <span className="sales-detail-value">{selectedSale.payment_status || '-'}</span>
+                  </div>
+
+                  <div className="sales-detail-item">
+                    <span className="sales-detail-label">Total</span>
+                    <span className="sales-detail-value">{formatCurrency(selectedSale.total || 0)}</span>
+                  </div>
+
+                  <div className="sales-detail-item">
+                    <span className="sales-detail-label">Paid</span>
+                    <span className="sales-detail-value">{formatCurrency(selectedSale.paid_amount || 0)}</span>
+                  </div>
+
+                  <div className="sales-detail-item">
+                    <span className="sales-detail-label">Balance</span>
+                    <span className="sales-detail-value">{formatCurrency(selectedSale.balance || 0)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="sales-modal-actions">
+              <button
+                type="button"
+                className="sales-action-btn sales-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

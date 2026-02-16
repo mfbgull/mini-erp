@@ -74,7 +74,7 @@ class PurchaseModel {
 
       const purchaseId = result.lastInsertRowid as number;
 
-      const movementNo = 'STK-' + new Date().getFullYear() + '-0001';
+      const movementNo = this.generateMovementNo(db);
       db.prepare(`
         INSERT INTO stock_movements (
           movement_no, item_id, warehouse_id, movement_type,
@@ -158,6 +158,25 @@ class PurchaseModel {
     `).run(settingKey, nextNo.toString());
 
     return `PURCH-${year}-${nextNo.toString().padStart(4, '0')}`;
+  }
+
+  static generateMovementNo(db: Database.Database): string {
+    const year = new Date().getFullYear();
+    const settingKey = `STK_last_no_${year}`;
+
+    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
+
+    let nextNo = 1;
+    if (setting) {
+      nextNo = parseInt(setting.value) + 1;
+    }
+
+    db.prepare(`
+      INSERT OR REPLACE INTO settings (key, value, updated_at)
+      VALUES (?, ?, CURRENT_TIMESTAMP)
+    `).run(settingKey, nextNo.toString());
+
+    return `STK-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
   static getAll(filters: PurchaseFilters = {}, db: Database.Database): Purchase[] {

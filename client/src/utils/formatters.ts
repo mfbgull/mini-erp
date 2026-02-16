@@ -1,12 +1,11 @@
 import { format } from 'date-fns';
 
 export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  const formatted = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
+  return `Rs. ${formatted}`;
 };
 
 export const formatDate = (dateString: string): string => {

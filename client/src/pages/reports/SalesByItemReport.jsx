@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -9,19 +9,21 @@ import {
   Calendar,
   Download,
   Filter,
-  BarChart3
+  BarChart3,
+  X,
+  Tag,
+  Hash
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './SalesByItemReport.css';
 
-// Register AG Grid modules
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+// Register AG Grid modules - AllCommunityModule required for Quartz theme
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default function SalesByItemReport() {
   const [dateRange, setDateRange] = useState({
@@ -29,7 +31,31 @@ export default function SalesByItemReport() {
     toDate: new Date().toISOString().split('T')[0]
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const modalRef = useRef(null);
   const { formatCurrency } = useSettings();
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (item) => {
+    setSelectedItem(item);
+    setShowDetailModal(true);
+  };
 
   // Fetch sales by item report
   const { data: reportData, isLoading, refetch } = useQuery({
@@ -209,32 +235,56 @@ export default function SalesByItemReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData && reportData.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params) => {
-                // Check if the grid is visible before sizing columns
-                setTimeout(() => {
-                  if (params.api && params.columnApi) {
-                    const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-                    if (gridElement && gridElement.clientWidth > 0) {
-                      params.columnApi.autoSizeAllColumns();
+          <>
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+                onGridReady={(params) => {
+                  setTimeout(() => {
+                    if (params.api && params.columnApi) {
+                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                      if (gridElement && gridElement.clientWidth > 0) {
+                        params.columnApi.autoSizeAllColumns();
+                      }
                     }
-                  }
-                }, 100); // Small delay to ensure grid is rendered
-              }}
-            />
-          </div>
+                  }, 100);
+                }}
+              />
+            </div>
+
+            <div className="mobile-sales-list">
+              {reportData.map((item, index) => (
+                <div
+                  key={item.item_code || item.item_name || `item-${index}`}
+                  className="sales-item-card"
+                  onClick={() => handleCardClick(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(item);
+                    }
+                  }}
+                >
+                  <div className="sales-item-card-content">
+                    <h3 className="item-card-name">{item.item_name}</h3>
+                    <span className="item-card-amount">{formatCurrency(item.total_sales || 0)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <Package size={48} />
@@ -243,6 +293,85 @@ export default function SalesByItemReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedItem && (
+        <div
+          className="item-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="item-modal"
+            onClick={(e) => e.stopPropagation()}
+            ref={modalRef}
+          >
+            <div className="item-modal-header">
+              <h2 className="item-modal-title">{selectedItem.item_name}</h2>
+              <button
+                type="button"
+                className="item-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="item-modal-content">
+              <div className="item-detail-section">
+                <div className="item-details-grid">
+                  <div className="item-detail-item">
+                    <span className="item-detail-label">
+                      <Tag size={14} />
+                      Item Code
+                    </span>
+                    <span className="item-detail-value">{selectedItem.item_code || '-'}</span>
+                  </div>
+
+                  <div className="item-detail-item">
+                    <span className="item-detail-label">
+                      <Package size={14} />
+                      Category
+                    </span>
+                    <span className="item-detail-value">{selectedItem.item_category || '-'}</span>
+                  </div>
+
+                  <div className="item-detail-item">
+                    <span className="item-detail-label">
+                      <Hash size={14} />
+                      Quantity Sold
+                    </span>
+                    <span className="item-detail-value">{selectedItem.total_quantity_sold}</span>
+                  </div>
+
+                  <div className="item-detail-item">
+                    <span className="item-detail-label">
+                      <TrendingUp size={14} />
+                      Avg. Selling Price
+                    </span>
+                    <span className="item-detail-value">{formatCurrency(selectedItem.avg_selling_price || 0)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="item-sales-highlight">
+                <span className="sales-label">Total Sales</span>
+                <span className="sales-value">{formatCurrency(selectedItem.total_sales || 0)}</span>
+              </div>
+            </div>
+
+            <div className="item-modal-actions">
+              <button
+                type="button"
+                className="item-action-btn item-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

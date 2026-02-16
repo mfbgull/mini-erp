@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
-import ledgerUtils from '../utils/ledgerUtils';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
+import { getRouteParam } from '../utils/queryUtils';
+import ledgerUtils from '../utils/ledgerUtils';
+import logger from '../utils/logger';
 
 function getPayments(req: Request, res: Response): void {
   try {
@@ -60,7 +62,13 @@ function getPayments(req: Request, res: Response): void {
       params.push(toDate);
     }
 
-    query += ` GROUP BY p.id ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`;
+    // Validate and whitelist sort parameters to prevent SQL injection
+    const ALLOWED_SORT_COLUMNS = ['payment_date', 'payment_no', 'amount', 'customer_name', 'id', 'created_at'];
+    const ALLOWED_SORT_ORDERS = ['ASC', 'DESC'];
+    const validatedSortBy = ALLOWED_SORT_COLUMNS.includes(sortBy) ? sortBy : 'payment_date';
+    const validatedSortOrder = ALLOWED_SORT_ORDERS.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
+
+    query += ` GROUP BY p.id ORDER BY ${validatedSortBy} ${validatedSortOrder} LIMIT ? OFFSET ?`;
     params.push(parseInt(limit as string), (parseInt(page as string) - 1) * parseInt(limit as string));
 
     const payments = db.prepare(query).all(...params);
@@ -111,7 +119,7 @@ function getPayments(req: Request, res: Response): void {
       }
     });
   } catch (error) {
-    console.error('Error fetching payments:', error);
+    logger.error('Error fetching payments:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch payments'
@@ -166,7 +174,7 @@ function getPayment(req: Request, res: Response): void {
       data: payment
     });
   } catch (error) {
-    console.error('Error fetching payment:', error);
+    logger.error('Error fetching payment:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch payment'
@@ -245,7 +253,7 @@ function createPayment(req: AuthRequest, res: Response): void {
         return;
       }
 
-      console.log('Payment validation - Invoice:', parsedInvoiceId, 'Invoice customer_id:', invoice.customer_id, typeof invoice.customer_id, 'Parsed customer_id:', parsedCustomerId, typeof parsedCustomerId);
+      logger.debug('Payment validation - Invoice:', parsedInvoiceId, 'Invoice customer_id:', invoice.customer_id, typeof invoice.customer_id, 'Parsed customer_id:', parsedCustomerId, typeof parsedCustomerId);
 
       if (Number(invoice.customer_id) !== Number(parsedCustomerId)) {
         res.status(400).json({
@@ -320,7 +328,7 @@ function createPayment(req: AuthRequest, res: Response): void {
       const invoiceNumbers = invoice_allocations.map((alloc: any) => {
         const invoiceId = parseInt(alloc.invoice_id, 10);
         const inv = db.prepare('SELECT invoice_no FROM invoices WHERE id = ?').get(invoiceId) as { invoice_no: string } | undefined;
-        console.log('Ledger description - Looking up invoice:', invoiceId, 'Found:', inv);
+        logger.debug('Ledger description - Looking up invoice:', invoiceId, 'Found:', inv);
         return inv && inv.invoice_no ? inv.invoice_no : `Invoice #${invoiceId}`;
       });
 
@@ -385,7 +393,7 @@ function createPayment(req: AuthRequest, res: Response): void {
       data: createdPayment
     });
   } catch (error) {
-    console.error('Error creating payment:', error);
+    logger.error('Error creating payment:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to create payment'
@@ -446,7 +454,7 @@ function updatePayment(req: AuthRequest, res: Response): void {
       message: 'Payment updated successfully'
     });
   } catch (error) {
-    console.error('Error updating payment:', error);
+    logger.error('Error updating payment:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update payment'
@@ -456,10 +464,10 @@ function updatePayment(req: AuthRequest, res: Response): void {
 
 function deletePayment(req: AuthRequest, res: Response): void {
   try {
-    const { id } = req.params;
+    const id = getRouteParam(req.params.id);
     const parsedId = parseInt(id, 10);
 
-    console.log('Attempting to delete payment with ID:', id, 'Parsed as:', parsedId);
+    logger.debug('Attempting to delete payment with ID:', id, 'Parsed as:', parsedId);
 
     if (isNaN(parsedId)) {
       res.status(400).json({
@@ -471,10 +479,10 @@ function deletePayment(req: AuthRequest, res: Response): void {
 
     // Query to check if payment exists
     const paymentCheck = db.prepare('SELECT id FROM payments WHERE id = ?').get(parsedId);
-    console.log('Payment check result:', paymentCheck);
+    logger.debug('Payment check result:', paymentCheck);
 
     if (!paymentCheck) {
-      console.log('Payment with ID', parsedId, 'does not exist in database');
+      logger.debug('Payment with ID', parsedId, 'does not exist in database');
       res.status(404).json({
         success: false,
         error: 'Payment not found'
@@ -484,7 +492,7 @@ function deletePayment(req: AuthRequest, res: Response): void {
 
     // If payment exists, fetch full details
     const existingPayment = db.prepare('SELECT * FROM payments WHERE id = ?').get(parsedId) as any;
-    console.log('Found payment details:', existingPayment);
+    logger.debug('Found payment details:', existingPayment);
 
     if (!existingPayment) {
       res.status(404).json({
@@ -495,26 +503,26 @@ function deletePayment(req: AuthRequest, res: Response): void {
     }
 
     const transaction = db.transaction(() => {
-      console.log('Starting transaction to delete payment:', parsedId);
+      logger.debug('Starting transaction to delete payment:', parsedId);
 
       const allocations = db.prepare('SELECT * FROM payment_allocations WHERE payment_id = ?').all(parsedId) as Array<{ invoice_id: number }>;
-      console.log('Found allocations to delete:', allocations.length);
+      logger.debug('Found allocations to delete:', allocations.length);
 
       const deleteAllocationsResult = db.prepare('DELETE FROM payment_allocations WHERE payment_id = ?').run(parsedId);
-      console.log('Deleted allocations result:', deleteAllocationsResult);
+      logger.debug('Deleted allocations result:', deleteAllocationsResult);
 
       const deletePaymentResult = db.prepare('DELETE FROM payments WHERE id = ?').run(parsedId);
-      console.log('Deleted payment result:', deletePaymentResult);
+      logger.debug('Deleted payment result:', deletePaymentResult);
 
       const deleteLedgerResult = db.prepare('DELETE FROM customer_ledger WHERE reference_no = ?').run(existingPayment.payment_no);
-      console.log('Deleted ledger entries result:', deleteLedgerResult);
+      logger.debug('Deleted ledger entries result:', deleteLedgerResult);
 
       for (const alloc of allocations) {
         try {
           ledgerUtils.calculateInvoiceBalance(alloc.invoice_id);
           ledgerUtils.updateInvoiceStatus(alloc.invoice_id);
         } catch (error) {
-          console.error(`Error updating invoice ${alloc.invoice_id} after payment deletion:`, error);
+          logger.error(`Error updating invoice ${alloc.invoice_id} after payment deletion:`, error);
           // Continue processing other allocations even if one fails
         }
       }
@@ -522,14 +530,14 @@ function deletePayment(req: AuthRequest, res: Response): void {
       try {
         ledgerUtils.updateCustomerBalance(existingPayment.customer_id);
       } catch (error) {
-        console.error(`Error updating customer ${existingPayment.customer_id} balance after payment deletion:`, error);
+        logger.error(`Error updating customer ${existingPayment.customer_id} balance after payment deletion:`, error);
       }
     });
 
     try {
       transaction();
     } catch (transactionError) {
-      console.error('Transaction failed during payment deletion:', transactionError);
+      logger.error('Transaction failed during payment deletion:', transactionError);
       res.status(500).json({
         success: false,
         error: 'Failed to delete payment due to database error'
@@ -544,7 +552,7 @@ function deletePayment(req: AuthRequest, res: Response): void {
         amount: existingPayment.amount
       });
     } catch (logError) {
-      console.error('Error logging payment deletion:', logError);
+      logger.error('Error logging payment deletion:', logError);
       // Don't fail the operation if logging fails
     }
 
@@ -553,7 +561,7 @@ function deletePayment(req: AuthRequest, res: Response): void {
       message: 'Payment deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting payment:', error);
+    logger.error('Error deleting payment:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to delete payment'
@@ -568,7 +576,7 @@ function allocatePaymentToInvoice(req: Request, res: Response): void {
       error: 'Manual allocation endpoint not implemented - use createPayment with allocations instead'
     });
   } catch (error) {
-    console.error('Error allocating payment to invoice:', error);
+    logger.error('Error allocating payment to invoice:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to allocate payment to invoice'

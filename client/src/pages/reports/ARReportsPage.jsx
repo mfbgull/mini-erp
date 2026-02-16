@@ -8,7 +8,11 @@ import {
   AlertTriangle,
   FileText,
   Download,
-  BarChart3
+  BarChart3,
+  X,
+  Users,
+  Clock,
+  Hash
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -344,7 +348,31 @@ export default function ARReportsPage() {
 }
 
 // AR Aging Report Component
-function ARAgingReport({ data, loading, asOfDate, formatCurrency }) {
+function ARAgingReport({ data, loading, formatCurrency, asOfDate }) {
+  const [selectedAging, setSelectedAging] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (aging) => {
+    setSelectedAging(aging);
+    setShowDetailModal(true);
+  };
+
   if (loading) {
     return (
       <div className="loading">
@@ -354,10 +382,9 @@ function ARAgingReport({ data, loading, asOfDate, formatCurrency }) {
   }
 
   if (!data) {
-    return <div className="no-data">No data available</div>;
+    return <div className="no-data">No AR aging data available</div>;
   }
 
-  // Column definitions for aging report
   const columnDefs = [
     {
       headerName: 'Customer',
@@ -466,33 +493,145 @@ function ARAgingReport({ data, loading, asOfDate, formatCurrency }) {
 
       <div className="aging-grid-container">
         <h3>AR Aging as of {new Date(asOfDate).toLocaleDateString()}</h3>
-        <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>
-          <AgGridReact
-            rowData={data.agingBuckets || []}
-            columnDefs={columnDefs}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={15}
-            paginationPageSizeSelector={[10, 15, 25, 50]}
-            rowSelection={{ mode: 'singleRow' }}
-            onGridReady={(params) => {
-              // Check if the grid is visible before sizing columns
-              setTimeout(() => {
-                if (params.api && params.columnApi) {
-                  const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-                  if (gridElement && gridElement.clientWidth > 0) {
-                    params.columnApi.autoSizeAllColumns();
+        <>
+          <div className="ag-theme-quartz desktop-view" style={{ height: 500, width: '100%' }}>
+            <AgGridReact
+              rowData={data.agingBuckets || []}
+              columnDefs={columnDefs}
+              defaultColDef={{
+                resizable: true,
+                sortable: true,
+                filter: true
+              }}
+              pagination={true}
+              paginationPageSize={15}
+              paginationPageSizeSelector={[10, 15, 25, 50]}
+              rowSelection={{ mode: 'singleRow' }}
+              onGridReady={(params) => {
+                setTimeout(() => {
+                  if (params.api && params.columnApi) {
+                    const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                    if (gridElement && gridElement.clientWidth > 0) {
+                      params.columnApi.autoSizeAllColumns();
+                    }
                   }
-                }
-              }, 100); // Small delay to ensure grid is rendered
-            }}
-          />
-        </div>
+                }, 100);
+              }}
+            />
+          </div>
+
+          <div className="mobile-ar-aging-list">
+            {(data.agingBuckets || []).map((aging, index) => (
+              <div
+                key={`${aging.customer_id || aging.customer_name}-${index}`}
+                className="ar-aging-card"
+                onClick={() => handleCardClick(aging)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCardClick(aging);
+                  }
+                }}
+              >
+                <div className="ar-aging-card-content">
+                  <h3 className="ar-aging-customer">{aging.customer_name}</h3>
+                  <span className="ar-aging-amount">{formatCurrency(aging.total_outstanding || 0)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       </div>
+
+      {showDetailModal && selectedAging && (
+        <div
+          className="ar-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="ar-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="ar-modal-header">
+              <h2 className="ar-modal-title">{selectedAging.customer_name}</h2>
+              <button
+                type="button"
+                className="ar-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="ar-modal-content">
+              <div className="ar-detail-section">
+                <div className="ar-details-grid">
+                  <div className="ar-detail-item">
+                    <span className="ar-detail-label">
+                      <Users size={14} />
+                      Customer Code
+                    </span>
+                    <span className="ar-detail-value">{selectedAging.customer_code || '-'}</span>
+                  </div>
+
+                  <div className="ar-detail-item">
+                    <span className="ar-detail-label">
+                      <DollarSign size={14} />
+                      Total Outstanding
+                    </span>
+                    <span className="ar-detail-value">{formatCurrency(selectedAging.total_outstanding || 0)}</span>
+                  </div>
+
+                  <div className="ar-detail-item">
+                    <span className="ar-detail-label">
+                      <Clock size={14} />
+                      Current
+                    </span>
+                    <span className="ar-detail-value">{formatCurrency(selectedAging.current_amount || 0)}</span>
+                  </div>
+
+                  <div className="ar-detail-item">
+                    <span className="ar-detail-label">1-30 Days</span>
+                    <span className="ar-detail-value">{formatCurrency(selectedAging.days_1_30 || 0)}</span>
+                  </div>
+
+                  <div className="ar-detail-item">
+                    <span className="ar-detail-label">31-60 Days</span>
+                    <span className="ar-detail-value">{formatCurrency(selectedAging.days_31_60 || 0)}</span>
+                  </div>
+
+                  <div className="ar-detail-item">
+                    <span className="ar-detail-label">61-90 Days</span>
+                    <span className="ar-detail-value">{formatCurrency(selectedAging.days_61_90 || 0)}</span>
+                  </div>
+
+                  <div className="ar-detail-item">
+                    <span className="ar-detail-label">
+                      <AlertTriangle size={14} />
+                      90+ Days
+                    </span>
+                    <span className="ar-detail-value">{formatCurrency(selectedAging.days_over_90 || 0)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="ar-modal-actions">
+              <button
+                type="button"
+                className="ar-action-btn ar-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -668,32 +807,47 @@ function TopDebtorsReport({ data, loading, formatCurrency }) {
 
   return (
     <div className="top-debtors-report">
-      <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>
-        <AgGridReact
-          rowData={data}
-          columnDefs={columnDefs}
-          defaultColDef={{
-            resizable: true,
-            sortable: true,
-            filter: true
-          }}
-          pagination={true}
-          paginationPageSize={20}
-          paginationPageSizeSelector={[10, 20, 50, 100]}
-          rowSelection="single"
-          onGridReady={(params) => {
-            // Check if the grid is visible before sizing columns
-            setTimeout(() => {
-              if (params.api && params.columnApi) {
-                const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-                if (gridElement && gridElement.clientWidth > 0) {
-                  params.columnApi.autoSizeAllColumns();
+      <>
+        <div className="ag-theme-quartz desktop-view" style={{ height: 500, width: '100%' }}>
+          <AgGridReact
+            rowData={data}
+            columnDefs={columnDefs}
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true
+            }}
+            pagination={true}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            rowSelection="single"
+            onGridReady={(params) => {
+              setTimeout(() => {
+                if (params.api && params.columnApi) {
+                  const gridElement = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
+                  if (gridElement && gridElement.clientWidth > 0) {
+                    params.columnApi.autoSizeAllColumns();
+                  }
                 }
-              }
-            }, 100); // Small delay to ensure grid is rendered
-          }}
-        />
-      </div>
+              }, 100);
+            }}
+          />
+        </div>
+
+        <div className="mobile-top-debtors-list">
+          {data.map((debtor, index) => (
+            <div
+              key={`${debtor.customer_id || debtor.customer_name}-${index}`}
+              className="top-debtor-card"
+            >
+              <div className="top-debtor-card-content">
+                <h3 className="top-debtor-name">{debtor.customer_name}</h3>
+                <span className="top-debtor-balance">{formatCurrency(debtor.balance || 0)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </>
     </div>
   );
 }

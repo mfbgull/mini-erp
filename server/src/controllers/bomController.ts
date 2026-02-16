@@ -3,6 +3,7 @@ import BOMModel from '../models/BOM';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 export const getAllBOMs = (req: Request, res: Response, next: NextFunction): void => {
   try {
@@ -61,7 +62,7 @@ export const createBOM = (req: AuthRequest, res: Response, next: NextFunction): 
 
     const bom = BOMModel.create(req.body, req.user!.id, db);
 
-    console.log(`Created BOM: ${bom.bom_no} for ${bom.finished_item_name}`);
+    logger.info(`Created BOM: ${bom.bom_no} for ${bom.finished_item_name}`);
 
     // Log BOM creation using activity logger
     logCRUD(ActionType.BOM_CREATE, 'BOM', bom.id, `Created BOM: ${bom.bom_no} for ${bom.finished_item_name}`, req.user!.id);
@@ -78,7 +79,7 @@ export const updateBOM = (req: AuthRequest, res: Response, next: NextFunction): 
 
     const bom = BOMModel.update(Number(id), req.body, req.user!.id, db);
 
-    console.log(`Updated BOM: ${bom.bom_no}`);
+    logger.info(`Updated BOM: ${bom.bom_no}`);
 
     // Log BOM update using activity logger
     logCRUD(ActionType.BOM_UPDATE, 'BOM', bom.id, `Updated BOM: ${bom.bom_no}`, req.user!.id);
@@ -102,7 +103,7 @@ export const deleteBOM = (req: AuthRequest, res: Response, next: NextFunction): 
 
     BOMModel.delete(Number(id), db);
 
-    console.log(`Deleted BOM: ${bom.bom_no}`);
+    logger.info(`Deleted BOM: ${bom.bom_no}`);
 
     // Log BOM deletion using activity logger
     logCRUD(ActionType.BOM_DELETE, 'BOM', Number(id), `Deleted BOM: ${bom.bom_no}`, req.user!.id);
@@ -119,7 +120,7 @@ export const toggleBOMActive = (req: AuthRequest, res: Response, next: NextFunct
 
     const bom = BOMModel.toggleActive(Number(id), db);
 
-    console.log(`${bom.is_active ? 'Activated' : 'Deactivated'} BOM: ${bom.bom_no}`);
+    logger.info(`${bom.is_active ? 'Activated' : 'Deactivated'} BOM: ${bom.bom_no}`);
 
     res.json(bom);
   } catch (error) {

@@ -292,6 +292,10 @@
   color: var(--text-secondary);
 }
 
+.desktop-view {
+  display: block;
+}
+
 /* Mobile Expense Report Cards */
 .mobile-expenses-list {
   display: none; /* Hidden by default, shown on mobile */

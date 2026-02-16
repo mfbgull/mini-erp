@@ -1,8 +1,11 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import errorHandlerMiddleware from './middleware/errorHandler';
 import { apiLimiter } from './middleware/rateLimiter';
+import logger from './utils/logger';
+import { requestLogger, errorLogger } from './middleware/requestLogger';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -45,13 +48,16 @@ app.use(helmet({
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
     ? (process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3010'])
-    : ['http://localhost:5173', 'http://localhost:3010', 'http://127.0.0.1:5173'],
+    : ['http://localhost:5173', 'http://localhost:3010', 'http://localhost:3013', 'http://localhost:3015', 'http://127.0.0.1:5173'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 app.use(cors(corsOptions));
+
+// Cookie parser
+app.use(cookieParser());
 
 // Body parsing middleware with limits
 app.use(express.json({ limit: '10mb' }));
@@ -60,13 +66,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Apply rate limiting to all API routes
 app.use('/api/', apiLimiter);
 
-// Request logging middleware (development)
-if (process.env.NODE_ENV !== 'production') {
-  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-  });
-}
+// Request logging middleware
+app.use(requestLogger);
 
 // Health check endpoint
 app.get('/health', (req: express.Request, res: express.Response) => {
@@ -109,7 +110,7 @@ if (process.env.NODE_ENV === 'production') {
     clientDistPath = path.normalize(clientDistPath);
 
     if (!fs.existsSync(clientDistPath)) {
-      console.log('[Server] Path not found, trying alternative locations...');
+      logger.warn('[Server] Path not found, trying alternative locations...');
 
       clientDistPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
       clientDistPath = path.normalize(clientDistPath);
@@ -124,9 +125,9 @@ if (process.env.NODE_ENV === 'production') {
     clientDistPath = path.join(__dirname, '..', '..', 'client', 'dist');
   }
 
-  console.log('[Server] Serving static files from:', clientDistPath);
-  console.log('[Server] Path exists:', fs.existsSync(clientDistPath));
-  console.log('[Server] process.cwd():', process.cwd());
+  logger.info('[Server] Serving static files from:', { path: clientDistPath });
+  logger.info('[Server] Path exists:', { exists: fs.existsSync(clientDistPath) });
+  logger.info('[Server] process.cwd():', { cwd: process.cwd() });
 
   // Serve static assets (js, css, images, etc.)
   app.use(express.static(clientDistPath, {
@@ -149,7 +150,7 @@ if (process.env.NODE_ENV === 'production') {
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
-      console.error('[Server] index.html not found at:', indexPath);
+      logger.error('[Server] index.html not found at:', { path: indexPath });
       res.status(404).json({ error: 'Route not found', path: req.path });
     }
   });
@@ -158,7 +159,7 @@ if (process.env.NODE_ENV === 'production') {
   const clientDistPath = path.join(__dirname, '..', '..', 'client', 'dist');
   const normalizedPath = path.normalize(clientDistPath);
 
-  console.log('[Server] Serving static files from:', normalizedPath);
+  logger.info('[Server] Serving static files from:', { path: normalizedPath });
 
   // Serve static assets
   app.use(express.static(normalizedPath));
@@ -174,11 +175,14 @@ if (process.env.NODE_ENV === 'production') {
     if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
-      console.error('[Server] index.html not found at:', indexPath);
+      logger.error('[Server] index.html not found at:', { path: indexPath });
       res.status(404).json({ error: 'Route not found', path: req.path });
     }
   });
 }
+
+// Error logging middleware (before error handler)
+app.use(errorLogger);
 
 // Global error handler
 app.use(errorHandlerMiddleware.errorHandler);

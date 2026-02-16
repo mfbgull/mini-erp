@@ -13,7 +13,6 @@ import { storage } from '../utils/storage';
 import { User } from '../types';
 
 interface LoginResponse {
-  token: string;
   user: User;
 }
 
@@ -42,9 +41,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = useCallback(async (username: string, password: string) => {
     try {
       const response = await api.post<LoginResponse>('/auth/login', { username, password });
-      const { token, user: userData } = response.data;
+      const { user: userData } = response.data;
 
-      storage.setToken(token);
+      // Token is now handled via httpOnly cookie automatically
       storage.setUser(userData);
       setUser(userData);
 
@@ -63,7 +62,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      storage.clearAuth();
+      // Only clear user data, token cookie is cleared by server
+      storage.removeUser();
       setUser(null);
       toast.success('Logged out successfully');
     }

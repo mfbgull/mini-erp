@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
 import Purchase from '../models/Purchase';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 function recordPurchase(req: AuthRequest, res: Response): void {
   try {
@@ -37,7 +38,7 @@ function recordPurchase(req: AuthRequest, res: Response): void {
 
     res.status(201).json(purchase);
   } catch (error: any) {
-    console.error('Record purchase error:', error);
+    logger.error('Record purchase error:', error);
     res.status(500).json({ error: error.message || 'Failed to record purchase' });
   }
 }
@@ -64,7 +65,7 @@ function getPurchases(req: Request, res: Response): void {
 
     res.json(purchases);
   } catch (error) {
-    console.error('Get purchases error:', error);
+    logger.error('Get purchases error:', error);
     res.status(500).json({ error: 'Failed to get purchases' });
   }
 }
@@ -80,7 +81,7 @@ function getPurchase(req: Request, res: Response): void {
 
     res.json(purchase);
   } catch (error) {
-    console.error('Get purchase error:', error);
+    logger.error('Get purchase error:', error);
     res.status(500).json({ error: 'Failed to get purchase' });
   }
 }
@@ -98,7 +99,7 @@ function getPurchaseSummaryByItem(req: Request, res: Response): void {
 
     res.json(summary);
   } catch (error) {
-    console.error('Get purchase summary error:', error);
+    logger.error('Get purchase summary error:', error);
     res.status(500).json({ error: 'Failed to get purchase summary' });
   }
 }
@@ -116,7 +117,7 @@ function getPurchaseSummaryByDateRange(req: Request, res: Response): void {
 
     res.json(summary);
   } catch (error) {
-    console.error('Get purchase summary error:', error);
+    logger.error('Get purchase summary error:', error);
     res.status(500).json({ error: 'Failed to get purchase summary' });
   }
 }
@@ -129,7 +130,7 @@ function getTopSuppliers(req: Request, res: Response): void {
 
     res.json(suppliers);
   } catch (error) {
-    console.error('Get top suppliers error:', error);
+    logger.error('Get top suppliers error:', error);
     res.status(500).json({ error: 'Failed to get top suppliers' });
   }
 }
@@ -140,7 +141,7 @@ function deletePurchase(req: AuthRequest, res: Response): void {
 
     res.json({ success: true, message: 'Purchase deleted successfully' });
   } catch (error: any) {
-    console.error('Delete purchase error:', error);
+    logger.error('Delete purchase error:', error);
     res.status(500).json({ error: error.message || 'Failed to delete purchase' });
   }
 }

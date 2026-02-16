@@ -1,6 +1,8 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
 import db from '../config/database';
+import { getRouteParam } from '../utils/queryUtils';
+import logger from '../utils/logger';
 
 // ============================================
 // DRAFT INVOICE MANAGEMENT
@@ -70,7 +72,7 @@ export async function createDraft(req: AuthRequest, res: Response) {
             message: 'Draft created successfully'
         });
     } catch (error) {
-        console.error('Create draft error:', error);
+        logger.error('Create draft error:', error);
         res.status(500).json({ error: 'Failed to create draft' });
     }
 }
@@ -80,7 +82,7 @@ export async function createDraft(req: AuthRequest, res: Response) {
  */
 export async function updateDraft(req: AuthRequest, res: Response) {
     try {
-        const { id } = req.params;
+        const id = getRouteParam(req.params.id);
         const { customer_id, invoice_date, due_date, terms, notes, items_data, status } = req.body;
         
         const draft = db.prepare('SELECT * FROM invoice_drafts WHERE id = ?').get(id);
@@ -118,7 +120,7 @@ export async function updateDraft(req: AuthRequest, res: Response) {
             message: 'Draft updated successfully'
         });
     } catch (error) {
-        console.error('Update draft error:', error);
+        logger.error('Update draft error:', error);
         res.status(500).json({ error: 'Failed to update draft' });
     }
 }
@@ -128,7 +130,7 @@ export async function updateDraft(req: AuthRequest, res: Response) {
  */
 export async function getDraft(req: AuthRequest, res: Response) {
     try {
-        const { id } = req.params;
+        const id = getRouteParam(req.params.id);
         
         const draft = db.prepare('SELECT * FROM invoice_drafts WHERE id = ?').get(id);
         
@@ -154,7 +156,7 @@ export async function getDraft(req: AuthRequest, res: Response) {
             data: parsedDraft
         });
     } catch (error) {
-        console.error('Get draft error:', error);
+        logger.error('Get draft error:', error);
         res.status(500).json({ error: 'Failed to get draft' });
     }
 }
@@ -164,7 +166,7 @@ export async function getDraft(req: AuthRequest, res: Response) {
  */
 export async function deleteDraft(req: AuthRequest, res: Response) {
     try {
-        const { id } = req.params;
+        const id = getRouteParam(req.params.id);
         
         const result = db.prepare('DELETE FROM invoice_drafts WHERE id = ?').run(parseInt(id, 10));
         
@@ -177,7 +179,7 @@ export async function deleteDraft(req: AuthRequest, res: Response) {
             message: 'Draft deleted successfully'
         });
     } catch (error) {
-        console.error('Delete draft error:', error);
+        logger.error('Delete draft error:', error);
         res.status(500).json({ error: 'Failed to delete draft' });
     }
 }
@@ -229,7 +231,7 @@ export async function searchItems(req: AuthRequest, res: Response) {
             count: (items as []).length
         });
     } catch (error) {
-        console.error('Search items error:', error);
+        logger.error('Search items error:', error);
         res.status(500).json({ error: 'Failed to search items' });
     }
 }
@@ -244,7 +246,7 @@ export async function searchCustomers(req: AuthRequest, res: Response) {
 
         const q = qParam as string;
         const limit = limitParam as string || '20';
-        console.log('[searchCustomers] Query:', q, 'Limit:', limit);
+        logger.debug('[searchCustomers] Query:', q, 'Limit:', limit);
 
         let query = `
             SELECT
@@ -266,9 +268,9 @@ export async function searchCustomers(req: AuthRequest, res: Response) {
         query += ` ORDER BY customer_name ASC LIMIT ?`;
         params.push(parseInt(limit as string, 10));
 
-        console.log('[searchCustomers] Running query with params:', params);
+        logger.debug('[searchCustomers] Running query with params:', params);
         const customers = db.prepare(query).all(...params);
-        console.log('[searchCustomers] Found:', customers.length, 'customers');
+        logger.debug('[searchCustomers] Found:', customers.length, 'customers');
 
         res.json({
             success: true,
@@ -276,7 +278,7 @@ export async function searchCustomers(req: AuthRequest, res: Response) {
             count: (customers as []).length
         });
     } catch (error) {
-        console.error('Search customers error:', error);
+        logger.error('Search customers error:', error);
         res.status(500).json({ error: 'Failed to search customers' });
     }
 }
@@ -302,7 +304,7 @@ export async function getTaxRates(req: AuthRequest, res: Response) {
             data: taxRates
         });
     } catch (error) {
-        console.error('Get tax rates error:', error);
+        logger.error('Get tax rates error:', error);
         res.status(500).json({ error: 'Failed to get tax rates' });
     }
 }
@@ -324,7 +326,7 @@ export async function getPaymentTerms(req: AuthRequest, res: Response) {
             data: paymentTerms
         });
     } catch (error) {
-        console.error('Get payment terms error:', error);
+        logger.error('Get payment terms error:', error);
         res.status(500).json({ error: 'Failed to get payment terms' });
     }
 }
@@ -502,7 +504,7 @@ export async function submitInvoice(req: AuthRequest, res: Response) {
             message: 'Invoice created successfully'
         });
     } catch (error) {
-        console.error('Submit invoice error:', error);
+        logger.error('Submit invoice error:', error);
         res.status(500).json({ error: 'Failed to create invoice: ' + (error as Error).message });
     }
 }

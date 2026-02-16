@@ -3,6 +3,7 @@ import ProductionModel from '../models/Production';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 function recordProduction(req: AuthRequest, res: Response): void {
   try {
@@ -38,7 +39,7 @@ function recordProduction(req: AuthRequest, res: Response): void {
 
     res.status(201).json(production);
   } catch (error: any) {
-    console.error('Record production error:', error);
+    logger.error('Record production error:', error);
     res.status(500).json({ error: error.message || 'Failed to record production' });
   }
 }
@@ -60,7 +61,7 @@ function getProductions(req: Request, res: Response): void {
     };
     res.json(ProductionModel.getAll(filters, db));
   } catch (error) {
-    console.error('Get productions error:', error);
+    logger.error('Get productions error:', error);
     res.status(500).json({ error: 'Failed to get productions' });
   }
 }
@@ -74,7 +75,7 @@ function getProduction(req: Request, res: Response): void {
     }
     res.json(production);
   } catch (error) {
-    console.error('Get production error:', error);
+    logger.error('Get production error:', error);
     res.status(500).json({ error: 'Failed to get production' });
   }
 }
@@ -88,7 +89,7 @@ function getProductionSummaryByItem(req: Request, res: Response): void {
     }
     res.json(ProductionModel.getSummaryByItem(Number(item_id), db));
   } catch (error) {
-    console.error('Get production summary error:', error);
+    logger.error('Get production summary error:', error);
     res.status(500).json({ error: 'Failed to get production summary' });
   }
 }
@@ -107,7 +108,7 @@ function deleteProduction(req: AuthRequest, res: Response): void {
 
     res.json({ success: true, message: 'Production deleted successfully' });
   } catch (error: any) {
-    console.error('Delete production error:', error);
+    logger.error('Delete production error:', error);
     res.status(500).json({ error: error.message || 'Failed to delete production' });
   }
 }

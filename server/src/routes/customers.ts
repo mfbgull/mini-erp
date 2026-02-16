@@ -1,9 +1,18 @@
 import express from 'express';
 const router = express.Router();
 import customersController from '../controllers/customersController';
+import { validateZodQuery, validateZodParams, zodSchemas } from '../middleware/validation';
+import { z } from 'zod';
 
-router.get('/', customersController.getCustomers);
-router.get('/:id', customersController.getCustomer);
+const customerListQuery = z.object({
+  ...zodSchemas.pagination.shape,
+  ...zodSchemas.search.shape,
+  ...zodSchemas.sorting(['customer_name', 'customer_code', 'created_at', 'id', 'current_balance', 'credit_limit']).shape,
+  status: z.enum(['active', 'inactive', 'all']).optional().default('all'),
+});
+
+router.get('/', validateZodQuery(customerListQuery), customersController.getCustomers);
+router.get('/:id', validateZodParams(zodSchemas.id), customersController.getCustomer);
 router.post('/', customersController.createCustomer);
 router.put('/:id', customersController.updateCustomer);
 router.delete('/:id', customersController.deleteCustomer);

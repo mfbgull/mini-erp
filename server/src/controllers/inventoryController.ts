@@ -6,6 +6,7 @@ import StockMovementModel from '../models/StockMovement';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 function getItems(req: Request, res: Response): void {
   try {
@@ -15,7 +16,7 @@ function getItems(req: Request, res: Response): void {
       data: items
     });
   } catch (error) {
-    console.error('Get items error:', error);
+    logger.error('Get items error:', error);
     res.status(500).json({ error: 'Failed to fetch items' });
   }
 }
@@ -36,7 +37,7 @@ function getItem(req: Request, res: Response): void {
       stock_by_warehouse: stockByWarehouse
     });
   } catch (error) {
-    console.error('Get item error:', error);
+    logger.error('Get item error:', error);
     res.status(500).json({ error: 'Failed to fetch item' });
   }
 }
@@ -68,7 +69,7 @@ function createItem(req: AuthRequest, res: Response): void {
     const newItem = ItemModel.getById(itemId, db);
     res.status(201).json(newItem);
   } catch (error) {
-    console.error('Create item error:', error);
+    logger.error('Create item error:', error);
     res.status(500).json({ error: 'Failed to create item' });
   }
 }
@@ -93,7 +94,7 @@ function updateItem(req: AuthRequest, res: Response): void {
     const updatedItem = ItemModel.getById(itemId, db);
     res.json(updatedItem);
   } catch (error) {
-    console.error('Update item error:', error);
+    logger.error('Update item error:', error);
     res.status(500).json({ error: 'Failed to update item' });
   }
 }
@@ -122,7 +123,7 @@ function deleteItem(req: AuthRequest, res: Response): void {
 
     res.json({ success: true, message: 'Item deleted successfully' });
   } catch (error) {
-    console.error('Delete item error:', error);
+    logger.error('Delete item error:', error);
     res.status(500).json({ error: 'Failed to delete item' });
   }
 }
@@ -132,7 +133,7 @@ function getCategories(req: Request, res: Response): void {
     const categories = ItemModel.getCategories(db);
     res.json(categories);
   } catch (error) {
-    console.error('Get categories error:', error);
+    logger.error('Get categories error:', error);
     res.status(500).json({ error: 'Failed to fetch categories' });
   }
 }
@@ -142,7 +143,7 @@ function getLowStock(req: Request, res: Response): void {
     const items = ItemModel.getLowStock(db);
     res.json(items);
   } catch (error) {
-    console.error('Get low stock error:', error);
+    logger.error('Get low stock error:', error);
     res.status(500).json({ error: 'Failed to fetch low stock items' });
   }
 }
@@ -177,7 +178,7 @@ function getUnitsOfMeasure(req: Request, res: Response): void {
 
     res.json(allUoms);
   } catch (error) {
-    console.error('Get units of measure error:', error);
+    logger.error('Get units of measure error:', error);
     res.status(500).json({ error: 'Failed to fetch units of measure' });
   }
 }
@@ -190,7 +191,7 @@ function getWarehouses(req: Request, res: Response): void {
       data: warehouses
     });
   } catch (error) {
-    console.error('Get warehouses error:', error);
+    logger.error('Get warehouses error:', error);
     res.status(500).json({ error: 'Failed to fetch warehouses' });
   }
 }
@@ -211,7 +212,7 @@ function getWarehouse(req: Request, res: Response): void {
       stock_summary: stockSummary
     });
   } catch (error) {
-    console.error('Get warehouse error:', error);
+    logger.error('Get warehouse error:', error);
     res.status(500).json({ error: 'Failed to fetch warehouse' });
   }
 }
@@ -243,7 +244,7 @@ function createWarehouse(req: AuthRequest, res: Response): void {
     const newWarehouse = WarehouseModel.getById(warehouseId, db);
     res.status(201).json(newWarehouse);
   } catch (error) {
-    console.error('Create warehouse error:', error);
+    logger.error('Create warehouse error:', error);
     res.status(500).json({ error: 'Failed to create warehouse' });
   }
 }
@@ -268,7 +269,7 @@ function updateWarehouse(req: AuthRequest, res: Response): void {
     const updated = WarehouseModel.getById(warehouseId, db);
     res.json(updated);
   } catch (error) {
-    console.error('Update warehouse error:', error);
+    logger.error('Update warehouse error:', error);
     res.status(500).json({ error: 'Failed to update warehouse' });
   }
 }
@@ -278,7 +279,7 @@ function getStockMovements(req: Request, res: Response): void {
     const movements = StockMovementModel.getAll(req.query, db);
     res.json(movements);
   } catch (error) {
-    console.error('Get stock movements error:', error);
+    logger.error('Get stock movements error:', error);
     res.status(500).json({ error: 'Failed to fetch stock movements' });
   }
 }
@@ -290,6 +291,27 @@ function createStockMovement(req: AuthRequest, res: Response): void {
     if (!item_id || !warehouse_id || !quantity || !movement_type) {
       res.status(400).json({ error: 'Item, warehouse, quantity, and movement type are required' });
       return;
+    }
+
+    // Negative Stock Validation for Outgoing Movements
+    if (['OUT', 'TRANSFER', 'ADJUSTMENT_OUT'].includes(movement_type)) {
+      const currentStock = db.prepare(`
+        SELECT quantity FROM stock_balances 
+        WHERE item_id = ? AND warehouse_id = ?
+      `).get(item_id, warehouse_id) as { quantity: number } | undefined;
+
+      const availableQty = currentStock?.quantity || 0;
+      
+      if (availableQty < quantity) {
+        res.status(400).json({ 
+          error: 'Insufficient stock', 
+          details: { 
+            available: availableQty, 
+            requested: quantity 
+          } 
+        });
+        return;
+      }
     }
 
     const result = StockMovementModel.recordMovement(req.body, req.user!.id, db);
@@ -310,7 +332,7 @@ function createStockMovement(req: AuthRequest, res: Response): void {
     const movement = StockMovementModel.getById(result.id, db);
     res.status(201).json(movement);
   } catch (error) {
-    console.error('Create stock movement error:', error);
+    logger.error('Create stock movement error:', error);
     res.status(500).json({ error: 'Failed to create stock movement' });
   }
 }
@@ -320,7 +342,7 @@ function getStockSummary(req: Request, res: Response): void {
     const summary = StockMovementModel.getStockSummary(db);
     res.json(summary);
   } catch (error) {
-    console.error('Get stock summary error:', error);
+    logger.error('Get stock summary error:', error);
     res.status(500).json({ error: 'Failed to fetch stock summary' });
   }
 }
@@ -334,7 +356,7 @@ function getItemLedger(req: Request, res: Response): void {
     const ledger = StockMovementModel.getItemLedger(itemId, warehouseId, db);
     res.json(ledger);
   } catch (error) {
-    console.error('Get item ledger error:', error);
+    logger.error('Get item ledger error:', error);
     res.status(500).json({ error: 'Failed to fetch item ledger' });
   }
 }
@@ -357,7 +379,7 @@ function getStockBalances(req: Request, res: Response): void {
 
     res.json(balances);
   } catch (error) {
-    console.error('Get stock balances error:', error);
+    logger.error('Get stock balances error:', error);
     res.status(500).json({ error: 'Failed to fetch stock balances' });
   }
 }

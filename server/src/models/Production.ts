@@ -101,8 +101,6 @@ class ProductionModel {
         ) VALUES (?, ?, ?, ?)
       `);
 
-      const movementNo = 'STK-' + new Date().getFullYear() + '-0001';
-
       for (const input of input_items) {
         const stockBalance = db.prepare(`
           SELECT quantity FROM stock_balances
@@ -118,6 +116,7 @@ class ProductionModel {
 
         inputStmt.run(productionId, input.item_id, input.quantity, materialsWarehouseId);
 
+        const inputMovementNo = this.generateMovementNo(db);
         db.prepare(`
           INSERT INTO stock_movements (
             movement_no, item_id, warehouse_id, movement_type,
@@ -125,7 +124,7 @@ class ProductionModel {
             remarks, movement_date, created_by
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          movementNo,
+          inputMovementNo,
           input.item_id,
           materialsWarehouseId,
           'PRODUCTION',
@@ -168,6 +167,7 @@ class ProductionModel {
         `).run(input.item_id, input.item_id);
       }
 
+      const outputMovementNo = this.generateMovementNo(db);
       db.prepare(`
         INSERT INTO stock_movements (
           movement_no, item_id, warehouse_id, movement_type,
@@ -175,7 +175,7 @@ class ProductionModel {
           remarks, movement_date, created_by
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
-        movementNo,
+        outputMovementNo,
         output_item_id,
         warehouse_id,
         'PRODUCTION',
@@ -251,6 +251,25 @@ class ProductionModel {
     `).run(settingKey, nextNo.toString());
 
     return `PROD-${year}-${nextNo.toString().padStart(4, '0')}`;
+  }
+
+  static generateMovementNo(db: Database.Database): string {
+    const year = new Date().getFullYear();
+    const settingKey = `STK_last_no_${year}`;
+
+    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
+
+    let nextNo = 1;
+    if (setting) {
+      nextNo = parseInt(setting.value) + 1;
+    }
+
+    db.prepare(`
+      INSERT OR REPLACE INTO settings (key, value, updated_at)
+      VALUES (?, ?, CURRENT_TIMESTAMP)
+    `).run(settingKey, nextNo.toString());
+
+    return `STK-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
   static getAll(filters: ProductionFilters = {}, db: Database.Database): Production[] {

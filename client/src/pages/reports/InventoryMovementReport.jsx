@@ -9,9 +9,12 @@ import {
   PackageMinus,
   Download,
   Filter,
-  Eye,
-  Edit,
-  Plus
+  X,
+  Tag,
+  Hash,
+  Calendar,
+  MapPin,
+  ArrowRight
 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry } from 'ag-grid-community';
@@ -34,8 +37,31 @@ export default function InventoryMovementReport() {
   const [warehouseId, setWarehouseId] = useState('');
   const [movementType, setMovementType] = useState('all'); // all, in, out
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedMovement, setSelectedMovement] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
   const gridRef = useRef(null);
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setShowDetailModal(false);
+      }
+    };
+
+    if (showDetailModal) {
+      document.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDetailModal]);
+
+  const handleCardClick = (movement) => {
+    setSelectedMovement(movement);
+    setShowDetailModal(true);
+  };
 
   // Fetch items for filter
   const { data: items = [], isLoading: itemsLoading } = useQuery({
@@ -393,21 +419,48 @@ export default function InventoryMovementReport() {
             <div className="spinner"></div>
           </div>
         ) : reportData?.movements && reportData.movements.length > 0 ? (
-          <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={reportData.movements}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-            />
-          </div>
+          <>
+            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+              <AgGridReact
+                rowData={reportData.movements}
+                columnDefs={columnDefs}
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true
+                }}
+                pagination={true}
+                paginationPageSize={20}
+                paginationPageSizeSelector={[10, 20, 50, 100]}
+                rowSelection={{ mode: 'singleRow' }}
+              />
+            </div>
+
+            <div className="mobile-inventory-movement-list">
+              {reportData.movements.map((movement, index) => (
+                <div
+                  key={`${movement.id || movement.item_code}-${index}`}
+                  className="inventory-movement-card"
+                  onClick={() => handleCardClick(movement)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCardClick(movement);
+                    }
+                  }}
+                >
+                  <div className="inventory-movement-card-content">
+                    <h3 className="movement-item-name">{movement.item_name}</h3>
+                    <span className={`movement-item-qty ${movement.movement_type?.toLowerCase().includes('in') ? 'in' : 'out'}`}>
+                      {movement.movement_type?.toLowerCase().includes('in') ? '+' : '-'}{movement.quantity} {movement.unit_of_measure}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="no-data">
             <Package size={48} />
@@ -416,6 +469,108 @@ export default function InventoryMovementReport() {
           </div>
         )}
       </div>
+
+      {showDetailModal && selectedMovement && (
+        <div
+          className="movement-modal-overlay"
+          onClick={() => setShowDetailModal(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="movement-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="movement-modal-header">
+              <h2 className="movement-modal-title">{selectedMovement.item_name}</h2>
+              <button
+                type="button"
+                className="movement-modal-close"
+                onClick={() => setShowDetailModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="movement-modal-content">
+              <div className="movement-detail-section">
+                <div className="movement-details-grid">
+                  <div className="movement-detail-item">
+                    <span className="movement-detail-label">
+                      <Tag size={14} />
+                      Item Code
+                    </span>
+                    <span className="movement-detail-value">{selectedMovement.item_code || '-'}</span>
+                  </div>
+
+                  <div className="movement-detail-item">
+                    <span className="movement-detail-label">
+                      <Package size={14} />
+                      Category
+                    </span>
+                    <span className="movement-detail-value">{selectedMovement.item_category || '-'}</span>
+                  </div>
+
+                  <div className="movement-detail-item">
+                    <span className="movement-detail-label">
+                      <Hash size={14} />
+                      UOM
+                    </span>
+                    <span className="movement-detail-value">{selectedMovement.unit_of_measure || '-'}</span>
+                  </div>
+
+                  <div className="movement-detail-item">
+                    <span className="movement-detail-label">
+                      <ArrowRight size={14} />
+                      Movement Type
+                    </span>
+                    <span className="movement-detail-value">{selectedMovement.movement_type || '-'}</span>
+                  </div>
+
+                  <div className="movement-detail-item">
+                    <span className="movement-detail-label">
+                      <Hash size={14} />
+                      Quantity
+                    </span>
+                    <span className="movement-detail-value">{selectedMovement.quantity} {selectedMovement.unit_of_measure}</span>
+                  </div>
+
+                  <div className="movement-detail-item">
+                    <span className="movement-detail-label">
+                      <MapPin size={14} />
+                      Warehouse
+                    </span>
+                    <span className="movement-detail-value">{selectedMovement.warehouse_name || '-'}</span>
+                  </div>
+
+                  <div className="movement-detail-item">
+                    <span className="movement-detail-label">
+                      <Calendar size={14} />
+                      Date
+                    </span>
+                    <span className="movement-detail-value">{selectedMovement.movement_date ? new Date(selectedMovement.movement_date).toLocaleDateString() : '-'}</span>
+                  </div>
+
+                  <div className="movement-detail-item">
+                    <span className="movement-detail-label">Reference</span>
+                    <span className="movement-detail-value">{selectedMovement.reference || '-'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="movement-modal-actions">
+              <button
+                type="button"
+                className="movement-action-btn movement-action-secondary"
+                onClick={() => setShowDetailModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

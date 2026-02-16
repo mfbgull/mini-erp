@@ -76,9 +76,9 @@ export const SettingsProvider = ({ children }: SettingsProviderProps) => {
 
   const formatCurrency = (amount: number | string | null | undefined): string => {
     if (!settings) {
-      return `$ ${parseFloat(String(amount || 0)).toFixed(2)}`;
+      return `Rs. ${parseFloat(String(amount || 0)).toFixed(2)}`;
     }
-    const currencySymbol = settings.currency_symbol?.value || '$';
+    const currencySymbol = settings.currency_symbol?.value || 'Rs.';
     const decimalPlaces = parseInt(settings.decimal_places?.value || '2');
     const numAmount = parseFloat(String(amount));
     if (isNaN(numAmount)) {
@@ -89,9 +89,9 @@ export const SettingsProvider = ({ children }: SettingsProviderProps) => {
 
   const getCurrencySymbol = (): string => {
     if (!settings) {
-      return '$';
+      return 'Rs.';
     }
-    return settings.currency_symbol?.value || '$';
+    return settings.currency_symbol?.value || 'Rs.';
   };
 
   const value: SettingsContextType = {

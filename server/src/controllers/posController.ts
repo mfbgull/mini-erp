@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
 import StockMovement from '../models/StockMovement';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 function generatePOSTransactionNo(): string {
   const year = new Date().getFullYear();
@@ -200,7 +201,7 @@ function createPOSSale(req: AuthRequest, res: Response): void {
     });
 
   } catch (error: any) {
-    console.error('POS Sale Error:', error);
+    logger.error('POS Sale Error:', error);
     res.status(500).json({ error: error.message || 'Failed to process POS sale' });
   }
 }
@@ -245,7 +246,7 @@ function getPOSTransactions(req: Request, res: Response): void {
     });
 
   } catch (error) {
-    console.error('Get POS Transactions Error:', error);
+    logger.error('Get POS Transactions Error:', error);
     res.status(500).json({ error: 'Failed to fetch POS transactions' });
   }
 }
