@@ -35,9 +35,13 @@ export const storage = {
   getUser: (): User | null => {
     try {
       const user = localStorage.getItem(STORAGE_KEYS.USER);
-      return user ? JSON.parse(user) : null;
+      if (!user || user === 'undefined' || user === 'null') {
+        return null;
+      }
+      return JSON.parse(user);
     } catch (error) {
       console.error('Failed to parse user:', error);
+      localStorage.removeItem(STORAGE_KEYS.USER);
       return null;
     }
   },
