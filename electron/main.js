@@ -119,7 +119,11 @@ function startServer() {
     const serverScript = app.isPackaged ? 'server.js' : 'server.ts';
     const nodeArgs = app.isPackaged ? [serverScript] : ['-r', 'ts-node/register', serverScript];
 
-    serverProcess = spawn('node', nodeArgs, {
+    // Use Electron's built-in Node.js in production, system node in dev
+    const nodePath = app.isPackaged ? process.execPath : 'node';
+    console.log('[Electron] Spawning server using:', nodePath);
+
+    serverProcess = spawn(nodePath, nodeArgs, {
       cwd: serverPath,
       env: env,
       stdio: 'pipe',

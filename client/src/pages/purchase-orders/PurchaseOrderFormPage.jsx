@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
+import { PurchaseOrderWizard } from '../../components/purchase-order/PurchaseOrderWizard';
 
 export default function PurchaseOrderFormPage({ mode }) {
   const { id } = useParams();
@@ -13,6 +14,21 @@ export default function PurchaseOrderFormPage({ mode }) {
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
   const isEditMode = mode === 'edit' && id;
+  const [showWizard, setShowWizard] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Show wizard automatically on mobile for create mode
+  useEffect(() => {
+    if (isMobile && !isEditMode) {
+      setShowWizard(true);
+    }
+  }, [isMobile, isEditMode]);
 
   const [formData, setFormData] = useState({
     supplier_id: '',
@@ -376,6 +392,15 @@ export default function PurchaseOrderFormPage({ mode }) {
           </Button>
         </div>
       </form>
+
+      {/* Mobile Wizard */}
+      <PurchaseOrderWizard
+        isOpen={showWizard}
+        onClose={() => {
+          setShowWizard(false);
+          navigate('/purchase-orders');
+        }}
+      />
     </div>
   );
 }

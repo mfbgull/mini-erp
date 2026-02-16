@@ -46,13 +46,6 @@
         ]
       },
       {
-        "from": "server/src/migrations",
-        "to": "server/src/migrations",
-        "filter": [
-          "*.sql"
-        ]
-      },
-      {
         "from": "server/package.json",
         "to": "server/package.json"
       },
