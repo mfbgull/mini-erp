@@ -76,13 +76,18 @@ export const createBOM = (req: AuthRequest, res: Response, next: NextFunction): 
 export const updateBOM = (req: AuthRequest, res: Response, next: NextFunction): void => {
   try {
     const { id } = req.params;
+    
+    if (!req.user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
 
-    const bom = BOMModel.update(Number(id), req.body, req.user!.id, db);
+    const bom = BOMModel.update(Number(id), req.body, req.user.id, db);
 
     logger.info(`Updated BOM: ${bom.bom_no}`);
 
     // Log BOM update using activity logger
-    logCRUD(ActionType.BOM_UPDATE, 'BOM', bom.id, `Updated BOM: ${bom.bom_no}`, req.user!.id);
+    logCRUD(ActionType.BOM_UPDATE, 'BOM', bom.id, `Updated BOM: ${bom.bom_no}`, req.user.id);
 
     res.json(bom);
   } catch (error) {

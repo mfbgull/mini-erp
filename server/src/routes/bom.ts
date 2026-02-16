@@ -9,13 +9,14 @@ import {
   toggleBOMActive,
   deleteBOM
 } from '../controllers/bomController';
+import { authenticateToken } from '../middleware/auth';
 
 router.get('/', getAllBOMs);
 router.get('/:id', getBOMById);
 router.get('/by-item/:itemId', getBOMsByFinishedItem);
-router.post('/', createBOM);
-router.put('/:id', updateBOM);
-router.patch('/:id/toggle-active', toggleBOMActive);
-router.delete('/:id', deleteBOM);
+router.post('/', authenticateToken, createBOM);
+router.put('/:id', authenticateToken, updateBOM);
+router.patch('/:id/toggle-active', authenticateToken, toggleBOMActive);
+router.delete('/:id', authenticateToken, deleteBOM);
 
 export default router;
