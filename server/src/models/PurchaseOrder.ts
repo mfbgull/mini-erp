@@ -747,17 +747,18 @@ class PurchaseOrderModel {
     const year = new Date().getFullYear();
     const settingKey = `GR_last_no_${year}`;
 
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
+    // Atomically increment the counter using INSERT OR REPLACE
     db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
+      INSERT INTO settings (key, value, updated_at)
+      VALUES (?, '1', CURRENT_TIMESTAMP)
+      ON CONFLICT(key) DO UPDATE SET
+        value = CAST(CAST(settings.value AS INTEGER) + 1 AS TEXT),
+        updated_at = CURRENT_TIMESTAMP
+    `).run(settingKey);
+
+    // Get the updated value
+    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string };
+    const nextNo = parseInt(setting.value);
 
     return `GR-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
