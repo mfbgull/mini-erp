@@ -36,6 +36,8 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
   const [expectedDeliveryDate, setExpectedDeliveryDate] = useState('');
   const [selectedWarehouse, setSelectedWarehouse] = useState<any>(null);
   const [notes, setNotes] = useState('');
+  const [supplierSearch, setSupplierSearch] = useState('');
+  const [itemSearch, setItemSearch] = useState('');
 
   // Fetch data on mount
   const fetchSuppliers = async () => {
@@ -82,7 +84,19 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
     setExpectedDeliveryDate('');
     setSelectedWarehouse(null);
     setNotes('');
+    setSupplierSearch('');
+    setItemSearch('');
   };
+
+  const filteredSuppliers = suppliers.filter((supplier: any) =>
+    supplier.supplier_name?.toLowerCase().includes(supplierSearch.toLowerCase()) ||
+    supplier.supplier_code?.toLowerCase().includes(supplierSearch.toLowerCase())
+  );
+
+  const filteredItems = items.filter((item: any) =>
+    item.item_name?.toLowerCase().includes(itemSearch.toLowerCase()) ||
+    item.item_code?.toLowerCase().includes(itemSearch.toLowerCase())
+  );
 
   // Calculations
   const subtotal = poItems.reduce((sum, item) => sum + item.total, 0);
@@ -100,14 +114,12 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
           type="text"
           placeholder="Search suppliers..."
           className="search-input"
-          onChange={(e) => {
-            const term = e.target.value.toLowerCase();
-            // Filter logic handled by display
-          }}
+          value={supplierSearch}
+          onChange={(e) => setSupplierSearch(e.target.value)}
         />
       </div>
       <div className="selection-list">
-        {suppliers.map((supplier: any) => (
+        {filteredSuppliers.map((supplier: any) => (
           <div
             key={supplier.id}
             className={`selection-card ${selectedSupplier?.id === supplier.id ? 'selected' : ''}`}
@@ -217,10 +229,12 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
           type="text"
           placeholder="Search items..."
           className="search-input"
+          value={itemSearch}
+          onChange={(e) => setItemSearch(e.target.value)}
         />
       </div>
       <div className="items-list">
-        {items.map((item: any) => {
+        {filteredItems.map((item: any) => {
           const existingItem = poItems.find(pi => pi.item_id === item.id);
           return (
             <div key={item.id} className="item-row">
