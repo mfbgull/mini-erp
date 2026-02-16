@@ -137,13 +137,17 @@ export default function SearchableSelect({
     }
 
     // Don't override search query if user is actively searching
-    if (searchQuery.trim() !== '') {
+    if (searchQuery.trim() !== '' && isOpen) {
       return;
     }
 
-    // For edit mode: clear search query so all options are visible
-    // This allows user to change the unit of measurement
-    setSearchQuery('');
+    // For single select: show the selected option's label
+    if (!multiple && value) {
+      const selectedOption = options.find(opt => opt.value === value);
+      if (selectedOption) {
+        setSearchQuery(selectedOption.label);
+      }
+    }
   }, [value, options, multiple]);
 
   // Filter options to show available options
