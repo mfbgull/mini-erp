@@ -40,8 +40,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = useCallback(async (username: string, password: string) => {
     try {
-      const response = await api.post<LoginResponse>('/auth/login', { username, password });
-      const { user: userData } = response.data;
+      const response = await api.post('/auth/login', { username, password });
+      const userData = response.data?.data?.user;
+
+      if (!userData) {
+        throw new Error('Invalid response from server');
+      }
 
       // Token is now handled via httpOnly cookie automatically
       storage.setUser(userData);
@@ -50,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       toast.success(`Welcome back, ${userData.full_name}!`);
       return { success: true };
     } catch (error: any) {
-      const message = error.response?.data?.error || 'Login failed';
+      const message = error.response?.data?.error?.message || error.message || 'Login failed';
       toast.error(message);
       return { success: false, error: message };
     }
