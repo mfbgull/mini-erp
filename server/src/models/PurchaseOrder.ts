@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import StockMovementModel from './StockMovement';
 
 interface PurchaseOrder {
   id: number;
@@ -645,7 +646,8 @@ class PurchaseOrderModel {
           WHERE id = ?
         `).run(newReceived, receiptItem.po_item_id);
 
-        // Create stock movement
+        // Create stock movement using atomic movement number generation
+        const movementNo = StockMovementModel.generateMovementNo(db);
         db.prepare(`
           INSERT INTO stock_movements (
             movement_no, item_id, warehouse_id, movement_type,
@@ -653,7 +655,7 @@ class PurchaseOrderModel {
             remarks, movement_date, created_by
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          'STK-' + new Date().getFullYear() + '-' + Date.now(),
+          movementNo,
           poItem.item_id,
           warehouse_id,
           'PURCHASE',
