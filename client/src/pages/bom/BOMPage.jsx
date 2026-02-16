@@ -371,6 +371,7 @@ export default function BOMPage() {
         size="large"
       >
         <BOMForm
+          key={editingBOM?.id || 'new'}
           bom={editingBOM}
           onClose={() => {
             setIsModalOpen(false);
@@ -400,6 +401,8 @@ function BOMForm({ bom, onClose, onSuccess }) {
   });
 
   const [bomItems, setBOMItems] = useState(() => {
+    console.log('BOMForm init - bom:', bom);
+    console.log('BOMForm init - bom?.items:', bom?.items);
     if (bom?.items && bom.items.length > 0) {
       return bom.items.map(item => ({
         item_id: item.item_id?.toString() || '',
