@@ -287,10 +287,22 @@ export default function ItemsPage() {
     {
       headerName: 'Actions',
       field: 'actions',
-      flex: 0.8,
+      flex: 1,
+      minWidth: 120,
       cellRenderer: (params) => {
         return (
           <div className="table-actions">
+            <Button
+              variant="primary"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditingItem(params.data);
+                setIsModalOpen(true);
+              }}
+            >
+              Edit
+            </Button>
             <Button
               variant="danger"
               size="small"
