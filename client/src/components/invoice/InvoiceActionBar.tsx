@@ -8,7 +8,7 @@ import './InvoiceRouter.css';
 interface InvoiceActionBarProps {
   invoiceId: string;
   currentMode: 'view' | 'edit';
-  invoice?: any;
+  invoice?: Invoice;
   onPrint?: () => void;
   onDownload?: () => void;
   onEmail?: () => void;

@@ -5,13 +5,13 @@ interface Column {
   key: string;
   label: string;
   sortable?: boolean;
-  render?: (value: any, row: any) => React.ReactNode;
+  render?: (value: unknown, row: T) => React.ReactNode;
 }
 
 interface DataTableProps {
   columns: Column[];
-  data: any[];
-  onRowClick?: (row: any) => void;
+  data: T[];
+  onRowClick?: (row: T) => void;
   className?: string;
 }
 

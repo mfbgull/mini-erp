@@ -217,6 +217,6 @@ export interface TableColumn<T> {
   filter?: boolean | string;
   flex?: number;
   minWidth?: number;
-  valueFormatter?: (params: { value: any; data: T }) => string;
-  cellRenderer?: (params: { value: any; data: T }) => React.ReactNode;
+  valueFormatter?: (params: { value: unknown; data: T }) => string;
+  cellRenderer?: (params: { value: unknown; data: T }) => React.ReactNode;
 }

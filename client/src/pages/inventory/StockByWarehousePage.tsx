@@ -28,7 +28,7 @@ export default function StockByWarehousePage() {
     }
   });
 
-  const warehouseOptions = warehouses.map((wh: any) => ({
+  const warehouseOptions = warehouses.map((wh: Warehouse) => ({
     value: wh.id,
     label: `${wh.warehouse_code} - ${wh.warehouse_name}`
   }));

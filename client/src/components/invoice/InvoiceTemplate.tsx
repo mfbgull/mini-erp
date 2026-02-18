@@ -49,13 +49,13 @@ interface InvoiceTemplateProps {
 }
 
 // Helper function to safely convert any value to string for number parsing
-const safeToString = (value: any): string => {
+const safeToString = (value: unknown): string => {
   if (value === null || value === undefined) return '0';
   return String(value);
 };
 
 // Helper function to safely parse float
-const safeParseFloat = (value: any): number => {
+const safeParseFloat = (value: unknown): number => {
   const str = safeToString(value);
   const result = parseFloat(str);
   return isNaN(result) ? 0 : result;

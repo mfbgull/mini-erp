@@ -54,7 +54,7 @@ export default function ActivityLog() {
     window.open(`/api/activity-logs/export?${params.toString()}`, '_blank');
   };
 
-  const handleRowClick = (activity: any) => {
+  const handleRowClick = (activity: Activity) => {
     setSelectedActivity(activity);
     setShowDetailsModal(true);
   };
@@ -70,7 +70,7 @@ export default function ActivityLog() {
       key: 'username',
       label: 'User',
       sortable: true,
-      render: (value: string | null, row: any) => value || 'System'
+      render: (value: string | null, row: Activity) => value || 'System'
     },
     {
       key: 'action',
@@ -86,7 +86,7 @@ export default function ActivityLog() {
       key: 'description',
       label: 'Description',
       sortable: false,
-      render: (value: string, row: any) => (
+      render: (value: string, row: Activity) => (
         <div className="mobile-description">
           <span className="description-text">{value}</span>
           <span className="view-details">View Details</span>

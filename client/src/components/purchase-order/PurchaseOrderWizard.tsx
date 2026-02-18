@@ -88,12 +88,12 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
     setItemSearch('');
   };
 
-  const filteredSuppliers = suppliers.filter((supplier: any) =>
+  const filteredSuppliers = suppliers.filter((supplier: Supplier) =>
     supplier.supplier_name?.toLowerCase().includes(supplierSearch.toLowerCase()) ||
     supplier.supplier_code?.toLowerCase().includes(supplierSearch.toLowerCase())
   );
 
-  const filteredItems = items.filter((item: any) =>
+  const filteredItems = items.filter((item: Item) =>
     item.item_name?.toLowerCase().includes(itemSearch.toLowerCase()) ||
     item.item_code?.toLowerCase().includes(itemSearch.toLowerCase())
   );
@@ -119,7 +119,7 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
         />
       </div>
       <div className="selection-list">
-        {filteredSuppliers.map((supplier: any) => (
+        {filteredSuppliers.map((supplier: Supplier) => (
           <div
             key={supplier.id}
             className={`selection-card ${selectedSupplier?.id === supplier.id ? 'selected' : ''}`}
@@ -184,7 +184,7 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
             className="form-select"
           >
             <option value="">Select warehouse...</option>
-            {warehouses.map((warehouse: any) => (
+            {warehouses.map((warehouse: Warehouse) => (
               <option key={warehouse.id} value={warehouse.id}>
                 {warehouse.warehouse_code} - {warehouse.warehouse_name}
               </option>
@@ -234,7 +234,7 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
         />
       </div>
       <div className="items-list">
-        {filteredItems.map((item: any) => {
+        {filteredItems.map((item: Item) => {
           const existingItem = poItems.find(pi => pi.item_id === item.id);
           return (
             <div key={item.id} className="item-row">
@@ -422,7 +422,7 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
       setCreatedPO(response.data);
       setStep(5);
       toast.success('Purchase order created successfully!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(error.response?.data?.error || 'Failed to create purchase order');
     } finally {
       setLoading(false);

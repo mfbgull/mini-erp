@@ -102,7 +102,7 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
       queryClient.invalidateQueries({ queryKey: ['items'] });
       onSuccess();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.response?.data?.error || 'Failed to save item');
     }
   });

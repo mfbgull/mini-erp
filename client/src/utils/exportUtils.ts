@@ -6,7 +6,7 @@ interface Column {
   headerName: string;
   field: string;
   width?: number;
-  valueFormatter?: (params: { value: any }) => string;
+  valueFormatter?: (params: { value: unknown }) => string;
 }
 
 interface Summary {
@@ -27,12 +27,12 @@ interface ExportOptions {
 
 declare module 'jspdf' {
   interface jsPDF {
-    autoTable: (options: any) => void;
+    autoTable: (options: Record<string, unknown>) => void;
   }
 }
 
 export const exportToPDF = (
-  data: any[],
+  data: Record<string, unknown>[],
   columns: Column[],
   title: string,
   filename: string = 'report.pdf',
@@ -123,7 +123,7 @@ export const exportToPDF = (
   columns
     .filter(col => col.headerName && col.field !== 'actions')
     .forEach((col, index) => {
-      const style: any = {};
+      const style: Record<string, string> = {};
 
       if (col.width) {
         style.cellWidth = col.width;
@@ -164,8 +164,8 @@ export const exportToPDF = (
     theme: 'grid',
     showHead: 'everyPage',
     margin: { top: margin, left: margin, right: margin, bottom: 15 },
-    didDrawPage: (data: any) => {
-      const pageCount = (doc.internal as any).getNumberOfPages();
+    didDrawPage: (data: { cursor: { y: number } }) => {
+      const pageCount = (doc.internal as { getNumberOfPages: () => number }).getNumberOfPages();
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
       doc.text(
@@ -181,7 +181,7 @@ export const exportToPDF = (
 };
 
 export const exportToExcel = (
-  data: any[],
+  data: Record<string, unknown>[],
   columns: Column[],
   title: string,
   filename: string = 'report.csv'

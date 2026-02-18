@@ -90,7 +90,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
           className="form-select"
         >
           <option value="">Select a customer...</option>
-          {customers.map((customer: any) => (
+          {customers.map((customer: Customer) => (
             <option key={customer.id} value={customer.id}>
               {customer.customer_name} ({customer.customer_code})
             </option>
@@ -118,7 +118,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
         <h3>Step 2: Add Items</h3>
       </div>
       <div className="items-list">
-        {items.filter((i: any) => i.current_stock > 0).slice(0, 10).map((item: any) => {
+        {items.filter((i: Item) => i.current_stock > 0).slice(0, 10).map((item: Item) => {
           const existingItem = invoiceItems.find(ii => ii.item_id === item.id);
           return (
             <div key={item.id} className="item-row">
@@ -352,7 +352,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
       setCreatedInvoice(response.data);
       setStep(5);
       toast.success('Invoice created successfully!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(error.response?.data?.error || 'Failed to create invoice');
     } finally {
       setLoading(false);

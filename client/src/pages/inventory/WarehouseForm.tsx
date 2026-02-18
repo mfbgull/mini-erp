@@ -52,7 +52,7 @@ export default function WarehouseForm({ warehouse, onClose, onSuccess }: Warehou
       queryClient.invalidateQueries({ queryKey: ['warehouses'] });
       onSuccess();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast.error(error.response?.data?.error || 'Failed to save warehouse');
     }
   });

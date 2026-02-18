@@ -85,7 +85,7 @@ export default function InvoiceStep5Review() {
       } else {
         toast.error(response.message || 'Failed to create invoice');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating invoice:', error);
       toast.error(error.response?.data?.error || 'Failed to create invoice');
     }
@@ -131,7 +131,7 @@ export default function InvoiceStep5Review() {
             className={`miw-added-items-list ${isItemsExpanded ? 'expanded' : 'collapsed'}`}
             style={{ maxHeight: isItemsExpanded ? '300px' : '0' }}
           >
-            {items.map((item: any, index: number) => (
+            {items.map((item: InvoiceItem, index: number) => (
               <div 
                 key={item.id} 
                 className="miw-added-item"

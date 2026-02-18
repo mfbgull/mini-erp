@@ -62,7 +62,7 @@ export default function InvoiceStep4Payment() {
     }
   };
 
-  const handlePaymentChange = (field: string, value: any) => {
+  const handlePaymentChange = (field: string, value: string | number) => {
     dispatch({
       type: 'SET_PAYMENT',
       payload: { [field]: value }
@@ -118,7 +118,7 @@ export default function InvoiceStep4Payment() {
             className={`miw-added-items-list ${isItemsExpanded ? 'expanded' : 'collapsed'}`}
             style={{ maxHeight: isItemsExpanded ? '300px' : '0' }}
           >
-            {items.map((item: any, index: number) => (
+            {items.map((item: InvoiceItem, index: number) => (
               <div 
                 key={item.id} 
                 className="miw-added-item"
@@ -167,7 +167,7 @@ export default function InvoiceStep4Payment() {
                 value={payment.method}
                 onChange={(e) => handlePaymentChange('method', e.target.value)}
               >
-                {paymentMethods.map((method: any) => (
+                {paymentMethods.map((method: PaymentMethod) => (
                   <option key={method.id} value={method.name}>
                     {method.name}
                   </option>

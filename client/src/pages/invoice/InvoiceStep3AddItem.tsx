@@ -23,7 +23,7 @@ export default function InvoiceStep3AddItem() {
   const [taxRates, setTaxRates] = useState<any[]>([]);
   
   // For item context menu
-  const [contextMenu, setContextMenu] = useState<{ item: any; x: number; y: number } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ item: InvoiceItem; x: number; y: number } | null>(null);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [isFormExpanded, setIsFormExpanded] = useState(false);
   const [isItemsExpanded, setIsItemsExpanded] = useState(true);
@@ -50,7 +50,7 @@ export default function InvoiceStep3AddItem() {
         if (response.success) {
           setTaxRates(response.data);
           // Set default tax rate
-          const defaultTax = response.data.find((t: any) => t.is_default);
+          const defaultTax = response.data.find((t: TaxRate) => t.is_default);
           if (defaultTax) {
             setTaxRate(defaultTax.rate);
           }
@@ -141,7 +141,7 @@ export default function InvoiceStep3AddItem() {
   };
 
   // Select item from search
-  const handleSelectItem = (item: any) => {
+  const handleSelectItem = (item: InvoiceItem) => {
     setSelectedItem(item);
     setSearchQuery(item.item_name);
     setUnitPrice(item.price || item.standard_selling_price || 0);
@@ -256,7 +256,7 @@ export default function InvoiceStep3AddItem() {
   };
 
   // Select customer from dialog
-  const handleSelectCustomer = (customerData: any) => {
+  const handleSelectCustomer = (customerData: Customer) => {
     dispatch({
       type: 'SET_CUSTOMER',
       payload: {
@@ -282,7 +282,7 @@ export default function InvoiceStep3AddItem() {
   };
 
   // Edit an existing item
-  const handleEditItem = (item: any) => {
+  const handleEditItem = (item: InvoiceItem) => {
     setEditingItem(item);
     setSelectedItem({ id: item.itemId, item_name: item.name, price: item.unitPrice });
     setSearchQuery(item.name);
@@ -324,7 +324,7 @@ export default function InvoiceStep3AddItem() {
   };
 
   // Delete an item
-  const handleDeleteItem = (item: any) => {
+  const handleDeleteItem = (item: InvoiceItem) => {
     if (confirm('Delete this item?')) {
       dispatch({
         type: 'DELETE_ITEM',
@@ -336,7 +336,7 @@ export default function InvoiceStep3AddItem() {
   };
 
   // Show context menu
-  const showContextMenu = (e: React.MouseEvent, item: any) => {
+  const showContextMenu = (e: React.MouseEvent, item: InvoiceItem) => {
     e.preventDefault();
     e.stopPropagation();
     const rect = (e.target as HTMLElement).getBoundingClientRect();
@@ -347,7 +347,7 @@ export default function InvoiceStep3AddItem() {
   const previewAmount = quantity * unitPrice * (1 - discount / 100) * (1 + taxRate / 100);
 
   // Calculate total amount from all items
-  const totalAmount = items.reduce((sum: number, item: any) => sum + (item.amount || 0), 0);
+  const totalAmount = items.reduce((sum: number, item: InvoiceItem) => sum + (item.amount || 0), 0);
 
   // Handle continue to next step
   const handleContinue = () => {
@@ -389,7 +389,7 @@ export default function InvoiceStep3AddItem() {
             className={`miw-added-items-list ${isItemsExpanded ? 'expanded' : 'collapsed'}`}
             style={{ maxHeight: isItemsExpanded ? '400px' : '0' }}
           >
-            {items.map((item: any, index: number) => (
+            {items.map((item: InvoiceItem, index: number) => (
               <div 
                 key={item.id} 
                 className="miw-added-item"
@@ -465,7 +465,7 @@ export default function InvoiceStep3AddItem() {
               
               {customerSearchResults.length > 0 && (
                 <div className="miw-customer-dialog-results">
-                  {customerSearchResults.map((c: any) => (
+                  {customerSearchResults.map((c: Customer) => (
                     <div
                       key={c.id}
                       className="miw-customer-dialog-item"
@@ -582,7 +582,7 @@ export default function InvoiceStep3AddItem() {
                         <div className="miw-item-search-header">Recent Items</div>
                       )}
                       
-                      {!isSearching && searchResults.map((item: any, index: number) => (
+                      {!isSearching && searchResults.map((item: InvoiceItem, index: number) => (
                         <div
                           key={item.id}
                           className={`miw-item-search-result ${index === highlightedIndex ? 'highlighted' : ''}`}
@@ -667,7 +667,7 @@ export default function InvoiceStep3AddItem() {
                     value={taxRate}
                     onChange={(e) => setTaxRate(parseFloat(e.target.value))}
                   >
-                    {taxRates.map((rate: any) => (
+                    {taxRates.map((rate: TaxRate) => (
                       <option key={rate.id} value={rate.rate}>
                         {rate.rate}%
                       </option>

@@ -157,7 +157,7 @@ const MobileInvoiceEditForm: React.FC = () => {
           const invoiceData = response.data;
 
           // Convert item data to match form structure
-          const formattedItems: InvoiceItem[] = invoiceData.items?.map((item: any, index: number) => ({
+          const formattedItems: InvoiceItem[] = invoiceData.items?.map((item: InvoiceItem, index: number) => ({
             id: index + 1,
             item_id: item.item_id,
             description: item.item_name || item.description,
@@ -282,7 +282,7 @@ const MobileInvoiceEditForm: React.FC = () => {
   };
 
   // Update invoice data
-  const updateInvoice = (field: keyof InvoiceData, value: any) => {
+  const updateInvoice = (field: keyof InvoiceData, value: string | number) => {
     setInvoice(prev => ({
       ...prev,
       [field]: value
@@ -290,7 +290,7 @@ const MobileInvoiceEditForm: React.FC = () => {
   };
 
   // Update customer information
-  const updateCustomer = (field: string, value: any) => {
+  const updateCustomer = (field: string, value: string | number) => {
     setInvoice(prev => ({
       ...prev,
       [`customer_${field}`]: value
@@ -298,7 +298,7 @@ const MobileInvoiceEditForm: React.FC = () => {
   };
 
   // Update payment information
-  const updatePayment = (field: string, value: any) => {
+  const updatePayment = (field: string, value: string | number) => {
     setInvoice(prev => ({
       ...prev,
       payment: {
@@ -337,7 +337,7 @@ const MobileInvoiceEditForm: React.FC = () => {
   };
 
   // Update item
-  const updateItem = (id: number, field: string, value: any) => {
+  const updateItem = (id: number, field: string, value: string | number) => {
     setInvoice(prev => ({
       ...prev,
       items: (prev.items || []).map(item => 
@@ -409,7 +409,7 @@ const MobileInvoiceEditForm: React.FC = () => {
   };
 
   // Select item from search
-  const handleSelectItem = (item: any, itemIndex: number) => {
+  const handleSelectItem = (item: Item, itemIndex: number) => {
     // Update the specific item in the items array
     setInvoice(prev => ({
       ...prev,
@@ -591,12 +591,12 @@ const MobileInvoiceEditForm: React.FC = () => {
                   type="searchable-select"
                   value={invoice.customer_name}
                   onChange={(e) => {
-                    const customer = customers.find((c: any) => c.customer_name === e.target.value);
+                    const customer = customers.find((c: Customer) => c.customer_name === e.target.value);
                     if (customer) {
                       handleCustomerSelect(customer);
                     }
                   }}
-                  options={customers.map((c: any) => ({
+                  options={customers.map((c: Customer) => ({
                     value: c.customer_name,
                     label: `${c.customer_name}${c.customer_code ? ` (${c.customer_code})` : ''}`
                   }))}

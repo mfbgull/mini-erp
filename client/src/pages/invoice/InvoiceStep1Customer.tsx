@@ -64,7 +64,7 @@ export default function InvoiceStep1Customer() {
   };
 
   // Select customer
-  const handleSelectCustomer = (customerData: any) => {
+  const handleSelectCustomer = (customerData: Customer) => {
     dispatch({
       type: 'SET_CUSTOMER',
       payload: {
@@ -124,7 +124,7 @@ export default function InvoiceStep1Customer() {
         {/* Customer Search Dropdown */}
         {showCustomerDropdown && (
           <div className="miw-customer-dropdown">
-            {customerResults.map((c: any) => (
+            {customerResults.map((c: Customer) => (
               <div
                 key={c.id}
                 className="miw-customer-dropdown-item"
@@ -194,7 +194,7 @@ export default function InvoiceStep1Customer() {
             value={terms}
             onChange={(e) => dispatch({ type: 'SET_TERMS', payload: e.target.value })}
           >
-            {termsOptions.map((term: any) => (
+            {termsOptions.map((term: PaymentTerm) => (
               <option key={term.name} value={term.name}>
                 {term.name}
               </option>

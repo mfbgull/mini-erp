@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import type { Item } from '../../types';
 import './BorderAccentItemCard.css';
 
 interface BorderAccentItemCardProps {
-  item: any;
-  onEdit: (item: any) => void;
-  onDelete: (item: any) => void;
+  item: Item;
+  onEdit: (item: Item) => void;
+  onDelete: (item: Item) => void;
   showDetails?: boolean;
   onDetailsChange?: (show: boolean) => void;
 }

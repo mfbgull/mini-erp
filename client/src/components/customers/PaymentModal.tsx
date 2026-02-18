@@ -172,7 +172,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
   };
 
   const mutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: Record<string, unknown>) => {
       return api.post('/payments', data);
     },
     onSuccess: () => {
@@ -186,7 +186,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
       onSuccess?.();
       onClose();
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       const errorMsg = error.response?.data?.error || 'Failed to record payment';
       toast.error(errorMsg);
     }

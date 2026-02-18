@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { MoreVertical, Edit, Trash2, X } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import type { Item } from '../../types';
 import './CompactItemCard.css';
 
 interface CompactItemCardProps {
-  item: any;
-  onEdit: (item: any) => void;
-  onDelete: (item: any) => void;
+  item: Item;
+  onEdit: (item: Item) => void;
+  onDelete: (item: Item) => void;
 }
 
 export function CompactItemCard({ item, onEdit, onDelete }: CompactItemCardProps) {

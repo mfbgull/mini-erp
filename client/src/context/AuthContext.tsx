@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       toast.success(`Welcome back, ${userData.full_name}!`);
       return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error.response?.data?.error?.message || error.message || 'Login failed';
       toast.error(message);
       return { success: false, error: message };

@@ -6,7 +6,7 @@ import api from './api';
 
 export interface SearchResult {
   id: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface TaxRate {
@@ -82,7 +82,7 @@ export const mobileInvoiceApi = {
     due_date?: string;
     terms?: string;
     notes?: string;
-    items_data?: any[];
+    items_data?: InvoiceItem[];
   }): Promise<{ success: boolean; data: { id: number; session_id: string }; message: string }> => {
     const response = await api.post('/mobile-invoices/draft', data);
     return response.data;
@@ -130,7 +130,7 @@ export const mobileInvoiceApi = {
   },
 
   // Final Submission
-  submitInvoice: async (data: InvoiceSubmitData): Promise<{ success: boolean; data: any; message: string }> => {
+  submitInvoice: async (data: InvoiceSubmitData): Promise<{ success: boolean; data: Invoice; message: string }> => {
     const response = await api.post('/mobile-invoices/submit', data);
     return response.data;
   }

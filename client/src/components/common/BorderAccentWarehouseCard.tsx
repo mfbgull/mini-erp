@@ -5,9 +5,9 @@ import api from '../../utils/api';
 import './BorderAccentWarehouseCard.css';
 
 interface BorderAccentWarehouseCardProps {
-  warehouse: any;
-  onEdit: (warehouse: any) => void;
-  onDelete: (warehouse: any) => void;
+  warehouse: Warehouse;
+  onEdit: (warehouse: Warehouse) => void;
+  onDelete: (warehouse: Warehouse) => void;
   showItems?: boolean;
   onShowItemsChange?: (show: boolean) => void;
 }
@@ -80,11 +80,11 @@ export default function BorderAccentWarehouseCard({
   };
 
   // Calculate stock value
-  const totalStockValue = items.reduce((sum: number, item: any) => 
+  const totalStockValue = items.reduce((sum: number, item: Item) => 
     sum + (parseFloat(item.quantity || 0) * parseFloat(item.standard_cost || 0)), 0
   );
 
-  const totalStock = items.reduce((sum: number, item: any) => 
+  const totalStock = items.reduce((sum: number, item: Item) => 
     sum + parseFloat(item.quantity || 0), 0
   );
 
@@ -170,7 +170,7 @@ export default function BorderAccentWarehouseCard({
                 <p>No items in this warehouse</p>
               </div>
             ) : (
-              items.map((item: any) => (
+              items.map((item: Item) => (
                 <div key={item.id} className="warehouse-item-card">
                   <div className="warehouse-item-info">
                     <span className="warehouse-item-name">{item.item_name}</span>
