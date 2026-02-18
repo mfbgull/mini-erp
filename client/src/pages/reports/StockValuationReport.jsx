@@ -68,7 +68,6 @@ export default function StockValuationReport() {
     queryKey: ['items'],
     queryFn: async () => {
       const response = await api.get('/inventory/items');
-      console.log('Items API response:', response.data);
       return response.data.data || [];
     }
   });

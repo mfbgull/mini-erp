@@ -130,7 +130,6 @@ export function useActivityLogs(filters: ActivityLogFilters) {
       
       // Ensure data is an array
       if (!Array.isArray(response.data.data)) {
-        console.warn('Expected array but got:', response.data.data);
         response.data.data = [];
       }
       
@@ -158,7 +157,6 @@ export function useActivityStats(startDate?: string, endDate?: string) {
       
       // Ensure data exists and has correct structure
       if (!response.data.data) {
-        console.warn('Expected data object but got:', response.data.data);
         return {
           actions: [],
           users: [],
@@ -199,7 +197,6 @@ export function useEntityTypes() {
       
       // Ensure data is an array
       if (!Array.isArray(response.data.data)) {
-        console.warn('Expected array but got:', response.data.data);
         return [];
       }
       
@@ -224,7 +221,6 @@ export function useActions() {
       
       // Ensure data is an array
       if (!Array.isArray(response.data.data)) {
-        console.warn('Expected array but got:', response.data.data);
         return [];
       }
       
@@ -249,7 +245,6 @@ export function useUsers() {
       
       // Ensure data is an array
       if (!Array.isArray(response.data.data)) {
-        console.warn('Expected array but got:', response.data.data);
         return [];
       }
       

@@ -71,23 +71,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
     );
   }
 
-  // Helper function to validate invoice data
-  const validateInvoiceData = () => {
-    if (!invoice.invoice_no) {
-      console.warn('Invoice is missing invoice_no');
-    }
-    if (invoice.total_amount == null) {
-      console.warn('Invoice is missing total_amount');
-    }
-    if (!invoice.customer_name) {
-      console.warn('Invoice is missing customer_name');
-    }
-    if (!Array.isArray(invoice.items)) {
-      console.warn('Invoice items is not an array');
-    }
-  };
 
-  validateInvoiceData();
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -98,7 +82,6 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
         day: 'numeric'
       });
     } catch (error) {
-      console.warn('Error formatting date:', dateString, error);
       return dateString || '';
     }
   };
@@ -116,7 +99,6 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
     try {
       // Validate item properties before processing
       if (item.quantity == null) {
-        console.warn('Item quantity is null or undefined:', item);
         return 0;
       }
 
@@ -138,7 +120,6 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
       return Math.max(0, subtotal); // Ensure non-negative result
     } catch (error) {
-      console.warn('Error calculating item total:', item, error);
       return 0;
     }
   };
@@ -146,13 +127,11 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
   const getSubtotal = () => {
     try {
       if (!invoice.items || !Array.isArray(invoice.items)) {
-        console.warn('Invoice items is not an array, returning 0');
         return 0;
       }
 
       return invoice.items.reduce((sum, item) => {
         if (!item) {
-          console.warn('Skipping null/undefined item in subtotal calculation');
           return sum;
         }
 
@@ -162,14 +141,12 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
         // Validate the calculation result
         if (isNaN(itemSubtotal) || !isFinite(itemSubtotal)) {
-          console.warn('Invalid subtotal calculation for item:', item);
           return sum;
         }
 
         return sum + itemSubtotal;
       }, 0);
     } catch (error) {
-      console.warn('Error calculating subtotal:', error);
       return 0;
     }
   };
@@ -181,7 +158,6 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       if (invoice.items && Array.isArray(invoice.items)) {
         for (const item of invoice.items) {
           if (!item) {
-            console.warn('Skipping null/undefined item in discount calculation');
             continue;
           }
 
@@ -222,7 +198,6 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
       return Math.max(0, discount); // Ensure non-negative result
     } catch (error) {
-      console.warn('Error calculating total discount:', error);
       return 0;
     }
   };
@@ -230,13 +205,11 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
   const getTotalTax = () => {
     try {
       if (!invoice.items || !Array.isArray(invoice.items)) {
-        console.warn('Invoice items is not an array, returning 0 for tax');
         return 0;
       }
 
       return invoice.items.reduce((sum, item) => {
         if (!item) {
-          console.warn('Skipping null/undefined item in tax calculation');
           return sum;
         }
 
@@ -256,14 +229,12 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
         const taxAmount = subtotal * (taxRate / 100);
 
         if (isNaN(taxAmount) || !isFinite(taxAmount)) {
-          console.warn('Invalid tax calculation for item:', item);
           return sum;
         }
 
         return sum + taxAmount;
       }, 0);
     } catch (error) {
-      console.warn('Error calculating total tax:', error);
       return 0;
     }
   };

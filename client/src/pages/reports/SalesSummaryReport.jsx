@@ -73,14 +73,12 @@ export default function SalesSummaryReport() {
     queryKey: ['items-all'],
     queryFn: async () => {
       const response = await api.get('/inventory/items');
-      console.log('Items API response:', response.data);
       return response.data.data || [];
     }
   });
 
   // Filter items for Finished Good on client side
   const items = allItems.filter(item => item.is_finished_good === 1 || item.is_finished_good === true);
-  console.log('Filtered Finished Good items:', items);
 
   // Fetch sales summary report
   const { data: reportData, isLoading, refetch } = useQuery({

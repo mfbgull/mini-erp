@@ -1086,7 +1086,6 @@ export default function SalesInvoicePage() {
       })
     };
 
-    console.log('Creating invoice with data:', JSON.stringify(invoiceData, null, 2));
     mutation.mutate(invoiceData);
   };
 

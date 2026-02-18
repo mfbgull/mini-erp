@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo, useMemo } from 'react';
 import './DataTable.css';
 
 interface Column {
@@ -15,7 +15,7 @@ interface DataTableProps {
   className?: string;
 }
 
-export default function DataTable({ columns, data, onRowClick, className }: DataTableProps) {
+function DataTable({ columns, data, onRowClick, className }: DataTableProps) {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -28,17 +28,19 @@ export default function DataTable({ columns, data, onRowClick, className }: Data
     }
   };
 
-  const sortedData = [...data].sort((a, b) => {
-    if (!sortColumn) return 0;
+  const sortedData = useMemo(() => {
+    if (!sortColumn) return data;
+    
+    return [...data].sort((a, b) => {
+      const aVal = a[sortColumn];
+      const bVal = b[sortColumn];
 
-    const aVal = a[sortColumn];
-    const bVal = b[sortColumn];
+      if (aVal === bVal) return 0;
 
-    if (aVal === bVal) return 0;
-
-    const comparison = aVal < bVal ? -1 : 1;
-    return sortDirection === 'asc' ? comparison : -comparison;
-  });
+      const comparison = aVal < bVal ? -1 : 1;
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [data, sortColumn, sortDirection]);
 
   return (
     <div className="data-table-container">
@@ -91,3 +93,5 @@ export default function DataTable({ columns, data, onRowClick, className }: Data
     </div>
   );
 }
+
+export default memo(DataTable);

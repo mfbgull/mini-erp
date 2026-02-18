@@ -1,4 +1,4 @@
-import { useEffect, ReactNode } from 'react';
+import { useEffect, ReactNode, memo } from 'react';
 import './Modal.css';
 
 type ModalSize = 'small' | 'medium' | 'large';
@@ -11,7 +11,7 @@ interface ModalProps {
   size?: ModalSize;
 }
 
-export default function Modal({ isOpen, onClose, title, children, size = 'medium' }: ModalProps) {
+function Modal({ isOpen, onClose, title, children, size = 'medium' }: ModalProps) {
   // Close on ESC key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -56,3 +56,5 @@ export default function Modal({ isOpen, onClose, title, children, size = 'medium
     </div>
   );
 }
+
+export default memo(Modal);

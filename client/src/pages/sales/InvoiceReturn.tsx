@@ -57,28 +57,20 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: Inv
 
   // Initialize state when items prop changes
   useEffect(() => {
-    console.log('[InvoiceReturn] items prop received:', JSON.stringify(items));
     setIsInitialLoad(false);
     
     if (items && items.length > 0) {
-      console.log('[InvoiceReturn] Processing', items.length, 'items...');
-      const mappedItems = items.map((item, index) => {
-        console.log('[InvoiceReturn] Mapping item', index, ':', JSON.stringify(item));
-        return {
-          invoice_item_id: item.id,
-          item_id: item.item_id,
-          item_name: item.item_name,
-          item_code: item.item_code,
-          original_quantity: parseFloat(String(item.quantity)) || 0,
-          return_quantity: 0,
-          unit_price: parseFloat(String(item.unit_price)) || 0,
-          unit_of_measure: item.unit_of_measure
-        };
-      });
-      console.log('[InvoiceReturn] Mapped items:', JSON.stringify(mappedItems));
+      const mappedItems = items.map((item) => ({
+        invoice_item_id: item.id,
+        item_id: item.item_id,
+        item_name: item.item_name,
+        item_code: item.item_code,
+        original_quantity: parseFloat(String(item.quantity)) || 0,
+        return_quantity: 0,
+        unit_price: parseFloat(String(item.unit_price)) || 0,
+        unit_of_measure: item.unit_of_measure
+      }));
       setReturnItems(mappedItems);
-    } else {
-      console.log('[InvoiceReturn] No items to process - items is:', items);
     }
   }, [items]);
 

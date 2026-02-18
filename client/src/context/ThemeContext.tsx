@@ -34,6 +34,14 @@ export const THEME_DESCRIPTIONS: Record<ThemeType, string> = {
   [THEMES.SAP]: 'SAP Fiori-inspired enterprise theme with blue and gold accents'
 };
 
+// Theme CSS file mapping for dynamic loading
+const THEME_CSS_FILES: Record<ThemeType, string> = {
+  [THEMES.DEFAULT]: '/src/assets/styles/default-theme.css',
+  [THEMES.ERPNEXT]: '/src/assets/styles/erpnext-theme.css',
+  [THEMES.ODOO]: '/src/assets/styles/odoo-theme.css',
+  [THEMES.SAP]: '/src/assets/styles/sap-theme.css'
+};
+
 interface ThemeContextType {
   currentTheme: ThemeType;
   themeName: string;
@@ -47,6 +55,21 @@ interface ThemeProviderProps {
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
+
+// Dynamically load theme CSS
+const loadThemeCSS = (theme: ThemeType) => {
+  const themeId = 'dynamic-theme-css';
+  let linkElement = document.getElementById(themeId) as HTMLLinkElement | null;
+  
+  if (!linkElement) {
+    linkElement = document.createElement('link');
+    linkElement.id = themeId;
+    linkElement.rel = 'stylesheet';
+    document.head.appendChild(linkElement);
+  }
+  
+  linkElement.href = THEME_CSS_FILES[theme];
+};
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   // Load theme from localStorage or use ERPNext as default
@@ -68,6 +91,9 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     // Add current theme class
     root.classList.add(`theme-${currentTheme}`);
     body.classList.add(`theme-${currentTheme}`);
+
+    // Dynamically load theme CSS
+    loadThemeCSS(currentTheme);
 
     // Save to localStorage
     localStorage.setItem('miniERP-theme', currentTheme);

@@ -94,11 +94,6 @@ export default function PriceHistoryHint({ history, currentPrice, onClose }: Pri
     onClose(); // Close immediately when mouse leaves
   };
 
-  // Debug: log isHovering changes
-  // useEffect(() => {
-  //   console.log('isHovering state changed to:', isHovering);
-  // }, [isHovering]);
-
   // Calculate price difference
   const getPriceDifference = () => {
     if (!history?.last_price || !currentPrice) {

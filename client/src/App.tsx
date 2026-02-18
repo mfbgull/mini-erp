@@ -8,6 +8,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { InvoiceProvider } from './context/InvoiceContext';
 import SearchModal from './components/common/SearchModal';
 import PageLoader from './components/common/PageLoader';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Eager loaded - Critical path components
 import Login from './pages/Login';
@@ -142,8 +143,9 @@ function AppLayout() {
         <Sidebar />
         <div className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
           <div className="content">
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+            <ErrorBoundary>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/inventory/items" element={<ItemsPage />} />
               <Route path="/inventory/warehouses" element={<WarehousesPage />} />
@@ -194,8 +196,9 @@ function AppLayout() {
               <Route path="/integrations" element={<IntegrationsPage />} />
               <Route path="/activity-log" element={<ActivityLog />} />
               <Route path="*" element={<Navigate to="/" />} />
-              </Routes>
-            </Suspense>
+                </Routes>
+              </Suspense>
+            </ErrorBoundary>
             <FloatingActionButton />
           </div>
         </div>

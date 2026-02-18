@@ -401,8 +401,6 @@ function BOMForm({ bom, onClose, onSuccess }) {
   });
 
   const [bomItems, setBOMItems] = useState(() => {
-    console.log('BOMForm init - bom:', bom);
-    console.log('BOMForm init - bom?.items:', bom?.items);
     if (bom?.items && bom.items.length > 0) {
       return bom.items.map(item => ({
         item_id: item.item_id?.toString() || '',
@@ -509,11 +507,6 @@ function BOMForm({ bom, onClose, onSuccess }) {
   // Get raw materials and finished goods AFTER all hooks
   const rawMaterials = items.filter(i => i.is_raw_material || i.category === 'Packaging Material');
   const finishedGoods = items.filter(i => i.is_finished_good);
-  // Debug logging
-  console.log('BOMForm - Items loaded:', items.length);
-  console.log('BOMForm - Raw materials:', rawMaterials.length);
-  console.log('BOMForm - Finished goods:', finishedGoods.length);
-  console.log('BOMForm - Items:', items);
   // Show loading state AFTER all hooks
   if (itemsLoading) {
     return (

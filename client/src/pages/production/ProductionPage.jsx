@@ -22,9 +22,7 @@ export default function ProductionPage() {
     queryKey: ['productions'],
     queryFn: async () => {
       try {
-        console.log('Fetching productions...');
         const response = await api.get('/productions');
-        console.log('Productions response:', response.data);
         return response.data;
       } catch (error) {
         console.error('Error fetching productions:', error);

@@ -5,10 +5,7 @@ import App from './App'
 import './assets/styles/variables.css'
 import './assets/styles/global.css'
 import './assets/styles/mobile-responsive.css'
-import './assets/styles/erpnext-theme.css'
-import './assets/styles/odoo-theme.css'
-import './assets/styles/sap-theme.css'
-import './assets/styles/default-theme.css'
+// Theme CSS loaded dynamically based on user preference
 import './components/common/SearchModal.css'
 import './components/common/SearchableSelect.css'
 
