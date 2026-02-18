@@ -8,9 +8,13 @@ import './assets/styles/mobile-responsive.css'
 // Theme CSS loaded dynamically based on user preference
 import './components/common/SearchModal.css'
 import './components/common/SearchableSelect.css'
+import { registerServiceWorker } from './utils/serviceWorker'
 
 // Register AG Grid Community modules
 ModuleRegistry.registerModules([AllCommunityModule])
+
+// Register service worker for PWA support
+registerServiceWorker();
 
 const rootElement = document.getElementById('root')
 if (!rootElement) {
