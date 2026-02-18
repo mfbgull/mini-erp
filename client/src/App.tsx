@@ -1,62 +1,82 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { InvoiceProvider } from './context/InvoiceContext';
 import SearchModal from './components/common/SearchModal';
+import PageLoader from './components/common/PageLoader';
 
+// Eager loaded - Critical path components
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import ItemsPage from './pages/inventory/ItemsPage';
-import WarehousesPage from './pages/inventory/WarehousesPage';
-import StockMovementPage from './pages/inventory/StockMovementPage';
-import StockByWarehousePage from './pages/inventory/StockByWarehousePage';
-import PurchasesPage from './pages/purchases/PurchasesPage';
-import PurchaseOrdersPage from './pages/purchase-orders/PurchaseOrdersPage';
-import PurchaseOrderFormPage from './pages/purchase-orders/PurchaseOrderFormPage';
-import PurchaseOrderDetailPage from './pages/purchase-orders/PurchaseOrderDetailPage';
-import SuppliersPage from './pages/suppliers/SuppliersPage';
-import SupplierFormPage from './pages/suppliers/SupplierFormPage';
-import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
-import BOMPage from './pages/bom/BOMPage';
-import ProductionPage from './pages/production/ProductionPage';
-import SalesPage from './pages/sales/SalesPage';
-import SalesInvoicePage from './pages/sales/SalesInvoicePage';
-import InvoiceViewPage from './pages/sales/InvoiceViewPage';
-import InvoiceRouter from './components/invoice/InvoiceRouter';
-import POSPage from './pages/pos/POSPage';
-import CustomersPage from './pages/customers/CustomersPage';
-import CustomerDetailPage from './pages/customers/CustomerDetailPage';
-import CustomerStatement from './pages/customers/CustomerStatement';
-import ARReportsPage from './pages/reports/ARReportsPage';
-import ReportsDashboard from './pages/reports/ReportsDashboard';
-import SalesSummaryReport from './pages/reports/SalesSummaryReport';
-import SalesByCustomerReport from './pages/reports/SalesByCustomerReport';
-import SalesByItemReport from './pages/reports/SalesByItemReport';
-import StockLevelReport from './pages/reports/StockLevelReport';
-import StockValuationReport from './pages/reports/StockValuationReport';
-import InventoryMovementReport from './pages/reports/InventoryMovementReport';
-import LowStockReport from './pages/reports/LowStockReport';
-import ProfitLossReport from './pages/reports/ProfitLossReport';
-import CashFlowReport from './pages/reports/CashFlowReport';
-import CustomerStatementsReport from './pages/reports/CustomerStatementsReport';
-import TopDebtorsReport from './pages/reports/TopDebtorsReport';
-import DSOReport from './pages/reports/DSOReport';
-import PurchaseSummaryReport from './pages/reports/PurchaseSummaryReport';
-import SupplierAnalysisReport from './pages/reports/SupplierAnalysisReport';
-import ProductionSummaryReport from './pages/reports/ProductionSummaryReport';
-import BOMUsageReport from './pages/reports/BOMUsageReport';
-import ExpensesReport from './pages/reports/ExpensesReport';
-import SettingsPage from './pages/SettingsPage';
-import IntegrationsPage from './pages/IntegrationsPage';
-import ExpensesPage from './pages/expenses/ExpensesPage';
-import ActivityLog from './pages/ActivityLog';
 import Sidebar from './components/layout/Sidebar';
 import FloatingActionButton from './components/layout/FloatingActionButton';
-import MobileInvoiceWizard from './pages/invoice/MobileInvoiceWizard';
-import { InvoiceProvider } from './context/InvoiceContext';
+
+// Lazy loaded - Inventory module
+const ItemsPage = lazy(() => import('./pages/inventory/ItemsPage'));
+const WarehousesPage = lazy(() => import('./pages/inventory/WarehousesPage'));
+const StockMovementPage = lazy(() => import('./pages/inventory/StockMovementPage'));
+const StockByWarehousePage = lazy(() => import('./pages/inventory/StockByWarehousePage'));
+
+// Lazy loaded - Purchase module
+const PurchasesPage = lazy(() => import('./pages/purchases/PurchasesPage'));
+const PurchaseOrdersPage = lazy(() => import('./pages/purchase-orders/PurchaseOrdersPage'));
+const PurchaseOrderFormPage = lazy(() => import('./pages/purchase-orders/PurchaseOrderFormPage'));
+const PurchaseOrderDetailPage = lazy(() => import('./pages/purchase-orders/PurchaseOrderDetailPage'));
+
+// Lazy loaded - Suppliers module
+const SuppliersPage = lazy(() => import('./pages/suppliers/SuppliersPage'));
+const SupplierFormPage = lazy(() => import('./pages/suppliers/SupplierFormPage'));
+const SupplierDetailPage = lazy(() => import('./pages/suppliers/SupplierDetailPage'));
+
+// Lazy loaded - BOM & Production
+const BOMPage = lazy(() => import('./pages/bom/BOMPage'));
+const ProductionPage = lazy(() => import('./pages/production/ProductionPage'));
+
+// Lazy loaded - Sales module
+const SalesPage = lazy(() => import('./pages/sales/SalesPage'));
+const SalesInvoicePage = lazy(() => import('./pages/sales/SalesInvoicePage'));
+const InvoiceViewPage = lazy(() => import('./pages/sales/InvoiceViewPage'));
+const InvoiceRouter = lazy(() => import('./components/invoice/InvoiceRouter'));
+const MobileInvoiceWizard = lazy(() => import('./pages/invoice/MobileInvoiceWizard'));
+
+// Lazy loaded - Customers module
+const CustomersPage = lazy(() => import('./pages/customers/CustomersPage'));
+const CustomerDetailPage = lazy(() => import('./pages/customers/CustomerDetailPage'));
+const CustomerStatement = lazy(() => import('./pages/customers/CustomerStatement'));
+
+// Lazy loaded - POS
+const POSPage = lazy(() => import('./pages/pos/POSPage'));
+
+// Lazy loaded - Reports module (heavy)
+const ReportsDashboard = lazy(() => import('./pages/reports/ReportsDashboard'));
+const ARReportsPage = lazy(() => import('./pages/reports/ARReportsPage'));
+const SalesSummaryReport = lazy(() => import('./pages/reports/SalesSummaryReport'));
+const SalesByCustomerReport = lazy(() => import('./pages/reports/SalesByCustomerReport'));
+const SalesByItemReport = lazy(() => import('./pages/reports/SalesByItemReport'));
+const StockLevelReport = lazy(() => import('./pages/reports/StockLevelReport'));
+const StockValuationReport = lazy(() => import('./pages/reports/StockValuationReport'));
+const InventoryMovementReport = lazy(() => import('./pages/reports/InventoryMovementReport'));
+const LowStockReport = lazy(() => import('./pages/reports/LowStockReport'));
+const ProfitLossReport = lazy(() => import('./pages/reports/ProfitLossReport'));
+const CashFlowReport = lazy(() => import('./pages/reports/CashFlowReport'));
+const CustomerStatementsReport = lazy(() => import('./pages/reports/CustomerStatementsReport'));
+const TopDebtorsReport = lazy(() => import('./pages/reports/TopDebtorsReport'));
+const DSOReport = lazy(() => import('./pages/reports/DSOReport'));
+const PurchaseSummaryReport = lazy(() => import('./pages/reports/PurchaseSummaryReport'));
+const SupplierAnalysisReport = lazy(() => import('./pages/reports/SupplierAnalysisReport'));
+const ProductionSummaryReport = lazy(() => import('./pages/reports/ProductionSummaryReport'));
+const BOMUsageReport = lazy(() => import('./pages/reports/BOMUsageReport'));
+const ExpensesReport = lazy(() => import('./pages/reports/ExpensesReport'));
+
+// Lazy loaded - Other pages
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'));
+const ExpensesPage = lazy(() => import('./pages/expenses/ExpensesPage'));
+const ActivityLog = lazy(() => import('./pages/ActivityLog'));
 
 import './assets/styles/variables.css';
 import './assets/styles/global.css';
@@ -122,7 +142,8 @@ function AppLayout() {
         <Sidebar />
         <div className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
           <div className="content">
-            <Routes>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/inventory/items" element={<ItemsPage />} />
               <Route path="/inventory/warehouses" element={<WarehousesPage />} />
@@ -172,8 +193,9 @@ function AppLayout() {
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/integrations" element={<IntegrationsPage />} />
               <Route path="/activity-log" element={<ActivityLog />} />
-<Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+              <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </Suspense>
             <FloatingActionButton />
           </div>
         </div>
@@ -210,7 +232,7 @@ function AppRoutesOuter() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BrowserRouter>
 <AuthProvider>
           <ThemeProvider>
             <InvoiceProvider>
