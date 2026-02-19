@@ -154,10 +154,10 @@ export default function InvoiceStep5Review() {
       )}
 
       {/* Invoice Dates Card - At Top Above Summary */}
-      <div className="miw-card" style={{ marginBottom: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <Calendar size={18} style={{ color: 'var(--primary, #367BF5)' }} />
-          <span style={{ fontSize: '14px', fontWeight: 600, color: '#374151' }}>Invoice Details</span>
+      <div className="miw-card miw-card-inline">
+        <div className="miw-flex-center-gap miw-mb-12">
+          <Calendar size={18} className="miw-icon-primary" />
+          <span className="miw-text-sm-bold">Invoice Details</span>
         </div>
         <div className="miw-inline-row">
           <div className="miw-inline-item miw-inline-50">
@@ -174,7 +174,7 @@ export default function InvoiceStep5Review() {
           </div>
         </div>
         {terms && (
-          <div style={{ marginTop: '10px' }}>
+          <div className="miw-mt-10">
             <span className="miw-summary-label">Terms</span>
             <span className="miw-summary-value">{terms}</span>
           </div>
@@ -206,34 +206,30 @@ export default function InvoiceStep5Review() {
             <span className="miw-summary-value">-{formatCurrency(calculateDiscount())}</span>
           </div>
           
-          <div className="miw-summary-divider" style={{ height: '1px', background: 'var(--miw-border)', margin: '8px 0' }} />
-          
+          <div className="miw-summary-divider miw-divider" />
+
           {/* Total */}
           <div className="miw-summary-row total">
-            <span className="miw-summary-label" style={{ fontSize: '15px', fontWeight: 700 }}>Total</span>
-            <span className="miw-summary-value" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--primary-500)' }}>
+            <span className="miw-summary-label miw-text-15-bold">Total</span>
+            <span className="miw-summary-value miw-text-18-bold">
               {formatCurrency(calculateTotal())}
             </span>
           </div>
-          
+
           {/* Paid */}
           {payment.recordPayment && payment.amount > 0 && (
-            <div className="miw-summary-row" style={{ marginTop: '6px' }}>
+            <div className="miw-summary-row miw-mt-6">
               <span className="miw-summary-label">Paid</span>
-              <span className="miw-summary-value" style={{ color: 'var(--success)', fontWeight: 600 }}>
+              <span className="miw-summary-value miw-text-success-bold">
                 -{formatCurrency(payment.amount)}
               </span>
             </div>
           )}
-          
+
           {/* Balance Due */}
-          <div className="miw-summary-row total" style={{ marginTop: '6px' }}>
-            <span className="miw-summary-label" style={{ fontSize: '14px', fontWeight: 700 }}>Balance Due</span>
-            <span className="miw-summary-value" style={{ 
-              fontSize: '16px', 
-              fontWeight: 700, 
-              color: calculateBalance() > 0 ? 'var(--warning)' : 'var(--success)' 
-            }}>
+          <div className="miw-summary-row total miw-mt-6">
+            <span className="miw-summary-label miw-text-14-bold">Balance Due</span>
+            <span className={`miw-summary-value miw-text-16-bold ${calculateBalance() > 0 ? 'miw-text-warning' : 'miw-text-success'}`}>
               {formatCurrency(Math.abs(calculateBalance()))}
             </span>
           </div>
@@ -242,12 +238,12 @@ export default function InvoiceStep5Review() {
 
       {/* Notes */}
       {notes && (
-        <div className="miw-card" style={{ marginTop: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <FileText size={16} style={{ color: '#6b7280' }} />
-            <span style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280' }}>Notes</span>
+        <div className="miw-card miw-mt-12">
+          <div className="miw-flex-center-gap-sm">
+            <FileText size={16} className="miw-icon-gray" />
+            <span className="miw-text-xs-bold-gray">Notes</span>
           </div>
-          <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: 1.5 }}>{notes}</p>
+          <p className="miw-text-sm-dark">{notes}</p>
         </div>
       )}
 

@@ -1,5 +1,5 @@
 import { useInvoice } from '../../context/InvoiceContext';
-import { Trash2, Plus, Camera } from 'lucide-react';
+import { Trash2, Plus, ChevronRight } from 'lucide-react';
 import './MobileInvoice.css';
 
 export default function InvoiceStep2Items() {
@@ -7,10 +7,6 @@ export default function InvoiceStep2Items() {
     items, 
     dispatch, 
     calculateSubtotal,
-    calculateTax,
-    calculateDiscount,
-    calculateTotal,
-    calculateBalance,
     goToStep
   } = useInvoice();
 
@@ -42,25 +38,17 @@ export default function InvoiceStep2Items() {
   if (items.length === 0) {
     return (
       <div className="miw-step-2">
-        <div className="miw-empty-state">
+        <div className="miw-empty">
           <div className="miw-empty-icon">
-            <Plus size={24} />
+            <Plus size={32} />
           </div>
           <div className="miw-empty-title">No items yet</div>
-          <div className="miw-empty-message">Tap the button below to add items to your invoice</div>
+          <div className="miw-empty-message">Add items to your invoice</div>
         </div>
-        <div className="miw-step-actions">
+        <div className="miw-wizard-actions" style={{ marginTop: '24px' }}>
           <button 
             className="btn btn-primary"
             onClick={() => goToStep(3)}
-            style={{ 
-              width: '100%',
-              height: '48px',
-              borderRadius: '12px',
-              fontSize: '14px',
-              fontWeight: 600,
-              boxShadow: '0 2px 4px rgba(54, 123, 245, 0.3)'
-            }}
           >
             <Plus size={18} />
             Add Item
@@ -72,68 +60,62 @@ export default function InvoiceStep2Items() {
 
   return (
     <div className="miw-step-2">
-      {/* Items List */}
-      {items.map((item) => (
-        <div key={item.id} className="miw-item-card">
-          <div 
-            className="miw-item-content"
-            onClick={() => goToStep(3)}
-          >
-            <div className="miw-item-name">{item.name}</div>
-            <div className="miw-item-details">
-              <div className="miw-quantity-control">
-                <button 
-                  className="miw-qty-btn"
-                  onClick={(e) => { e.stopPropagation(); handleQuantityChange(item.id, -1); }}
-                >
-                  -
-                </button>
-                <span className="miw-qty-value">{item.quantity}</span>
-                <button 
-                  className="miw-qty-btn"
-                  onClick={(e) => { e.stopPropagation(); handleQuantityChange(item.id, 1); }}
-                >
-                  +
-                </button>
-              </div>
-              <span>@ ${item.unitPrice.toFixed(2)} | Tax: {item.taxRate}%</span>
+      <div className="miw-items-list-po">
+        {items.map((item) => (
+          <div key={item.id} className="miw-item-row-po">
+            <div className="miw-item-info-po">
+              <span className="miw-item-name-po">{item.name}</span>
+              <span className="miw-item-code-po">Qty: {item.quantity} @ ${item.unitPrice.toFixed(2)}</span>
+              <span className="miw-item-price-po">${item.amount.toFixed(2)}</span>
             </div>
-            <div className="miw-item-amount">${item.amount.toFixed(2)}</div>
+            <div className="miw-item-quantity-po">
+              <input
+                type="number"
+                min="1"
+                value={item.quantity}
+                onChange={(e) => {
+                  const qty = parseInt(e.target.value) || 0;
+                  if (qty > 0) {
+                    dispatch({
+                      type: 'UPDATE_ITEM',
+                      payload: { id: item.id, updates: { quantity: qty } }
+                    });
+                  }
+                }}
+                className="miw-qty-input-po"
+              />
+              <button
+                onClick={() => handleDeleteItem(item.id)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#dc2626',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
           </div>
-          <div className="miw-item-actions">
-            <button 
-              className="miw-item-action-btn miw-item-delete"
-              onClick={() => handleDeleteItem(item.id)}
-            >
-              <Trash2 size={20} />
-            </button>
-          </div>
+        ))}
+      </div>
+
+      {items.length > 0 && (
+        <div className="miw-items-summary">
+          <span>{items.length} item{items.length !== 1 ? 's' : ''}</span>
+          <span>Subtotal: ${calculateSubtotal().toFixed(2)}</span>
         </div>
-      ))}
+      )}
 
-      {/* FAB - Add Item */}
-      <button 
-        className="miw-fab"
-        onClick={() => goToStep(3)}
-      >
-        <Plus size={24} />
-      </button>
-
-      {/* Continue Button */}
-      <div className="miw-step-actions">
-        <button 
-          className="btn btn-primary"
-          onClick={handleContinue}
-          style={{ 
-            width: '100%',
-            height: '48px',
-            borderRadius: '12px',
-            fontSize: '14px',
-            fontWeight: 600,
-            boxShadow: '0 2px 4px rgba(54, 123, 245, 0.3)'
-          }}
-        >
+      <div className="miw-wizard-actions">
+        <button className="btn btn-secondary" onClick={() => goToStep(3)}>
+          <Plus size={18} />
+          Add More
+        </button>
+        <button className="btn btn-primary" onClick={handleContinue}>
           Continue
+          <ChevronRight size={16} />
         </button>
       </div>
     </div>

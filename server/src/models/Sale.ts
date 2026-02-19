@@ -187,6 +187,7 @@ class SaleModel {
       JOIN items i ON s.item_id = i.id
       JOIN warehouses w ON s.warehouse_id = w.id
       JOIN users u ON s.created_by = u.id
+      WHERE 1=1
       `;
 
     const params: any[] = [];

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useInvoice } from '../../context/InvoiceContext';
 import { mobileInvoiceApi } from '../../utils/invoiceApi';
-import { Search, Calendar, ChevronDown } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Check, User } from 'lucide-react';
 import toast from 'react-hot-toast';
 import './MobileInvoice.css';
 
@@ -13,22 +13,13 @@ export default function InvoiceStep1Customer() {
     dueDate, 
     terms, 
     notes,
-    calculateSubtotal,
-    calculateTotal,
-    calculateBalance,
-    canProceedToStep,
     nextStep
   } = useInvoice();
 
   const [customerSearch, setCustomerSearch] = useState('');
-  const [customerResults, setCustomerResults] = useState<any[]>([]);
-  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
-  const [showTermsDropdown, setShowTermsDropdown] = useState(false);
-  const [isSearchingCustomers, setIsSearchingCustomers] = useState(false);
-  const [paymentTerms, setPaymentTerms] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Load payment terms on mount
-  // For now, use hardcoded terms matching the wireframe
   const termsOptions = [
     { name: 'Due on Receipt', days: 0 },
     { name: 'Net 7', days: 7 },
@@ -39,32 +30,27 @@ export default function InvoiceStep1Customer() {
     { name: 'Net 60', days: 60 },
   ];
 
-  // Search customers
-  const handleCustomerSearch = async (query: string) => {
-    setCustomerSearch(query);
-    
-    if (query.trim().length < 2) {
-      setCustomerResults([]);
-      setShowCustomerDropdown(false);
-      return;
-    }
+  useEffect(() => {
+    loadCustomers();
+  }, []);
 
-    setIsSearchingCustomers(true);
+  const loadCustomers = async () => {
     try {
-      const response = await mobileInvoiceApi.searchCustomers(query);
+      const response = await mobileInvoiceApi.searchCustomers('');
       if (response.success) {
-        setCustomerResults(response.data);
-        setShowCustomerDropdown(true);
+        setCustomers(response.data);
       }
     } catch (error) {
-      console.error('Error searching customers:', error);
-    } finally {
-      setIsSearchingCustomers(false);
+      console.error('Error loading customers:', error);
     }
   };
 
-  // Select customer
-  const handleSelectCustomer = (customerData: Customer) => {
+  const filteredCustomers = customers.filter((c: any) =>
+    c.customer_name?.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    c.customer_code?.toLowerCase().includes(customerSearch.toLowerCase())
+  );
+
+  const handleSelectCustomer = (customerData: any) => {
     dispatch({
       type: 'SET_CUSTOMER',
       payload: {
@@ -72,14 +58,16 @@ export default function InvoiceStep1Customer() {
         name: customerData.customer_name,
         email: customerData.email || '',
         phone: customerData.phone || '',
-        balance: 0 // We could fetch this, but keeping it simple
+        balance: 0
       }
     });
-    setCustomerSearch(customerData.customer_name);
-    setShowCustomerDropdown(false);
   };
 
-  // Handle Continue
+  const handleClearCustomer = () => {
+    dispatch({ type: 'SET_CUSTOMER', payload: null });
+    setCustomerSearch('');
+  };
+
   const handleContinue = () => {
     if (!customer) {
       toast.error('Please select a customer');
@@ -90,57 +78,30 @@ export default function InvoiceStep1Customer() {
 
   return (
     <div className="miw-step-1">
-      {/* Customer Selector Card */}
-      <div className="miw-card">
-        <div className="miw-card-header">
-          <span className="miw-card-title">Customer</span>
-        </div>
-        
-        <div className="miw-customer-selector">
-          <div className="miw-customer-icon">
-            <Search size={20} />
+      <div className="miw-search-box">
+        <input
+          type="text"
+          className="miw-search-input"
+          placeholder="Search customers..."
+          value={customerSearch}
+          onChange={(e) => setCustomerSearch(e.target.value)}
+        />
+      </div>
+      
+      <div className="miw-selection-list">
+        {filteredCustomers.map((c: any) => (
+          <div
+            key={c.id}
+            className={`miw-selection-card ${customer?.id === c.id ? 'selected' : ''}`}
+            onClick={() => handleSelectCustomer(c)}
+          >
+            <div className="miw-card-main">
+              <span className="miw-card-title">{c.customer_name}</span>
+              <span className="miw-card-subtitle">{c.customer_code}</span>
+            </div>
+            {customer?.id === c.id && <Check size={20} className="miw-check-icon" />}
           </div>
-          <div className="miw-customer-info" style={{ flex: 1 }}>
-            {customer ? (
-              <>
-                <div className="miw-customer-name">{customer.name}</div>
-                {customer.email && <div className="miw-customer-secondary">{customer.email}</div>}
-              </>
-            ) : (
-              <>
-                <input
-                  type="text"
-                  className="miw-input"
-                  placeholder="Select customer..."
-                  value={customerSearch}
-                  onChange={(e) => handleCustomerSearch(e.target.value)}
-                  onFocus={() => customerSearch.length >= 2 && setShowCustomerDropdown(true)}
-                />
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Customer Search Dropdown */}
-        {showCustomerDropdown && (
-          <div className="miw-customer-dropdown">
-            {customerResults.map((c: Customer) => (
-              <div
-                key={c.id}
-                className="miw-customer-dropdown-item"
-                onClick={() => handleSelectCustomer(c)}
-              >
-                <div className="miw-customer-dropdown-name">{c.customer_name}</div>
-                <div className="miw-customer-dropdown-code">{c.customer_code}</div>
-              </div>
-            ))}
-            {customerResults.length === 0 && !isSearchingCustomers && (
-              <div className="miw-customer-dropdown-empty">
-                No customers found
-              </div>
-            )}
-          </div>
-        )}
+        ))}
       </div>
 
       {/* Date Row */}
@@ -185,16 +146,13 @@ export default function InvoiceStep1Customer() {
           <span className="miw-card-title">Payment Terms</span>
         </div>
         
-        <div 
-          className="miw-select-container"
-          onClick={() => setShowTermsDropdown(!showTermsDropdown)}
-        >
+        <div className="miw-select-container">
           <select
             className="miw-input miw-select"
             value={terms}
             onChange={(e) => dispatch({ type: 'SET_TERMS', payload: e.target.value })}
           >
-            {termsOptions.map((term: PaymentTerm) => (
+            {termsOptions.map((term: any) => (
               <option key={term.name} value={term.name}>
                 {term.name}
               </option>

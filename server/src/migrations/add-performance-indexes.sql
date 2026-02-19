@@ -23,7 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_payments_date ON payments(payment_date);
 
 -- Stock movement indexes
 CREATE INDEX IF NOT EXISTS idx_stock_movements_item_warehouse ON stock_movements(item_id, warehouse_id);
-CREATE INDEX IF NOT EXISTS idx_stock_movements_date ON stock_movement_date(movement_date);
+CREATE INDEX IF NOT EXISTS idx_stock_movements_date ON stock_movements(movement_date);
 CREATE INDEX IF NOT EXISTS idx_stock_movements_type ON stock_movements(movement_type);
 
 -- Stock balance indexes

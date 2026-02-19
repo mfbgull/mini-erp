@@ -26,6 +26,7 @@ import expenseRoutes from './routes/expenses';
 import supplierRoutes from './routes/suppliers';
 import mobileInvoiceRoutes from './routes/mobileInvoices';
 import integrationRoutes from './routes/integrations';
+import dashboardRoutes from './routes/dashboard';
 import path from 'path';
 import fs from 'fs';
 
@@ -97,6 +98,7 @@ app.use('/api', saleRoutes);
 app.use('/api', productionRoutes);
 app.use('/api/mobile-invoices', mobileInvoiceRoutes);
 app.use('/api/integrations', integrationRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Serve static files from client/dist in production
 // This MUST come AFTER API routes

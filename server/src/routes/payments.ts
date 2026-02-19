@@ -1,8 +1,12 @@
 import express from 'express';
 const router = express.Router();
 import paymentsController from '../controllers/paymentsController';
+import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { validateZodQuery, validateZodParams, zodSchemas } from '../middleware/validation';
 import { z } from 'zod';
+
+// All payment routes require authentication
+router.use(authenticateToken);
 
 const paymentListQuery = z.object({
   ...zodSchemas.pagination.shape,
@@ -16,7 +20,7 @@ router.get('/', validateZodQuery(paymentListQuery), paymentsController.getPaymen
 router.get('/:id', validateZodParams(zodSchemas.id), paymentsController.getPayment);
 router.post('/', paymentsController.createPayment);
 router.put('/:id', paymentsController.updatePayment);
-router.delete('/:id', paymentsController.deletePayment);
+router.delete('/:id', requireAdmin, paymentsController.deletePayment);
 router.post('/:id/allocate', paymentsController.allocatePaymentToInvoice);
 
 export default router;

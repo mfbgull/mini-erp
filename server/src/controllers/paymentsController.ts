@@ -5,6 +5,7 @@ import db from '../config/database';
 import { getRouteParam } from '../utils/queryUtils';
 import ledgerUtils from '../utils/ledgerUtils';
 import logger from '../utils/logger';
+import { parseCurrency, subtractCurrency } from '../utils/currency';
 
 function getPayments(req: Request, res: Response): void {
   try {
@@ -263,7 +264,7 @@ function createPayment(req: AuthRequest, res: Response): void {
         return;
       }
 
-      if (parseFloat(alloc.amount) <= 0) {
+      if (parseCurrency(alloc.amount) <= 0) {
         res.status(400).json({
           success: false,
           error: `Allocation amount for invoice ${alloc.invoice_id} must be greater than 0`
@@ -272,8 +273,8 @@ function createPayment(req: AuthRequest, res: Response): void {
       }
     }
 
-    const totalAllocated = invoice_allocations.reduce((sum: number, alloc: any) => sum + parseFloat(alloc.amount || '0'), 0);
-    if (Math.abs(totalAllocated - parseFloat(amount || '0')) > 0.01) {
+    const totalAllocated = invoice_allocations.reduce((sum: number, alloc: any) => sum + parseCurrency(alloc.amount), 0);
+    if (Math.abs(totalAllocated - parseCurrency(amount)) > 0.01) {
       res.status(400).json({
         success: false,
         error: `Payment amount (${amount}) does not match total allocated amount (${totalAllocated})`
@@ -323,7 +324,7 @@ function createPayment(req: AuthRequest, res: Response): void {
       `);
 
       const currentBalance = db.prepare('SELECT current_balance FROM customers WHERE id = ?').get(parsedCustomerId) as { current_balance: number };
-      const newBalance = parseFloat(String(currentBalance.current_balance || 0)) - parseFloat(String(amount));
+      const newBalance = subtractCurrency(parseCurrency(currentBalance.current_balance), parseCurrency(amount));
 
       const invoiceNumbers = invoice_allocations.map((alloc: any) => {
         const invoiceId = parseInt(alloc.invoice_id, 10);

@@ -21,12 +21,12 @@ body {
 }
 
 /* Typography */
-h1 { font-size: 30px; font-weight: 700; line-height: 1.2; color: var(--neutral-900); }
-h2 { font-size: 24px; font-weight: 600; line-height: 1.3; color: var(--neutral-900); }
-h3 { font-size: 20px; font-weight: 600; line-height: 1.4; color: var(--neutral-900); }
-h4 { font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--neutral-900); }
-.small { font-size: 14px; font-weight: 400; line-height: 1.4; }
-.tiny { font-size: 12px; font-weight: 500; line-height: 1.3; }
+h1 { font-size: var(--font-size-3xl); font-weight: 700; line-height: 1.2; color: var(--neutral-900); }
+h2 { font-size: var(--font-size-2xl); font-weight: 600; line-height: 1.3; color: var(--neutral-900); }
+h3 { font-size: var(--font-size-xl); font-weight: 600; line-height: 1.4; color: var(--neutral-900); }
+h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: var(--neutral-900); }
+.small { font-size: var(--font-size-sm); font-weight: 400; line-height: 1.4; }
+.tiny { font-size: var(--font-size-xs); font-weight: 500; line-height: 1.3; }
 
 /* Layout */
 .app-container {
@@ -41,13 +41,13 @@ h4 { font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--neutral-9
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none;
-  margin-left: 240px;
+  scrollbar-width: thin;
+  margin-left: var(--sidebar-width);
   transition: margin-left 0.3s ease;
 }
 
 .main-content.sidebar-collapsed {
-  margin-left: 70px;
+  margin-left: var(--sidebar-collapsed-width);
   padding-bottom: 12px;
 }
 
@@ -85,9 +85,13 @@ h4 { font-size: 18px; font-weight: 600; line-height: 1.4; color: var(--neutral-9
   padding: var(--space-lg);
 }
 
-/* Hide scrollbar for content */
+/* Thin scrollbar for content */
 .content::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+}
+.content::-webkit-scrollbar-thumb {
+  background-color: var(--neutral-300);
+  border-radius: 3px;
 }
 
 /* Page Header - Two Column Layout */

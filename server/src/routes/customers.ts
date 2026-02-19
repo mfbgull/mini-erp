@@ -1,8 +1,12 @@
 import express from 'express';
 const router = express.Router();
 import customersController from '../controllers/customersController';
+import { authenticateToken } from '../middleware/auth';
 import { validateZodQuery, validateZodParams, zodSchemas } from '../middleware/validation';
 import { z } from 'zod';
+
+// All customer routes require authentication
+router.use(authenticateToken);
 
 const customerListQuery = z.object({
   ...zodSchemas.pagination.shape,

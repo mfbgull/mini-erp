@@ -62,7 +62,7 @@ function createDefaultUser(): void {
   const existingUser = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
 
   if (!existingUser) {
-    const passwordHash = bcrypt.hashSync('admin123', 8);
+    const passwordHash = bcrypt.hashSync('admin123', 12);
 
     const stmt = db.prepare(`
       INSERT INTO users (username, email, password_hash, full_name, role, is_active)
@@ -577,6 +577,30 @@ function runMobileInvoiceMigration(): void {
   }
 }
 
+function runMissingIndexesMigration(): void {
+  try {
+    const indexCheck = db.prepare(`
+      SELECT COUNT(*) as count FROM sqlite_master
+      WHERE type='index' AND name='idx_payment_allocations_payment'
+    `).get() as { count: number };
+
+    if (indexCheck.count === 0) {
+      logger.info('Running missing indexes migration...');
+
+      const indexSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-missing-indexes.sql'),
+        'utf8'
+      );
+
+      db.exec(indexSQL);
+
+      logger.info('✅ Missing indexes migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Missing indexes migration error:', error.message);
+  }
+}
+
 initializeDatabase();
 runExpensesMigration();
 runPurchasesMigration();
@@ -588,5 +612,6 @@ runActivityLogMigration();
 runRawMaterialsWarehouseMigration();
 runProductionInputsWarehouseMigration();
 runMobileInvoiceMigration();
+runMissingIndexesMigration();
 
 export default db;

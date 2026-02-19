@@ -1,6 +1,10 @@
 import express from 'express';
 const router = express.Router();
 import suppliersController from '../controllers/suppliersController';
+import { authenticateToken } from '../middleware/auth';
+
+// All supplier routes require authentication
+router.use(authenticateToken);
 
 router.get('/', suppliersController.getSuppliers);
 router.get('/next-code', suppliersController.getNextSupplierCode);

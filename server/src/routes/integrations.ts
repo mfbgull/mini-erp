@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import db from '../config/database';
+import { authenticateToken, requireAdmin } from '../middleware/auth';
 import emailService from '../services/integrations/emailService';
 import notificationService from '../services/integrations/notificationService';
 import weatherService from '../services/integrations/weatherService';
@@ -8,6 +9,10 @@ import currencyService from '../services/integrations/currencyService';
 import taxService from '../services/integrations/taxService';
 
 const router = Router();
+
+// All integration routes require authentication and admin role
+router.use(authenticateToken);
+router.use(requireAdmin);
 
 /**
  * Get all integration settings

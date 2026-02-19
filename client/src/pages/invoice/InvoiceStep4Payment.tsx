@@ -141,15 +141,14 @@ export default function InvoiceStep4Payment() {
       )}
 
       {/* Payment Toggle Card */}
-      <div className="miw-card" style={{ marginBottom: '12px' }}>
-        <div 
-          className="miw-toggle" 
+      <div className="miw-card miw-card-inline">
+        <div
+          className="miw-toggle miw-p-8-0"
           onClick={handleTogglePayment}
-          style={{ padding: '8px 0' }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <CreditCard size={20} style={{ color: 'var(--primary, #367BF5)' }} />
-            <span className="miw-toggle-label" style={{ fontSize: '15px', fontWeight: 600 }}>Record Payment</span>
+          <div className="miw-flex miw-items-center miw-gap-10">
+            <CreditCard size={20} className="miw-icon-primary" />
+            <span className="miw-toggle-label miw-text-15-bold-dark">Record Payment</span>
           </div>
           <div className={`miw-toggle-switch ${isPaymentExpanded ? 'active' : ''}`} />
         </div>
@@ -201,24 +200,15 @@ export default function InvoiceStep4Payment() {
             
             <div className="miw-inline-item miw-inline-50">
               <label className="miw-label">Amount</label>
-              <div style={{ position: 'relative' }}>
-                <span style={{ 
-                  position: 'absolute', 
-                  left: '12px', 
-                  top: '50%', 
-                  transform: 'translateY(-50%)',
-                  color: '#6b7280',
-                  fontWeight: 600,
-                  fontSize: '14px'
-                }}>$</span>
+              <div className="miw-input-prefix-container">
+                <span className="miw-input-prefix">$</span>
                 <input
                   ref={amountInputRef}
                   type="number"
-                  className="miw-input"
+                  className="miw-input miw-input-with-prefix"
                   placeholder="0.00"
                   value={payment.amount || ''}
                   onChange={(e) => handlePaymentChange('amount', parseFloat(e.target.value) || 0)}
-                  style={{ paddingLeft: '28px', fontSize: '16px', fontWeight: 600 }}
                 />
               </div>
             </div>
@@ -228,11 +218,10 @@ export default function InvoiceStep4Payment() {
           <div className="miw-form-section">
             <label className="miw-label">Notes (Optional)</label>
             <textarea
-              className="miw-input miw-textarea"
+              className="miw-input miw-textarea miw-textarea-min"
               placeholder="Add notes..."
               value={payment.notes}
               onChange={(e) => handlePaymentChange('notes', e.target.value)}
-              style={{ minHeight: '70px' }}
             />
           </div>
         </div>

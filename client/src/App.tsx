@@ -9,9 +9,10 @@ import { InvoiceProvider } from './context/InvoiceContext';
 import SearchModal from './components/common/SearchModal';
 import PageLoader from './components/common/PageLoader';
 import ErrorBoundary from './components/ErrorBoundary';
+import WebMCPStatus from './components/WebMCPStatus';
 
 // Eager loaded - Critical path components
-import Login from './pages/Login';
+import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import Sidebar from './components/layout/Sidebar';
 import FloatingActionButton from './components/layout/FloatingActionButton';
@@ -77,10 +78,7 @@ const ExpensesReport = lazy(() => import('./pages/reports/ExpensesReport'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'));
 const ExpensesPage = lazy(() => import('./pages/expenses/ExpensesPage'));
-const ActivityLog = lazy(() => import('./pages/ActivityLog'));
-
-import './assets/styles/variables.css';
-import './assets/styles/global.css';
+const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -196,7 +194,7 @@ function AppLayout() {
               <Route path="/pos" element={<POSPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/integrations" element={<IntegrationsPage />} />
-              <Route path="/activity-log" element={<ActivityLog />} />
+              <Route path="/activity-log" element={<ActivityLogPage />} />
               <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Suspense>
@@ -217,7 +215,7 @@ function AppRoutesOuter() {
     <Routes>
       <Route
         path="/login"
-        element={isAuthenticated ? <Navigate to="/" /> : <Login />}
+        element={isAuthenticated ? <Navigate to="/" /> : <LoginPage />}
       />
 
       <Route
@@ -265,6 +263,7 @@ export default function App() {
                 }
               }}
             />
+            <WebMCPStatus />
           </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>

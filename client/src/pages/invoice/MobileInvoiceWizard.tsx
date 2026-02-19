@@ -8,7 +8,7 @@ import InvoiceStep3AddItem from './InvoiceStep3AddItem';
 import InvoiceStep4Payment from './InvoiceStep4Payment';
 import InvoiceStep5Review from './InvoiceStep5Review';
 import toast from 'react-hot-toast';
-import { ArrowLeft, X } from 'lucide-react';
+import { X, User, Package, Plus, DollarSign, Check } from 'lucide-react';
 import './MobileInvoice.css';
 
 export default function MobileInvoiceWizard() {
@@ -90,36 +90,46 @@ export default function MobileInvoiceWizard() {
     }
   };
 
-  const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+  const steps = [
+    { number: 1, label: 'Customer', icon: User },
+    { number: 2, label: 'Items', icon: Package },
+    { number: 3, label: 'Add', icon: Plus },
+    { number: 4, label: 'Payment', icon: DollarSign },
+    { number: 5, label: 'Review', icon: Check },
+  ];
 
   return (
     <div className="mobile-invoice-wizard">
-      {/* Header */}
       <div className="miw-header">
         <div className="miw-header-top">
           <button className="miw-close-btn" onClick={handleClose}>
-            <X size={24} />
+            <X size={20} />
           </button>
           <div className="miw-title">Create Invoice</div>
-          <div className="miw-header-right">
-            <span className="miw-step-count">{currentStep} of {totalSteps}</span>
-          </div>
+          <div className="miw-header-right" style={{ width: '44px' }} />
         </div>
         
-        {/* Progress Bar */}
-        <div className="miw-progress-container">
-          <div className="miw-progress-bar">
-            <div className="miw-progress-fill" style={{ width: `${progress}%` }} />
+        {currentStep < 5 && (
+          <div className="miw-progress-steps">
+            {steps.map((step) => {
+              const Icon = step.icon;
+              const isActive = currentStep >= step.number;
+              const isCurrent = currentStep === step.number;
+              
+              return (
+                <div 
+                  key={step.number}
+                  className={`miw-progress-step ${isActive ? 'active' : ''} ${isCurrent ? 'current' : ''}`}
+                >
+                  <div className="miw-step-number">
+                    {step.number}
+                  </div>
+                  <span className="miw-step-label">{step.label}</span>
+                </div>
+              );
+            })}
           </div>
-          <div className="miw-step-indicators">
-            {[1, 2, 3, 4, 5].map((step) => (
-              <div 
-                key={step}
-                className={`miw-step-dot ${step === currentStep ? 'active' : ''} ${step < currentStep ? 'completed' : ''}`}
-              />
-            ))}
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Content */}

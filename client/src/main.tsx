@@ -9,6 +9,8 @@ import './assets/styles/mobile-responsive.css'
 import './components/common/SearchModal.css'
 import './components/common/SearchableSelect.css'
 import { registerServiceWorker } from './utils/serviceWorker'
+import './utils/webmcp'
+import './utils/webmcp-mock'
 
 // Register AG Grid Community modules
 ModuleRegistry.registerModules([AllCommunityModule])

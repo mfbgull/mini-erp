@@ -127,7 +127,7 @@ function changePassword(req: AuthRequest, res: Response): void {
       return;
     }
 
-    const newPasswordHash = bcrypt.hashSync(newPassword, 8);
+    const newPasswordHash = bcrypt.hashSync(newPassword, 12);
 
     db.prepare(`
       UPDATE users

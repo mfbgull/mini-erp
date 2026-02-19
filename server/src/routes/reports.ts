@@ -1,8 +1,12 @@
 import express from 'express';
 const router = express.Router();
 import reportsController from '../controllers/reportsController';
+import { authenticateToken } from '../middleware/auth';
 import { sensitiveOperationLimiter } from '../middleware/rateLimiter';
 import { validateZodQuery, zodSchemas } from '../middleware/validation';
+
+// All report routes require authentication
+router.use(authenticateToken);
 
 router.get('/ar-aging', sensitiveOperationLimiter, reportsController.getARAgingReport);
 router.get('/customer-statements', sensitiveOperationLimiter, reportsController.getCustomerStatements);

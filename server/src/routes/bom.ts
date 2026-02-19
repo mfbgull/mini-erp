@@ -11,12 +11,15 @@ import {
 } from '../controllers/bomController';
 import { authenticateToken } from '../middleware/auth';
 
+// All BOM routes require authentication
+router.use(authenticateToken);
+
 router.get('/', getAllBOMs);
 router.get('/:id', getBOMById);
 router.get('/by-item/:itemId', getBOMsByFinishedItem);
-router.post('/', authenticateToken, createBOM);
-router.put('/:id', authenticateToken, updateBOM);
-router.patch('/:id/toggle-active', authenticateToken, toggleBOMActive);
-router.delete('/:id', authenticateToken, deleteBOM);
+router.post('/', createBOM);
+router.put('/:id', updateBOM);
+router.patch('/:id/toggle-active', toggleBOMActive);
+router.delete('/:id', deleteBOM);
 
 export default router;

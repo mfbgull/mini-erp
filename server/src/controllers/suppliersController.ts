@@ -200,6 +200,10 @@ function deleteSupplier(req: Request, res: Response): void {
       return;
     }
 
+    // Query supplier info BEFORE deletion so we can log it
+    const deleteId = Array.isArray(id) ? id[0] : id;
+    const existingSupplier = db.prepare('SELECT supplier_name, supplier_code FROM suppliers WHERE id = ?').get(deleteId) as { supplier_name?: string, supplier_code?: string } | undefined;
+
     const query = `DELETE FROM suppliers WHERE id = ?`;
     const result = db.prepare(query).run(id);
 
@@ -212,8 +216,6 @@ function deleteSupplier(req: Request, res: Response): void {
     }
 
     // Log supplier deletion using activity logger
-    const deleteId = Array.isArray(id) ? id[0] : id;
-    const existingSupplier = db.prepare('SELECT supplier_name, supplier_code FROM suppliers WHERE id = ?').get(deleteId) as { supplier_name?: string, supplier_code?: string } | undefined;
     logCRUD(ActionType.SUPPLIER_DELETE, 'Supplier', parseInt(deleteId, 10), `Deleted supplier: ${existingSupplier?.supplier_name || 'Unknown'} (${existingSupplier?.supplier_code || 'N/A'})`, (req as AuthRequest).user?.id);
 
     res.json({

@@ -488,22 +488,9 @@ export default function InvoiceStep3AddItem() {
 
       {/* Add Item Button - Full width when no items */}
       {!isFormExpanded && items.length === 0 && (
-        <button 
-          className="btn btn-primary"
+        <button
+          className="btn btn-primary miw-btn-fab miw-btn-fab-primary"
           onClick={() => setIsFormExpanded(true)}
-          style={{ 
-            position: 'fixed',
-            bottom: '80px',
-            left: 'var(--space-md)',
-            right: 'var(--space-md)',
-            zIndex: 999,
-            width: 'calc(100% - 32px)',
-            height: '48px',
-            fontSize: '14px',
-            fontWeight: 600,
-            borderRadius: '12px',
-            boxShadow: '0 2px 4px rgba(54, 123, 245, 0.3)'
-          }}
         >
           <Plus size={18} />
           Add Item
@@ -551,17 +538,9 @@ export default function InvoiceStep3AddItem() {
                     autoComplete="off"
                   />
                   
-                  <Search 
-                    className="miw-search-icon" 
-                    size={18} 
-                    style={{ 
-                      position: 'absolute', 
-                      right: '12px', 
-                      top: '50%', 
-                      transform: 'translateY(-50%)',
-                      color: '#9ca3af',
-                      pointerEvents: 'none'
-                    }} 
+                  <Search
+                    className="miw-search-icon-wrapper"
+                    size={18}
                   />
 
                   {/* Search Results Dropdown */}
@@ -572,7 +551,7 @@ export default function InvoiceStep3AddItem() {
                     >
                       {isSearching && (
                         <div className="miw-item-search-empty">
-                          <div className="miw-spinner" style={{ width: 24, height: 24, margin: '0 auto 8px' }}></div>
+                          <div className="miw-spinner miw-spinner-sm"></div>
                           Searching...
                         </div>
                       )}
@@ -696,23 +675,21 @@ export default function InvoiceStep3AddItem() {
 
               {/* Action Buttons */}
               <div className="miw-form-actions">
-                <button 
-                  className="btn btn-secondary"
+                <button
+                  className="btn btn-secondary miw-btn-half"
                   onClick={() => {
                     resetForm();
                     setIsFormExpanded(false);
                     setJustArrived(false);
                   }}
-                  style={{ flex: 1, height: '44px', borderRadius: '10px' }}
                 >
                   Cancel
                 </button>
-                
-                <button 
-                  className="btn btn-primary"
+
+                <button
+                  className="btn btn-primary miw-btn-half"
                   onClick={editingItem ? handleUpdateItem : handleAddItem}
                   disabled={!selectedItem}
-                  style={{ flex: 1, height: '44px', borderRadius: '10px' }}
                 >
                   {editingItem ? 'Update' : 'Add'}
                 </button>
@@ -724,79 +701,32 @@ export default function InvoiceStep3AddItem() {
 
       {/* Total Amount Status Bar - Above Buttons */}
       {items.length > 0 && (
-        <div 
-          className="miw-total-status-bar"
-          style={{ 
-            position: 'fixed',
-            bottom: '125px',
-            left: 'var(--space-md)',
-            right: 'var(--space-md)',
-            zIndex: 999,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '10px 16px',
-            background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
-            color: 'white'
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '10px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total</span>
-            <span style={{ fontSize: '18px', fontWeight: 700 }}>${totalAmount.toFixed(2)}</span>
+        <div className="miw-total-status-bar">
+          <div className="miw-flex-col">
+            <span className="miw-text-2xs miw-opacity-80 miw-uppercase miw-tracking-wide">Total</span>
+            <span className="miw-font-bold" style={{ fontSize: '18px' }}>${totalAmount.toFixed(2)}</span>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <span style={{ fontSize: '10px', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Items</span>
-            <span style={{ fontSize: '14px', fontWeight: 600 }}>{items.length} item{items.length !== 1 ? 's' : ''}</span>
+          <div className="miw-flex-col miw-items-end">
+            <span className="miw-text-2xs miw-opacity-80 miw-uppercase miw-tracking-wide">Items</span>
+            <span className="miw-font-semibold miw-text-sm">{items.length} item{items.length !== 1 ? 's' : ''}</span>
           </div>
         </div>
       )}
 
       {/* Button Row - Add Item (50%) + Continue (50%) */}
       {items.length > 0 && (
-        <div 
-          style={{ 
-            position: 'fixed',
-            bottom: '70px',
-            left: 'var(--space-md)',
-            right: 'var(--space-md)',
-            zIndex: 1000,
-            display: 'flex',
-            gap: '10px'
-          }}
-        >
-          <button 
-            className="btn btn-primary"
+        <div className="miw-fab-container">
+          <button
+            className="btn btn-primary miw-btn-fab miw-btn-fab-primary miw-flex miw-items-center miw-justify-between"
             onClick={() => setIsFormExpanded(true)}
-            style={{ 
-              flex: 1,
-              height: '48px',
-              fontSize: '14px',
-              fontWeight: 600,
-              borderRadius: '12px',
-              boxShadow: '0 2px 4px rgba(54, 123, 245, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px'
-            }}
           >
             <Plus size={18} />
             Add Item
           </button>
-          
-          <button 
-            className="btn btn-success"
+
+          <button
+            className="btn btn-success miw-btn-fab miw-btn-fab-success"
             onClick={handleContinue}
-            style={{ 
-              flex: 1,
-              height: '48px',
-              fontSize: '14px',
-              fontWeight: 600,
-              borderRadius: '12px',
-              boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)'
-            }}
           >
             Continue ({items.length})
           </button>
