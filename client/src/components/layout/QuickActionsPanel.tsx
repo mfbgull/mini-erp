@@ -16,7 +16,7 @@ import './QuickActionsPanel.css';
 interface QuickActionItem {
   id: string;
   label: string;
-  icon: JSX.Element;
+  icon: React.ReactNode;
   path?: string;
   onClick?: () => void;
 }

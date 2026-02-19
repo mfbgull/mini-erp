@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { X, User, Package, DollarSign, Check, ChevronRight, ChevronLeft } from 'lucide-react';
+import type { Invoice, Customer, InvoiceItem, Item } from '../../types';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import './InvoiceWizard.css';
 
-interface InvoiceItem {
+interface LocalInvoiceItem {
   item_id: number;
   item_name: string;
   item_code: string;
@@ -353,7 +354,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
       setStep(5);
       toast.success('Invoice created successfully!');
     } catch (error: unknown) {
-      toast.error(error.response?.data?.error || 'Failed to create invoice');
+      toast.error((error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to create invoice');
     } finally {
       setLoading(false);
     }

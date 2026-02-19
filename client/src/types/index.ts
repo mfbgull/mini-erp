@@ -35,9 +35,12 @@ export interface Item {
   reorder_level?: number;
   standard_selling_price?: number;
   standard_cost?: number;
+  standard_price?: number;
+  purchase_price?: number;
   is_raw_material?: boolean;
   is_finished_good?: boolean;
   is_purchased?: boolean;
+  is_manufactured?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -219,4 +222,17 @@ export interface TableColumn<T> {
   minWidth?: number;
   valueFormatter?: (params: { value: unknown; data: T }) => string;
   cellRenderer?: (params: { value: unknown; data: T }) => React.ReactNode;
+}
+
+// ============ Supplier Types ============
+export interface Supplier {
+  id: number;
+  supplier_name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  contact_person?: string;
+  current_balance?: number;
+  created_at?: string;
+  updated_at?: string;
 }

@@ -2,12 +2,6 @@ import React, { useState } from 'react';
 import { Search, Package } from 'lucide-react';
 import './MobileCardView.css';
 
-interface Item {
-  id: number;
-  item_name: string;
-  item_code: string;
-  current_stock: number;
-}
 
 interface MobileItemCardViewProps {
   items: Item[];

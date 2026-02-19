@@ -1,16 +1,9 @@
+import type { Item } from '../../types';
 import React, { useState } from 'react';
 import { Search, MoreVertical, Edit, Trash2, Package } from 'lucide-react';
 import DropdownMenu from './DropdownMenu';
 import './CompactMobileCard.css';
 
-interface Item {
-  id: number;
-  item_name: string;
-  item_code: string;
-  current_stock: number;
-  standard_selling_price?: number;
-  reorder_level?: number;
-}
 
 interface CompactMobileCardViewProps {
   items: Item[];

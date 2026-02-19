@@ -1,26 +1,9 @@
+import type { Item } from '../../types';
 import { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Edit, X, Trash2, Loader2 } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import './ItemCard.css';
 
-interface Item {
-  id: number;
-  item_code: string;
-  item_name: string;
-  description?: string;
-  category?: string;
-  unit_of_measure: string;
-  current_stock: number;
-  reorder_level: number;
-  standard_cost: number;
-  standard_selling_price: number;
-  is_raw_material: boolean;
-  is_finished_good: boolean;
-  is_purchased: boolean;
-  is_manufactured: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
 
 interface ItemCardProps {
   item: Item;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Truck, Package, ClipboardList, Check, ChevronRight, ChevronLeft, Calendar, MapPin } from 'lucide-react';
+import type { Supplier, Item, Warehouse } from '../../types';
 import toast from 'react-hot-toast';
 import api from '../../utils/api';
 import './PurchaseOrderWizard.css';
@@ -423,7 +424,7 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
       setStep(5);
       toast.success('Purchase order created successfully!');
     } catch (error: unknown) {
-      toast.error(error.response?.data?.error || 'Failed to create purchase order');
+      toast.error((error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to create purchase order');
     } finally {
       setLoading(false);
     }

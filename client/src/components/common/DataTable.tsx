@@ -1,21 +1,21 @@
 import { useState, memo, useMemo } from 'react';
 import './DataTable.css';
 
-interface Column {
+interface Column<T = Record<string, unknown>> {
   key: string;
   label: string;
   sortable?: boolean;
   render?: (value: unknown, row: T) => React.ReactNode;
 }
 
-interface DataTableProps {
-  columns: Column[];
+interface DataTableProps<T = Record<string, unknown>> {
+  columns: Column<T>[];
   data: T[];
   onRowClick?: (row: T) => void;
   className?: string;
 }
 
-function DataTable({ columns, data, onRowClick, className }: DataTableProps) {
+function DataTable<T = Record<string, unknown>>({ columns, data, onRowClick, className }: DataTableProps<T>) {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -73,7 +73,7 @@ function DataTable({ columns, data, onRowClick, className }: DataTableProps) {
           ) : (
             sortedData.map((row, index) => (
               <tr
-                key={row.id || index}
+                key={(row as Record<string, unknown>).id || index}
                 onClick={() => onRowClick && onRowClick(row)}
                 className={onRowClick ? 'clickable' : ''}
               >
@@ -82,7 +82,7 @@ function DataTable({ columns, data, onRowClick, className }: DataTableProps) {
                     key={col.key}
                     data-label={col.label}
                   >
-                    {col.render ? col.render(row[col.key], row) : row[col.key]}
+                    {col.render ? col.render(row[col.key as keyof T], row) : String(row[col.key as keyof T] ?? '')}
                   </td>
                 ))}
               </tr>

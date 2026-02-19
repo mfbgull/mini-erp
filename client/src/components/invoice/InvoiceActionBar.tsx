@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Eye, Edit2, Printer, Download, Mail, ArrowLeft } from 'lucide-react';
+import type { Invoice, Customer, InvoiceItem, Item } from '../../types';
 import Button from '../common/Button';
 import { useInvoiceNavigation } from '../../hooks/useInvoiceNavigation';
 import './InvoiceRouter.css';

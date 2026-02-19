@@ -137,4 +137,3 @@ function getDaysOverdue(dueDate: string): string {
   return `${diffDays} days overdue`;
 }
 
-export default MobileInvoiceCardView;

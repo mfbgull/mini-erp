@@ -138,4 +138,3 @@ function getUtilizationClass(utilization: number): string {
   return 'utilization-low';
 }
 
-export default MobileCardView;

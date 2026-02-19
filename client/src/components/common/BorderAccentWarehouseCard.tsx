@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MoreVertical, Edit, Trash2, Package, ArrowLeft } from 'lucide-react';
+import type { Item, Warehouse } from '../../types';
 import api from '../../utils/api';
 import './BorderAccentWarehouseCard.css';
 
