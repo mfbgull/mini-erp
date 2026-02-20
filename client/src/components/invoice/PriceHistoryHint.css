@@ -287,3 +287,8 @@
 .theme-sap .price-history-hint {
   box-shadow: var(--sap-shadow-md);
 }
+
+/* Icon utility */
+.icon-mr-xs {
+  margin-right: 4px;
+}

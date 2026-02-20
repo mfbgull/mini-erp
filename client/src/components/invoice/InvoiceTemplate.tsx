@@ -420,9 +420,9 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       <div className="error-message">
         <h3>Error rendering invoice</h3>
         <p>An error occurred while rendering the invoice template.</p>
-        <details style={{ marginTop: '10px' }}>
+        <details className="error-details">
           <summary>Error details</summary>
-          <pre style={{ fontSize: '12px', whiteSpace: 'pre-wrap' }}>
+          <pre className="error-details-pre">
             {error instanceof Error ? error.message : String(error)}
           </pre>
         </details>

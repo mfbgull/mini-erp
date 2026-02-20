@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+
 import { DollarSign, AlertTriangle, Info, ArrowRight, ArrowUp, ArrowDown, Check } from 'lucide-react';
+
 import { useSettings } from '../../context/SettingsContext';
 import './PriceHistoryHint.css';
 
@@ -194,7 +196,7 @@ export default function PriceHistoryHint({ history, currentPrice, onClose }: Pri
         {/* Countdown timer - show countdown when not hovering */}
         {isHovering ? (
           <div className="countdown-timer keep-open">
-            <Check size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} /> Tooltip will stay open while hovering - move mouse away to close
+            <Check size={14} className="icon-valign-middle icon-mr-xs" /> Tooltip will stay open while hovering - move mouse away to close
           </div>
         ) : !isHovering && countdown !== null && countdown > 0 ? (
           <div className="countdown-timer">
