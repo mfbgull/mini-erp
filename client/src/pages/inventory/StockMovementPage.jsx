@@ -1,177 +1,189 @@
-import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { useSettings } from '../../context/SettingsContext';
-import { useMobileDetection } from '../../hooks/useMobileDetection';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { AgGridReact } from 'ag-grid-react';
-import { Package, ArrowUp, ArrowDown, ArrowRight, Filter, ClipboardList } from 'lucide-react';
-import api from '../../utils/api';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
-import FormInput from '../../components/common/FormInput';
-import './StockMovementPage.css';
+import { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { useSettings } from "../../context/SettingsContext";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { AgGridReact } from "ag-grid-react";
+import {
+  Package,
+  ArrowUp,
+  ArrowDown,
+  ArrowRight,
+  ClipboardList,
+} from "lucide-react";
+import api from "../../utils/api";
+import Button from "../../components/common/Button";
+import Modal from "../../components/common/Modal";
+import FormInput from "../../components/common/FormInput";
+import CompactStockMovementCardView from "../../components/common/CompactStockMovementCard";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { stockMovementSchema } from "../../schemas";
+import "./StockMovementPage.css";
 
 export default function StockMovementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
   const navigate = useNavigate();
 
   const { data: movements = [], isLoading } = useQuery({
-    queryKey: ['stock-movements'],
+    queryKey: ["stock-movements"],
     queryFn: async () => {
-      const response = await api.get('/inventory/stock-movements', {
-        params: { limit: 100 }
+      const response = await api.get("/inventory/stock-movements", {
+        params: { limit: 100 },
       });
       return response.data;
-    }
+    },
   });
 
-  // Calculate statistics
   const stats = {
     totalMovements: movements.length,
-    totalIn: movements.filter(m => m.quantity > 0).length,
-    totalOut: movements.filter(m => m.quantity < 0).length,
-    totalQuantity: movements.reduce((sum, m) => sum + Math.abs(parseFloat(m.quantity || 0)), 0),
-    mostActiveType: movements.length > 0
-      ? movements.reduce((counts, m) => {
-          counts[m.movement_type] = (counts[m.movement_type] || 0) + 1;
-          return counts;
-        }, {})
-      : {},
+    totalIn: movements.filter((m) => m.quantity > 0).length,
+    totalOut: movements.filter((m) => m.quantity < 0).length,
+    totalQuantity: movements.reduce(
+      (sum, m) => sum + Math.abs(parseFloat(m.quantity || 0)),
+      0,
+    ),
+    mostActiveType:
+      movements.length > 0
+        ? movements.reduce((counts, m) => {
+            counts[m.movement_type] = (counts[m.movement_type] || 0) + 1;
+            return counts;
+          }, {})
+        : {},
     movementsByType: {
-      PURCHASE: movements.filter(m => m.movement_type === 'PURCHASE').length,
-      SALE: movements.filter(m => m.movement_type === 'SALE').length,
-      PRODUCTION: movements.filter(m => m.movement_type === 'PRODUCTION').length,
-      TRANSFER: movements.filter(m => m.movement_type === 'TRANSFER').length,
-      ADJUSTMENT: movements.filter(m => m.movement_type === 'ADJUSTMENT').length
-    }
+      PURCHASE: movements.filter((m) => m.movement_type === "PURCHASE").length,
+      SALE: movements.filter((m) => m.movement_type === "SALE").length,
+      PRODUCTION: movements.filter((m) => m.movement_type === "PRODUCTION")
+        .length,
+      TRANSFER: movements.filter((m) => m.movement_type === "TRANSFER").length,
+      ADJUSTMENT: movements.filter((m) => m.movement_type === "ADJUSTMENT")
+        .length,
+    },
   };
 
-  // Get most active movement type
   const mostActiveType = useMemo(() => {
-    if (movements.length === 0) return 'None';
+    if (movements.length === 0) return "None";
     const typeCount = movements.reduce((counts, m) => {
       counts[m.movement_type] = (counts[m.movement_type] || 0) + 1;
       return counts;
     }, {});
-    return Object.entries(typeCount).sort((a, b) => b[1] - a[1])[0]?.[0] || 'None';
-  }, [movements]);
-
-  // Filter movements for mobile view
-  const filteredMovements = useMemo(() => {
-    if (!searchTerm) return movements;
-    const term = searchTerm.toLowerCase();
-    return movements.filter(m => 
-      m.movement_no?.toLowerCase().includes(term) ||
-      m.item_name?.toLowerCase().includes(term) ||
-      m.item_code?.toLowerCase().includes(term) ||
-      m.warehouse_name?.toLowerCase().includes(term) ||
-      m.movement_type?.toLowerCase().includes(term)
+    return (
+      Object.entries(typeCount).sort((a, b) => b[1] - a[1])[0]?.[0] || "None"
     );
-  }, [movements, searchTerm]);
+  }, [movements]);
 
   // Export to CSV
   const handleExport = () => {
     if (movements.length === 0) {
-      toast.error('No movements to export');
+      toast.error("No movements to export");
       return;
     }
 
     const headers = [
-      'Movement No', 'Date', 'Item Code', 'Item Name',
-      'Warehouse', 'Type', 'Quantity', 'Unit', 'Remarks'
+      "Movement No",
+      "Date",
+      "Item Code",
+      "Item Name",
+      "Warehouse",
+      "Type",
+      "Quantity",
+      "Unit",
+      "Remarks",
     ];
 
-    const rows = movements.map(m => [
+    const rows = movements.map((m) => [
       m.movement_no,
-      format(new Date(m.movement_date), 'yyyy-MM-dd'),
+      format(new Date(m.movement_date), "yyyy-MM-dd"),
       m.item_code,
       m.item_name,
       m.warehouse_name,
       m.movement_type,
       Math.abs(m.quantity),
       m.unit_of_measure,
-      m.remarks || ''
+      m.remarks || "",
     ]);
 
     const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n');
+      headers.join(","),
+      ...rows.map((row) => row.join(",")),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `stock-movements-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `stock-movements-${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    toast.success('Movements exported successfully!');
+    toast.success("Movements exported successfully!");
   };
 
   const columnDefs = [
     {
-      headerName: 'Movement No',
-      field: 'movement_no',
+      headerName: "Movement No",
+      field: "movement_no",
       sortable: true,
       filter: true,
-      flex: 1
-    },
-    {
-      headerName: 'Date',
-      field: 'movement_date',
-      sortable: true,
-      filter: 'agDateColumnFilter',
       flex: 1,
-      valueFormatter: params => format(new Date(params.value), 'dd MMM yyyy')
     },
     {
-      headerName: 'Item Code',
-      field: 'item_code',
-      filter: true,
-      flex: 1
-    },
-    {
-      headerName: 'Item Name',
-      field: 'item_name',
-      filter: true,
-      flex: 2
-    },
-    {
-      headerName: 'Quantity',
-      field: 'quantity',
+      headerName: "Date",
+      field: "movement_date",
       sortable: true,
-      filter: 'agNumberColumnFilter',
+      filter: "agDateColumnFilter",
+      flex: 1,
+      valueFormatter: (params) => format(new Date(params.value), "dd MMM yyyy"),
+    },
+    {
+      headerName: "Item Code",
+      field: "item_code",
+      filter: true,
+      flex: 1,
+    },
+    {
+      headerName: "Item Name",
+      field: "item_name",
+      filter: true,
+      flex: 2,
+    },
+    {
+      headerName: "Quantity",
+      field: "quantity",
+      sortable: true,
+      filter: "agNumberColumnFilter",
       flex: 1.5,
       cellRenderer: (params) => (
-        <span className={params.value >= 0 ? 'qty-in' : 'qty-out'}>
-          {params.value >= 0 ? '+' : ''}{parseFloat(params.value).toFixed(2)} {params.data.unit_of_measure}
+        <span className={params.value >= 0 ? "qty-in" : "qty-out"}>
+          {params.value >= 0 ? "+" : ""}
+          {parseFloat(params.value).toFixed(2)} {params.data.unit_of_measure}
         </span>
-      )
+      ),
     },
     {
-      headerName: 'Warehouse',
-      field: 'warehouse_name',
+      headerName: "Warehouse",
+      field: "warehouse_name",
       filter: true,
-      flex: 1.5
+      flex: 1.5,
     },
     {
-      headerName: 'Type',
-      field: 'movement_type',
+      headerName: "Type",
+      field: "movement_type",
       sortable: true,
       filter: true,
       flex: 1,
       cellRenderer: (params) => (
         <span className="status-tag">{params.value}</span>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -191,9 +203,7 @@ export default function StockMovementPage() {
       {/* Summary Statistics Cards */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            📋
-          </div>
+          <div className="stat-icon stat-icon-gradient-purple">📋</div>
           <div className="stat-content">
             <div className="stat-label">Total Movements</div>
             <div className="stat-value">{stats.totalMovements}</div>
@@ -202,9 +212,7 @@ export default function StockMovementPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            📥
-          </div>
+          <div className="stat-icon stat-icon-gradient-blue">📥</div>
           <div className="stat-content">
             <div className="stat-label">Total In</div>
             <div className="stat-value">{stats.totalIn}</div>
@@ -213,9 +221,7 @@ export default function StockMovementPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)' }}>
-            📤
-          </div>
+          <div className="stat-icon stat-icon-gradient-red">📤</div>
           <div className="stat-content">
             <div className="stat-label">Total Out</div>
             <div className="stat-value">{stats.totalOut}</div>
@@ -224,35 +230,31 @@ export default function StockMovementPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            📊
-          </div>
+          <div className="stat-icon stat-icon-gradient-pink">📊</div>
           <div className="stat-content">
             <div className="stat-label">Total Quantity</div>
-            <div className="stat-value">{parseFloat(stats.totalQuantity).toFixed(2)}</div>
+            <div className="stat-value">
+              {parseFloat(stats.totalQuantity).toFixed(2)}
+            </div>
             <div className="stat-subtitle">Aggregate moved</div>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            🔝
-          </div>
+          <div className="stat-icon stat-icon-gradient-orange">🔝</div>
           <div className="stat-content">
             <div className="stat-label">Most Active Type</div>
-            <div className="stat-value" style={{ fontSize: '1.4rem' }}>
-              {mostActiveType}
-            </div>
+            <div className="stat-value text-lg">{mostActiveType}</div>
             <div className="stat-subtitle">
-              {stats.mostActiveType !== 'None' ? `Count: ${stats.movementsByType[stats.mostActiveType]}` : 'No movements'}
+              {stats.mostActiveType !== "None"
+                ? `Count: ${stats.movementsByType[stats.mostActiveType]}`
+                : "No movements"}
             </div>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
-            📁
-          </div>
+          <div className="stat-icon stat-icon-gradient-green">📁</div>
           <div className="stat-content">
             <div className="stat-label">Purchases</div>
             <div className="stat-value">{stats.movementsByType.PURCHASE}</div>
@@ -261,9 +263,7 @@ export default function StockMovementPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            💰
-          </div>
+          <div className="stat-icon stat-icon-gradient-indigo">💰</div>
           <div className="stat-content">
             <div className="stat-label">Sales</div>
             <div className="stat-value">{stats.movementsByType.SALE}</div>
@@ -272,9 +272,7 @@ export default function StockMovementPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            🏭
-          </div>
+          <div className="stat-icon stat-icon-gradient-orange">🏭</div>
           <div className="stat-content">
             <div className="stat-label">Production</div>
             <div className="stat-value">{stats.movementsByType.PRODUCTION}</div>
@@ -283,9 +281,7 @@ export default function StockMovementPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            🔄
-          </div>
+          <div className="stat-icon stat-icon-gradient-indigo">🔄</div>
           <div className="stat-content">
             <div className="stat-label">Transfers</div>
             <div className="stat-value">{stats.movementsByType.TRANSFER}</div>
@@ -294,9 +290,7 @@ export default function StockMovementPage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            ⚙️
-          </div>
+          <div className="stat-icon stat-icon-gradient-coral">⚙️</div>
           <div className="stat-content">
             <div className="stat-label">Adjustments</div>
             <div className="stat-value">{stats.movementsByType.ADJUSTMENT}</div>
@@ -313,21 +307,21 @@ export default function StockMovementPage() {
         </button>
         <button
           className="quick-action-btn"
-          onClick={() => navigate('/reports/inventory-movement')}
+          onClick={() => navigate("/reports/inventory-movement")}
         >
           <span className="action-icon">📋</span>
           <span className="action-text">Movement Report</span>
         </button>
         <button
           className="quick-action-btn"
-          onClick={() => navigate('/reports/stock-valuation')}
+          onClick={() => navigate("/reports/stock-valuation")}
         >
           <span className="action-icon">💰</span>
           <span className="action-text">Stock Valuation</span>
         </button>
         <button
           className="quick-action-btn"
-          onClick={() => navigate('/inventory/stock-by-warehouse')}
+          onClick={() => navigate("/inventory/stock-by-warehouse")}
         >
           <span className="action-icon">🏭</span>
           <span className="action-text">Stock by Warehouse</span>
@@ -339,109 +333,29 @@ export default function StockMovementPage() {
           <div className="spinner"></div>
         </div>
       ) : isMobile ? (
-        // Mobile card-based view
         <>
-          <div className="mobile-search-section">
-            <div className="search-input-wrapper">
-              <Filter size={18} />
-              <input
-                type="text"
-                className="search-input-field"
-                placeholder="Search movements..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm && (
-                <button 
-                  className="search-clear-btn"
-                  onClick={() => setSearchTerm('')}
-                >
-                  ×
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="mobile-movements-container">
-            {filteredMovements.length === 0 ? (
-              <div className="no-results">
-                <ClipboardList className="no-results-icon" size={48} />
-                <h3>No movements found</h3>
-                <p>{searchTerm ? `No movements match "${searchTerm}"` : 'No stock movements recorded'}</p>
-                {searchTerm && (
-                  <Button variant="secondary" onClick={() => setSearchTerm('')}>
-                    Clear Search
-                  </Button>
-                )}
-              </div>
-            ) : (
-              filteredMovements.map((movement) => (
-                <div key={movement.id} className="movement-card">
-                  <div className="movement-card-header">
-                    <div className="movement-info">
-                      <span className="movement-no">{movement.movement_no}</span>
-                      <span className="movement-date">
-                        {format(new Date(movement.movement_date), 'dd MMM yyyy')}
-                      </span>
-                    </div>
-                    <span className={`movement-type-badge type-${movement.movement_type.toLowerCase()}`}>
-                      {movement.movement_type}
-                    </span>
-                  </div>
-                  
-                  <div className="movement-card-body">
-                    <div className="movement-item">
-                      <span className="item-name">{movement.item_name}</span>
-                      <span className="item-code">{movement.item_code}</span>
-                    </div>
-                    <div className="movement-warehouse">
-                      <span className="warehouse-label">Warehouse:</span>
-                      <span className="warehouse-name">{movement.warehouse_name}</span>
-                    </div>
-                    <div className="movement-quantity">
-                      {movement.quantity >= 0 ? (
-                        <ArrowUp size={16} className="qty-in-icon" />
-                      ) : (
-                        <ArrowDown size={16} className="qty-out-icon" />
-                      )}
-                      <span className={movement.quantity >= 0 ? 'qty-in' : 'qty-out'}>
-                        {movement.quantity >= 0 ? '+' : ''}{parseFloat(movement.quantity).toFixed(2)} {movement.unit_of_measure}
-                      </span>
-                    </div>
-                  </div>
-
-                  {movement.remarks && (
-                    <div className="movement-card-footer">
-                      <span className="movement-remarks">{movement.remarks}</span>
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-
-          {filteredMovements.length > 0 && (
-            <div className="mobile-pagination-info">
-              Showing {filteredMovements.length} of {movements.length} movements
-            </div>
-          )}
+          <CompactStockMovementCardView movements={movements} />
 
           <div className="mobile-action-bar">
-            <Button variant="primary" onClick={() => setIsModalOpen(true)} className="fab-button">
+            <Button
+              variant="primary"
+              onClick={() => setIsModalOpen(true)}
+              className="fab-button"
+            >
               + New Adjustment
             </Button>
           </div>
         </>
       ) : (
         // Desktop ag-grid view
-        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
+        <div className="ag-theme-quartz ag-grid-container">
           <AgGridReact
             rowData={movements}
             columnDefs={columnDefs}
             defaultColDef={{
               resizable: true,
               sortable: false,
-              filter: false
+              filter: false,
             }}
             pagination={true}
             paginationPageSize={20}
@@ -467,63 +381,68 @@ export default function StockMovementPage() {
 
 function StockAdjustmentForm({ onClose, onSuccess }) {
   const queryClient = useQueryClient();
-  const [movementType, setMovementType] = useState('ADJUSTMENT');
+  const [movementType, setMovementType] = useState("ADJUSTMENT");
   const [formData, setFormData] = useState({
-    from_warehouse_id: '',
-    to_warehouse_id: '',
-    movement_date: new Date().toISOString().split('T')[0],
-    remarks: ''
+    from_warehouse_id: "",
+    to_warehouse_id: "",
+    movement_date: new Date().toISOString().split("T")[0],
+    remarks: "",
   });
   const [lineItems, setLineItems] = useState([
-    { item_id: '', quantity: 0, available_stock: 0 }
+    { item_id: "", quantity: 0, available_stock: 0 },
   ]);
 
+  const { errors, validate, clearErrors } =
+    useFormValidation(stockMovementSchema);
+
   const { data: items = [] } = useQuery({
-    queryKey: ['items'],
+    queryKey: ["items"],
     queryFn: async () => {
-      const response = await api.get('/inventory/items');
+      const response = await api.get("/inventory/items");
       return response.data.data;
-    }
+    },
   });
 
   const { data: warehouses = [] } = useQuery({
-    queryKey: ['warehouses'],
+    queryKey: ["warehouses"],
     queryFn: async () => {
-      const response = await api.get('/inventory/warehouses');
+      const response = await api.get("/inventory/warehouses");
       return response.data.data;
-    }
+    },
   });
 
   const { data: stockBalances = [] } = useQuery({
-    queryKey: ['stock-balances'],
+    queryKey: ["stock-balances"],
     queryFn: async () => {
-      const response = await api.get('/inventory/stock-balances');
+      const response = await api.get("/inventory/stock-balances");
       return response.data;
-    }
+    },
   });
 
   const mutation = useMutation({
     mutationFn: async (movements) => {
       // Submit each line item as a separate movement
-      const promises = movements.map(movement =>
-        api.post('/inventory/stock-movements', movement)
+      const promises = movements.map((movement) =>
+        api.post("/inventory/stock-movements", movement),
       );
       return Promise.all(promises);
     },
     onSuccess: () => {
-      toast.success(`${lineItems.length} stock movement(s) recorded successfully!`);
-      queryClient.invalidateQueries(['stock-movements']);
-      queryClient.invalidateQueries(['items']);
-      queryClient.invalidateQueries(['stock-balances']);
+      toast.success(
+        `${lineItems.length} stock movement(s) recorded successfully!`,
+      );
+      queryClient.invalidateQueries(["stock-movements"]);
+      queryClient.invalidateQueries(["items"]);
+      queryClient.invalidateQueries(["stock-balances"]);
       onSuccess();
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to adjust stock');
-    }
+      toast.error(error.response?.data?.error || "Failed to adjust stock");
+    },
   });
 
   const getItemStock = (itemId, warehouseId) => {
-    if (!itemId || !warehouseId || itemId === '' || warehouseId === '') {
+    if (!itemId || !warehouseId || itemId === "" || warehouseId === "") {
       return 0;
     }
     const parsedItemId = parseInt(itemId);
@@ -534,13 +453,19 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
     }
 
     const stock = stockBalances.find(
-      sb => sb.item_id === parsedItemId && sb.warehouse_id === parsedWarehouseId
+      (sb) =>
+        sb.item_id === parsedItemId && sb.warehouse_id === parsedWarehouseId,
     );
     return stock ? parseFloat(stock.quantity) : 0;
   };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    // Clear error when user starts typing
+    if (errors[e.target.name]) {
+      clearErrors();
+    }
   };
 
   const handleLineItemChange = (index, field, value) => {
@@ -548,10 +473,11 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
     updated[index][field] = value;
 
     // Update available stock when item or warehouse changes
-    if (field === 'item_id') {
-      const warehouseId = movementType === 'TRANSFER'
-        ? formData.from_warehouse_id
-        : formData.to_warehouse_id;
+    if (field === "item_id") {
+      const warehouseId =
+        movementType === "TRANSFER"
+          ? formData.from_warehouse_id
+          : formData.to_warehouse_id;
       updated[index].available_stock = getItemStock(value, warehouseId);
     }
 
@@ -559,7 +485,10 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
   };
 
   const addLineItem = () => {
-    setLineItems([...lineItems, { item_id: '', quantity: 0, available_stock: 0 }]);
+    setLineItems([
+      ...lineItems,
+      { item_id: "", quantity: 0, available_stock: 0 },
+    ]);
   };
 
   const removeLineItem = (index) => {
@@ -571,27 +500,31 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!validate(formData)) return;
+
     // Validate line items
-    const validItems = lineItems.filter(item => item.item_id && item.quantity > 0);
+    const validItems = lineItems.filter(
+      (item) => item.item_id && item.quantity > 0,
+    );
     if (validItems.length === 0) {
-      toast.error('Please add at least one item with quantity');
+      toast.error("Please add at least one item with quantity");
       return;
     }
 
     // Create movements based on type
     const movements = [];
 
-    if (movementType === 'TRANSFER') {
+    if (movementType === "TRANSFER") {
       // For transfers, create two movements per item (OUT from source, IN to destination)
-      validItems.forEach(item => {
+      validItems.forEach((item) => {
         // Negative movement from source warehouse
         movements.push({
           item_id: item.item_id,
           warehouse_id: formData.from_warehouse_id,
           quantity: -Math.abs(item.quantity),
-          movement_type: 'TRANSFER',
+          movement_type: "TRANSFER",
           movement_date: formData.movement_date,
-          remarks: formData.remarks || 'Stock transfer'
+          remarks: formData.remarks || "Stock transfer",
         });
 
         // Positive movement to destination warehouse
@@ -599,21 +532,21 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
           item_id: item.item_id,
           warehouse_id: formData.to_warehouse_id,
           quantity: Math.abs(item.quantity),
-          movement_type: 'TRANSFER',
+          movement_type: "TRANSFER",
           movement_date: formData.movement_date,
-          remarks: formData.remarks || 'Stock transfer'
+          remarks: formData.remarks || "Stock transfer",
         });
       });
     } else {
       // For adjustments, create one movement per item
-      validItems.forEach(item => {
+      validItems.forEach((item) => {
         movements.push({
           item_id: item.item_id,
           warehouse_id: formData.to_warehouse_id,
           quantity: item.quantity,
-          movement_type: 'ADJUSTMENT',
+          movement_type: "ADJUSTMENT",
           movement_date: formData.movement_date,
-          remarks: formData.remarks || 'Stock adjustment'
+          remarks: formData.remarks || "Stock adjustment",
         });
       });
     }
@@ -631,8 +564,8 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
           value={movementType}
           onChange={(e) => setMovementType(e.target.value)}
           options={[
-            { value: 'ADJUSTMENT', label: 'Stock Adjustment' },
-            { value: 'TRANSFER', label: 'Stock Transfer' }
+            { value: "ADJUSTMENT", label: "Stock Adjustment" },
+            { value: "TRANSFER", label: "Stock Transfer" },
           ]}
           required
         />
@@ -646,8 +579,14 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: movementType === 'TRANSFER' ? '1fr 1fr' : '1fr', gap: 'var(--space-md)' }}>
-        {movementType === 'TRANSFER' ? (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: movementType === "TRANSFER" ? "1fr 1fr" : "1fr",
+          gap: "var(--space-md)",
+        }}
+      >
+        {movementType === "TRANSFER" ? (
           <>
             <FormInput
               label="From Warehouse"
@@ -656,15 +595,15 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
               value={formData.from_warehouse_id}
               onChange={(e) => {
                 handleChange(e);
-                const updated = lineItems.map(item => ({
+                const updated = lineItems.map((item) => ({
                   ...item,
-                  available_stock: getItemStock(item.item_id, e.target.value)
+                  available_stock: getItemStock(item.item_id, e.target.value),
                 }));
                 setLineItems(updated);
               }}
-              options={warehouses.map(wh => ({
+              options={warehouses.map((wh) => ({
                 value: wh.id,
-                label: `${wh.warehouse_code} - ${wh.warehouse_name}`
+                label: `${wh.warehouse_code} - ${wh.warehouse_name}`,
               }))}
               placeholder="Select source warehouse..."
               required
@@ -675,10 +614,12 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
               type="searchable-select"
               value={formData.to_warehouse_id}
               onChange={handleChange}
-              options={warehouses.filter(wh => wh.id !== parseInt(formData.from_warehouse_id)).map(wh => ({
-                value: wh.id,
-                label: `${wh.warehouse_code} - ${wh.warehouse_name}`
-              }))}
+              options={warehouses
+                .filter((wh) => wh.id !== parseInt(formData.from_warehouse_id))
+                .map((wh) => ({
+                  value: wh.id,
+                  label: `${wh.warehouse_code} - ${wh.warehouse_name}`,
+                }))}
               placeholder="Select destination warehouse..."
               required
             />
@@ -691,15 +632,15 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
             value={formData.to_warehouse_id}
             onChange={(e) => {
               handleChange(e);
-              const updated = lineItems.map(item => ({
+              const updated = lineItems.map((item) => ({
                 ...item,
-                available_stock: getItemStock(item.item_id, e.target.value)
+                available_stock: getItemStock(item.item_id, e.target.value),
               }));
               setLineItems(updated);
             }}
-            options={warehouses.map(wh => ({
+            options={warehouses.map((wh) => ({
               value: wh.id,
-              label: `${wh.warehouse_code} - ${wh.warehouse_name}`
+              label: `${wh.warehouse_code} - ${wh.warehouse_name}`,
             }))}
             placeholder="Select warehouse..."
             required
@@ -707,8 +648,15 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
         )}
       </div>
 
-      <div style={{ marginTop: 'var(--space-lg)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
+      <div style={{ marginTop: "var(--space-lg)" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "var(--space-md)",
+          }}
+        >
           <h4 style={{ margin: 0 }}>Items</h4>
           <Button
             type="button"
@@ -722,11 +670,14 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
 
         <div className="line-items-list">
           {lineItems.map((lineItem, index) => {
-            const warehouseId = movementType === 'TRANSFER'
-              ? formData.from_warehouse_id
-              : formData.to_warehouse_id;
+            const warehouseId =
+              movementType === "TRANSFER"
+                ? formData.from_warehouse_id
+                : formData.to_warehouse_id;
             const availableStock = getItemStock(lineItem.item_id, warehouseId);
-            const selectedItem = items.find(i => i.id === parseInt(lineItem.item_id));
+            const selectedItem = items.find(
+              (i) => i.id === parseInt(lineItem.item_id),
+            );
 
             return (
               <div key={index} className="line-item-row">
@@ -737,10 +688,12 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
                     name={`item_id_${index}`}
                     type="searchable-select"
                     value={lineItem.item_id}
-                    onChange={(e) => handleLineItemChange(index, 'item_id', e.target.value)}
-                    options={items.map(i => ({
+                    onChange={(e) =>
+                      handleLineItemChange(index, "item_id", e.target.value)
+                    }
+                    options={items.map((i) => ({
                       value: i.id,
-                      label: `${i.item_code} - ${i.item_name}`
+                      label: `${i.item_code} - ${i.item_name}`,
                     }))}
                     placeholder="Search items..."
                     required
@@ -748,10 +701,12 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
                   <div className="line-item-stock-qty">
                     <div className="available-stock-display">
                       <span className="stock-label">Available</span>
-                      <span className={`stock-value ${availableStock > 0 ? 'stock-positive' : lineItem.item_id ? 'stock-zero' : ''}`}>
+                      <span
+                        className={`stock-value ${availableStock > 0 ? "stock-positive" : lineItem.item_id ? "stock-zero" : ""}`}
+                      >
                         {lineItem.item_id && warehouseId
-                          ? `${availableStock} ${selectedItem?.unit_of_measure || ''}`
-                          : '-'}
+                          ? `${availableStock} ${selectedItem?.unit_of_measure || ""}`
+                          : "-"}
                       </span>
                     </div>
                     <FormInput
@@ -760,7 +715,13 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
                       type="number"
                       step="0.01"
                       value={lineItem.quantity}
-                      onChange={(e) => handleLineItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                      onChange={(e) =>
+                        handleLineItemChange(
+                          index,
+                          "quantity",
+                          parseFloat(e.target.value) || 0,
+                        )
+                      }
                       placeholder="0.00"
                       required
                     />
@@ -789,7 +750,7 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
         onChange={handleChange}
         placeholder="Reason for movement..."
         rows={2}
-        style={{ marginTop: 'var(--space-md)' }}
+        style={{ marginTop: "var(--space-md)" }}
       />
 
       <div className="form-actions">
@@ -797,7 +758,7 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
           Cancel
         </Button>
         <Button type="submit" variant="primary" loading={mutation.isPending}>
-          Record {movementType === 'TRANSFER' ? 'Transfer' : 'Adjustment'}
+          Record {movementType === "TRANSFER" ? "Transfer" : "Adjustment"}
         </Button>
       </div>
     </form>

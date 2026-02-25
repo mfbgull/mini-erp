@@ -1,40 +1,63 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
-import { format } from 'date-fns';
-import { AgGridReact } from 'ag-grid-react';
-import api from '../../utils/api';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
-import FormInput from '../../components/common/FormInput';
-import SearchableSelect from '../../components/common/SearchableSelect';
-import { ProductionCard } from '../../components/production/ProductionCard';
-import { AlertTriangle, Search, Factory, ClipboardList, Calendar } from 'lucide-react';
-import './ProductionPage.css';
+import { useState, useEffect, useMemo } from "react";
+import { useSettings } from "../../context/SettingsContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { format } from "date-fns";
+import { AgGridReact } from "ag-grid-react";
+import api from "../../utils/api";
+import Button from "../../components/common/Button";
+import Modal from "../../components/common/Modal";
+import FormInput from "../../components/common/FormInput";
+import SearchableSelect from "../../components/common/SearchableSelect";
+import { CompactProductionCardView } from "../../components/common/CompactProductionCard";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
+import {
+  AlertTriangle,
+  Search,
+  Factory,
+  ClipboardList,
+  Calendar,
+} from "lucide-react";
+import { useFormValidation } from "../../hooks/useFormValidation";
+import { productionSchema } from "../../schemas";
+import "./ProductionPage.css";
 
 export default function ProductionPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [editingProduction, setEditingProduction] = useState(null);
   const queryClient = useQueryClient();
+  const { isMobile } = useMobileDetection();
 
-  const { data: productions = [], isLoading, error, isError } = useQuery({
-    queryKey: ['productions'],
+  const {
+    data: productions = [],
+    isLoading,
+    error,
+    isError,
+  } = useQuery({
+    queryKey: ["productions"],
     queryFn: async () => {
       try {
-        const response = await api.get('/productions');
+        const response = await api.get("/productions");
         return response.data;
       } catch (error) {
-        console.error('Error fetching productions:', error);
+        console.error("Error fetching productions:", error);
         throw error;
       }
-    }
+    },
   });
 
-  const filteredProductions = productions.filter(production =>
-    production.production_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    production.output_item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    production.finished_goods_warehouse_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProductions = productions.filter(
+    (production) =>
+      production.production_no
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      production.output_item_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      production.finished_goods_warehouse_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()),
   );
 
   const deleteProductionMutation = useMutation({
@@ -42,16 +65,22 @@ export default function ProductionPage() {
       return api.delete(`/productions/${productionId}`);
     },
     onSuccess: () => {
-      toast.success('Production record deleted successfully!');
-      queryClient.invalidateQueries(['productions']);
+      toast.success("Production record deleted successfully!");
+      queryClient.invalidateQueries(["productions"]);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to delete production record');
-    }
+      toast.error(
+        error.response?.data?.error || "Failed to delete production record",
+      );
+    },
   });
 
   const handleDeleteProduction = (production) => {
-    if (window.confirm(`Are you sure you want to delete production: ${production.production_no}?`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete production: ${production.production_no}?`,
+      )
+    ) {
       deleteProductionMutation.mutate(production.id);
     }
   };
@@ -62,7 +91,7 @@ export default function ProductionPage() {
       setEditingProduction(response.data);
       setIsModalOpen(true);
     } catch (error) {
-      toast.error('Failed to load production details');
+      toast.error("Failed to load production details");
     }
   };
 
@@ -73,55 +102,55 @@ export default function ProductionPage() {
 
   const columnDefs = [
     {
-      headerName: 'Production #',
-      field: 'production_no',
+      headerName: "Production #",
+      field: "production_no",
       sortable: true,
       filter: true,
-      flex: 1
-    },
-    {
-      headerName: 'Date',
-      field: 'production_date',
-      sortable: true,
-      filter: 'agDateColumnFilter',
       flex: 1,
-      valueFormatter: params => format(new Date(params.value), 'dd MMM yyyy')
     },
     {
-      headerName: 'Output Item',
-      field: 'output_item_name',
+      headerName: "Date",
+      field: "production_date",
+      sortable: true,
+      filter: "agDateColumnFilter",
+      flex: 1,
+      valueFormatter: (params) => format(new Date(params.value), "dd MMM yyyy"),
+    },
+    {
+      headerName: "Output Item",
+      field: "output_item_name",
       sortable: true,
       filter: true,
-      flex: 2
+      flex: 2,
     },
     {
-      headerName: 'Quantity Produced',
-      field: 'output_quantity',
+      headerName: "Quantity Produced",
+      field: "output_quantity",
       sortable: true,
-      filter: 'agNumberColumnFilter',
+      filter: "agNumberColumnFilter",
       flex: 1.5,
       cellRenderer: (params) => (
         <span className="production-output">
           {parseFloat(params.value).toFixed(2)} {params.data.output_uom}
         </span>
-      )
+      ),
     },
     {
-      headerName: 'Warehouse',
-      field: 'finished_goods_warehouse_name',
-      filter: true,
-      flex: 1.5
-    },
-    {
-      headerName: 'Remarks',
-      field: 'remarks',
+      headerName: "Warehouse",
+      field: "finished_goods_warehouse_name",
       filter: true,
       flex: 1.5,
-      valueFormatter: params => params.value || '—'
     },
     {
-      headerName: 'Actions',
-      field: 'actions',
+      headerName: "Remarks",
+      field: "remarks",
+      filter: true,
+      flex: 1.5,
+      valueFormatter: (params) => params.value || "—",
+    },
+    {
+      headerName: "Actions",
+      field: "actions",
       flex: 1,
       cellRenderer: (params) => (
         <div className="table-actions">
@@ -134,11 +163,11 @@ export default function ProductionPage() {
             }}
             disabled={deleteProductionMutation.isPending}
           >
-            {deleteProductionMutation.isPending ? 'Deleting...' : 'Delete'}
+            {deleteProductionMutation.isPending ? "Deleting..." : "Delete"}
           </Button>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const handleRowClick = async (production) => {
@@ -146,12 +175,16 @@ export default function ProductionPage() {
     const response = await api.get(`/productions/${production.id}`);
     toast.success(
       <div>
-        <strong>{response.data.production_no}</strong><br/>
-        <small>Consumed: {response.data.inputs.map(i =>
-          `${i.quantity} ${i.unit_of_measure} ${i.item_name}`
-        ).join(', ')}</small>
+        <strong>{response.data.production_no}</strong>
+        <br />
+        <small>
+          Consumed:{" "}
+          {response.data.inputs
+            .map((i) => `${i.quantity} ${i.unit_of_measure} ${i.item_name}`)
+            .join(", ")}
+        </small>
       </div>,
-      { duration: 5000 }
+      { duration: 5000 },
     );
   };
 
@@ -160,7 +193,9 @@ export default function ProductionPage() {
       <div className="page-header">
         <div>
           <h1>Production</h1>
-          <p className="page-subtitle">Record manufacturing and track production output</p>
+          <p className="page-subtitle">
+            Record manufacturing and track production output
+          </p>
         </div>
         <Button variant="primary" onClick={handleNew}>
           + Record Production
@@ -175,13 +210,13 @@ export default function ProductionPage() {
       ) : isError ? (
         <div className="error-state">
           <p>Error loading production records. Please try again.</p>
-          <p>{error?.message || 'Unknown error occurred'}</p>
+          <p>{error?.message || "Unknown error occurred"}</p>
         </div>
       ) : (
         <>
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+              <div className="stat-icon stat-icon-gradient-purple">
                 <ClipboardList size={24} color="white" />
               </div>
               <div className="stat-content">
@@ -192,35 +227,44 @@ export default function ProductionPage() {
             </div>
 
             <div className="stat-card">
-              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
+              <div className="stat-icon stat-icon-gradient-green">
                 <Factory size={24} color="white" />
               </div>
               <div className="stat-content">
                 <div className="stat-label">This Month</div>
                 <div className="stat-value">
-                  {productions.filter(p => {
-                    const prodDate = new Date(p.production_date);
-                    const now = new Date();
-                    return prodDate.getMonth() === now.getMonth() && prodDate.getFullYear() === now.getFullYear();
-                  }).length}
+                  {
+                    productions.filter((p) => {
+                      const prodDate = new Date(p.production_date);
+                      const now = new Date();
+                      return (
+                        prodDate.getMonth() === now.getMonth() &&
+                        prodDate.getFullYear() === now.getFullYear()
+                      );
+                    }).length
+                  }
                 </div>
                 <div className="stat-subtitle">Productions</div>
               </div>
             </div>
 
             <div className="stat-card">
-              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
+              <div className="stat-icon stat-icon-gradient-orange">
                 <Calendar size={24} color="white" />
               </div>
               <div className="stat-content">
                 <div className="stat-label">This Week</div>
                 <div className="stat-value">
-                  {productions.filter(p => {
-                    const prodDate = new Date(p.production_date);
-                    const now = new Date();
-                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    return prodDate >= weekAgo;
-                  }).length}
+                  {
+                    productions.filter((p) => {
+                      const prodDate = new Date(p.production_date);
+                      const now = new Date();
+                      const weekAgo = new Date(
+                        now.getTime() - 7 * 24 * 60 * 60 * 1000,
+                      );
+                      return prodDate >= weekAgo;
+                    }).length
+                  }
                 </div>
                 <div className="stat-subtitle">Productions</div>
               </div>
@@ -240,7 +284,7 @@ export default function ProductionPage() {
               {searchTerm && (
                 <button
                   className="search-clear"
-                  onClick={() => setSearchTerm('')}
+                  onClick={() => setSearchTerm("")}
                   aria-label="Clear search"
                 >
                   ×
@@ -252,41 +296,42 @@ export default function ProductionPage() {
             </span>
           </div>
 
-          {/* Desktop view - AG Grid */}
-          <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
-            <AgGridReact
-              rowData={filteredProductions}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                resizable: true,
-                sortable: false,
-                filter: false
+          {isMobile ? (
+            <CompactProductionCardView
+              productions={filteredProductions}
+              onEdit={handleEditProduction}
+              onDelete={(id) => {
+                const prod = productions.find((p) => p.id === id);
+                if (prod) handleDeleteProduction(prod);
               }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
             />
-          </div>
+          ) : (
+            <>
+              <div className="ag-theme-quartz ag-grid-container">
+                <AgGridReact
+                  rowData={filteredProductions}
+                  columnDefs={columnDefs}
+                  defaultColDef={{
+                    resizable: true,
+                    sortable: false,
+                    filter: false,
+                  }}
+                  pagination={true}
+                  paginationPageSize={20}
+                  paginationPageSizeSelector={[10, 20, 50, 100]}
+                  rowSelection={{ mode: "singleRow" }}
+                />
+              </div>
 
-          <div className="mobile-production-list">
-            {filteredProductions.map((production) => (
-              <ProductionCard
-                key={production.id}
-                production={production}
-                onEdit={handleEditProduction}
-                onDelete={handleDeleteProduction}
-              />
-            ))}
-          </div>
-
-          {filteredProductions.length === 0 && (
-            <div className="no-results">
-              <p>No productions found matching "{searchTerm}"</p>
-              <Button variant="secondary" onClick={() => setSearchTerm('')}>
-                Clear Search
-              </Button>
-            </div>
+              {filteredProductions.length === 0 && searchTerm && (
+                <div className="no-results">
+                  <p>No productions found matching "{searchTerm}"</p>
+                  <Button variant="secondary" onClick={() => setSearchTerm("")}>
+                    Clear Search
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </>
       )}
@@ -307,8 +352,8 @@ export default function ProductionPage() {
             setEditingProduction(null);
           }}
           onSuccess={() => {
-            queryClient.invalidateQueries(['productions']);
-            queryClient.invalidateQueries(['items']);
+            queryClient.invalidateQueries(["productions"]);
+            queryClient.invalidateQueries(["items"]);
             setIsModalOpen(false);
             setEditingProduction(null);
           }}
@@ -320,62 +365,93 @@ export default function ProductionPage() {
 
 function ProductionForm({ production, onClose, onSuccess }) {
   const isEdit = !!production;
-  const [selectedBOMId, setSelectedBOMId] = useState('');
+  const [selectedBOMId, setSelectedBOMId] = useState("");
   const [formData, setFormData] = useState({
-    output_item_id: production?.output_item_id || '',
-    output_quantity: production?.output_quantity || '',
-    warehouse_id: production?.finished_goods_warehouse_id || '',
-    raw_materials_warehouse_id: production?.raw_materials_warehouse_id || '',
-    production_date: production?.production_date || new Date().toISOString().split('T')[0],
-    remarks: production?.remarks || ''
+    output_item_id: production?.output_item_id || "",
+    output_quantity: production?.output_quantity || "",
+    warehouse_id: production?.finished_goods_warehouse_id || "",
+    raw_materials_warehouse_id: production?.raw_materials_warehouse_id || "",
+    production_date:
+      production?.production_date || new Date().toISOString().split("T")[0],
+    remarks: production?.remarks || "",
+    overhead_cost: production?.overhead_cost || "",
   });
 
   useEffect(() => {
     if (production) {
       setFormData({
-        output_item_id: production.output_item_id || '',
-        output_quantity: production.output_quantity || '',
-        warehouse_id: production.finished_goods_warehouse_id || '',
-        raw_materials_warehouse_id: production.raw_materials_warehouse_id || '',
-        production_date: production.production_date || new Date().toISOString().split('T')[0],
-        remarks: production.remarks || ''
+        output_item_id: production.output_item_id || "",
+        output_quantity: production.output_quantity || "",
+        warehouse_id: production.finished_goods_warehouse_id || "",
+        raw_materials_warehouse_id: production.raw_materials_warehouse_id || "",
+        production_date:
+          production.production_date || new Date().toISOString().split("T")[0],
+        remarks: production.remarks || "",
+        overhead_cost: production.overhead_cost || "",
       });
     }
   }, [production?.id]);
 
   const [calculatedInputItems, setCalculatedInputItems] = useState([]);
 
+  const { formatCurrency } = useSettings();
+  const { errors, validate, clearErrors } = useFormValidation(productionSchema);
+
   // Fetch BOMs
   const { data: boms = [], isLoading: isLoadingBoms } = useQuery({
-    queryKey: ['boms'],
+    queryKey: ["boms"],
     queryFn: async () => {
-      const response = await api.get('/boms');
-      return response.data.filter(b => b.is_active);
-    }
+      const response = await api.get("/boms");
+      return response.data.filter((b) => b.is_active);
+    },
   });
 
   // Fetch items
   const { data: items = [], isLoading: isLoadingItems } = useQuery({
-    queryKey: ['items'],
+    queryKey: ["items"],
     queryFn: async () => {
-      const response = await api.get('/inventory/items');
+      const response = await api.get("/inventory/items");
       return response.data.data;
-    }
+    },
   });
 
   // Fetch warehouses
   const { data: warehouses = [], isLoading: isLoadingWarehouses } = useQuery({
-    queryKey: ['warehouses'],
+    queryKey: ["warehouses"],
     queryFn: async () => {
-      const response = await api.get('/inventory/warehouses');
+      const response = await api.get("/inventory/warehouses");
       return response.data.data;
-    }
+    },
   });
+
+  // Live cost preview (must be after items query)
+  const costPreview = useMemo(() => {
+    const qty = parseFloat(formData.output_quantity) || 0;
+    const overhead = parseFloat(formData.overhead_cost) || 0;
+    if (calculatedInputItems.length === 0 && overhead === 0) return null;
+    let materialCost = 0;
+    for (const input of calculatedInputItems) {
+      const item = items?.find((i) => i.id === parseInt(input.item_id));
+      if (item) {
+        materialCost += (parseFloat(item.standard_cost) || 0) * input.quantity;
+      }
+    }
+    const totalCost = materialCost + overhead;
+    const costPerUnit = qty > 0 ? totalCost / qty : 0;
+    return { materialCost, overhead, totalCost, costPerUnit };
+  }, [
+    calculatedInputItems,
+    formData.overhead_cost,
+    formData.output_quantity,
+    items,
+  ]);
 
   // When a finished good is selected, check for existing BOMs
   useEffect(() => {
     if (formData.output_item_id) {
-      const associatedBOMs = boms.filter(bom => bom.finished_item_id === parseInt(formData.output_item_id));
+      const associatedBOMs = boms.filter(
+        (bom) => bom.finished_item_id === parseInt(formData.output_item_id),
+      );
 
       if (associatedBOMs.length > 0) {
         // Auto-select the first BOM if available
@@ -387,24 +463,25 @@ function ProductionForm({ production, onClose, onSuccess }) {
           <div>
             <strong>No BOM found for this product.</strong>
             <div>Please create a BOM first in the BOM module.</div>
-            <div style={{ marginTop: '8px' }}>
+            <div className="mt-xs">
               <button
-                onClick={() => window.location.href = '/bom'}
+                onClick={() => (window.location.href = "/bom")}
                 style={{
-                  background: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  marginRight: '8px'
+                  background: "#007bff",
+                  color: "white",
+                  border: "none",
+                  padding: "4px 8px",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  marginRight: "8px",
                 }}
               >
                 Go to BOM
               </button>
-              <small style={{ color: '#6c757d' }}>
-                (You can return to complete the production after creating the BOM)
+              <small style={{ color: "#6c757d" }}>
+                (You can return to complete the production after creating the
+                BOM)
               </small>
             </div>
           </div>
@@ -412,12 +489,17 @@ function ProductionForm({ production, onClose, onSuccess }) {
 
         toast.error(message, {
           duration: 10000,
-          style: { background: '#fff3cd', color: '#856404', border: '1px solid #ffeaa7', maxWidth: '400px' }
+          style: {
+            background: "#fff3cd",
+            color: "#856404",
+            border: "1px solid #ffeaa7",
+            maxWidth: "400px",
+          },
         });
       }
     } else {
       // Reset BOM if no output item is selected
-      setSelectedBOMId('');
+      setSelectedBOMId("");
       setCalculatedInputItems([]);
     }
   }, [formData.output_item_id, boms]);
@@ -432,13 +514,13 @@ function ProductionForm({ production, onClose, onSuccess }) {
 
           // Auto-populate output item if not already set
           if (!formData.output_item_id) {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
-              output_item_id: bomDetails.finished_item_id
+              output_item_id: bomDetails.finished_item_id,
             }));
           }
         } catch (error) {
-          toast.error('Failed to load BOM details');
+          toast.error("Failed to load BOM details");
         }
       };
 
@@ -456,19 +538,21 @@ function ProductionForm({ production, onClose, onSuccess }) {
 
           // Calculate required quantities based on production quantity
           const quantity = parseFloat(formData.output_quantity) || 0;
-          const calculatedItems = bomDetails.items.map(item => ({
+          const calculatedItems = bomDetails.items.map((item) => ({
             item_id: item.item_id,
-            quantity: item.quantity * quantity // Scale by production quantity
+            quantity: item.quantity * quantity, // Scale by production quantity
           }));
 
           setCalculatedInputItems(calculatedItems);
 
           // Only show toast when we have a valid quantity (not just when BOM is selected)
           if (quantity > 0) {
-            toast.success(`Calculated materials for ${quantity} units of ${bomDetails.finished_item_name}`);
+            toast.success(
+              `Calculated materials for ${quantity} units of ${bomDetails.finished_item_name}`,
+            );
           }
         } catch (error) {
-          toast.error('Failed to load BOM details for calculation');
+          toast.error("Failed to load BOM details for calculation");
           setCalculatedInputItems([]);
         }
       };
@@ -482,35 +566,40 @@ function ProductionForm({ production, onClose, onSuccess }) {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      return api.post('/productions', data);
+      return api.post("/productions", data);
     },
     onSuccess: () => {
-      toast.success('Production recorded successfully!');
+      toast.success("Production recorded successfully!");
       onSuccess();
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to record production');
-    }
+      toast.error(error.response?.data?.error || "Failed to record production");
+    },
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      clearErrors();
+    }
   };
 
   // Validate stock availability before submitting with warehouse-specific stock check
   const validateStockBeforeSubmission = async (data) => {
     try {
       // Fetch stock balances for the specific warehouse where production will happen
-      const stockBalancesResponse = await api.get('/inventory/stock-movements');
+      const stockBalancesResponse = await api.get("/inventory/stock-movements");
       // Actually, let's fetch stock balances more specifically
       // For now, we'll fetch all items but also get warehouse-specific stock if possible
 
       // Get fresh items data
-      const itemsResponse = await api.get('/inventory/items');
+      const itemsResponse = await api.get("/inventory/items");
       const freshItems = itemsResponse.data.data;
 
       // Since we don't have a direct endpoint for warehouse-specific stock,
@@ -519,7 +608,7 @@ function ProductionForm({ production, onClose, onSuccess }) {
 
       // For now, let's try to get stock data by warehouse by using stock movements
       // We'll fetch stock balances which should have warehouse-specific data
-      const balancesResponse = await api.get('/inventory/stock-movements');
+      const balancesResponse = await api.get("/inventory/stock-movements");
 
       // However, to properly validate by warehouse, we need to check against the specific warehouse
       // Since the backend already has the correct validation, let's implement a more direct approach
@@ -535,7 +624,9 @@ function ProductionForm({ production, onClose, onSuccess }) {
         // Since we don't have a direct warehouse-balance endpoint, let's validate differently
 
         // Get the specific item details with warehouse stock
-        const itemBalanceResponse = await api.get(`/inventory/items/${inputItem.item_id}`);
+        const itemBalanceResponse = await api.get(
+          `/inventory/items/${inputItem.item_id}`,
+        );
         const itemDetails = itemBalanceResponse.data;
 
         // If itemDetails has warehouse-specific info, check against the production warehouse
@@ -545,21 +636,22 @@ function ProductionForm({ production, onClose, onSuccess }) {
         // If itemDetails has warehouse balances, check the specific raw materials warehouse
         if (itemDetails.warehouse_balances) {
           // Use raw materials warehouse if specified, otherwise use finished goods warehouse
-          const materialsWarehouseId = data.raw_materials_warehouse_id || data.warehouse_id;
+          const materialsWarehouseId =
+            data.raw_materials_warehouse_id || data.warehouse_id;
           const warehouseBalance = itemDetails.warehouse_balances.find(
-            balance => balance.warehouse_id === materialsWarehouseId
+            (balance) => balance.warehouse_id === materialsWarehouseId,
           );
           availableStock = warehouseBalance ? warehouseBalance.quantity : 0;
         }
 
         if (availableStock < inputItem.quantity) {
-          const item = freshItems.find(i => i.id === inputItem.item_id);
+          const item = freshItems.find((i) => i.id === inputItem.item_id);
           if (item) {
             insufficientMaterials.push({
               name: item.item_name,
               available: availableStock,
               required: inputItem.quantity,
-              uom: item.unit_of_measure
+              uom: item.unit_of_measure,
             });
           }
         }
@@ -567,20 +659,23 @@ function ProductionForm({ production, onClose, onSuccess }) {
 
       return insufficientMaterials;
     } catch (error) {
-      console.error('Error fetching warehouse-specific stock data for validation:', error);
+      console.error(
+        "Error fetching warehouse-specific stock data for validation:",
+        error,
+      );
       // Fallback: Use the original validation method
-      const itemsResponse = await api.get('/inventory/items');
+      const itemsResponse = await api.get("/inventory/items");
       const freshItems = itemsResponse.data.data;
 
       const insufficientMaterials = [];
       for (const inputItem of data.input_items) {
-        const item = freshItems.find(i => i.id === inputItem.item_id);
+        const item = freshItems.find((i) => i.id === inputItem.item_id);
         if (item && item.current_stock < inputItem.quantity) {
           insufficientMaterials.push({
             name: item.item_name,
             available: item.current_stock,
             required: inputItem.quantity,
-            uom: item.unit_of_measure
+            uom: item.unit_of_measure,
           });
         }
       }
@@ -591,20 +686,28 @@ function ProductionForm({ production, onClose, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!validate(formData)) return;
+
     // Use calculated input items when BOM is selected
     let inputItemsToUse = [];
     if (selectedBOMId) {
       inputItemsToUse = calculatedInputItems;
     } else {
-      toast.error('Please select a product with a BOM to proceed with production.');
+      toast.error(
+        "Please select a product with a BOM to proceed with production.",
+      );
       return;
     }
 
     // Validate input items
-    const validInputItems = inputItemsToUse.filter(i => i.item_id && i.quantity > 0);
+    const validInputItems = inputItemsToUse.filter(
+      (i) => i.item_id && i.quantity > 0,
+    );
 
     if (validInputItems.length === 0) {
-      toast.error('No materials calculated from BOM. Please check the BOM configuration.');
+      toast.error(
+        "No materials calculated from BOM. Please check the BOM configuration.",
+      );
       return;
     }
 
@@ -613,14 +716,17 @@ function ProductionForm({ production, onClose, onSuccess }) {
       output_item_id: parseInt(formData.output_item_id),
       output_quantity: parseFloat(formData.output_quantity),
       warehouse_id: parseInt(formData.warehouse_id),
-      raw_materials_warehouse_id: formData.raw_materials_warehouse_id ? parseInt(formData.raw_materials_warehouse_id) : null,
+      raw_materials_warehouse_id: formData.raw_materials_warehouse_id
+        ? parseInt(formData.raw_materials_warehouse_id)
+        : null,
       production_date: formData.production_date,
       bom_id: selectedBOMId ? parseInt(selectedBOMId) : null,
       remarks: formData.remarks || null,
-      input_items: validInputItems.map(item => ({
+      overhead_cost: parseFloat(formData.overhead_cost) || 0,
+      input_items: validInputItems.map((item) => ({
         item_id: parseInt(item.item_id),
-        quantity: parseFloat(item.quantity)
-      }))
+        quantity: parseFloat(item.quantity),
+      })),
     };
 
     // Validate stock availability if using BOM
@@ -631,14 +737,17 @@ function ProductionForm({ production, onClose, onSuccess }) {
         const message = (
           <div>
             <strong>Insufficient stock for the following materials:</strong>
-            <ul style={{ textAlign: 'left', marginTop: '8px' }}>
+            <ul style={{ textAlign: "left", marginTop: "8px" }}>
               {insufficientMaterials.map((mat, idx) => (
                 <li key={idx}>
-                  <strong>{mat.name}</strong>: Available {mat.available} {mat.uom}, Required {mat.required} {mat.uom}
+                  <strong>{mat.name}</strong>: Available {mat.available}{" "}
+                  {mat.uom}, Required {mat.required} {mat.uom}
                 </li>
               ))}
             </ul>
-            <div style={{ marginTop: '8px' }}>Please adjust quantities or increase stock before production.</div>
+            <div className="mt-xs">
+              Please adjust quantities or increase stock before production.
+            </div>
           </div>
         );
 
@@ -651,11 +760,13 @@ function ProductionForm({ production, onClose, onSuccess }) {
   };
 
   // Get raw materials and finished goods
-  const rawMaterials = items.filter(i => i.is_raw_material);
-  const finishedGoods = items.filter(i => i.is_finished_good);
+  const rawMaterials = items.filter((i) => i.is_raw_material);
+  const finishedGoods = items.filter((i) => i.is_finished_good);
 
   // Get selected output item for display
-  const selectedOutputItem = items.find(i => i.id === parseInt(formData.output_item_id));
+  const selectedOutputItem = items.find(
+    (i) => i.id === parseInt(formData.output_item_id),
+  );
 
   return (
     <form onSubmit={handleSubmit} className="production-form">
@@ -669,9 +780,9 @@ function ProductionForm({ production, onClose, onSuccess }) {
             type="searchable-select"
             value={formData.output_item_id}
             onChange={handleChange}
-            options={finishedGoods.map(item => ({
+            options={finishedGoods.map((item) => ({
               value: item.id,
-              label: `${item.item_code} - ${item.item_name}`
+              label: `${item.item_code} - ${item.item_name}`,
             }))}
             placeholder="Search finished goods..."
             required
@@ -698,9 +809,9 @@ function ProductionForm({ production, onClose, onSuccess }) {
             type="searchable-select"
             value={formData.raw_materials_warehouse_id}
             onChange={handleChange}
-            options={warehouses.map(wh => ({
+            options={warehouses.map((wh) => ({
               value: wh.id,
-              label: `${wh.warehouse_code} - ${wh.warehouse_name}`
+              label: `${wh.warehouse_code} - ${wh.warehouse_name}`,
             }))}
             placeholder="Select warehouse for raw materials..."
             required
@@ -713,9 +824,9 @@ function ProductionForm({ production, onClose, onSuccess }) {
             type="searchable-select"
             value={formData.warehouse_id}
             onChange={handleChange}
-            options={warehouses.map(wh => ({
+            options={warehouses.map((wh) => ({
               value: wh.id,
-              label: `${wh.warehouse_code} - ${wh.warehouse_name}`
+              label: `${wh.warehouse_code} - ${wh.warehouse_name}`,
             }))}
             placeholder="Select warehouse for finished goods..."
             required
@@ -744,41 +855,66 @@ function ProductionForm({ production, onClose, onSuccess }) {
         {selectedBOMId ? (
           <div className="calculated-materials-summary">
             <div className="materials-header">
-              <p>Based on BOM and production quantity of <strong>{formData.output_quantity}</strong> units:</p>
+              <p>
+                Based on BOM and production quantity of{" "}
+                <strong>{formData.output_quantity}</strong> units:
+              </p>
               {formData.raw_materials_warehouse_id && (
                 <p className="warehouse-note">
                   Stock checked from warehouse:
-                  {warehouses.find(w => w.id === parseInt(formData.raw_materials_warehouse_id))?.warehouse_name || 'N/A'}
+                  {warehouses.find(
+                    (w) =>
+                      w.id === parseInt(formData.raw_materials_warehouse_id),
+                  )?.warehouse_name || "N/A"}
                 </p>
               )}
             </div>
             {calculatedInputItems.length > 0 ? (
               <ul className="materials-list">
                 {calculatedInputItems.map((input, index) => {
-                  const item = items.find(i => i.id === parseInt(input.item_id));
+                  const item = items.find(
+                    (i) => i.id === parseInt(input.item_id),
+                  );
                   if (!item) return null;
 
                   const stockAvailable = item.current_stock || 0;
                   const isSufficient = stockAvailable >= input.quantity;
 
                   return (
-                    <li key={index} className={`material-item ${isSufficient ? 'sufficient' : 'insufficient'}`}>
+                    <li
+                      key={index}
+                      className={`material-item ${isSufficient ? "sufficient" : "insufficient"}`}
+                    >
                       <div className="material-info">
                         <div className="material-name-quantity">
-                          <span className="material-name">{item.item_code} - {item.item_name}</span>
+                          <span className="material-name">
+                            {item.item_code} - {item.item_name}
+                          </span>
                           <span className="material-quantity">
-                            {parseFloat(input.quantity).toFixed(3)} {item.unit_of_measure}
+                            {parseFloat(input.quantity).toFixed(3)}{" "}
+                            {item.unit_of_measure}
                           </span>
                         </div>
                         <div className="material-stock-info">
-                          <span className={isSufficient ? 'stock-sufficient' : 'stock-insufficient'}>
+                          <span
+                            className={
+                              isSufficient
+                                ? "stock-sufficient"
+                                : "stock-insufficient"
+                            }
+                          >
                             Stock: {stockAvailable} {item.unit_of_measure}
                           </span>
-                            {!isSufficient && (
-                              <span className="insufficient-warning">
-                                <AlertTriangle size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />Insufficient stock
-                              </span>
-                            )}
+                          {!isSufficient && (
+                            <span className="insufficient-warning">
+                              <AlertTriangle
+                                size={14}
+                                className="icon-valign-middle"
+                                style={{ marginRight: "4px" }}
+                              />
+                              Insufficient stock
+                            </span>
+                          )}
                         </div>
                       </div>
                     </li>
@@ -786,15 +922,52 @@ function ProductionForm({ production, onClose, onSuccess }) {
                 })}
               </ul>
             ) : (
-              <p className="no-materials">No materials calculated yet. Enter a production quantity.</p>
+              <p className="no-materials">
+                No materials calculated yet. Enter a production quantity.
+              </p>
             )}
           </div>
         ) : (
           <p className="no-bom-message">
-            Please select a finished good that has a BOM defined, or create a BOM first.
+            Please select a finished good that has a BOM defined, or create a
+            BOM first.
           </p>
         )}
       </div>
+
+      <FormInput
+        label="Overhead Cost (PKR)"
+        name="overhead_cost"
+        type="number"
+        step="0.01"
+        min="0"
+        value={formData.overhead_cost}
+        onChange={handleChange}
+        placeholder="Electricity, labour, machine costs..."
+        tooltip="Optional overhead expenses for this production run. Added to material cost to calculate cost per unit."
+      />
+
+      {costPreview && (
+        <div className="cost-preview-box">
+          <h4 className="cost-preview-title">Cost Breakdown</h4>
+          <div className="cost-preview-row">
+            <span>Material Cost:</span>
+            <span>{formatCurrency(costPreview.materialCost)}</span>
+          </div>
+          <div className="cost-preview-row">
+            <span>Overhead Cost:</span>
+            <span>{formatCurrency(costPreview.overhead)}</span>
+          </div>
+          <div className="cost-preview-row cost-preview-total">
+            <span>Total Cost:</span>
+            <span>{formatCurrency(costPreview.totalCost)}</span>
+          </div>
+          <div className="cost-preview-row cost-preview-per-unit">
+            <span>Cost per Unit:</span>
+            <span>{formatCurrency(costPreview.costPerUnit)}</span>
+          </div>
+        </div>
+      )}
 
       <FormInput
         label="Remarks"

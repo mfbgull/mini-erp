@@ -1,50 +1,54 @@
-import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
-import { useMobileDetection } from '../../hooks/useMobileDetection';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { AgGridReact } from 'ag-grid-react';
-import api from '../../utils/api';
-import CompactStockByWarehouseCardView from '../../components/common/CompactStockByWarehouseCard';
-import ItemPreview from './ItemPreview';
-import SearchableSelect from '../../components/common/SearchableSelect';
-import './StockByWarehousePage.css';
+import { useState, useMemo } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
+import { useQuery } from "@tanstack/react-query";
+import { AgGridReact } from "ag-grid-react";
+
+import ItemPreview from "./ItemPreview";
+import CompactStockByWarehouseCardView from "../../components/common/CompactStockByWarehouseCard";
+import SearchableSelect from "../../components/common/SearchableSelect";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
+import api from "../../utils/api";
+import "./StockByWarehousePage.css";
 
 export default function StockByWarehousePage() {
-  const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
   const navigate = useNavigate();
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | number>('');
-  const [quantityFilter, setQuantityFilter] = useState<'all' | 'zero' | 'nonzero'>('nonzero');
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<
+    string | number
+  >("");
+  const [quantityFilter, setQuantityFilter] = useState<
+    "all" | "zero" | "nonzero"
+  >("nonzero");
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
 
   // Fetch warehouses for searchable select
   const { data: warehouses = [] } = useQuery({
-    queryKey: ['warehouses'],
+    queryKey: ["warehouses"],
     queryFn: async () => {
-      const response = await api.get('/inventory/warehouses');
+      const response = await api.get("/inventory/warehouses");
       return response.data.data;
-    }
+    },
   });
 
   const warehouseOptions = warehouses.map((wh: Warehouse) => ({
     value: wh.id,
-    label: `${wh.warehouse_code} - ${wh.warehouse_name}`
+    label: `${wh.warehouse_code} - ${wh.warehouse_name}`,
   }));
 
   const { data: stockBalances = [], isLoading } = useQuery({
-    queryKey: ['stock-balances'],
+    queryKey: ["stock-balances"],
     queryFn: async () => {
-      const response = await api.get('/inventory/stock-balances');
+      const response = await api.get("/inventory/stock-balances");
       // Filter out items with zero or negative quantity
-      return response.data.filter(item => item.quantity > 0);
-    }
+      return response.data.filter((item) => item.quantity > 0);
+    },
   });
 
   // Fetch item details when a card is clicked
   const { data: selectedItem } = useQuery({
-    queryKey: ['item', selectedItemId],
+    queryKey: ["item", selectedItemId],
     queryFn: async () => {
       if (!selectedItemId) return null;
       const response = await api.get(`/inventory/items/${selectedItemId}`);
@@ -67,7 +71,7 @@ export default function StockByWarehousePage() {
         is_manufactured: item.is_manufactured,
       };
     },
-    enabled: !!selectedItemId
+    enabled: !!selectedItemId,
   });
 
   const filteredStockBalances = useMemo(() => {
@@ -75,16 +79,16 @@ export default function StockByWarehousePage() {
 
     // Filter by warehouse if selected
     if (selectedWarehouseId) {
-      result = result.filter(item =>
-        item.warehouse_id === selectedWarehouseId
+      result = result.filter(
+        (item) => item.warehouse_id === selectedWarehouseId,
       );
     }
 
     // Filter by quantity
-    if (quantityFilter === 'zero') {
-      result = result.filter(item => item.quantity === 0);
-    } else if (quantityFilter === 'nonzero') {
-      result = result.filter(item => item.quantity > 0);
+    if (quantityFilter === "zero") {
+      result = result.filter((item) => item.quantity === 0);
+    } else if (quantityFilter === "nonzero") {
+      result = result.filter((item) => item.quantity > 0);
     }
 
     return result;
@@ -92,104 +96,119 @@ export default function StockByWarehousePage() {
 
   // Calculate statistics
   const stats = {
-    totalStockValue: stockBalances.reduce((sum, item) =>
-      sum + (parseFloat(item.quantity || 0)), 0
+    totalStockValue: stockBalances.reduce(
+      (sum, item) => sum + parseFloat(item.quantity || 0),
+      0,
     ),
-    totalItems: new Set(stockBalances.map(item => item.item_id)).size,
-    totalWarehouses: new Set(stockBalances.map(item => item.warehouse_id)).size,
-    warehouseWithMostStock: stockBalances.reduce((max, item) =>
-      item.quantity > max.quantity ? item : max
-    , { warehouse_name: 'None', quantity: 0 }),
+    totalItems: new Set(stockBalances.map((item) => item.item_id)).size,
+    totalWarehouses: new Set(stockBalances.map((item) => item.warehouse_id))
+      .size,
+    warehouseWithMostStock: stockBalances.reduce(
+      (max, item) => (item.quantity > max.quantity ? item : max),
+      { warehouse_name: "None", quantity: 0 },
+    ),
     multiWarehouseItems: new Set(
       stockBalances
-        .map(item => item.item_id)
-        .filter((id, index, arr) => arr.indexOf(id) !== index)
+        .map((item) => item.item_id)
+        .filter((id, index, arr) => arr.indexOf(id) !== index),
     ).size,
-    averageQuantity: stockBalances.length > 0
-      ? stockBalances.reduce((sum, item) => sum + parseFloat(item.quantity || 0), 0) / stockBalances.length
-      : 0
+    averageQuantity:
+      stockBalances.length > 0
+        ? stockBalances.reduce(
+            (sum, item) => sum + parseFloat(item.quantity || 0),
+            0,
+          ) / stockBalances.length
+        : 0,
   };
 
   // Export to CSV
   const handleExport = () => {
     if (stockBalances.length === 0) {
-      toast.error('No stock data to export');
+      toast.error("No stock data to export");
       return;
     }
 
     const headers = [
-      'Item Code', 'Item Name', 'Warehouse Code', 'Warehouse Name',
-      'Quantity', 'Unit of Measure'
+      "Item Code",
+      "Item Name",
+      "Warehouse Code",
+      "Warehouse Name",
+      "Quantity",
+      "Unit of Measure",
     ];
 
-    const rows = stockBalances.map(item => [
+    const rows = stockBalances.map((item) => [
       item.item_code,
       item.item_name,
       item.warehouse_code,
       item.warehouse_name,
       item.quantity,
-      item.unit_of_measure
+      item.unit_of_measure,
     ]);
 
     const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n');
+      headers.join(","),
+      ...rows.map((row) => row.join(",")),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `stock-by-warehouse-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `stock-by-warehouse-${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    toast.success('Stock data exported successfully!');
+    toast.success("Stock data exported successfully!");
   };
 
   const columnDefs = [
     {
-      headerName: 'Item Code',
-      field: 'item_code',
+      headerName: "Item Code",
+      field: "item_code",
       sortable: true,
       filter: true,
-      flex: 1
-    },
-    {
-      headerName: 'Item Name',
-      field: 'item_name',
-      sortable: true,
-      filter: true,
-      flex: 2
-    },
-    {
-      headerName: 'Warehouse Code',
-      field: 'warehouse_code',
-      sortable: true,
-      filter: true,
-      flex: 1
-    },
-    {
-      headerName: 'Warehouse Name',
-      field: 'warehouse_name',
-      sortable: true,
-      filter: true,
-      flex: 1.5
-    },
-    {
-      headerName: 'Quantity',
-      field: 'quantity',
-      sortable: true,
-      filter: 'agNumberColumnFilter',
       flex: 1,
-      valueFormatter: params => `${parseFloat(params.value).toFixed(2)} ${params.data.unit_of_measure}`,
-      cellStyle: params => ({
-        fontWeight: 'bold',
-        color: params.value > 0 ? 'var(--success)' : 'var(--neutral-400)'
-      })
-    }
+    },
+    {
+      headerName: "Item Name",
+      field: "item_name",
+      sortable: true,
+      filter: true,
+      flex: 2,
+    },
+    {
+      headerName: "Warehouse Code",
+      field: "warehouse_code",
+      sortable: true,
+      filter: true,
+      flex: 1,
+    },
+    {
+      headerName: "Warehouse Name",
+      field: "warehouse_name",
+      sortable: true,
+      filter: true,
+      flex: 1.5,
+    },
+    {
+      headerName: "Quantity",
+      field: "quantity",
+      sortable: true,
+      filter: "agNumberColumnFilter",
+      flex: 1,
+      valueFormatter: (params) =>
+        `${parseFloat(params.value).toFixed(2)} ${params.data.unit_of_measure}`,
+      cellStyle: (params) => ({
+        fontWeight: "bold",
+        color: params.value > 0 ? "var(--success)" : "var(--neutral-400)",
+      }),
+    },
   ];
 
   return (
@@ -197,16 +216,16 @@ export default function StockByWarehousePage() {
       <div className="page-header">
         <div>
           <h1>Stock by Warehouse</h1>
-          <p className="page-subtitle">View current stock levels for each item by warehouse</p>
+          <p className="page-subtitle">
+            View current stock levels for each item by warehouse
+          </p>
         </div>
       </div>
 
       {/* Summary Statistics Cards */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            📦
-          </div>
+          <div className="stat-icon stat-icon-gradient-purple">📦</div>
           <div className="stat-content">
             <div className="stat-label">Total Items</div>
             <div className="stat-value">{stats.totalItems}</div>
@@ -215,20 +234,18 @@ export default function StockByWarehousePage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            📊
-          </div>
+          <div className="stat-icon stat-icon-gradient-pink">📊</div>
           <div className="stat-content">
             <div className="stat-label">Total Stock</div>
-            <div className="stat-value">{parseFloat(stats.totalStockValue).toFixed(2)}</div>
+            <div className="stat-value">
+              {parseFloat(stats.totalStockValue).toFixed(2)}
+            </div>
             <div className="stat-subtitle">Aggregate quantity</div>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            🏭
-          </div>
+          <div className="stat-icon stat-icon-gradient-blue">🏭</div>
           <div className="stat-content">
             <div className="stat-label">Warehouses</div>
             <div className="stat-value">{stats.totalWarehouses}</div>
@@ -237,24 +254,21 @@ export default function StockByWarehousePage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f5af19 0%, #12cfa9 100%)' }}>
-            🔝
-          </div>
+          <div className="stat-icon stat-icon-gradient-orange">🔝</div>
           <div className="stat-content">
             <div className="stat-label">Largest Stock</div>
-            <div className="stat-value" style={{ fontSize: '1.4rem' }}>
+            <div className="stat-value text-lg">
               {stats.warehouseWithMostStock.warehouse_name}
             </div>
             <div className="stat-subtitle">
-              {parseFloat(stats.warehouseWithMostStock.quantity).toFixed(2)} units
+              {parseFloat(stats.warehouseWithMostStock.quantity).toFixed(2)}{" "}
+              units
             </div>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
-            📁
-          </div>
+          <div className="stat-icon stat-icon-gradient-green">📁</div>
           <div className="stat-content">
             <div className="stat-label">Multi-Warehouse Items</div>
             <div className="stat-value">{stats.multiWarehouseItems}</div>
@@ -263,12 +277,12 @@ export default function StockByWarehousePage() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #5436ff 0%, #667eea 100%)' }}>
-            📈
-          </div>
+          <div className="stat-icon stat-icon-gradient-indigo">📈</div>
           <div className="stat-content">
             <div className="stat-label">Average Qty</div>
-            <div className="stat-value">{parseFloat(stats.averageQuantity).toFixed(2)}</div>
+            <div className="stat-value">
+              {parseFloat(stats.averageQuantity).toFixed(2)}
+            </div>
             <div className="stat-subtitle">Per stock line</div>
           </div>
         </div>
@@ -282,28 +296,28 @@ export default function StockByWarehousePage() {
         </button>
         <button
           className="quick-action-btn"
-          onClick={() => navigate('/inventory/stock-movements')}
+          onClick={() => navigate("/inventory/stock-movements")}
         >
           <span className="action-icon">📋</span>
           <span className="action-text">Stock Movements</span>
         </button>
         <button
           className="quick-action-btn"
-          onClick={() => navigate('/reports/stock-valuation')}
+          onClick={() => navigate("/reports/stock-valuation")}
         >
           <span className="action-icon">💰</span>
           <span className="action-text">Stock Valuation</span>
         </button>
         <button
           className="quick-action-btn"
-          onClick={() => navigate('/reports/inventory-movement')}
+          onClick={() => navigate("/reports/inventory-movement")}
         >
           <span className="action-icon">🔄</span>
           <span className="action-text">Inventory Movement</span>
         </button>
       </div>
 
-{isLoading ? (
+      {isLoading ? (
         <div className="loading">
           <div className="spinner"></div>
         </div>
@@ -317,7 +331,7 @@ export default function StockByWarehousePage() {
               options={warehouseOptions}
               placeholder="All Warehouses"
             />
-            
+
             <div className="quantity-filter-section">
               <label className="quantity-filter-label">Quantity:</label>
               <div className="quantity-filter-options">
@@ -326,8 +340,12 @@ export default function StockByWarehousePage() {
                     type="radio"
                     name="quantityFilter"
                     value="all"
-                    checked={quantityFilter === 'all'}
-                    onChange={(e) => setQuantityFilter(e.target.value as 'all' | 'zero' | 'nonzero')}
+                    checked={quantityFilter === "all"}
+                    onChange={(e) =>
+                      setQuantityFilter(
+                        e.target.value as "all" | "zero" | "nonzero",
+                      )
+                    }
                   />
                   <span>All</span>
                 </label>
@@ -336,8 +354,12 @@ export default function StockByWarehousePage() {
                     type="radio"
                     name="quantityFilter"
                     value="nonzero"
-                    checked={quantityFilter === 'nonzero'}
-                    onChange={(e) => setQuantityFilter(e.target.value as 'all' | 'zero' | 'nonzero')}
+                    checked={quantityFilter === "nonzero"}
+                    onChange={(e) =>
+                      setQuantityFilter(
+                        e.target.value as "all" | "zero" | "nonzero",
+                      )
+                    }
                   />
                   <span>Stock</span>
                 </label>
@@ -346,8 +368,12 @@ export default function StockByWarehousePage() {
                     type="radio"
                     name="quantityFilter"
                     value="zero"
-                    checked={quantityFilter === 'zero'}
-                    onChange={(e) => setQuantityFilter(e.target.value as 'all' | 'zero' | 'nonzero')}
+                    checked={quantityFilter === "zero"}
+                    onChange={(e) =>
+                      setQuantityFilter(
+                        e.target.value as "all" | "zero" | "nonzero",
+                      )
+                    }
                   />
                   <span>Zero</span>
                 </label>
@@ -364,23 +390,24 @@ export default function StockByWarehousePage() {
 
           {filteredStockBalances.length > 0 && (
             <div className="mobile-pagination-info">
-              Showing {filteredStockBalances.length} of {stockBalances.length} stock items
+              Showing {filteredStockBalances.length} of {stockBalances.length}{" "}
+              stock items
             </div>
           )}
         </>
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
+        <div className="ag-theme-quartz ag-grid-container">
           <AgGridReact
             rowData={stockBalances}
             columnDefs={columnDefs}
             defaultColDef={{
               resizable: true,
               sortable: false,
-              filter: false
+              filter: false,
             }}
             pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
           />
         </div>
       )}
