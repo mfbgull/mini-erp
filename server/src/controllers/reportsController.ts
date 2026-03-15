@@ -1441,6 +1441,281 @@ function getExpensesReport(req: Request, res: Response): void {
   }
 }
 
+
+
+function getTrialBalanceReport(req: Request, res: Response): void {
+  try {
+    const { asOfDate = new Date().toISOString().split('T')[0] } = req.query;
+
+    // Get receivables
+    const receivablesQuery = `
+      SELECT COALESCE(SUM(balance_amount), 0) as total
+      FROM invoices WHERE balance_amount > 0
+    `;
+    const receivables = db.prepare(receivablesQuery).get() as { total: number };
+
+    // Get inventory value
+    const inventoryQuery = `
+      SELECT COALESCE(SUM(sb.quantity * i.standard_cost), 0) as total
+      FROM stock_balances sb JOIN items i ON sb.item_id = i.id
+    `;
+    const inventory = db.prepare(inventoryQuery).get() as { total: number };
+
+    // Get cash
+    const cashQuery = `SELECT COALESCE(SUM(amount), 0) as total FROM payments`;
+    const cash = db.prepare(cashQuery).get() as { total: number };
+
+    // Get payables
+    const payablesQuery = `
+      SELECT COALESCE(SUM(poi.quantity * poi.unit_price - COALESCE(poi.received_quantity * poi.unit_price, 0)), 0) as total
+      FROM purchase_order_items poi JOIN purchase_orders po ON poi.po_id = po.id
+      WHERE po.status IN ('Pending', 'Ordered', 'Partially Delivered')
+    `;
+    const payables = db.prepare(payablesQuery).get() as { total: number };
+
+    // Get expenses
+    const expensesQuery = `SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE status = 'Paid'`;
+    const expenses = db.prepare(expensesQuery).get() as { total: number };
+
+    // Get revenue
+    const revenueQuery = `SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE status != 'Cancelled'`;
+    const revenue = db.prepare(revenueQuery).get() as { total: number };
+
+    const totalAssets = parseFloat(String(receivables.total || 0)) + parseFloat(String(inventory.total || 0)) + parseFloat(String(cash.total || 0));
+    const totalLiabilities = parseFloat(String(payables.total || 0));
+    const totalEquity = totalAssets - totalLiabilities;
+
+    res.json({
+      success: true,
+      data: {
+        asOfDate,
+        accounts: [
+          { accountType: 'Asset', accountName: 'Accounts Receivable', debit: parseFloat(String(receivables.total || 0)), credit: 0 },
+          { accountType: 'Asset', accountName: 'Inventory', debit: parseFloat(String(inventory.total || 0)), credit: 0 },
+          { accountType: 'Asset', accountName: 'Cash', debit: parseFloat(String(cash.total || 0)), credit: 0 },
+          { accountType: 'Liability', accountName: 'Accounts Payable', debit: 0, credit: parseFloat(String(payables.total || 0)) },
+          { accountType: 'Equity', accountName: 'Retained Earnings', debit: 0, credit: totalEquity },
+          { accountType: 'Revenue', accountName: 'Sales Revenue', debit: 0, credit: parseFloat(String(revenue.total || 0)) },
+          { accountType: 'Expense', accountName: 'Expenses', debit: parseFloat(String(expenses.total || 0)), credit: 0 }
+        ],
+        summary: {
+          totalDebits: totalAssets + parseFloat(String(expenses.total || 0)),
+          totalCredits: totalLiabilities + totalEquity + parseFloat(String(revenue.total || 0)),
+          isBalanced: Math.abs((totalAssets + parseFloat(String(expenses.total || 0))) - (totalLiabilities + totalEquity + parseFloat(String(revenue.total || 0)))) < 0.01
+        }
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching trial balance report:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch trial balance report' });
+  }
+}
+
+function getGeneralLedgerReport(req: Request, res: Response): void {
+  try {
+    const { startDate, endDate, accountId } = req.query;
+
+    let query = `
+      SELECT 
+        'Customer' as ledger_type,
+        customer_id as entity_id,
+        transaction_date as date,
+        transaction_type as type,
+        reference_no as reference,
+        debit, credit, balance, description
+      FROM customer_ledger WHERE 1=1
+    `;
+    const params: (string | number)[] = [];
+
+    if (startDate) { query += ' AND transaction_date >= ?'; params.push(startDate as string); }
+    if (endDate) { query += ' AND transaction_date <= ?'; params.push(endDate as string); }
+    if (accountId) { query += ' AND customer_id = ?'; params.push(Number(accountId)); }
+    query += ' ORDER BY transaction_date DESC';
+
+    const customerLedger = db.prepare(query).all(...params);
+
+    res.json({ success: true, data: { customerLedger, summary: { totalEntries: customerLedger.length } } });
+  } catch (error) {
+    logger.error('Error fetching general ledger report:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch general ledger report' });
+  }
+}
+
+function getBalanceSheetReport(req: Request, res: Response): void {
+  try {
+    const { asOfDate = new Date().toISOString().split('T')[0] } = req.query;
+
+    const cash = db.prepare(`SELECT COALESCE(SUM(amount), 0) as total FROM payments`).get() as { total: number };
+    const receivables = db.prepare(`SELECT COALESCE(SUM(balance_amount), 0) as total FROM invoices WHERE balance_amount > 0 AND status != 'Cancelled'`).get() as { total: number };
+    const inventory = db.prepare(`SELECT COALESCE(SUM(sb.quantity * i.standard_cost), 0) as total FROM stock_balances sb JOIN items i ON sb.item_id = i.id`).get() as { total: number };
+    const payables = db.prepare(`SELECT COALESCE(SUM(poi.quantity * poi.unit_price - COALESCE(poi.received_quantity * poi.unit_price, 0)), 0) as total FROM purchase_order_items poi JOIN purchase_orders po ON poi.po_id = po.id WHERE po.status IN ('Pending', 'Ordered', 'Partially Delivered')`).get() as { total: number };
+    const revenue = db.prepare(`SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE status != 'Cancelled'`).get() as { total: number };
+    const expenses = db.prepare(`SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE status = 'Paid'`).get() as { total: number };
+
+    const totalAssets = parseFloat(String(cash.total || 0)) + parseFloat(String(receivables.total || 0)) + parseFloat(String(inventory.total || 0));
+    const totalLiabilities = parseFloat(String(payables.total || 0));
+    const retainedEarnings = parseFloat(String(revenue.total || 0)) - parseFloat(String(expenses.total || 0));
+
+    res.json({
+      success: true,
+      data: {
+        asOfDate,
+        assets: { cash: parseFloat(String(cash.total || 0)), accountsReceivable: parseFloat(String(receivables.total || 0)), inventory: parseFloat(String(inventory.total || 0)), totalAssets },
+        liabilities: { accountsPayable: parseFloat(String(payables.total || 0)), totalLiabilities },
+        equity: { retainedEarnings, totalEquity: retainedEarnings },
+        summary: { totalAssets, totalLiabilities, totalEquity: retainedEarnings, isBalanced: Math.abs(totalAssets - (totalLiabilities + retainedEarnings)) < 0.01 }
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching balance sheet report:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch balance sheet report' });
+  }
+}
+
+function getIncomeStatementReport(req: Request, res: Response): void {
+  try {
+    const { startDate, endDate } = req.query;
+
+    let revenueQuery = `SELECT COALESCE(SUM(ii.quantity * ii.unit_price), 0) as total FROM invoice_items ii JOIN invoices i ON ii.invoice_id = i.id WHERE i.status != 'Cancelled'`;
+    let cogsQuery = `SELECT COALESCE(SUM(ii.quantity * i.standard_cost), 0) as total FROM invoice_items ii JOIN invoices inv ON ii.invoice_id = inv.id JOIN items i ON ii.item_id = i.id WHERE inv.status != 'Cancelled'`;
+    let expenseQuery = `SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE status = 'Paid'`;
+    const paramsR: (string | number)[] = [];
+    const paramsC: (string | number)[] = [];
+    const paramsE: (string | number)[] = [];
+
+    if (startDate) { revenueQuery += ' AND i.invoice_date >= ?'; cogsQuery += ' AND inv.invoice_date >= ?'; expenseQuery += ' AND expense_date >= ?'; paramsR.push(startDate as string); paramsC.push(startDate as string); paramsE.push(startDate as string); }
+    if (endDate) { revenueQuery += ' AND i.invoice_date <= ?'; cogsQuery += ' AND inv.invoice_date <= ?'; expenseQuery += ' AND expense_date <= ?'; paramsR.push(endDate as string); paramsC.push(endDate as string); paramsE.push(endDate as string); }
+
+    const revenue = parseFloat(String((db.prepare(revenueQuery).get(...paramsR) as { total: number }).total || 0));
+    const cogs = parseFloat(String((db.prepare(cogsQuery).get(...paramsC) as { total: number }).total || 0));
+    const expenses = parseFloat(String((db.prepare(expenseQuery).get(...paramsE) as { total: number }).total || 0));
+
+    const grossProfit = revenue - cogs;
+    const netIncome = grossProfit - expenses;
+
+    res.json({
+      success: true,
+      data: {
+        period: { startDate, endDate },
+        revenue, costOfGoodsSold: cogs, grossProfit, operatingExpenses: expenses, netIncome,
+        grossProfitMargin: revenue > 0 ? parseFloat(((grossProfit / revenue) * 100).toFixed(2)) : 0,
+        netProfitMargin: revenue > 0 ? parseFloat(((netIncome / revenue) * 100).toFixed(2)) : 0
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching income statement report:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch income statement report' });
+  }
+}
+
+function getTaxSummaryReport(req: Request, res: Response): void {
+  try {
+    const { startDate, endDate } = req.query;
+
+    let salesQuery = `SELECT COALESCE(SUM(total_amount), 0) as totalSales FROM invoices WHERE status != 'Cancelled'`;
+    let purchaseQuery = `SELECT COALESCE(SUM(poi.quantity * poi.unit_price), 0) as total FROM purchase_order_items poi JOIN purchase_orders po ON poi.po_id = po.id WHERE po.status IN ('Delivered', 'Completed', 'Partially Delivered')`;
+    let expenseQuery = `SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE status = 'Paid'`;
+    const paramsS: (string | number)[] = [];
+    const paramsP: (string | number)[] = [];
+    const paramsE: (string | number)[] = [];
+
+    if (startDate) { salesQuery += ' AND invoice_date >= ?'; purchaseQuery += ' AND po.po_date >= ?'; expenseQuery += ' AND expense_date >= ?'; paramsS.push(startDate as string); paramsP.push(startDate as string); paramsE.push(startDate as string); }
+    if (endDate) { salesQuery += ' AND invoice_date <= ?'; purchaseQuery += ' AND po.po_date <= ?'; expenseQuery += ' AND expense_date <= ?'; paramsS.push(endDate as string); paramsP.push(endDate as string); paramsE.push(endDate as string); }
+
+    const sales = db.prepare(salesQuery).get(...paramsS) as { totalSales: number };
+    const purchases = db.prepare(purchaseQuery).get(...paramsP) as { total: number };
+    const expenses = db.prepare(expenseQuery).get(...paramsE) as { total: number };
+
+    const totalSales = parseFloat(String(sales.totalSales || 0));
+    const totalTax = parseFloat(String((sales.totalSales || 0) * 0.10));  // Estimated 10% tax
+    const totalPurchases = parseFloat(String(purchases.total || 0));
+    const totalExpenses = parseFloat(String(expenses.total || 0));
+
+    const estimatedOutputTax = totalTax;
+    const estimatedInputTax = (totalPurchases + totalExpenses) * 0.10;
+    const netTax = estimatedOutputTax - estimatedInputTax;
+
+    res.json({
+      success: true,
+      data: {
+        period: { startDate, endDate },
+        sales: { totalSales, taxCollected: totalTax },
+        purchases: { totalPurchases, estimatedTax: parseFloat((totalPurchases * 0.10).toFixed(2)) },
+        expenses: { totalExpenses, estimatedTax: parseFloat((totalExpenses * 0.10).toFixed(2)) },
+        summary: { outputTax: estimatedOutputTax, inputTax: parseFloat(estimatedInputTax.toFixed(2)), netTaxPayable: parseFloat(netTax.toFixed(2)) }
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching tax summary report:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch tax summary report' });
+  }
+}
+
+function getBatchTraceabilityReport(req: Request, res: Response): void {
+  try {
+    const { itemId } = req.params;
+
+    if (!itemId || isNaN(Number(itemId))) { 
+      res.status(400).json({ success: false, error: 'Valid Item ID is required' }); 
+      return; 
+    }
+
+    const itemIdNum = Number(itemId);
+    
+    // Get item info
+    const item = db.prepare(`SELECT id, item_code, item_name, category FROM items WHERE id = ?`).get(itemIdNum) as any;
+    
+    if (!item) { 
+      res.status(404).json({ success: false, error: 'Item not found' }); 
+      return; 
+    }
+
+    // Get current stock by warehouse - this is the key query
+    const currentStock = db.prepare(`
+      SELECT 
+        sb.warehouse_id, 
+        w.warehouse_name, 
+        sb.quantity 
+      FROM stock_balances sb 
+      JOIN warehouses w ON sb.warehouse_id = w.id 
+      WHERE sb.item_id = ? AND sb.quantity > 0
+    `).all(itemIdNum);
+
+    // Get recent movements with LIMIT
+    const movements = db.prepare(`
+      SELECT 
+        sm.id,
+        sm.movement_type,
+        sm.quantity,
+        sm.movement_date,
+        sm.reference_doctype,
+        sm.reference_docno,
+        w.warehouse_name
+      FROM stock_movements sm
+      JOIN warehouses w ON sm.warehouse_id = w.id
+      WHERE sm.item_id = ?
+      ORDER BY sm.movement_date DESC
+      LIMIT 50
+    `).all(itemIdNum);
+
+    res.json({
+      success: true,
+      data: {
+        item,
+        currentStock,
+        movements,
+        summary: { 
+          warehousesWithStock: currentStock.length,
+          recentMovements: movements.length
+        }
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching batch traceability report:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch batch traceability report' });
+  }
+}
+
 export default {
   getARAgingReport,
   getCustomerStatements,
@@ -1460,5 +1735,11 @@ export default {
   getSupplierAnalysis,
   getProductionSummary,
   getBOMUsageReport,
-  getExpensesReport
+  getExpensesReport,
+  getTrialBalanceReport,
+  getGeneralLedgerReport,
+  getBalanceSheetReport,
+  getIncomeStatementReport,
+  getTaxSummaryReport,
+  getBatchTraceabilityReport
 };

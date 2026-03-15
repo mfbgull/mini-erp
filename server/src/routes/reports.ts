@@ -27,5 +27,11 @@ router.get('/supplier-analysis', reportsController.getSupplierAnalysis);
 router.get('/production-summary', reportsController.getProductionSummary);
 router.get('/bom-usage', reportsController.getBOMUsageReport);
 router.get('/expenses', sensitiveOperationLimiter, reportsController.getExpensesReport);
+router.get('/trial-balance', sensitiveOperationLimiter, reportsController.getTrialBalanceReport);
+router.get('/general-ledger', sensitiveOperationLimiter, reportsController.getGeneralLedgerReport);
+router.get('/balance-sheet', sensitiveOperationLimiter, reportsController.getBalanceSheetReport);
+router.get('/income-statement', sensitiveOperationLimiter, reportsController.getIncomeStatementReport);
+router.get('/tax-summary', sensitiveOperationLimiter, reportsController.getTaxSummaryReport);
+router.get('/batch-traceability/:itemId', reportsController.getBatchTraceabilityReport);
 
 export default router;
