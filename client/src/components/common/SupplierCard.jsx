@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+
 import { MoreVertical, Eye, Edit, Trash2, X } from 'lucide-react';
 import './SupplierCard.css';
 
@@ -177,126 +178,98 @@ export function SupplierCard({ supplier, onView, onEdit, onDelete }) {
 
       {showDetails && (
         <div
-          className="supplier-modal-overlay"
+          className="item-preview-overlay"
           onClick={() => setShowDetails(false)}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="supplier-modal-title"
+          aria-labelledby="supplier-preview-title"
         >
           <div
-            className="supplier-modal"
+            className="item-preview-container"
             onClick={(e) => e.stopPropagation()}
             ref={cardRef}
           >
-            <div className="supplier-modal-header">
-              <div className="supplier-modal-title-section">
-                <h2 id="supplier-modal-title" className="supplier-modal-title">
+            <div className="swipe-indicator"></div>
+
+            <div className="item-preview-header">
+              <div className="item-preview-title-section">
+                <h2 id="supplier-preview-title" className="item-preview-title">
                   {supplier.supplier_name}
                 </h2>
-                <span className="supplier-modal-code">{supplier.supplier_code}</span>
+                <span className="item-preview-code">{supplier.supplier_code}</span>
               </div>
               <button
                 type="button"
-                className="supplier-modal-close"
+                className="item-preview-close"
                 onClick={() => setShowDetails(false)}
-                aria-label="Close modal"
+                aria-label="Close"
               >
                 <X size={24} />
               </button>
             </div>
 
-            <div className="supplier-modal-content">
-              <section className="supplier-section">
-                <h3 className="supplier-section-title">Basic Information</h3>
-                <div className="supplier-details-grid">
-                  <div className="supplier-detail-item">
-                    <span className="supplier-detail-label">Supplier Code</span>
-                    <span className="supplier-detail-value">{supplier.supplier_code}</span>
-                  </div>
-                  <div className="supplier-detail-item">
-                    <span className="supplier-detail-label">Status</span>
-                    <span className={`supplier-detail-value supplier-status-badge ${supplier.is_active ? 'active' : 'inactive'}`}>
-                      {supplier.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                  <div className="supplier-detail-item">
-                    <span className="supplier-detail-label">Payment Terms</span>
-                    <span className="supplier-detail-value">{supplier.payment_terms || 'Net 30'}</span>
-                  </div>
+            <div className="item-preview-content">
+              <div className="item-preview-stats">
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Status</span>
+                  <span className={`preview-stat-value ${supplier.is_active ? 'stock-normal' : 'stock-out-of-stock'}`}>
+                    {supplier.is_active ? 'Active' : 'Inactive'}
+                  </span>
                 </div>
-              </section>
-
-              <section className="supplier-section">
-                <h3 className="supplier-section-title">Contact Information</h3>
-                <div className="supplier-details-grid">
-                  <div className="supplier-detail-item">
-                    <span className="supplier-detail-label">Contact Person</span>
-                    <span className="supplier-detail-value">{supplier.contact_person || 'N/A'}</span>
-                  </div>
-                  <div className="supplier-detail-item">
-                    <span className="supplier-detail-label">Email</span>
-                    <span className="supplier-detail-value">{supplier.email || 'N/A'}</span>
-                  </div>
-                  <div className="supplier-detail-item">
-                    <span className="supplier-detail-label">Phone</span>
-                    <span className="supplier-detail-value">{supplier.phone || 'N/A'}</span>
-                  </div>
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Payment Terms</span>
+                  <span className="preview-stat-value">{supplier.payment_terms || 'Net 30'}</span>
                 </div>
-              </section>
+              </div>
 
-              {supplier.address && (
-                <section className="supplier-section">
-                  <h3 className="supplier-section-title">Address</h3>
-                  <p className="supplier-address">{supplier.address}</p>
-                </section>
-              )}
-
-              {supplier.notes && (
-                <section className="supplier-section">
-                  <h3 className="supplier-section-title">Notes</h3>
-                  <p className="supplier-notes">{supplier.notes}</p>
-                </section>
-              )}
-
-              {(supplier.created_at || supplier.updated_at) && (
-                <section className="supplier-section supplier-section-meta">
-                  <div className="supplier-meta-grid">
-                    {supplier.created_at && (
-                      <div className="supplier-meta-item">
-                        <span className="supplier-meta-label">Created</span>
-                        <span className="supplier-meta-value">
-                          {new Date(supplier.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    )}
-                    {supplier.updated_at && (
-                      <div className="supplier-meta-item">
-                        <span className="supplier-meta-label">Last Updated</span>
-                        <span className="supplier-meta-value">
-                          {new Date(supplier.updated_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    )}
+              <div className="preview-details-grid">
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Supplier Code</span>
+                  <span className="preview-detail-value">{supplier.supplier_code}</span>
+                </div>
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Contact Person</span>
+                  <span className="preview-detail-value">{supplier.contact_person || '—'}</span>
+                </div>
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Email</span>
+                  <span className="preview-detail-value">{supplier.email || '—'}</span>
+                </div>
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Phone</span>
+                  <span className="preview-detail-value">{supplier.phone || '—'}</span>
+                </div>
+                {supplier.address && (
+                  <div className="preview-detail-item full-width">
+                    <span className="preview-detail-label">Address</span>
+                    <span className="preview-detail-value">{supplier.address}</span>
                   </div>
-                </section>
-              )}
+                )}
+                {supplier.notes && (
+                  <div className="preview-detail-item full-width">
+                    <span className="preview-detail-label">Notes</span>
+                    <span className="preview-detail-value">{supplier.notes}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="supplier-modal-actions">
+            <div className="item-preview-actions">
               <button
                 type="button"
-                className="supplier-action-btn supplier-action-secondary"
-                onClick={() => setShowDetails(false)}
+                className="preview-action-btn edit-btn"
+                onClick={handleEdit}
               >
-                Close
+                <Edit size={16} />
+                Edit
               </button>
               <button
                 type="button"
-                className="supplier-action-btn supplier-action-primary"
-                onClick={handleEdit}
+                className="preview-action-btn delete-btn"
+                onClick={handleDelete}
               >
-                <Edit size={18} />
-                Edit Supplier
+                <Trash2 size={16} />
+                Delete
               </button>
             </div>
           </div>

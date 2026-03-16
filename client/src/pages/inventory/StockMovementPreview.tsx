@@ -1,6 +1,7 @@
 import React from 'react';
-import { X, Download, Upload, Factory, ArrowLeftRight, Settings, ClipboardList, Info } from 'lucide-react';
+
 import { format } from 'date-fns';
+import { X, Download, Upload, Factory, ArrowLeftRight, Settings, ClipboardList, Info } from 'lucide-react';
 import './StockMovementPreview.css';
 
 interface StockMovementPreviewProps {

@@ -14,7 +14,8 @@ function recordProduction(req: AuthRequest, res: Response): void {
       raw_materials_warehouse_id,
       production_date,
       input_items,
-      remarks
+      remarks,
+      overhead_cost
     } = req.body;
 
     if (!output_item_id || !output_quantity || !warehouse_id || !production_date || !input_items || !input_items.length) {
@@ -29,7 +30,8 @@ function recordProduction(req: AuthRequest, res: Response): void {
 
     const productionData = {
       ...req.body,
-      raw_materials_warehouse_id: raw_materials_warehouse_id || warehouse_id
+      raw_materials_warehouse_id: raw_materials_warehouse_id || warehouse_id,
+      overhead_cost: overhead_cost ? parseFloat(String(overhead_cost)) : 0
     };
 
     const production = ProductionModel.recordProduction(productionData, req.user!.id, db);

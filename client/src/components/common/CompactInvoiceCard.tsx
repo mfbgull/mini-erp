@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { MoreVertical, Eye, Edit2, Trash2, X } from 'lucide-react';
+
 import { format } from 'date-fns';
+import { MoreVertical, Eye, Edit2, Trash2, X, FileText } from 'lucide-react';
+
+import Card from './Card';
 import { formatCurrency } from '../../utils/formatters';
-import './CompactInvoiceCard.css';
+import '../../styles/components/card.css';
 
 interface Invoice {
   id: number;
@@ -27,25 +30,14 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete }: Compac
   const [showMenu, setShowMenu] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
-  const getStatusColor = (status: string) => {
+  const getStatusClass = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'paid': return 'status-paid';
-      case 'partial': 
-      case 'partially paid': return 'status-partial';
-      case 'overdue': return 'status-overdue';
-      case 'cancelled': return 'status-cancelled';
-      default: return 'status-pending';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'paid': return '✓';
-      case 'partial': 
-      case 'partially paid': return '~';
-      case 'overdue': return '⚠';
-      case 'cancelled': return '✕';
-      default: return '○';
+      case 'paid': return 'stock-normal';
+      case 'partial':
+      case 'partially paid': return 'stock-low';
+      case 'overdue': return 'stock-out-of-stock';
+      case 'cancelled': return 'stock-out-of-stock';
+      default: return 'stock-low';
     }
   };
 
@@ -61,168 +53,139 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete }: Compac
     setShowMenu(prev => !prev);
   };
 
-  const handleView = () => {
-    setShowMenu(false);
-    onView(invoice);
-  };
-
-  const handleEdit = () => {
-    setShowMenu(false);
-    onEdit(invoice);
-  };
-
-  const handleDelete = () => {
-    setShowMenu(false);
-    if (onDelete) {
-      onDelete(invoice);
-    }
-  };
-
   const handleBackdropClick = () => {
     setShowMenu(false);
   };
 
   return (
     <>
-      <div className="compact-invoice-card">
-        {/* Clickable content area */}
-        <div className="card-content-clickable" onClick={handleCardClick}>
-          <div className="invoice-info">
-            <p className="invoice-name">{invoice.customer_name}</p>
-            <p className="invoice-code">{invoice.invoice_no}</p>
+      <Card variant="compact" hoverable onClick={handleCardClick} className="compact-invoice-card">
+        <div className="card-content-clickable">
+          <div className="invoice-info-section">
+            <p className="invoice-item-name">{invoice.customer_name}</p>
+            <div className="invoice-meta">
+              <span className="invoice-item-code">{invoice.invoice_no}</span>
+            </div>
           </div>
 
-          <div className="invoice-amount-info">
-            <p className="amount-label">Total</p>
-            <p className={`amount-value ${isPaid ? 'amount-paid' : ''}`}>
-              {formatCurrency(parseFloat(String(invoice.total_amount || 0)))}
-            </p>
-            {parseFloat(String(invoice.balance_amount || 0)) > 0 && (
-              <p className="amount-balance">
-                {formatCurrency(parseFloat(String(invoice.balance_amount || 0)))}
-              </p>
+          <div className="invoice-amount-row">
+            <div className="quantity-display">
+              <span className={`qty-text ${isPaid ? 'qty-positive' : 'qty-low'}`}>
+                {formatCurrency(parseFloat(String(invoice.total_amount || 0)))}
+              </span>
+            </div>
+          </div>
+
+          <div className="menu-container" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="menu-trigger" onClick={handleMenuToggle}>
+              <MoreVertical className="menu-icon" />
+            </button>
+
+            {showMenu && (
+              <>
+                <div className="menu-backdrop" onClick={handleBackdropClick} />
+                <div className="dropdown-menu">
+                  <button type="button" className="dropdown-item" onClick={() => { setShowMenu(false); onView(invoice); }}>
+                    <Eye className="dropdown-icon" />
+                    View
+                  </button>
+                  <button type="button" className="dropdown-item" onClick={() => { setShowMenu(false); onEdit(invoice); }}>
+                    <Edit2 className="dropdown-icon" />
+                    Edit
+                  </button>
+                  {onDelete && (
+                    <button type="button" className="dropdown-item delete" onClick={() => { setShowMenu(false); onDelete(invoice); }}>
+                      <Trash2 className="dropdown-icon" />
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>
 
-        {/* Menu button - separate from clickable area */}
-        <div className="menu-container">
-          <button
-            type="button"
-            className="menu-trigger"
-            onClick={handleMenuToggle}
-          >
-            <MoreVertical className="menu-icon" />
-          </button>
+        <div className="invoice-card-status-row">
+          <span className={`status-badge ${getStatusClass(invoice.status)}`}>
+            {invoice.status || 'Pending'}
+          </span>
+          <span className="invoice-date-text">
+            {invoice.invoice_date ? format(new Date(invoice.invoice_date), 'dd MMM') : ''}
+          </span>
+        </div>
+      </Card>
 
-          {showMenu && (
-            <>
-              <div className="menu-backdrop" onClick={handleBackdropClick} />
-              <div className="dropdown-menu">
-                <button type="button" className="dropdown-item" onClick={handleView}>
-                  <Eye className="dropdown-icon" />
-                  View
-                </button>
-                <button type="button" className="dropdown-item" onClick={handleEdit}>
-                  <Edit2 className="dropdown-icon" />
-                  Edit
-                </button>
-                {onDelete && (
-                  <button type="button" className="dropdown-item delete" onClick={handleDelete}>
-                    <Trash2 className="dropdown-icon" />
-                    Delete
-                  </button>
+      {showDetails && (
+        <div className="item-preview-overlay" onClick={() => setShowDetails(false)}>
+          <div className="item-preview-container" onClick={(e) => e.stopPropagation()}>
+            <div className="swipe-indicator"></div>
+
+            <div className="item-preview-header">
+              <div className="item-preview-title-section">
+                <h2 className="item-preview-title">{invoice.invoice_no}</h2>
+                <span className="item-preview-code">{invoice.customer_name}</span>
+              </div>
+              <button className="item-preview-close" onClick={() => setShowDetails(false)}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="item-preview-content">
+              <div className="item-preview-stats">
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Total</span>
+                  <span className="preview-stat-value">
+                    {formatCurrency(parseFloat(String(invoice.total_amount || 0)))}
+                  </span>
+                </div>
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Paid</span>
+                  <span className="preview-stat-value stock-normal">
+                    {formatCurrency(parseFloat(String(invoice.paid_amount || 0)))}
+                  </span>
+                </div>
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Balance</span>
+                  <span className={`preview-stat-value ${isPaid ? 'stock-normal' : 'stock-out-of-stock'}`}>
+                    {formatCurrency(parseFloat(String(invoice.balance_amount || 0)))}
+                  </span>
+                </div>
+              </div>
+
+              <div className="preview-details-grid">
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Status</span>
+                  <span className="preview-detail-value">
+                    <span className={`status-badge ${getStatusClass(invoice.status)}`}>
+                      {invoice.status || 'Pending'}
+                    </span>
+                  </span>
+                </div>
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Invoice Date</span>
+                  <span className="preview-detail-value">
+                    {invoice.invoice_date ? format(new Date(invoice.invoice_date), 'dd MMM yyyy') : ''}
+                  </span>
+                </div>
+                {invoice.due_date && (
+                  <div className="preview-detail-item">
+                    <span className="preview-detail-label">Due Date</span>
+                    <span className="preview-detail-value">
+                      {format(new Date(invoice.due_date), 'dd MMM yyyy')}
+                    </span>
+                  </div>
                 )}
               </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Details Modal */}
-      {showDetails && (
-        <div className="details-modal-overlay" onClick={() => setShowDetails(false)}>
-          <div className="details-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="details-header">
-              <div>
-                <h3 className="details-title">{invoice.invoice_no}</h3>
-                <p className="details-subtitle">{invoice.customer_name}</p>
-              </div>
-              <button className="close-button" onClick={() => setShowDetails(false)}>
-                <X className="close-icon" />
-              </button>
             </div>
 
-            <div className="details-content">
-              {/* Status */}
-              <div className="detail-section">
-                <div className={`status-banner ${getStatusColor(invoice.status)}`}>
-                  <span className="status-icon">{getStatusIcon(invoice.status)}</span>
-                  {invoice.status || 'Pending'}
-                </div>
-              </div>
-
-              {/* Amounts */}
-              <div className="detail-section">
-                <h4 className="section-title">Amounts</h4>
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <span className="detail-label">Total Amount</span>
-                    <span className="detail-value">
-                      {formatCurrency(parseFloat(String(invoice.total_amount || 0)))}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Paid Amount</span>
-                    <span className="detail-value">
-                      {formatCurrency(parseFloat(String(invoice.paid_amount || 0)))}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Balance</span>
-                    <span className={`detail-value ${parseFloat(String(invoice.balance_amount || 0)) > 0 ? 'balance-due' : ''}`}>
-                      {formatCurrency(parseFloat(String(invoice.balance_amount || 0)))}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div className="detail-section">
-                <h4 className="section-title">Dates</h4>
-                <div className="detail-grid">
-                  <div className="detail-item">
-                    <span className="detail-label">Invoice Date</span>
-                    <span className="detail-value">
-                      {invoice.invoice_date ? format(new Date(invoice.invoice_date), 'MMMM dd, yyyy') : ''}
-                    </span>
-                  </div>
-                  {invoice.due_date && (
-                    <div className="detail-item">
-                      <span className="detail-label">Due Date</span>
-                      <span className="detail-value">
-                        {format(new Date(invoice.due_date), 'MMMM dd, yyyy')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="details-actions">
-              <button className="action-btn view-btn" onClick={() => {
-                setShowDetails(false);
-                onView(invoice);
-              }}>
-                <Eye className="btn-icon" />
-                View Invoice
+            <div className="item-preview-actions">
+              <button className="preview-action-btn edit-btn" onClick={() => { setShowDetails(false); onView(invoice); }}>
+                <Eye size={16} />
+                View
               </button>
-              <button className="action-btn edit-btn" onClick={() => {
-                setShowDetails(false);
-                onEdit(invoice);
-              }}>
-                <Edit2 className="btn-icon" />
-                Edit Invoice
+              <button className="preview-action-btn delete-btn" onClick={() => { setShowDetails(false); onEdit(invoice); }}>
+                <Edit2 size={16} />
+                Edit
               </button>
             </div>
           </div>
@@ -232,41 +195,19 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete }: Compac
   );
 }
 
-export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDelete }: { 
-  invoices: Invoice[], 
-  onView: (invoice: Invoice) => void, 
+export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDelete }: {
+  invoices: Invoice[],
+  onView: (invoice: Invoice) => void,
   onEdit: (invoice: Invoice) => void,
-  onDelete?: (invoice: Invoice) => void 
+  onDelete?: (invoice: Invoice) => void
 }) {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const filteredInvoices = invoices.filter(invoice =>
-    invoice.invoice_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (filteredInvoices.length === 0) {
+  if (invoices.length === 0) {
     return (
       <div className="compact-mobile-cards-wrapper">
-        <div className="compact-mobile-search-container">
-          <input
-            type="text"
-            placeholder="Search invoices..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="compact-mobile-search-input"
-          />
-        </div>
         <div className="mobile-empty-state">
-          <div className="empty-icon">📄</div>
-          <div className="empty-title">
-            {searchTerm ? 'No matching invoices' : 'No invoices found'}
-          </div>
-          <div className="empty-subtitle">
-            {searchTerm
-              ? 'Try adjusting your search terms'
-              : 'Create your first invoice to get started'}
-          </div>
+          <FileText className="empty-icon" size={48} />
+          <div className="empty-title">No invoices found</div>
+          <div className="empty-subtitle">Invoices will appear here</div>
         </div>
       </div>
     );
@@ -274,25 +215,9 @@ export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDel
 
   return (
     <div className="compact-mobile-cards-wrapper">
-      <div className="compact-mobile-search-container">
-        <input
-          type="text"
-          placeholder="Search invoices..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="compact-mobile-search-input"
-        />
-      </div>
-
       <div className="compact-mobile-cards-container">
-        {filteredInvoices.map((invoice) => (
-          <CompactInvoiceCard
-            key={invoice.id}
-            invoice={invoice}
-            onView={onView}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
+        {invoices.map((invoice) => (
+          <CompactInvoiceCard key={invoice.id} invoice={invoice} onView={onView} onEdit={onEdit} onDelete={onDelete} />
         ))}
       </div>
     </div>

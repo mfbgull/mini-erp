@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
-import { X, RotateCcw, Minus, Plus } from 'lucide-react';
+
 import { format } from 'date-fns';
+import { X, RotateCcw, Minus, Plus } from 'lucide-react';
+
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { invoiceReturnItemSchema } from '../../schemas';
 import { formatCurrency } from '../../utils/formatters';
 import './InvoiceReturn.css';
 
@@ -52,7 +56,7 @@ interface InvoiceReturnProps {
 export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: InvoiceReturnProps) {
   const [returnItems, setReturnItems] = useState<InvoiceReturnItem[]>([]);
   const [reason, setReason] = useState('');
-  const [errors, setErrors] = useState<{ [key: number]: string }>({});
+  const { errors, validate } = useFormValidation(invoiceReturnItemSchema);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Initialize state when items prop changes
@@ -119,7 +123,7 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: Inv
 
   const handleSubmit = () => {
     const itemsToReturn = returnItems.filter(item => item.return_quantity > 0);
-    
+
     if (itemsToReturn.length === 0) {
       alert('Please select at least one item to return');
       return;
@@ -127,6 +131,17 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: Inv
 
     if (!reason.trim()) {
       alert('Please enter a reason for the return');
+      return;
+    }
+
+    // Validate return items
+    const hasErrors = itemsToReturn.some(item => {
+      const isValid = validate({ return_quantity: item.return_quantity });
+      return !isValid;
+    });
+
+    if (hasErrors) {
+      alert('Please enter valid return quantities');
       return;
     }
 

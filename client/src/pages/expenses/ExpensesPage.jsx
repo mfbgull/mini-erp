@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useSettings } from "../../context/SettingsContext";
+import { ModuleRegistry , ClientSideRowModelModule } from "ag-grid-community";
+import { AgGridReact } from "ag-grid-react";
 import {
   Plus,
   Search,
@@ -19,20 +21,20 @@ import {
   XCircle,
   MoreVertical,
 } from "lucide-react";
-import { AgGridReact } from "ag-grid-react";
-import { ModuleRegistry } from "ag-grid-community";
-import { ClientSideRowModelModule } from "ag-grid-community";
-import api from "../../utils/api";
+
 import Button from "../../components/common/Button";
-import FormInput from "../../components/common/FormInput";
+import { CompactExpenseCardView } from "../../components/common/CompactExpenseCard";
 import DateRangePicker from "../../components/common/DateRangePicker";
+import FormInput from "../../components/common/FormInput";
 import Modal from "../../components/common/Modal";
 import SearchableSelect from "../../components/common/SearchableSelect";
-import { exportToPDF, exportToExcel } from "../../utils/exportUtils";
-import { CompactExpenseCardView } from "../../components/common/CompactExpenseCard";
-import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { expenseSchema } from "../../schemas";
+import api from "../../utils/api";
+import { exportToPDF, exportToExcel } from "../../utils/exportUtils";
+import "../inventory/ItemPreview.css";
 import "./Expenses.css";
 
 // Register AG Grid modules

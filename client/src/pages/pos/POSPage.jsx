@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { useSettings } from '../../context/SettingsContext';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Barcode, Search, Plus, Minus, Trash2, ShoppingCart, DollarSign, Check } from 'lucide-react';
+
+import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import './POSPage.css';
 

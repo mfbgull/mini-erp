@@ -7,19 +7,19 @@ from cli_anything.minierp.utils.erp_backend import make_client, ERPError
 def list_boms(page: int = 1, limit: int = 50) -> dict:
     """List all BOMs."""
     client = make_client()
-    return client.get("/", params={"page": page, "limit": limit})
+    return client.get("/boms", params={"page": page, "limit": limit})
 
 
 def get_bom(bom_id: int) -> dict:
     """Get a specific BOM by ID."""
     client = make_client()
-    return client.get(f"/{bom_id}")
+    return client.get(f"/boms/{bom_id}")
 
 
 def get_boms_by_item(item_id: int) -> dict:
     """Get BOMs for a finished item."""
     client = make_client()
-    return client.get(f"/by-item/{item_id}")
+    return client.get(f"/boms/by-item/{item_id}")
 
 
 def create_bom(
@@ -31,7 +31,7 @@ def create_bom(
     """Create a new BOM."""
     client = make_client()
     return client.post(
-        "/",
+        "/boms",
         body={
             "finished_item_id": finished_item_id,
             "quantity": quantity,
@@ -56,16 +56,16 @@ def update_bom(
         body["items"] = items
     if notes is not None:
         body["notes"] = notes
-    return client.put(f"/{bom_id}", body=body)
+    return client.put(f"/boms/{bom_id}", body=body)
 
 
 def toggle_bom_active(bom_id: int) -> dict:
     """Toggle BOM active status."""
     client = make_client()
-    return client.patch(f"/{bom_id}/toggle-active")
+    return client.patch(f"/boms/{bom_id}/toggle-active")
 
 
 def delete_bom(bom_id: int) -> dict:
     """Delete a BOM."""
     client = make_client()
-    return client.delete(f"/{bom_id}")
+    return client.delete(f"/boms/{bom_id}")

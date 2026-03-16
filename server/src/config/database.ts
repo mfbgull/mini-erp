@@ -613,5 +613,21 @@ runRawMaterialsWarehouseMigration();
 runProductionInputsWarehouseMigration();
 runMobileInvoiceMigration();
 runMissingIndexesMigration();
+runProductionOverheadMigration();
 
 export default db;
+
+function runProductionOverheadMigration(): void {
+  try {
+    const hasOverheadCost = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('productions') WHERE name='overhead_cost'`
+    ).get() as { count: number };
+    if (!hasOverheadCost.count) {
+      logger.info('Running production overhead_cost migration...');
+      db.prepare(`ALTER TABLE productions ADD COLUMN overhead_cost DECIMAL(15,2) DEFAULT 0`).run();
+      logger.info('✅ Production overhead_cost migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Production overhead migration error:', error.message);
+  }
+}

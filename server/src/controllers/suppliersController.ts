@@ -251,13 +251,31 @@ function getSupplierById(req: Request, res: Response): void {
 
 function getNextSupplierCode(req: Request, res: Response): void {
   try {
-    const query = `SELECT COUNT(*) as count FROM suppliers`;
-    const result = db.prepare(query).get() as { count: number };
-    const nextNumber = result.count + 1;
-    const code = `SUP${String(nextNumber).padStart(4, '0')}`;
+    // Get the highest existing supplier code
+    const query = `SELECT MAX(CAST(SUBSTR(supplier_code, 5) AS INTEGER)) as maxCode FROM suppliers WHERE supplier_code LIKE 'SUP-%'`;
+    const result = db.prepare(query).get() as { maxCode: number | null };
+    
+    const nextNumber = (result.maxCode || 0) + 1;
+    const code = `SUP-${String(nextNumber).padStart(3, '0')}`;
+    
     res.json({ success: true, data: { code } });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to generate supplier code' });
+    logger.error('Error generating supplier code:', error);
+    // Fallback: try simple approach
+    try {
+      const fallbackQuery = `SELECT supplier_code FROM suppliers ORDER BY id DESC LIMIT 1`;
+      const lastSupplier = db.prepare(fallbackQuery).get() as { supplier_code: string } | undefined;
+      
+      if (lastSupplier && lastSupplier.supplier_code.startsWith('SUP-')) {
+        const num = parseInt(lastSupplier.supplier_code.split('-')[1], 10) || 0;
+        const code = `SUP-${String(num + 1).padStart(3, '0')}`;
+        res.json({ success: true, data: { code } });
+      } else {
+        res.json({ success: true, data: { code: 'SUP-001' } });
+      }
+    } catch (fallbackError) {
+      res.json({ success: true, data: { code: 'SUP-001' } });
+    }
   }
 }
 

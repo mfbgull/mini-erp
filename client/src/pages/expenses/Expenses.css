@@ -286,12 +286,7 @@
   color: var(--text-secondary);
 }
 
-/* Mobile Expense Cards */
-.mobile-expenses-list {
-  display: none; /* Hidden by default, shown on mobile */
-  flex-direction: column;
-  gap: 15px;
-}
+/* Mobile Expense Cards - handled by JS isMobile conditional */
 
 .expense-card {
   background: var(--card-bg);
@@ -562,15 +557,6 @@
     align-items: stretch;
   }
 
-  /* AG Grid desktop view - hide on mobile */
-  .desktop-view {
-    display: none !important;
-  }
-
-  /* Mobile expense list - show on mobile */
-  .mobile-expenses-list {
-    display: flex !important;
-  }
 
   .expenses-content .ag-theme-quartz {
     height: auto !important;

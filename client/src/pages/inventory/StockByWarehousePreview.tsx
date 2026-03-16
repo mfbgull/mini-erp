@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { X } from 'lucide-react';
+
 import { formatCurrency } from '../../utils/formatters';
 import './StockByWarehousePreview.css';
 

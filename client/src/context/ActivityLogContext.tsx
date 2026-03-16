@@ -1,5 +1,7 @@
 import { createContext, useContext } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
+
 import api from '../utils/api';
 
 interface ActivityLogEntry {

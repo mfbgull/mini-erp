@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DollarSign, Calendar, CreditCard, FileText, Plus, Minus } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../../utils/api';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus } from 'lucide-react';
+
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
+import api from '../../utils/api';
 import './PaymentModal.css';
 
 interface Customer {

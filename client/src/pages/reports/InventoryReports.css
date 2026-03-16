@@ -90,7 +90,7 @@
   border: 1px solid var(--neutral-300);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
-  background: white;
+  background: var(--card-bg);
 }
 
 .apply-filters-btn {
@@ -106,7 +106,7 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: var(--space-md);
@@ -156,7 +156,7 @@
 }
 
 .report-content {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   overflow: hidden;

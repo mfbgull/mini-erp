@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { X, Truck, Package, ClipboardList, Check, ChevronRight, ChevronLeft, Calendar, MapPin } from 'lucide-react';
-import type { Supplier, Item, Warehouse } from '../../types';
 import toast from 'react-hot-toast';
+
+import { X, Truck, Package, ClipboardList, Check, ChevronRight, ChevronLeft, Calendar, MapPin } from 'lucide-react';
+
+import type { Supplier, Item, Warehouse } from '../../types';
 import api from '../../utils/api';
+import Button from '../common/Button';
 import './PurchaseOrderWizard.css';
 
 interface POItem {
@@ -135,14 +138,14 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
         ))}
       </div>
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-        <button
-          className="btn btn-primary"
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button
+          variant="primary"
           disabled={!selectedSupplier}
           onClick={() => setStep(2)}
         >
           Continue <ChevronRight size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -204,16 +207,16 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
         </div>
       </div>
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={() => setStep(1)}>
+        <Button variant="secondary" onClick={() => setStep(1)}>
           <ChevronLeft size={16} /> Back
-        </button>
-        <button
-          className="btn btn-primary"
+        </Button>
+        <Button
+          variant="primary"
           disabled={!poDate}
           onClick={() => setStep(3)}
         >
           Continue <ChevronRight size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -291,16 +294,16 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
         </div>
       )}
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={() => setStep(2)}>
+        <Button variant="secondary" onClick={() => setStep(2)}>
           <ChevronLeft size={16} /> Back
-        </button>
-        <button
-          className="btn btn-primary"
+        </Button>
+        <Button
+          variant="primary"
           disabled={poItems.length === 0}
           onClick={() => setStep(4)}
         >
           Continue <ChevronRight size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -353,16 +356,17 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
         </div>
       </div>
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={() => setStep(3)}>
+        <Button variant="secondary" onClick={() => setStep(3)}>
           <ChevronLeft size={16} /> Back
-        </button>
-        <button
-          className="btn btn-success"
+        </Button>
+        <Button
+          variant="success"
           onClick={createPurchaseOrder}
           disabled={loading}
+          loading={loading}
         >
           {loading ? 'Creating...' : 'Create Purchase Order'}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -394,12 +398,12 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
         </div>
       </div>
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={handleOpen}>
+        <Button variant="secondary" onClick={handleOpen}>
           Create Another
-        </button>
-        <button className="btn btn-primary" onClick={onClose}>
+        </Button>
+        <Button variant="primary" onClick={onClose}>
           Close
-        </button>
+        </Button>
       </div>
     </div>
   );

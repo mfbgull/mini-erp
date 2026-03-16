@@ -465,3 +465,44 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+
+  .stat-card {
+    padding: var(--space-sm);
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .stat-content {
+    text-align: center;
+    width: 100%;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+    line-height: 1.2;
+  }
+
+  .stat-subtitle {
+    font-size: 0.65rem;
+    line-height: 1.2;
+  }
+}

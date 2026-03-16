@@ -23,13 +23,13 @@ def list_payments(
         params["start_date"] = start_date
     if end_date:
         params["end_date"] = end_date
-    return client.get("/", params=params)
+    return client.get("/payments", params=params)
 
 
 def get_payment(payment_id: int) -> dict:
     """Get a specific payment by ID."""
     client = make_client()
-    return client.get(f"/{payment_id}")
+    return client.get(f"/payments/{payment_id}")
 
 
 def create_payment(
@@ -43,7 +43,7 @@ def create_payment(
     """Create a new payment."""
     client = make_client()
     return client.post(
-        "/",
+        "/payments",
         body={
             "customer_id": customer_id,
             "amount": amount,
@@ -76,16 +76,18 @@ def update_payment(
         body["reference"] = reference
     if notes is not None:
         body["notes"] = notes
-    return client.put(f"/{payment_id}", body=body)
+    return client.put(f"/payments/{payment_id}", body=body)
 
 
 def delete_payment(payment_id: int) -> dict:
     """Delete a payment (admin only)."""
     client = make_client()
-    return client.delete(f"/{payment_id}")
+    return client.delete(f"/payments/{payment_id}")
 
 
 def allocate_payment(payment_id: int, allocations: list[dict]) -> dict:
     """Allocate a payment to invoices."""
     client = make_client()
-    return client.post(f"/{payment_id}/allocate", body={"allocations": allocations})
+    return client.post(
+        f"/payments/{payment_id}/allocate", body={"allocations": allocations}
+    )

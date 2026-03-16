@@ -47,34 +47,81 @@
 
 .purchase-orders-page .summary-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .purchase-orders-page .summary-card {
-  background: white;
-  padding: var(--space-md);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  border-left: 4px solid var(--primary);
+  background: var(--card-bg);
+  border: 1px solid var(--neutral-200);
+  border-radius: 12px;
+  padding: 20px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.purchase-orders-page .summary-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.purchase-orders-page .summary-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.purchase-orders-page .summary-icon.total {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.purchase-orders-page .summary-icon.draft {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+}
+
+.purchase-orders-page .summary-icon.submitted {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.purchase-orders-page .summary-icon.partial {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.purchase-orders-page .summary-icon.completed {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.purchase-orders-page .summary-icon.value {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+}
+
+.purchase-orders-page .summary-content {
+  flex: 1;
 }
 
 .purchase-orders-page .summary-label {
-  font-size: 0.875rem;
-  color: var(--neutral-600);
-  margin-bottom: var(--space-xs);
-  line-height: 1.3;
+  font-size: 13px;
+  color: var(--neutral-500);
+  margin-bottom: 4px;
 }
 
 .purchase-orders-page .summary-value {
-  font-size: 1.5rem;
+  font-size: 22px;
   font-weight: 600;
   color: var(--neutral-900);
-  line-height: 1.2;
 }
 
 /* Loading spinner */
@@ -113,9 +160,45 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-md);
 }
+VQ|
+/* Search Box */
+.purchase-orders-page .search-box {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.purchase-orders-page .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neutral-400);
+}
+
+.purchase-orders-page .search-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  padding-left: 40px;
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  background: var(--input-bg);
+  transition: border-color 0.2s;
+}
+
+.purchase-orders-page .search-input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.purchase-orders-page .search-input::placeholder {
+  color: var(--neutral-400);
+}
 
 .purchase-orders-page .filters-bar {
-  background: white;
+  background: var(--card-bg);
   padding: var(--space-md);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-md);
@@ -211,7 +294,7 @@
 }
 
 .po-form {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -305,7 +388,7 @@
 
 .po-form .po-detail-card .form-input,
 .po-form .po-detail-card .form-select {
-  background: white;
+  background: var(--card-bg);
 }
 
 /* Line Items Section */
@@ -327,7 +410,7 @@
 .po-form .items-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--card-bg);
 }
 
 .po-form .items-table th,
@@ -363,7 +446,7 @@
   border-radius: var(--radius-sm);
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
-  background: white;
+  background: var(--card-bg);
 }
 
 .po-form .items-table td .form-input:focus {
@@ -400,7 +483,7 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-md);
-  background: white;
+  background: var(--card-bg);
   border: 1px dashed #DEE2E6;
   border-radius: var(--radius-sm);
   color: var(--primary);
@@ -417,7 +500,7 @@
 
 /* Totals Section */
 .po-form .totals-section {
-  background: white;
+  background: var(--card-bg);
   padding: var(--space-lg);
   border-top: 1px solid #DEE2E6;
 }
@@ -487,7 +570,7 @@
   padding: 10px 12px;
   border: 1px solid #DEE2E6;
   border-radius: var(--radius-sm);
-  background: white;
+  background: var(--card-bg);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -540,7 +623,7 @@
 }
 
 .po-detail-page .po-header-card {
-  background: white;
+  background: var(--card-bg);
   padding: var(--space-lg);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
@@ -606,7 +689,7 @@
 }
 
 .po-detail-page .notes-section {
-  background: white;
+  background: var(--card-bg);
   padding: var(--space-lg);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
@@ -618,7 +701,7 @@
 }
 
 .po-detail-page .items-section {
-  background: white;
+  background: var(--card-bg);
   padding: var(--space-lg);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
@@ -720,7 +803,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-md);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   min-width: 200px;
@@ -780,7 +863,7 @@
 
 /* Receive Items Form */
 .po-detail-page .receive-form {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   margin-bottom: var(--space-lg);
@@ -946,7 +1029,7 @@
   right: 0;
   padding: var(--space-md);
   padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-  background: white;
+  background: var(--card-bg);
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   z-index: 100;
   display: flex;
@@ -1079,12 +1162,14 @@
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .purchase-orders-page {
-    padding: 16px;
+    padding: var(--space-md);
+    padding-bottom: 80px;
   }
 
   .purchase-orders-page .page-header {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-sm);
   }
 
   .purchase-orders-page .btn-primary {
@@ -1092,9 +1177,17 @@
     justify-content: center;
   }
 
+  /* Summary Cards - 2 per row, last one expands if odd */
   .purchase-orders-page .summary-cards {
+    display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  /* Make the last card full width if there's an odd number of cards */
+  .purchase-orders-page .summary-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .purchase-orders-page .summary-card {
@@ -1103,18 +1196,30 @@
     text-align: center;
   }
 
+  .purchase-orders-page .summary-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .purchase-orders-page .summary-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .purchase-orders-page .summary-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
   }
 
   .purchase-orders-page .summary-value {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 
   .purchase-orders-page .filters-bar {
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-sm);
+    background: var(--card-bg);
   }
 
   .purchase-orders-page .filters-bar label {
@@ -1123,6 +1228,21 @@
 
   .purchase-orders-page .filters-bar select {
     width: 100%;
+    background: var(--input-bg);
+  RY|  .purchase-orders-page .filters-bar select {
+    width: 100%;
+    background: var(--input-bg);
+  }
+
+  .purchase-orders-page .search-box {
+    width: 100%;
+  }
+
+  .purchase-orders-page .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+    background: var(--card-bg);
   }
 
   .purchase-orders-page .po-cards-grid {
@@ -1130,3 +1250,92 @@
   }
 }
 
+/* PO Link in AG-Grid */
+
+/* PO Link in AG-Grid */
+.purchase-orders-page .po-link {
+  color: var(--primary);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.purchase-orders-page .po-link:hover {
+  text-decoration: underline;
+}
+
+/* Action buttons in AG-Grid */
+.purchase-orders-page .action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.purchase-orders-page .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+}
+
+.purchase-orders-page .action-btn.view-btn {
+  color: var(--primary);
+}
+
+.purchase-orders-page .action-btn.view-btn:hover {
+  background: var(--primary-50);
+}
+
+.purchase-orders-page .action-btn.edit-btn {
+  color: var(--success);
+}
+
+.purchase-orders-page .action-btn.edit-btn:hover {
+  background: #ecfdf5;
+}
+
+.purchase-orders-page .action-btn.delete-btn {
+  color: var(--error);
+}
+
+.purchase-orders-page .action-btn.delete-btn:hover {
+  background: #fef2f2;
+}
+
+/* Status badges */
+.purchase-orders-page .status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.purchase-orders-page .status-draft {
+  background: var(--neutral-200);
+  color: var(--neutral-600);
+}
+
+.purchase-orders-page .status-submitted {
+  background: #3b82f6;
+  color: white;
+}
+
+.purchase-orders-page .status-partially-received {
+  background: #f59e0b;
+  color: white;
+}
+
+.purchase-orders-page .status-completed {
+  background: #10b981;
+  color: white;
+}
+
+JY|}

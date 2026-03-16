@@ -49,28 +49,7 @@
   overflow: visible;
 }
 
-/* Compact Card */
-.compact-mobile-card {
-  background: var(--neutral-100);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: var(--space-sm) var(--space-md);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: visible;
-}
-
-.compact-mobile-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary-500);
-}
-
-.compact-mobile-card:active {
-  transform: scale(0.99);
-}
+/* Wrapper styles removed as they are handled by Card component */
 
 /* Movement-specific card styling */
 .compact-mobile-card.movement-card {
@@ -102,13 +81,7 @@
   border-left-color: #f59e0b;
 }
 
-/* Compact Card Content Layout */
-.compact-card-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-md);
-}
+/* Content layout styles removed as they are handled by Card.Row */
 
 /* Left: Movement Info */
 .compact-item-info {
@@ -358,4 +331,173 @@
   .movement-warehouse {
     text-align: left;
   }
+}
+  .movement-warehouse {
+    text-align: left;
+  }
+}
+
+/* Item Preview Modal Styles */
+.item-preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1100;
+  padding: 0;
+  animation: fadeIn 0.2s ease;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.item-preview-container {
+  background: var(--neutral-100, #ffffff);
+  border-radius: 16px 16px 0 0;
+  max-height: 85vh;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.swipe-indicator {
+  width: 36px;
+  height: 4px;
+  background: var(--neutral-300, #e0e0e0);
+  border-radius: 2px;
+  margin: 8px auto;
+}
+
+.item-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--neutral-200, #f0f0f0);
+}
+
+.item-preview-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-preview-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 4px 0;
+}
+
+.item-preview-code {
+  font-size: 13px;
+  color: var(--text-tertiary, #6c757d);
+  font-family: monospace;
+}
+
+.item-preview-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--neutral-100, #f1f3f5);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: var(--text-secondary, #495057);
+  transition: background 0.2s;
+}
+
+.item-preview-close:hover {
+  background: var(--neutral-200, #e9ecef);
+}
+
+.item-preview-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.item-preview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.preview-stat {
+  text-align: center;
+  padding: 12px;
+  background: var(--neutral-50, #f8f9fa);
+  border-radius: 8px;
+}
+
+.preview-stat-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-tertiary, #6c757d);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.preview-stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.preview-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.preview-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.preview-detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.preview-detail-label {
+  font-size: 11px;
+  color: var(--text-tertiary, #6c757d);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview-detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.item-preview-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--neutral-200, #f0f0f0);
 }

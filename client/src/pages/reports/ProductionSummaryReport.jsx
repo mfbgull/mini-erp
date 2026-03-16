@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
+import { ModuleRegistry , ClientSideRowModelModule } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import {
   Factory,
   Package,
@@ -15,12 +17,11 @@ import {
   XCircle,
   X
 } from 'lucide-react';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './ProductionSummaryReport.css';
 
@@ -308,7 +309,7 @@ export default function ProductionSummaryReport() {
           </div>
         ) : reportData?.production && reportData.production.length > 0 ? (
           <>
-            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+            <div className="ag-theme-quartz desktop-view ag-grid-container">
               <AgGridReact
                 rowData={reportData.production || []}
                 columnDefs={columnDefs}

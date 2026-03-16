@@ -138,6 +138,8 @@ _tmp/
 .opencode/
 *.agent.log
 copilotilot*/
+pencil/
+CLI-Anything/
 
 # ----------------------------------------
 # INCLUDE IMPORTANT FILES (!NEGATION)

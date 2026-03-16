@@ -1,16 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSettings } from "../../context/SettingsContext";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { format } from "date-fns";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
-import api from "../../utils/api";
-import Button from "../../components/common/Button";
-import Modal from "../../components/common/Modal";
-import FormInput from "../../components/common/FormInput";
-import SearchableSelect from "../../components/common/SearchableSelect";
-import { CompactProductionCardView } from "../../components/common/CompactProductionCard";
-import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { format } from "date-fns";
 import {
   AlertTriangle,
   Search,
@@ -18,8 +11,18 @@ import {
   ClipboardList,
   Calendar,
 } from "lucide-react";
+
+import Button from "../../components/common/Button";
+import { CompactProductionCardView } from "../../components/common/CompactProductionCard";
+import FormInput from "../../components/common/FormInput";
+import Modal from "../../components/common/Modal";
+import SearchableSelect from "../../components/common/SearchableSelect";
+import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { productionSchema } from "../../schemas";
+import api from "../../utils/api";
+import "../inventory/ItemPreview.css";
 import "./ProductionPage.css";
 
 export default function ProductionPage() {

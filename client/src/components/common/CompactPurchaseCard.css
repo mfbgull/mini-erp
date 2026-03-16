@@ -43,29 +43,13 @@
   gap: 12px;
 }
 
-.compact-mobile-card {
-  background: var(--surface, #fff);
-  border: 1px solid var(--border-color, #e5e7eb);
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.compact-mobile-card:active {
-  transform: scale(0.99);
-}
+/* Wrapper styles removed as they are handled by Card component */
 
 .compact-mobile-card.purchase-card {
   border-left: 4px solid #8b5cf6;
 }
 
-.compact-card-content {
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
+/* Content layout styles removed as they are handled by Card.Row */
 
 .compact-item-info {
   flex: 1;

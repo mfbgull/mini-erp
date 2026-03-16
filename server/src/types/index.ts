@@ -191,3 +191,72 @@ export interface DatabaseResult {
   changes: number;
   lastInsertRowid: number | bigint;
 }
+
+// ============ Forecast Types ============
+export interface DemandForecast {
+  id: number;
+  item_id: number;
+  forecast_date: string;
+  period: 'next_week' | 'next_month' | 'next_quarter';
+  predicted_quantity: number;
+  confidence_level: number;
+  trend_direction: 'growing' | 'stable' | 'declining';
+  trend_percentage: number;
+  model_type: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ForecastResult {
+  itemId: number;
+  itemCode: string;
+  itemName: string;
+  category: string;
+  currentStock: number;
+  predictedDemand: {
+    nextWeek: number;
+    nextMonth: number;
+    nextQuarter: number;
+  };
+  trend: 'growing' | 'stable' | 'declining';
+  trendPercentage: number;
+  confidence: number;
+  recommendation: 'order_now' | 'order_soon' | 'monitor' | 'adequate';
+  lastUpdated: string;
+}
+
+export interface ForecastDashboardData {
+  summary: {
+    totalItems: number;
+    itemsNeedingRestock: number;
+    avgConfidence: number;
+    criticalAlerts: number;
+  };
+  alerts: ForecastAlert[];
+  topGrowing: ForecastResult[];
+  topDeclining: ForecastResult[];
+}
+
+export interface ForecastAlert {
+  itemId: number;
+  itemName: string;
+  currentStock: number;
+  predictedDemand: number;
+  alertLevel: 'critical' | 'warning' | 'monitor' | 'adequate';
+  recommendation: string;
+}
+
+export interface MonthlySaleData {
+  month: string;
+  actual: number | null;
+  predicted: number | null;
+}
+
+export interface TrendData {
+  historicalTrends: MonthlySaleData[];
+  itemBreakdown: {
+    itemName: string;
+    totalSold: number;
+    trend: 'growing' | 'stable' | 'declining';
+  }[];
+}

@@ -7,10 +7,12 @@ import {
   useMemo,
   ReactNode 
 } from 'react';
-import api from '../utils/api';
 import toast from 'react-hot-toast';
-import { storage } from '../utils/storage';
+
 import { User } from '../types';
+import api from '../utils/api';
+import { handleError } from '../utils/errors';
+import { storage } from '../utils/storage';
 
 interface LoginResponse {
   user: User;
@@ -54,9 +56,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       toast.success(`Welcome back, ${userData.full_name}!`);
       return { success: true };
     } catch (error: unknown) {
-      const message = error.response?.data?.error?.message || error.message || 'Login failed';
-      toast.error(message);
-      return { success: false, error: message };
+      const appError = handleError(error, 'AuthContext.login', { showToast: false });
+      toast.error(appError.message);
+      return { success: false, error: appError.message };
     }
   }, []);
 
@@ -64,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await api.post('/auth/logout');
     } catch (error) {
-      console.error('Logout error:', error);
+      handleError(error, 'AuthContext.logout', { showToast: false });
     } finally {
       // Only clear user data, token cookie is cleared by server
       storage.removeUser();

@@ -1,11 +1,14 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+
 import {
-  Menu, X, ChevronLeft, ChevronRight, LogOut,
+  Menu, X, LogOut,
   LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
-  ClipboardList, Factory, Receipt, FileText, Link2, Settings
+  ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, TrendingUp
 } from 'lucide-react';
+
+import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import './Sidebar.css';
 
 interface NavItem {
@@ -15,7 +18,6 @@ interface NavItem {
   children?: NavItem[];
 }
 
-// Static navigation items - defined outside component to avoid recreation on every render
 const NAV_ITEMS: NavItem[] = [
   { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
   {
@@ -53,6 +55,15 @@ const NAV_ITEMS: NavItem[] = [
     ]
   },
   {
+    label: 'Forecasts',
+    icon: <TrendingUp size={20} strokeWidth={1.5} />,
+    children: [
+      { path: '/forecasts', label: 'Dashboard' },
+      { path: '/forecasts/demand', label: 'Demand Forecast' },
+      { path: '/forecasts/trends', label: 'Trends' }
+    ]
+  },
+  {
     label: 'Purchases',
     icon: <ShoppingCart size={20} strokeWidth={1.5} />,
     children: [
@@ -72,21 +83,11 @@ const NAV_ITEMS: NavItem[] = [
 
 const Sidebar = memo(function Sidebar() {
   const { user, logout } = useAuth();
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    const saved = localStorage.getItem('sidebarCollapsed');
-    return saved === 'true';
-  });
-  const [dropdownTop, setDropdownTop] = useState<number | null>(null);
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', isCollapsed.toString());
-    window.dispatchEvent(new CustomEvent('sidebarToggle', { detail: { collapsed: isCollapsed } }));
-  }, [isCollapsed]);
-
-  // Detect mobile screen size
   useEffect(() => {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -97,62 +98,47 @@ const Sidebar = memo(function Sidebar() {
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, []);
 
-  const toggleSidebar = () => {
-    if (isMobile) {
-      setIsMobileMenuOpen(!isMobileMenuOpen);
-    } else {
-      setIsCollapsed(!isCollapsed);
-    }
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const handleNavClick = () => {
-    if (isMobile) {
-      setIsMobileMenuOpen(false);
-    }
+    setIsMobileMenuOpen(false);
   };
 
   return (
     <>
-      {/* Mobile Menu Toggle Button */}
       {isMobile && (
-        <button
-          className="sidebar-toggle mobile-menu-toggle"
-          onClick={toggleSidebar}
-          title={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={isMobileMenuOpen}
-          aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <>
+          <button
+            className="sidebar-toggle mobile-dark-mode-toggle"
+            onClick={toggleDarkMode}
+            title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <button
+            className="sidebar-toggle mobile-menu-toggle"
+            onClick={toggleMobileMenu}
+            title={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMobileMenuOpen}
+            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </>
       )}
 
-      {/* Desktop Collapse Toggle */}
-      {!isMobile && (
-        <button
-          className={`sidebar-toggle ${isCollapsed ? 'collapsed' : ''}`}
-          onClick={toggleSidebar}
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </button>
-      )}
-
-      <div className={`sidebar ${isCollapsed && !isMobile ? 'collapsed' : ''} ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+      <div className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-logo">
-          {isCollapsed && !isMobile ? (
-            <img src="/minierp-logo.webp" alt="Mini ERP" className="sidebar-logo-image collapsed" />
-          ) : (
-            <>
-              <img src="/minierp-logo.webp" alt="Mini ERP" className="sidebar-logo-image" />
-              <h3>Mini ERP</h3>
-              <p className="small">Simple & Powerful</p>
-            </>
-          )}
+          <img src="/minierp-logo.webp" alt="Mini ERP" className="sidebar-logo-image" />
+          <h3>Mini ERP</h3>
+          <p className="small">Simple & Powerful</p>
         </div>
 
         <nav className="sidebar-menu">
@@ -160,31 +146,15 @@ const Sidebar = memo(function Sidebar() {
             item.children ? (
               <div
                 key={index}
-                className={`nav-section ${isCollapsed && !isMobile ? 'has-dropdown' : ''} ${activeDropdown === index ? 'dropdown-active' : ''}`}
-                onMouseEnter={(e: React.MouseEvent) => {
-                  if (isCollapsed && !isMobile) {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    setDropdownTop(rect.top);
-                    setActiveDropdown(index);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (!isMobile) {
-                    setActiveDropdown(null);
-                  }
-                }}
+                className={`nav-section ${activeDropdown === index ? 'dropdown-active' : ''}`}
+                onMouseEnter={() => setActiveDropdown(index)}
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                <div className="nav-section-title" title={isCollapsed && !isMobile ? item.label : ''}>
+                <div className="nav-section-title">
                   <span className="nav-icon">{item.icon}</span>
-                  {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? <span className="nav-label">{item.label}</span> : null}
+                  {isMobileMenuOpen && <span className="nav-label">{item.label}</span>}
                 </div>
-                <div
-                  className={`nav-children ${isCollapsed && !isMobile ? 'dropdown' : ''}`}
-                  style={isCollapsed && !isMobile && activeDropdown === index && dropdownTop ? { top: dropdownTop } : {}}
-                >
-                  {isCollapsed && !isMobile ? (
-                    <div className="dropdown-header">{item.label}</div>
-                  ) : null}
+                <div className="nav-children">
                   {item.children.map((child) => (
                     <NavLink
                       key={child.path}
@@ -202,12 +172,11 @@ const Sidebar = memo(function Sidebar() {
                 key={item.path}
                 to={item.path!}
                 className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                title={isCollapsed && !isMobile ? item.label : ''}
                 end
                 onClick={handleNavClick}
               >
                 <span className="nav-icon">{item.icon}</span>
-                {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? <span className="nav-label">{item.label}</span> : null}
+                {isMobileMenuOpen && <span className="nav-label">{item.label}</span>}
               </NavLink>
             )
           ))}
@@ -216,18 +185,18 @@ const Sidebar = memo(function Sidebar() {
         <div className="sidebar-footer">
           <div className="user-info">
             <div className="user-avatar">{user?.full_name?.charAt(0)}</div>
-            {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? (
+            {isMobileMenuOpen && (
               <div className="user-details">
                 <div className="user-name">{user?.full_name}</div>
                 <div className="user-role tiny">{user?.role}</div>
               </div>
-            ) : null}
+            )}
           </div>
-          {((!isCollapsed && !isMobile) || (isMobile && isMobileMenuOpen)) ? (
+          {isMobileMenuOpen && (
             <button className="logout-btn" onClick={logout} title="Logout">
               <LogOut size={18} strokeWidth={1.5} />
             </button>
-          ) : null}
+          )}
         </div>
       </div>
     </>

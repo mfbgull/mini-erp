@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { useSettings } from '../../context/SettingsContext';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import { Plus, Edit2, Trash2, Eye, Search, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../../utils/api';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
-import FormInput from '../../components/common/FormInput';
-import CompactCustomerCardView from '../../components/common/CompactCustomerCard';
+import { useNavigate } from 'react-router-dom';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ClientSideRowModelModule , ModuleRegistry } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
+import { Plus, Edit2, Trash2, Eye, Search, RefreshCw } from 'lucide-react';
+
 import CustomerPreview from './CustomerPreview';
+import Button from '../../components/common/Button';
+import CompactCustomerCardView from '../../components/common/CompactCustomerCard';
+import FormInput from '../../components/common/FormInput';
+import Modal from '../../components/common/Modal';
 import PaymentModal from '../../components/customers/PaymentModal';
+import { useSettings } from '../../context/SettingsContext';
+import { useFormValidation } from '../../hooks/useFormValidation';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { customerSchema } from '../../schemas';
+import api from '../../utils/api';
 import './CustomersPage.css';
 
 // Register AG Grid modules
@@ -419,7 +422,7 @@ function CustomerForm({ customer, onClose, onSuccess }) {
     opening_balance: 0
   });
   
-  const [errors, setErrors] = useState({});
+  const { errors, validate, clearErrors } = useFormValidation(customerSchema);
   const queryClient = useQueryClient();
   
   const mutation = useMutation({
@@ -474,33 +477,22 @@ function CustomerForm({ customer, onClose, onSuccess }) {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name.includes('_days') || name === 'credit_limit' || name === 'opening_balance' 
-        ? Number(value) || 0 
+      [name]: name.includes('_days') || name === 'credit_limit' || name === 'opening_balance'
+        ? Number(value) || 0
         : value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      clearErrors();
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
-    const newErrors = {};
-    if (!formData.customer_name.trim()) newErrors.customer_name = 'Customer name is required';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    
+
+    if (!validate(formData)) return;
+
     mutation.mutate(formData);
   };
 

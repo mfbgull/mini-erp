@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { X, User, Package, DollarSign, Check, ChevronRight, ChevronLeft } from 'lucide-react';
-import type { Invoice, Customer, InvoiceItem, Item } from '../../types';
 import toast from 'react-hot-toast';
+
+import { X, User, Package, DollarSign, Check, ChevronRight, ChevronLeft } from 'lucide-react';
+
+import type { Invoice, Customer, InvoiceItem, Item } from '../../types';
 import api from '../../utils/api';
+import { handleError } from '../../utils/errors';
+import Button from '../common/Button';
 import './InvoiceWizard.css';
 
 interface LocalInvoiceItem {
@@ -38,7 +42,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
       const response = await api.get('/customers');
       setCustomers(response.data || []);
     } catch (error) {
-      console.error('Failed to fetch customers:', error);
+      handleError(error, 'InvoiceWizard.fetchCustomers');
     }
   };
 
@@ -47,7 +51,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
       const response = await api.get('/inventory/items');
       setItems(response.data.data || []);
     } catch (error) {
-      console.error('Failed to fetch items:', error);
+      handleError(error, 'InvoiceWizard.fetchItems');
     }
   };
 
@@ -99,14 +103,14 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
         </select>
       </div>
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-        <button
-          className="btn btn-primary"
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button
+          variant="primary"
           disabled={!selectedCustomer}
           onClick={() => setStep(2)}
         >
           Continue <ChevronRight size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -172,16 +176,16 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
         </div>
       )}
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={() => setStep(1)}>
+        <Button variant="secondary" onClick={() => setStep(1)}>
           <ChevronLeft size={16} /> Back
-        </button>
-        <button
-          className="btn btn-primary"
+        </Button>
+        <Button
+          variant="primary"
           disabled={invoiceItems.length === 0}
           onClick={() => setStep(3)}
         >
           Continue <ChevronRight size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -236,12 +240,12 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
         </div>
       </div>
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={() => setStep(2)}>
+        <Button variant="secondary" onClick={() => setStep(2)}>
           <ChevronLeft size={16} /> Back
-        </button>
-        <button className="btn btn-primary" onClick={() => setStep(4)}>
+        </Button>
+        <Button variant="primary" onClick={() => setStep(4)}>
           Continue <ChevronRight size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -286,16 +290,17 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
         </div>
       </div>
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={() => setStep(3)}>
+        <Button variant="secondary" onClick={() => setStep(3)}>
           <ChevronLeft size={16} /> Back
-        </button>
-        <button
-          className="btn btn-success"
+        </Button>
+        <Button
+          variant="success"
           onClick={createInvoice}
           disabled={loading}
+          loading={loading}
         >
           {loading ? 'Creating...' : 'Create Invoice'}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -323,12 +328,12 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
         </div>
       </div>
       <div className="wizard-actions">
-        <button className="btn btn-secondary" onClick={handleOpen}>
+        <Button variant="secondary" onClick={handleOpen}>
           Create Another
-        </button>
-        <button className="btn btn-primary" onClick={onClose}>
+        </Button>
+        <Button variant="primary" onClick={onClose}>
           Close
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -354,7 +359,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
       setStep(5);
       toast.success('Invoice created successfully!');
     } catch (error: unknown) {
-      toast.error((error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to create invoice');
+      handleError(error, 'InvoiceWizard.handleSubmit', { fallbackMessage: 'Failed to create invoice' });
     } finally {
       setLoading(false);
     }

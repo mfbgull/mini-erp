@@ -1,4 +1,5 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
+
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import './ErrorBoundary.css';
 

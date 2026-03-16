@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import api from '../../utils/api';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { supplierSchema } from '../../schemas';
+import api from '../../utils/api';
 import './SuppliersPage.css';
 
 export default function SupplierFormPage({ mode }) {
@@ -24,7 +28,7 @@ export default function SupplierFormPage({ mode }) {
     is_active: 1
   });
 
-  const [errors, setErrors] = useState({});
+  const { errors, validate, clearErrors } = useFormValidation(supplierSchema);
 
   // Fetch next supplier code for new suppliers
   const { isLoading: isLoadingCode } = useQuery({
@@ -89,28 +93,14 @@ export default function SupplierFormPage({ mode }) {
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      clearErrors();
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validation
-    const newErrors = {};
-    if (!formData.supplier_name.trim()) newErrors.supplier_name = 'Supplier name is required';
-    if (!formData.supplier_code.trim()) newErrors.supplier_code = 'Supplier code is required';
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    if (!validate(formData)) return;
 
     mutation.mutate(formData);
   };
@@ -152,8 +142,9 @@ export default function SupplierFormPage({ mode }) {
               onChange={handleChange}
               error={errors.supplier_code}
               required
+              readOnly={!isEditMode}
               autoFocus={!isEditMode}
-              help="Unique identifier for the supplier"
+              helpText={!isEditMode ? "Auto-generated" : "Unique identifier for the supplier"}
             />
             <FormInput
               label="Supplier Name *"

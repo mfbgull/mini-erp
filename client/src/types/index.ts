@@ -236,3 +236,15 @@ export interface Supplier {
   created_at?: string;
   updated_at?: string;
 }
+
+// ============ Warehouse Types ============
+export interface Warehouse {
+  id: number;
+  warehouse_code: string;
+  warehouse_name: string;
+  location?: string;
+  description?: string;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}

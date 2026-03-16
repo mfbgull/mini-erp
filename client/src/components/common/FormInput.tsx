@@ -1,5 +1,6 @@
 import { ChangeEvent } from 'react';
-import './FormInput.css';
+
+import '../../styles/components/form.css';
 import SearchableSelect from './SearchableSelect';
 
 interface SelectOption {

@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
+import { Search, Calendar, ChevronDown, Check, User } from 'lucide-react';
+
+import Button from '../../components/common/Button';
 import { useInvoice } from '../../context/InvoiceContext';
 import { mobileInvoiceApi } from '../../utils/invoiceApi';
-import { Search, Calendar, ChevronDown, Check, User } from 'lucide-react';
-import toast from 'react-hot-toast';
-import './MobileInvoice.css';
+import '../../styles/pages/invoice.css';
 
 export default function InvoiceStep1Customer() {
   const { 
@@ -158,16 +161,10 @@ export default function InvoiceStep1Customer() {
               </option>
             ))}
           </select>
-          <ChevronDown 
-            size={16} 
-            style={{ 
-              position: 'absolute', 
-              right: 12, 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              pointerEvents: 'none'
-            }}
-          />
+            <ChevronDown
+              size={16}
+              className="miw-select-chevron"
+            />
         </div>
       </div>
 
@@ -187,21 +184,14 @@ export default function InvoiceStep1Customer() {
 
         {/* Continue Button */}
         <div className="miw-step-actions">
-          <button 
-            className="btn btn-primary"
+          <Button
+            variant="primary"
+            className="miw-continue-btn-full"
             onClick={handleContinue}
             disabled={!customer}
-            style={{ 
-              width: '100%',
-              height: '48px',
-              borderRadius: '12px',
-              fontSize: '14px',
-              fontWeight: 600,
-              boxShadow: '0 2px 4px rgba(54, 123, 245, 0.3)'
-            }}
           >
             Continue
-          </button>
+          </Button>
         </div>
     </div>
   );

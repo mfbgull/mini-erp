@@ -1,13 +1,17 @@
 import { useState } from 'react';
-import { useInvoice } from '../../context/InvoiceContext';
-import { mobileInvoiceApi } from '../../utils/invoiceApi';
-import { useSettings } from '../../context/SettingsContext';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+
 import { useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronUp, Calendar, FileText } from 'lucide-react';
+
 import StickyFooter from './components/StickyFooter';
-import toast from 'react-hot-toast';
-import './MobileInvoice.css';
+import { useInvoice } from '../../context/InvoiceContext';
+import { useSettings } from '../../context/SettingsContext';
+import { mobileInvoiceApi } from '../../utils/invoiceApi';
+
+
+import '../../styles/pages/invoice.css';
 
 export default function InvoiceStep5Review() {
   const navigate = useNavigate();
@@ -127,9 +131,8 @@ export default function InvoiceStep5Review() {
               <ChevronDown size={18} className="miw-expand-icon" />
             )}
           </div>
-          <div 
-            className={`miw-added-items-list ${isItemsExpanded ? 'expanded' : 'collapsed'}`}
-            style={{ maxHeight: isItemsExpanded ? '300px' : '0' }}
+          <div
+            className={`miw-added-items-list ${isItemsExpanded ? 'miw-items-list-expanded-short' : 'miw-items-list-collapsed'}`}
           >
             {items.map((item: InvoiceItem, index: number) => (
               <div 

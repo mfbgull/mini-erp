@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { useActivityLogs, useEntityTypes, useActions, useUsers, useActivityStats } from '../context/ActivityLogContext';
-import DataTable from '../components/common/DataTable';
-import Button from '../components/common/Button';
-import Modal from '../components/common/Modal';
+
 import { format } from 'date-fns';
+
+import Button from '../components/common/Button';
+import DataTable from '../components/common/DataTable';
+import Modal from '../components/common/Modal';
+import { useActivityLogs, useEntityTypes, useActions, useUsers, useActivityStats } from '../context/ActivityLogContext';
+
 import './ActivityLog.css';
 
 export default function ActivityLog() {

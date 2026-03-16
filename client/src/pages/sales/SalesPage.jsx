@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
-import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { AgGridReact } from 'ag-grid-react';
-import { FileText, ShoppingCart, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../../utils/api';
+import { useNavigate } from 'react-router-dom';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AgGridReact } from 'ag-grid-react';
+import { format } from 'date-fns';
+import { FileText, ShoppingCart, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
+
+import InvoicePreview from './InvoicePreview';
 import Button from '../../components/common/Button';
 import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
-import InvoicePreview from './InvoicePreview';
+import { useSettings } from '../../context/SettingsContext';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import api from '../../utils/api';
 import './SalesPage.css';
 
 export default function SalesPage() {

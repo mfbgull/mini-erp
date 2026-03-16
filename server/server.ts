@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { Server } from 'http';
 import app from './src/app';
 import db from './src/config/database';

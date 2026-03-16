@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, ReactNode } from 'react';
 
+import { handleError } from '../utils/errors';
+
 // ============================================
 // Types
 // ============================================
@@ -305,7 +307,7 @@ export function InvoiceProvider({ children }: InvoiceProviderProps) {
       const data = await response.json();
       dispatch({ type: 'SET_DRAFT_ID', payload: data.data.id.toString() });
     } catch (error) {
-      console.error('Error saving draft:', error);
+      handleError(error, 'InvoiceContext.saveDraft');
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }

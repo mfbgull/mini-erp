@@ -40,7 +40,7 @@
 .report-type-btn {
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--neutral-200);
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-md);
   cursor: pointer;
   display: flex;
@@ -85,7 +85,7 @@
 }
 
 .report-content {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -138,8 +138,7 @@
 }
 
 .summary-card {
-  background: var(--neutral-100, white);
-  background: white;
+  background: var(--neutral-100);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: var(--space-md);
@@ -1969,7 +1968,7 @@
   }
 
   .expenses-report .report-summary {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 15px !important;
   }
 
@@ -1999,7 +1998,7 @@
   }
 
   .expenses-report .category-breakdown {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px !important;
   }
 
@@ -2464,7 +2463,7 @@
 }
 
 .report-content {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -2480,7 +2479,7 @@
 }
 
 .summary-item {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: var(--space-md);
@@ -2534,7 +2533,7 @@
 }
 
 .metric-card {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: var(--space-md);
@@ -3133,7 +3132,7 @@
   border: 1px solid var(--neutral-300);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
-  background: white;
+  background: var(--card-bg);
 }
 
 .apply-filters-btn {
@@ -3149,7 +3148,7 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: var(--space-md);
@@ -3199,7 +3198,7 @@
 }
 
 .report-content {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -4469,7 +4468,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-md);
   padding: var(--space-lg);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -4543,7 +4542,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-lg);
-  background: white;
+  background: var(--card-bg);
   border: 1px solid #dee2e6;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -4580,7 +4579,7 @@
 }
 
 .report-category {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -4768,7 +4767,37 @@
 
 @media (max-width: 480px) {
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xs);
+  }
+
+  .stat-card {
+    padding: var(--space-sm);
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+    line-height: 1.2;
+  }
+
+  .stat-subtitle {
+    font-size: 0.65rem;
+    line-height: 1.2;
   }
 
   .quick-actions {
@@ -5184,7 +5213,7 @@
   border: 1px solid var(--neutral-300);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
-  background: white;
+  background: var(--card-bg);
 }
 
 .apply-filters-btn {
@@ -5200,7 +5229,7 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--neutral-100);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: var(--space-md);
@@ -5240,7 +5269,7 @@
 }
 
 .report-content {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -5564,7 +5593,6 @@
 
 .sales-summary-card {
   background: var(--neutral-100);
-  background: var(--neutral-100, #ffffff);
   border-radius: var(--radius-md, 8px);
   box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04));
   border: 1px solid var(--neutral-200, #e5e7eb);

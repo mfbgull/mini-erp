@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MoreVertical, Eye, Edit, Trash2, X, FileCheck, PackageCheck } from 'lucide-react';
 import { format } from 'date-fns';
+import { MoreVertical, Eye, Edit, Trash2, X, FileCheck, PackageCheck } from 'lucide-react';
+
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
-import toast from 'react-hot-toast';
 import './PurchaseOrderCard.css';
 
 export function PurchaseOrderCard({ po }) {
@@ -160,6 +162,7 @@ export function PurchaseOrderCard({ po }) {
         <div className="po-card-content">
           <div className="po-card-info">
             <h3 className="po-card-name">{po.po_no}</h3>
+            <span className="po-card-supplier">{po.supplier_name}</span>
             <span className={`po-card-status ${getStatusClass(po.status)}`}>
               {po.status}
             </span>
@@ -306,14 +309,30 @@ export function PurchaseOrderCard({ po }) {
                       {format(new Date(po.po_date), 'dd MMM yyyy')}
                     </span>
                   </div>
+                  {po.expected_delivery_date && (
+                    <div className="po-detail-item">
+                      <span className="po-detail-label">Expected Delivery</span>
+                      <span className="po-detail-value">
+                        {format(new Date(po.expected_delivery_date), 'dd MMM yyyy')}
+                      </span>
+                    </div>
+                  )}
                   <div className="po-detail-item">
                     <span className="po-detail-label">Supplier</span>
                     <span className="po-detail-value">{po.supplier_name}</span>
                   </div>
-                  <div className="po-detail-item">
-                    <span className="po-detail-label">Warehouse</span>
-                    <span className="po-detail-value">{po.warehouse_name || 'N/A'}</span>
-                  </div>
+                  {po.warehouse_name && (
+                    <div className="po-detail-item">
+                      <span className="po-detail-label">Warehouse</span>
+                      <span className="po-detail-value">{po.warehouse_name}</span>
+                    </div>
+                  )}
+                  {po.created_by_username && (
+                    <div className="po-detail-item">
+                      <span className="po-detail-label">Created By</span>
+                      <span className="po-detail-value">{po.created_by_username}</span>
+                    </div>
+                  )}
                   <div className="po-detail-item">
                     <span className="po-detail-label">Total Amount</span>
                     <span className="po-detail-value po-total-amount">
@@ -322,6 +341,48 @@ export function PurchaseOrderCard({ po }) {
                   </div>
                 </div>
               </section>
+
+              {/* Items Section */}
+              {po.items && po.items.length > 0 && (
+                <section className="po-section">
+                  <h3 className="po-section-title">Items ({po.items.length})</h3>
+                  <div className="po-items-list">
+                    {po.items.map((item) => {
+                      const pending = (item.quantity || 0) - (item.received_quantity || 0);
+                      return (
+                        <div key={item.id} className="po-item-preview">
+                          <div className="po-item-preview-header">
+                            <span className="po-item-preview-name">
+                              {item.item_code} - {item.item_name}
+                            </span>
+                            <span className="po-item-preview-total">
+                              {formatCurrency((item.quantity || 0) * (item.unit_price || 0))}
+                            </span>
+                          </div>
+                          <div className="po-item-preview-details">
+                            <div className="po-item-preview-row">
+                              <span>Ordered</span>
+                              <span>{item.quantity} {item.unit_of_measure}</span>
+                            </div>
+                            <div className="po-item-preview-row">
+                              <span>Received</span>
+                              <span>{item.received_quantity || 0} {item.unit_of_measure}</span>
+                            </div>
+                            <div className="po-item-preview-row">
+                              <span>Pending</span>
+                              <span>{pending} {item.unit_of_measure}</span>
+                            </div>
+                            <div className="po-item-preview-row">
+                              <span>Unit Price</span>
+                              <span>{formatCurrency(item.unit_price)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
 
               {po.notes && (
                 <section className="po-section">
@@ -389,14 +450,6 @@ export function PurchaseOrderCard({ po }) {
                   Receive Items
                 </button>
               )}
-              <button
-                type="button"
-                className="po-action-btn po-action-primary"
-                onClick={() => navigate(`/purchase-orders/${po.id}`)}
-              >
-                <Eye size={18} />
-                View Full Details
-              </button>
             </div>
           </div>
         </div>

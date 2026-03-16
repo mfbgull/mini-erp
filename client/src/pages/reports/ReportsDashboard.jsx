@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+
+import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp,
   Package,
@@ -21,9 +23,9 @@ import {
   ClipboardList,
   Banknote
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import api from '../../utils/api';
+
 import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import './ReportsDashboard.css';
 
 export default function ReportsDashboard() {
@@ -237,7 +239,7 @@ export default function ReportsDashboard() {
       {/* Summary Statistics Cards - ItemsPage Style */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
+          <div className="stat-icon stat-icon-gradient-success">
             <TrendingUpIcon size={24} color="white" />
           </div>
           <div className="stat-content">
@@ -248,7 +250,7 @@ export default function ReportsDashboard() {
         </div>
 
         <div className="stat-card" style={{ borderColor: stats.pendingPayments > 0 ? '#f97316' : undefined }}>
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }}>
+          <div className="stat-icon stat-icon-gradient-warning">
             <DollarSign size={24} color="white" />
           </div>
           <div className="stat-content">
@@ -259,7 +261,7 @@ export default function ReportsDashboard() {
         </div>
 
         <div className="stat-card alert">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
+          <div className="stat-icon stat-icon-gradient-danger">
             <AlertTriangle size={24} color="white" />
           </div>
           <div className="stat-content">
@@ -270,7 +272,7 @@ export default function ReportsDashboard() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
+          <div className="stat-icon stat-icon-gradient-info">
             <Package size={24} color="white" />
           </div>
           <div className="stat-content">
@@ -281,7 +283,7 @@ export default function ReportsDashboard() {
         </div>
 
         <div className="stat-card" style={{ borderColor: stats.lowStockItems > 0 ? '#f59e0b' : undefined }}>
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
+          <div className="stat-icon stat-icon-gradient-amber">
             <Bell size={24} color="white" />
           </div>
           <div className="stat-content">
@@ -292,7 +294,7 @@ export default function ReportsDashboard() {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
+          <div className="stat-icon stat-icon-gradient-violet">
             <Gem size={24} color="white" />
           </div>
           <div className="stat-content">

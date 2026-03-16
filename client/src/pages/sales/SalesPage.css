@@ -13,7 +13,7 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: 12px;
   padding: 20px;
@@ -30,17 +30,17 @@
 
 .summary-card.success {
   border-color: var(--success);
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  background: linear-gradient(135deg, var(--card-bg) 0%, #f0fdf4 100%);
 }
 
 .summary-card.warning {
   border-color: #f59e0b;
-  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+  background: linear-gradient(135deg, var(--card-bg) 0%, #fffbeb 100%);
 }
 
 .summary-card.revenue-card {
   border-color: var(--success);
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  background: linear-gradient(135deg, var(--card-bg) 0%, #f0fdf4 100%);
 }
 
 .summary-icon {
@@ -177,7 +177,7 @@
 
 /* Sales Content */
 .sales-content {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   border: 1px solid var(--neutral-200);
   overflow: hidden;
@@ -254,7 +254,7 @@
   height: 28px;
   border-radius: 6px;
   border: 1px solid var(--neutral-200);
-  background: white;
+  background: var(--card-bg);
   cursor: pointer;
   display: flex;
   align-items: center;

@@ -1,139 +1,161 @@
-import React, { useState } from 'react';
-import { Search, MoreVertical, Edit, Trash2, Factory } from 'lucide-react';
-import DropdownMenu from './DropdownMenu';
-import './CompactWarehouseCard.css';
+import { useState } from 'react';
 
-interface Warehouse {
-  id: number;
-  warehouse_code: string;
-  warehouse_name: string;
-  location?: string;
+import { MoreVertical, Edit, Trash2, X } from 'lucide-react';
+
+import Card from './Card';
+import type { Warehouse as WarehouseType } from '../../types';
+import '../../styles/components/card.css';
+
+interface CompactWarehouseCardProps {
+  warehouse: WarehouseType;
+  onEdit: (warehouse: WarehouseType) => void;
+  onDelete: (warehouse: WarehouseType) => void;
 }
 
-interface CompactWarehouseCardViewProps {
-  warehouses: Warehouse[];
-  onEdit: (warehouse: Warehouse) => void;
-  onDelete: (warehouse: Warehouse) => void;
-  onRowClick: (warehouse: Warehouse) => void;
-}
+export function CompactWarehouseCard({ warehouse, onEdit, onDelete }: CompactWarehouseCardProps) {
+  const [showMenu, setShowMenu] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
-export default function CompactWarehouseCardView({
-  warehouses,
-  onEdit,
-  onDelete,
-  onRowClick
-}: CompactWarehouseCardViewProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const handleCardClick = () => {
+    setShowDetails(true);
+  };
 
-  const filteredWarehouses = warehouses.filter(warehouse =>
-    warehouse.warehouse_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    warehouse.warehouse_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    warehouse.location?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleMenuToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowMenu(prev => !prev);
+  };
 
-  if (filteredWarehouses.length === 0) {
-    return (
-      <div className="compact-mobile-cards-wrapper">
-        <div className="compact-mobile-search-container">
-          <Search className="search-icon" size={18} />
-          <input
-            type="text"
-            placeholder="Search warehouses..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="compact-mobile-search-input"
-          />
-        </div>
-        <div className="mobile-empty-state">
-          <Factory className="empty-icon" size={48} />
-          <div className="empty-title">
-            {searchTerm ? 'No matching warehouses' : 'No warehouses found'}
-          </div>
-          <div className="empty-subtitle">
-            {searchTerm
-              ? 'Try adjusting your search terms'
-              : 'Create your first warehouse to get started'}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleEdit = () => {
+    setShowMenu(false);
+    onEdit(warehouse);
+  };
+
+  const handleDelete = () => {
+    setShowMenu(false);
+    onDelete(warehouse);
+  };
+
+  const handleBackdropClick = () => {
+    setShowMenu(false);
+  };
 
   return (
-    <div className="compact-mobile-cards-wrapper">
-      <div className="compact-mobile-search-container">
-        <Search className="search-icon" size={18} />
-        <input
-          type="text"
-          placeholder="Search warehouses..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="compact-mobile-search-input"
-        />
-      </div>
+    <>
+      <Card variant="compact" hoverable onClick={handleCardClick} className="compact-item-card">
+        <Card.Row justify="space-between" align="center" className="card-content-clickable">
+          <div className="item-info-section">
+            <p className="item-item-name">{warehouse.warehouse_name}</p>
+            <div className="item-meta">
+              <span className="item-item-code">{warehouse.warehouse_code}</span>
+            </div>
+          </div>
 
-      <div className="compact-mobile-cards-container">
-        {filteredWarehouses.map((warehouse) => {
-          return (
-            <div
-              key={warehouse.id}
-              className="compact-mobile-card warehouse-card"
-              onClick={(e) => {
-                const target = e.target as HTMLElement;
-                const menuButton = target.closest('.compact-menu-trigger');
-                if (menuButton) return;
-                onRowClick(warehouse);
-              }}
+          <div className="menu-container" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="menu-trigger"
+              onClick={handleMenuToggle}
             >
-              <div className="compact-card-content">
-                {/* Left: Warehouse info */}
-                <div className="compact-item-info">
-                  <p className="compact-item-name">{warehouse.warehouse_name}</p>
-                  <p className="compact-item-code">{warehouse.warehouse_code}</p>
+              <MoreVertical className="menu-icon" />
+            </button>
+
+            {showMenu && (
+              <>
+                <div className="menu-backdrop" onClick={handleBackdropClick} />
+                <div className="dropdown-menu">
+                  <button type="button" className="dropdown-item" onClick={handleEdit}>
+                    <Edit className="dropdown-icon" />
+                    Edit
+                  </button>
+                  <button type="button" className="dropdown-item delete" onClick={handleDelete}>
+                    <Trash2 className="dropdown-icon" />
+                    Delete
+                  </button>
                 </div>
+              </>
+            )}
+          </div>
 
-                {/* Right: Location + menu */}
-                <div className="compact-item-right">
-                  {/* Location display */}
-                  <div className="compact-stock-display">
-                    <p className="stock-label">Location</p>
-                    <p className="stock-value location-value">
-                      {warehouse.location || 'N/A'}
-                    </p>
-                  </div>
+          <div className="item-stock-row">
+            <div className="quantity-display">
+              <span className={`qty-text ${warehouse.is_active ? 'qty-positive' : 'qty-zero'}`}>
+                {warehouse.is_active ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+          </div>
+        </Card.Row>
+      </Card>
 
-                  {/* Dropdown menu trigger */}
-                  <DropdownMenu
-                    trigger={
-                      <button className="compact-menu-trigger">
-                        <MoreVertical className="menu-icon" size={18} />
-                      </button>
-                    }
-                    items={[
-                      {
-                        label: 'Edit',
-                        icon: <Edit size={16} />,
-                        onClick: () => {
-                          onEdit(warehouse);
-                        }
-                      },
-                      {
-                        label: 'Delete',
-                        icon: <Trash2 size={16} />,
-                        destructive: true,
-                        onClick: () => {
-                          onDelete(warehouse);
-                        }
-                      }
-                    ] as any}
-                    align="end"
-                  />
+      {showDetails && (
+        <div className="item-preview-overlay" onClick={() => setShowDetails(false)}>
+          <div
+            className="item-preview-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="swipe-indicator"></div>
+
+            <div className="item-preview-header">
+              <div className="item-preview-title-section">
+                <h2 className="item-preview-title">{warehouse.warehouse_name}</h2>
+                <span className="item-preview-code">{warehouse.warehouse_code}</span>
+              </div>
+              <button className="item-preview-close" onClick={() => setShowDetails(false)}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="item-preview-content">
+              <div className="item-preview-stats">
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Code</span>
+                  <span className="preview-stat-value">{warehouse.warehouse_code}</span>
+                </div>
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Status</span>
+                  <span className={`preview-stat-value ${warehouse.is_active ? 'stock-normal' : 'stock-out-of-stock'}`}>
+                    {warehouse.is_active ? 'Active' : 'Inactive'}
+                  </span>
                 </div>
               </div>
+
+              <div className="preview-details-grid">
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Warehouse Code</span>
+                  <span className="preview-detail-value">{warehouse.warehouse_code}</span>
+                </div>
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Warehouse Name</span>
+                  <span className="preview-detail-value">{warehouse.warehouse_name}</span>
+                </div>
+                {warehouse.location && (
+                  <div className="preview-detail-item full-width">
+                    <span className="preview-detail-label">Location</span>
+                    <span className="preview-detail-value">{warehouse.location}</span>
+                  </div>
+                )}
+              </div>
             </div>
-          );
-        })}
-      </div>
-    </div>
+
+            <div className="item-preview-actions">
+              <button className="preview-action-btn edit-btn" onClick={() => {
+                setShowDetails(false);
+                onEdit(warehouse);
+              }}>
+                <Edit size={16} />
+                Edit
+              </button>
+              <button className="preview-action-btn delete-btn" onClick={() => {
+                setShowDetails(false);
+                onDelete(warehouse);
+              }}>
+                <Trash2 size={16} />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

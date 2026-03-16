@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import {
   Users,
   TrendingUp,
@@ -17,11 +19,11 @@ import {
   TrendingUp as TrendingUpIcon,
   Clock
 } from 'lucide-react';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './SalesReports.css';
 
@@ -277,7 +279,7 @@ export default function SalesByCustomerReport() {
         ) : reportData && reportData.length > 0 ? (
           <>
             {/* Desktop view - AG Grid */}
-            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+            <div className="ag-theme-quartz desktop-view ag-grid-container">
               <AgGridReact
                 rowData={reportData}
                 columnDefs={columnDefs}

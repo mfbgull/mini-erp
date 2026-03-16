@@ -1,11 +1,11 @@
 import React from 'react';
 import { useParams, useSearchParams, Navigate } from 'react-router-dom';
+
 import { useQuery } from '@tanstack/react-query';
-import { useMobileDetection } from '../../hooks/useMobileDetection';
-import api from '../../utils/api';
-import SalesInvoicePage from '../../pages/sales/SalesInvoicePage';
-import MobileInvoiceEditForm from '../../pages/invoice/MobileInvoiceEditForm';
+
 import InvoiceViewPage from '../../pages/sales/InvoiceViewPage';
+import SalesInvoicePage from '../../pages/sales/SalesInvoicePage';
+import api from '../../utils/api';
 import './InvoiceRouter.css';
 
 interface InvoiceRouterProps {
@@ -15,9 +15,7 @@ interface InvoiceRouterProps {
 export default function InvoiceRouter({ defaultMode = 'view' }: InvoiceRouterProps) {
   const { id: invoiceId } = useParams();
   const [searchParams] = useSearchParams();
-  const { isMobile } = useMobileDetection();
 
-  // Get mode from URL parameters
   const mode = searchParams.get('mode') || defaultMode;
   const action = searchParams.get('action');
 
@@ -93,12 +91,7 @@ export default function InvoiceRouter({ defaultMode = 'view' }: InvoiceRouterPro
 
   const showEdit = shouldShowEditMode();
 
-  // Render appropriate component
   if (showEdit) {
-    // Use mobile-optimized form on mobile devices
-    if (isMobile) {
-      return <MobileInvoiceEditForm />;
-    }
     return <SalesInvoicePage />;
   } else {
     return <InvoiceViewPage />;

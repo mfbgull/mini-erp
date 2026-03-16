@@ -1,5 +1,5 @@
 import { useState, memo, useMemo } from 'react';
-import './DataTable.css';
+import '../../styles/components/table.css';
 
 interface Column<T = Record<string, unknown>> {
   key: string;

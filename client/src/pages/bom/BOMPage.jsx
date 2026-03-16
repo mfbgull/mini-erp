@@ -1,16 +1,9 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSettings } from "../../context/SettingsContext";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
-import api from "../../utils/api";
-import Button from "../../components/common/Button";
-import Modal from "../../components/common/Modal";
-import FormInput from "../../components/common/FormInput";
-import SearchableSelect from "../../components/common/SearchableSelect";
-import { CompactBOMCardView } from "../../components/common/CompactBOMCard";
-import { useMobileDetection } from "../../hooks/useMobileDetection";
 import {
   ClipboardList,
   CheckCircle,
@@ -21,8 +14,18 @@ import {
   X,
   BarChart3,
 } from "lucide-react";
+
+import Button from "../../components/common/Button";
+import { CompactBOMCardView } from "../../components/common/CompactBOMCard";
+import FormInput from "../../components/common/FormInput";
+import Modal from "../../components/common/Modal";
+import SearchableSelect from "../../components/common/SearchableSelect";
+import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { bomSchema, bomItemSchema } from "../../schemas";
+import api from "../../utils/api";
+import "../inventory/ItemPreview.css";
 import "./BOMPage.css";
 
 export default function BOMPage() {

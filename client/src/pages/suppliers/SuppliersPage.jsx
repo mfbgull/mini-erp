@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
-import toast from 'react-hot-toast';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
+import Modal from '../../components/common/Modal';
 import { SupplierCard } from '../../components/common/SupplierCard';
+import api from '../../utils/api';
 import './SuppliersPage.css';
 
 export default function SuppliersPage() {
@@ -182,17 +184,22 @@ function SupplierForm({ supplier, onClose, onSuccess }) {
   const queryClient = useQueryClient();
 
   // Fetch next supplier code for new suppliers
-  useQuery({
-    queryKey: ['supplierNextCode'],
+  const { data: nextSupplierCode } = useQuery({
+    queryKey: ['supplierNextCode', supplier?.id],
     queryFn: async () => {
       const response = await api.get('/suppliers/next-code');
       return response.data.data.code;
     },
     enabled: !supplier,
-    onSuccess: (code) => {
-      setFormData(prev => ({ ...prev, supplier_code: code }));
-    }
+    staleTime: 0
   });
+
+  // Sync fetched code to form
+  useEffect(() => {
+    if (!supplier && nextSupplierCode && !formData.supplier_code) {
+      setFormData(prev => ({ ...prev, supplier_code: nextSupplierCode }));
+    }
+  }, [nextSupplierCode, supplier]);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -257,6 +264,7 @@ function SupplierForm({ supplier, onClose, onSuccess }) {
           onChange={handleChange}
           error={errors.supplier_code}
           required
+          readOnly={!supplier}
           autoFocus={!supplier}
           help="Unique identifier for the supplier"
         />

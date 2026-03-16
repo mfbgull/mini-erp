@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { Search, Package, MapPin } from 'lucide-react';
-import './CompactStockByWarehouseCard.css';
+import { useState } from 'react';
+
+import { X, Package, MapPin, Search, AlertTriangle } from 'lucide-react';
+
+import Card from './Card';
+import '../../styles/components/card.css';
 
 interface StockByWarehouse {
   id: number;
@@ -14,14 +17,102 @@ interface StockByWarehouse {
   unit_of_measure: string;
 }
 
+interface CompactStockByWarehouseCardProps {
+  item: StockByWarehouse;
+}
+
+export function CompactStockByWarehouseCard({ item }: CompactStockByWarehouseCardProps) {
+  const [showDetails, setShowDetails] = useState(false);
+
+  const isZeroStock = parseFloat(String(item.quantity || 0)) === 0;
+
+  return (
+    <>
+      <Card variant="compact" hoverable onClick={() => setShowDetails(true)} className="compact-stock-card">
+        <Card.Row justify="space-between" align="center" className="card-content-clickable">
+          <div className="stock-info-section">
+            <p className="stock-item-name">{item.item_name}</p>
+            <div className="stock-meta">
+              <span className="stock-item-code">{item.item_code}</span>
+            </div>
+          </div>
+
+          <div className="stock-row">
+            <div className="quantity-display">
+              <span className={`qty-text ${isZeroStock ? 'qty-zero' : 'qty-positive'}`}>
+                {parseFloat(String(item.quantity || 0)).toFixed(2)}
+              </span>
+              <span className="unit">{item.unit_of_measure}</span>
+            </div>
+          </div>
+        </Card.Row>
+
+        <div className="stock-card-warehouse-row">
+          <MapPin size={12} />
+          <span className="warehouse-text">{item.warehouse_name}</span>
+        </div>
+      </Card>
+
+      {showDetails && (
+        <div className="item-preview-overlay" onClick={() => setShowDetails(false)}>
+          <div
+            className="item-preview-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="swipe-indicator"></div>
+
+            <div className="item-preview-header">
+              <div className="item-preview-title-section">
+                <h2 className="item-preview-title">{item.item_name}</h2>
+                <span className="item-preview-code">{item.item_code}</span>
+              </div>
+              <button className="item-preview-close" onClick={() => setShowDetails(false)}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="item-preview-content">
+              <div className="preview-details-grid">
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Item</span>
+                  <span className="preview-detail-value">{item.item_name}</span>
+                </div>
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Code</span>
+                  <span className="preview-detail-value">{item.item_code}</span>
+                </div>
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Warehouse</span>
+                  <span className="preview-detail-value">{item.warehouse_name}</span>
+                </div>
+                <div className="preview-detail-item">
+                  <span className="preview-detail-label">Stock</span>
+                  <span className={`preview-detail-value ${isZeroStock ? 'stock-out-of-stock' : 'stock-normal'}`}>
+                    {parseFloat(String(item.quantity || 0)).toFixed(2)} {item.unit_of_measure}
+                  </span>
+                </div>
+              </div>
+
+              {isZeroStock && (
+                <div className="stock-alert preview-alert">
+                  <AlertTriangle className="alert-icon" size={18} />
+                  <span className="alert-text">Zero stock</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 interface CompactStockByWarehouseCardViewProps {
   stockData: StockByWarehouse[];
-  onRowClick: (item: StockByWarehouse) => void;
 }
 
 export default function CompactStockByWarehouseCardView({
-  stockData,
-  onRowClick
+  stockData
 }: CompactStockByWarehouseCardViewProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -73,31 +164,9 @@ export default function CompactStockByWarehouseCardView({
       </div>
 
       <div className="compact-mobile-cards-container">
-        {filteredStock.map((item) => {
-          const hasMultipleWarehouses = stockData.filter(s => s.item_id === item.item_id).length > 1;
-
-          return (
-            <div
-              key={`${item.item_id}-${item.warehouse_id}`}
-              className="compact-mobile-card stock-card"
-              onClick={() => onRowClick(item)}
-            >
-              <div className="compact-card-content">
-                <div className="compact-item-info">
-                  <span className="compact-item-name">{item.item_name}</span>
-                  <span className="compact-item-code">{item.item_code}</span>
-                </div>
-                <div className="compact-stock-info">
-                  <span className="compact-stock-qty">{parseFloat(String(item.quantity || 0)).toFixed(2)}</span>
-                  <span className="compact-stock-unit">{item.unit_of_measure}</span>
-                </div>
-                {hasMultipleWarehouses && (
-                  <span className="compact-multi-badge" title="Available in multiple warehouses"><MapPin size={14} /></span>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {filteredStock.map((item) => (
+          <CompactStockByWarehouseCard key={`${item.item_id}-${item.warehouse_id}`} item={item} />
+        ))}
       </div>
     </div>
   );

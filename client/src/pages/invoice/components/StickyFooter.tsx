@@ -1,6 +1,7 @@
-import { useSettings } from '../../../context/SettingsContext';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import '../MobileInvoice.css';
+
+import { useSettings } from '../../../context/SettingsContext';
+import '../../../styles/pages/invoice.css';
 
 interface StickyFooterProps {
   subtotal: number;

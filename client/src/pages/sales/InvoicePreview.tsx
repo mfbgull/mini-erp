@@ -1,6 +1,8 @@
 import React from 'react';
-import { X, Edit2, Trash2, Check, AlertTriangle, MinusCircle, Circle, AlertCircle } from 'lucide-react';
+
 import { format } from 'date-fns';
+import { X, Edit2, Trash2, Check, AlertTriangle, MinusCircle, Circle, AlertCircle } from 'lucide-react';
+
 import { formatCurrency } from '../../utils/formatters';
 import './InvoicePreview.css';
 
@@ -57,11 +59,7 @@ export default function InvoicePreview({ invoice, onClose, onEdit, onDelete }: I
 
         {/* Status Banner */}
         <div 
-          className="invoice-status-banner"
-          style={{ 
-            background: `linear-gradient(135deg, ${statusInfo.bg} 0%, white 100%)`,
-            borderColor: statusInfo.border 
-          }}
+          className={`invoice-status-banner ${invoice.status?.toLowerCase()}`}
         >
           <span className="status-icon">
             {invoice.status?.toLowerCase() === 'paid' ? <Check size={18} color={statusInfo.color} /> :

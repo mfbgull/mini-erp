@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
+
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { itemSchema } from '../../schemas';
 import api from '../../utils/api';
-import toast from 'react-hot-toast';
 import './ItemForm.css';
 
 interface ItemFormProps {
@@ -40,11 +44,7 @@ interface FormData {
   is_manufactured: boolean;
 }
 
-interface Errors {
-  item_code?: string;
-  item_name?: string;
-  unit_of_measure?: string;
-}
+// Errors type handled by useFormValidation
 
 const UOM_LABELS: Record<string, string> = {
   'Nos': 'Nos (Pieces)',
@@ -87,7 +87,7 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
     is_manufactured: item?.is_manufactured || false
   });
 
-  const [errors, setErrors] = useState<Errors>({});
+  const { errors, validate, clearErrors } = useFormValidation(itemSchema);
 
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -117,25 +117,14 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
     });
     
     // Clear error when field is modified
-    if (errors[name as keyof Errors]) {
-      setErrors({ ...errors, [name]: undefined });
+    if (errors[name]) {
+      clearErrors();
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Basic validation
-    const newErrors: Errors = {};
-    if (!formData.item_code.trim()) newErrors.item_code = 'Item code is required';
-    if (!formData.item_name.trim()) newErrors.item_name = 'Item name is required';
-    if (!formData.unit_of_measure) newErrors.unit_of_measure = 'Unit of measure is required';
-    
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
+    if (!validate(formData)) return;
     mutation.mutate(formData);
   };
 

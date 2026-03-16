@@ -1,5 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
+
 import { X, AlertTriangle, Ban } from 'lucide-react';
+
 import { formatCurrency } from '../../utils/formatters';
 import './ItemPreview.css';
 

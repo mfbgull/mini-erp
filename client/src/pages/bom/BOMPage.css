@@ -281,13 +281,7 @@
   gap: 16px;
 }
 
-/* Mobile BOM Cards */
-.mobile-bom-list {
-  display: none; /* Hidden by default, shown on mobile */
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
-}
+/* Mobile BOM Cards - handled by JS isMobile conditional */
 
 .bom-card {
   background: white;
@@ -366,15 +360,6 @@
     padding: 16px;
   }
 
-  /* AG Grid desktop view - hide on mobile */
-  .desktop-view {
-    display: none !important;
-  }
-
-  /* Mobile BOM list - show on mobile */
-  .mobile-bom-list {
-    display: flex !important;
-  }
 
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;

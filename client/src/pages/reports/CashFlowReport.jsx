@@ -1,16 +1,7 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
-import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Calendar,
-  Download,
-  Filter,
-  BarChart3
-} from 'lucide-react';
 import { Bar } from 'react-chartjs-2';
+
+import { useQuery } from '@tanstack/react-query';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,9 +12,20 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import api from '../../utils/api';
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Calendar,
+  Download,
+  Filter,
+  BarChart3
+} from 'lucide-react';
+
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './FinancialReports.css';
 
@@ -239,7 +241,7 @@ export default function CashFlowReport() {
           </div>
 
           <div className="chart-container">
-            <Bar data={chartData} options={chartOptions} />
+            <Bar key="cashflow-chart" data={chartData} options={chartOptions} />
           </div>
 
           <div className="cash-flow-analysis">

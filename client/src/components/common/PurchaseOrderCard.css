@@ -35,7 +35,32 @@
   min-width: 0;
 }
 
-.po-card-name {
+TH|.po-card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #164e63);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.po-card-supplier {
+  font-size: 0.85rem;
+  color: var(--neutral-600, #4b5563);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+MY|.po-card-status {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm, 4px);
+  width: fit-content;
+  text-transform: uppercase;
+}
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary, #164e63);
@@ -233,7 +258,14 @@
   text-overflow: ellipsis;
 }
 
-.po-modal-status {
+ZP|.po-modal-status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm, 4px);
+  width: fit-content;
+  text-transform: uppercase;
+}
   font-size: 0.75rem;
   font-weight: 500;
   padding: 4px 12px;
@@ -447,7 +479,70 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-md, 16px);
+XV|}
+
+/* Items List in Modal */
+.po-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 12px);
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: var(--space-xs);
 }
+
+.po-item-preview {
+  padding: var(--space-sm, 12px);
+  background: var(--neutral-50, #f9fafb);
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.po-item-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-xs, 8px);
+  gap: var(--space-sm);
+}
+
+.po-item-preview-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #164e63);
+  flex: 1;
+  min-width: 0;
+}
+
+.po-item-preview-total {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary, #0891b2);
+  white-space: nowrap;
+}
+
+.po-item-preview-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-xs, 8px);
+}
+
+.po-item-preview-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.po-item-preview-row span:first-child {
+  color: var(--neutral-500, #6b7280);
+}
+
+.po-item-preview-row span:last-child {
+  color: var(--text-primary, #164e63);
+  font-weight: 500;
+}
+
+JH|@media (max-width: 640px) {
 
 @media (max-width: 640px) {
   .po-cards-grid {

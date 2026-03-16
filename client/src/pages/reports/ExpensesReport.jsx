@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
+import { ModuleRegistry , ClientSideRowModelModule } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import {
   FileText,
   DollarSign,
@@ -12,20 +14,109 @@ import {
   Building,
   User,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  X
 } from 'lucide-react';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
 import SearchableSelect from '../../components/common/SearchableSelect';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './ExpensesReport.css';
 
 // Register AG Grid modules
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
+
+function ExpenseCard({ expense, formatCurrency }) {
+  const [showDetails, setShowDetails] = useState(false);
+
+  const statusClass = `expense-status status-${expense.status?.toLowerCase().replace(/\s+/g, '-')}`;
+
+  return (
+    <>
+      <div className="compact-expense-card" onClick={() => setShowDetails(true)}>
+        <div className="compact-expense-info">
+          <p className="compact-expense-no">{expense.expense_no}</p>
+          <span className="compact-expense-category">{expense.expense_category}</span>
+        </div>
+        <div className="compact-expense-right">
+          <span className="compact-expense-amount">{formatCurrency(expense.amount)}</span>
+          <span className={statusClass}>{expense.status}</span>
+        </div>
+      </div>
+
+      {showDetails && (
+        <div className="item-preview-overlay" onClick={() => setShowDetails(false)}>
+          <div className="item-preview-container" onClick={(e) => e.stopPropagation()}>
+            <div className="swipe-indicator"></div>
+
+            <div className="item-preview-header">
+              <div className="item-preview-title-section">
+                <h2 className="item-preview-title">{expense.expense_no}</h2>
+                <span className="item-preview-code">{expense.expense_category}</span>
+              </div>
+              <button className="item-preview-close" onClick={() => setShowDetails(false)}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="item-preview-content">
+              <div className="item-preview-stats">
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Amount</span>
+                  <span className="preview-stat-value expense-amount-highlight">{formatCurrency(expense.amount)}</span>
+                </div>
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Status</span>
+                  <span className={statusClass}>{expense.status}</span>
+                </div>
+                <div className="preview-stat">
+                  <span className="preview-stat-label">Date</span>
+                  <span className="preview-stat-value">{new Date(expense.expense_date).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              <div className="preview-details-grid">
+                {expense.description && (
+                  <div className="preview-detail-item full-width">
+                    <span className="preview-detail-label">Description</span>
+                    <span className="preview-detail-value">{expense.description}</span>
+                  </div>
+                )}
+                {expense.vendor_name && (
+                  <div className="preview-detail-item">
+                    <span className="preview-detail-label">Vendor</span>
+                    <span className="preview-detail-value">{expense.vendor_name}</span>
+                  </div>
+                )}
+                {expense.payment_method && (
+                  <div className="preview-detail-item">
+                    <span className="preview-detail-label">Payment Method</span>
+                    <span className="preview-detail-value">{expense.payment_method}</span>
+                  </div>
+                )}
+                {expense.reference_no && (
+                  <div className="preview-detail-item">
+                    <span className="preview-detail-label">Reference No</span>
+                    <span className="preview-detail-value">{expense.reference_no}</span>
+                  </div>
+                )}
+                {expense.project && (
+                  <div className="preview-detail-item">
+                    <span className="preview-detail-label">Project</span>
+                    <span className="preview-detail-value">{expense.project}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function ExpensesReport() {
   const [dateRange, setDateRange] = useState({
@@ -367,7 +458,7 @@ export default function ExpensesReport() {
         ) : reportData?.expenses && reportData.expenses.length > 0 ? (
           <>
             {/* Desktop view - AG Grid */}
-            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+            <div className="ag-theme-quartz desktop-view ag-grid-container">
               <AgGridReact
                 rowData={reportData.expenses}
                 columnDefs={columnDefs}
@@ -394,52 +485,10 @@ export default function ExpensesReport() {
               />
             </div>
 
-            {/* Mobile view - Card layout */}
+            {/* Mobile view - Compact cards */}
             <div className="mobile-expenses-list">
               {reportData.expenses.map((expense) => (
-                <div
-                  key={expense.id}
-                  className="expense-card"
-                >
-                  <div className="expense-header">
-                    <div className="expense-no">{expense.expense_no}</div>
-                    <div className={`expense-status status-${expense.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                      {expense.status}
-                    </div>
-                  </div>
-
-                  <div className="expense-details">
-                    <div className="detail-row">
-                      <span className="detail-label">Category:</span>
-                      <span className="detail-value">{expense.expense_category}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Description:</span>
-                      <span className="detail-value">{expense.description}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Amount:</span>
-                      <span className="detail-value expense-amount">{formatCurrency(expense.amount)}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Date:</span>
-                      <span className="detail-value">{new Date(expense.expense_date).toLocaleDateString()}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Vendor:</span>
-                      <span className="detail-value">{expense.vendor_name}</span>
-                    </div>
-
-                    <div className="detail-row">
-                      <span className="detail-label">Payment Method:</span>
-                      <span className="detail-value">{expense.payment_method}</span>
-                    </div>
-                  </div>
-                </div>
+                <ExpenseCard key={expense.id} expense={expense} formatCurrency={formatCurrency} />
               ))}
             </div>
           </>

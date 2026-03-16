@@ -10,6 +10,7 @@ interface Production {
   production_date: string;
   bom_id?: number;
   remarks?: string;
+  overhead_cost?: number;
   created_by: number;
   created_at?: string;
   output_item_code?: string;
@@ -54,6 +55,7 @@ interface CreateProductionDTO {
   input_items: { item_id: number; quantity: number }[];
   bom_id?: number;
   remarks?: string;
+  overhead_cost?: number;
 }
 
 class ProductionModel {
@@ -66,7 +68,8 @@ class ProductionModel {
       production_date,
       input_items,
       bom_id,
-      remarks
+      remarks,
+      overhead_cost
     } = data;
 
     const materialsWarehouseId = raw_materials_warehouse_id || warehouse_id;
@@ -77,8 +80,8 @@ class ProductionModel {
       const productionStmt = db.prepare(`
         INSERT INTO productions (
           production_no, output_item_id, output_quantity, warehouse_id,
-          raw_materials_warehouse_id, production_date, bom_id, remarks, created_by
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          raw_materials_warehouse_id, production_date, bom_id, remarks, overhead_cost, created_by
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       const result = productionStmt.run(
@@ -90,6 +93,7 @@ class ProductionModel {
         production_date,
         bom_id || null,
         remarks || null,
+        overhead_cost ?? 0,
         userId
       );
 
@@ -167,6 +171,18 @@ class ProductionModel {
         `).run(input.item_id, input.item_id);
       }
 
+      // Calculate material cost from input items' standard_cost
+      let materialCost = 0;
+      for (const item of input_items) {
+        const row = db.prepare(`SELECT standard_cost FROM items WHERE id = ?`).get(item.item_id) as { standard_cost: number } | undefined;
+        materialCost += item.quantity * (row?.standard_cost ?? 0);
+      }
+      const totalCost = materialCost + (overhead_cost ?? 0);
+      const costPerUnit = output_quantity > 0 ? totalCost / output_quantity : 0;
+
+      // Update finished good's standard_cost
+      db.prepare(`UPDATE items SET standard_cost = ? WHERE id = ?`).run(costPerUnit, output_item_id);
+
       const outputMovementNo = this.generateMovementNo(db);
       db.prepare(`
         INSERT INTO stock_movements (
@@ -180,7 +196,7 @@ class ProductionModel {
         warehouse_id,
         'PRODUCTION',
         output_quantity,
-        null,
+        costPerUnit,
         'Production',
         productionNo,
         `Produced to: ${productionNo} (to warehouse)`,

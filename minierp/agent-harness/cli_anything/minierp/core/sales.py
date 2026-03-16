@@ -50,19 +50,30 @@ def delete_sale(sale_id: int) -> dict:
     return client.delete(f"/sales/{sale_id}")
 
 
-def list_sales_orders(page: int = 1, limit: int = 50, status: Optional[str] = None) -> dict:
-    """List sales orders."""
-    client = make_client()
-    params = {"page": page, "limit": limit}
-    if status:
-        params["status"] = status
-    return client.get("/sales/orders", params=params)
+def list_sales_orders(
+    page: int = 1, limit: int = 50, status: Optional[str] = None
+) -> dict:
+    """List sales orders.
+
+    Note: Sales orders are not directly supported. Use POS or Invoices instead.
+    """
+    return {
+        "success": False,
+        "error": "Sales orders are not directly supported. Use POS system or Invoices instead.",
+        "message": "Use 'cli-anything-minierp invoices list' or 'cli-anything-minierp pos transactions'",
+    }
 
 
 def get_sales_order(order_id: int) -> dict:
-    """Get sales order details."""
-    client = make_client()
-    return client.get(f"/sales/orders/{order_id}")
+    """Get sales order details.
+
+    Note: Sales orders are not directly supported. Use POS or Invoices instead.
+    """
+    return {
+        "success": False,
+        "error": "Sales orders are not directly supported. Use POS or Invoices instead.",
+        "message": "Use 'cli-anything-minierp invoices list' or 'cli-anything-minierp pos transactions'",
+    }
 
 
 def create_sales_order(
@@ -72,40 +83,51 @@ def create_sales_order(
     notes: str = "",
     expected_delivery: Optional[str] = None,
 ) -> dict:
-    """Create a sales order."""
-    client = make_client()
-    body = {
-        "customer_id": customer_id,
-        "order_date": order_date,
-        "items": items,
-        "notes": notes,
+    """Create a sales order.
+
+    Note: Sales orders are not directly supported. Use POS or Invoices instead.
+    """
+    return {
+        "success": False,
+        "error": "Sales orders are not directly supported. Use POS or Invoices instead.",
+        "message": "Use 'cli-anything-minierp invoices create' or POS system instead.",
     }
-    if expected_delivery:
-        body["expected_delivery"] = expected_delivery
-    return client.post("/sales/orders", body=body)
 
 
 def update_sales_order(order_id: int, **fields) -> dict:
-    """Update sales order."""
-    client = make_client()
-    return client.put(f"/sales/orders/{order_id}", body=fields)
+    """Update sales order.
+
+    Note: Sales orders are not directly supported. Use POS or Invoices instead.
+    """
+    return {
+        "success": False,
+        "error": "Sales orders are not directly supported. Use POS or Invoices instead.",
+    }
 
 
 def delete_sales_order(order_id: int) -> dict:
-    """Delete sales order."""
-    client = make_client()
-    return client.delete(f"/sales/orders/{order_id}")
+    """Delete sales order.
+
+    Note: Sales orders are not directly supported. Use POS or Invoices instead.
+    """
+    return {
+        "success": False,
+        "error": "Sales orders are not directly supported. Use POS or Invoices instead.",
+    }
 
 
-def get_sales_returns(start_date: Optional[str] = None, end_date: Optional[str] = None) -> list[dict]:
-    """Get sales returns."""
-    client = make_client()
-    params = {}
-    if start_date:
-        params["start_date"] = start_date
-    if end_date:
-        params["end_date"] = end_date
-    return client.get("/sales/returns", params=params)
+def get_sales_returns(
+    start_date: Optional[str] = None, end_date: Optional[str] = None
+) -> dict:
+    """Get sales returns.
+
+    Note: Sales returns are not directly supported.
+    """
+    return {
+        "success": False,
+        "error": "Sales returns are not directly supported.",
+        "message": "Contact system administrator for sales return functionality.",
+    }
 
 
 def create_sales_return(
@@ -114,17 +136,15 @@ def create_sales_return(
     reason: str,
     notes: str = "",
 ) -> dict:
-    """Create a sales return."""
-    client = make_client()
-    return client.post(
-        "/sales/returns",
-        body={
-            "sale_id": sale_id,
-            "items": items,
-            "reason": reason,
-            "notes": notes,
-        },
-    )
+    """Create a sales return.
+
+    Note: Sales returns are not directly supported.
+    """
+    return {
+        "success": False,
+        "error": "Sales returns are not directly supported.",
+        "message": "Contact system administrator for sales return functionality.",
+    }
 
 
 def get_sales_commission(

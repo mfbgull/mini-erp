@@ -1,5 +1,5 @@
 import { useEffect, ReactNode, memo } from 'react';
-import './Modal.css';
+import '../../styles/components/modal.css';
 
 type ModalSize = 'small' | 'medium' | 'large';
 

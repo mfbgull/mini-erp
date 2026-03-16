@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import api from "../utils/api";
-import FormInput from "../components/common/FormInput";
-import Button from "../components/common/Button";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Mail,
   MessageSquare,
@@ -12,6 +10,11 @@ import {
   ArrowRightLeft,
   FileText,
 } from "lucide-react";
+
+import Button from "../components/common/Button";
+import FormInput from "../components/common/FormInput";
+import api from "../utils/api";
+
 import "./SettingsPage.css";
 
 export default function IntegrationsPage() {

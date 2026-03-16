@@ -14,6 +14,7 @@ interface BOM {
   created_at?: string;
   updated_at?: string;
   item_count?: number;
+  total_material_cost?: number;
   items?: BOMItem[];
 }
 
@@ -25,6 +26,8 @@ interface BOMItem {
   unit_of_measure?: string;
   current_stock?: number;
   quantity: number;
+  standard_cost?: number;
+  line_cost?: number;
 }
 
 interface BOMWithItems extends BOM {
@@ -106,7 +109,7 @@ class BOMModel {
   }
 
   static getAll(db: Database.Database): BOM[] {
-    const boms = db.prepare(`
+    return db.prepare(`
       SELECT
         b.id,
         b.bom_no,
@@ -119,22 +122,16 @@ class BOMModel {
         b.description,
         b.is_active,
         b.created_at,
-        b.updated_at
+        b.updated_at,
+        (SELECT COUNT(*) FROM bom_items WHERE bom_id = b.id) AS item_count,
+        (SELECT COALESCE(SUM(bi.quantity * it.standard_cost), 0)
+         FROM bom_items bi
+         JOIN items it ON bi.item_id = it.id
+         WHERE bi.bom_id = b.id) AS total_material_cost
       FROM boms b
       JOIN items i ON b.finished_item_id = i.id
       ORDER BY b.created_at DESC
     `).all() as BOM[];
-
-    return boms.map(bom => {
-      const itemCount = db.prepare(`
-        SELECT COUNT(*) as count FROM bom_items WHERE bom_id = ?
-      `).get(bom.id) as { count: number };
-
-      return {
-        ...bom,
-        item_count: itemCount.count
-      };
-    });
   }
 
   static getById(id: number, db: Database.Database): BOMWithItems | null {
@@ -169,15 +166,20 @@ class BOMModel {
         i.item_name,
         i.unit_of_measure,
         i.current_stock,
-        bi.quantity
+        bi.quantity,
+        i.standard_cost,
+        (bi.quantity * i.standard_cost) AS line_cost
       FROM bom_items bi
       JOIN items i ON bi.item_id = i.id
       WHERE bi.bom_id = ?
       ORDER BY bi.id
     `).all(id) as BOMItem[];
 
+    const total_material_cost = items.reduce((sum, item) => sum + (item.line_cost ?? 0), 0);
+
     return {
       ...bom,
+      total_material_cost,
       items
     };
   }

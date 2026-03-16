@@ -1,5 +1,5 @@
 import { ReactNode, MouseEvent, memo } from 'react';
-import './Button.css';
+import '../../styles/components/button.css';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'warning' | 'success';
 type ButtonType = 'button' | 'submit' | 'reset';

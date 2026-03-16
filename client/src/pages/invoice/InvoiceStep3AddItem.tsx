@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef, KeyboardEvent } from 'react';
+import toast from 'react-hot-toast';
+
+import { X, Search, Plus, Minus, ArrowDown, ArrowUp, Check, Edit2, Trash2, MoreVertical, ChevronDown, ChevronUp } from 'lucide-react';
+
+import Button from '../../components/common/Button';
 import { useInvoice } from '../../context/InvoiceContext';
 import { mobileInvoiceApi } from '../../utils/invoiceApi';
-import { X, Search, Plus, Minus, ArrowDown, ArrowUp, Check, Edit2, Trash2, MoreVertical, ChevronDown, ChevronUp } from 'lucide-react';
-import toast from 'react-hot-toast';
-import './MobileInvoice.css';
+import '../../styles/pages/invoice.css';
 
 export default function InvoiceStep3AddItem() {
   const { dispatch, items, goToStep, customer, invoiceDate, dueDate } = useInvoice();
@@ -385,9 +388,8 @@ export default function InvoiceStep3AddItem() {
               <ChevronDown size={18} className="miw-expand-icon" />
             )}
           </div>
-          <div 
-            className={`miw-added-items-list ${isItemsExpanded ? 'expanded' : 'collapsed'}`}
-            style={{ maxHeight: isItemsExpanded ? '400px' : '0' }}
+          <div
+            className={`miw-added-items-list ${isItemsExpanded ? 'miw-items-list-expanded' : 'miw-items-list-collapsed'}`}
           >
             {items.map((item: InvoiceItem, index: number) => (
               <div 
@@ -488,13 +490,14 @@ export default function InvoiceStep3AddItem() {
 
       {/* Add Item Button - Full width when no items */}
       {!isFormExpanded && items.length === 0 && (
-        <button
-          className="btn btn-primary miw-btn-fab miw-btn-fab-primary"
+        <Button
+          variant="primary"
+          className="miw-btn-fab miw-btn-fab-primary"
           onClick={() => setIsFormExpanded(true)}
         >
           <Plus size={18} />
           Add Item
-        </button>
+        </Button>
       )}
 
       {/* Add Item Form Bottom Sheet */}
@@ -525,7 +528,7 @@ export default function InvoiceStep3AddItem() {
               {/* Item Search */}
               <div className="miw-form-section">
                 <label className="miw-label">Item</label>
-                <div className="miw-search-container" style={{ position: 'relative' }}>
+                <div className="miw-search-container miw-relative">
                   <input
                     ref={searchInputRef}
                     type="text"
@@ -675,8 +678,9 @@ export default function InvoiceStep3AddItem() {
 
               {/* Action Buttons */}
               <div className="miw-form-actions">
-                <button
-                  className="btn btn-secondary miw-btn-half"
+                <Button
+                  variant="secondary"
+                  className="miw-btn-half"
                   onClick={() => {
                     resetForm();
                     setIsFormExpanded(false);
@@ -684,15 +688,16 @@ export default function InvoiceStep3AddItem() {
                   }}
                 >
                   Cancel
-                </button>
+                </Button>
 
-                <button
-                  className="btn btn-primary miw-btn-half"
+                <Button
+                  variant="primary"
+                  className="miw-btn-half"
                   onClick={editingItem ? handleUpdateItem : handleAddItem}
                   disabled={!selectedItem}
                 >
                   {editingItem ? 'Update' : 'Add'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -704,7 +709,7 @@ export default function InvoiceStep3AddItem() {
         <div className="miw-total-status-bar">
           <div className="miw-flex-col">
             <span className="miw-text-2xs miw-opacity-80 miw-uppercase miw-tracking-wide">Total</span>
-            <span className="miw-font-bold" style={{ fontSize: '18px' }}>${totalAmount.toFixed(2)}</span>
+            <span className="miw-font-bold miw-text-lg">${totalAmount.toFixed(2)}</span>
           </div>
           <div className="miw-flex-col miw-items-end">
             <span className="miw-text-2xs miw-opacity-80 miw-uppercase miw-tracking-wide">Items</span>
@@ -716,20 +721,22 @@ export default function InvoiceStep3AddItem() {
       {/* Button Row - Add Item (50%) + Continue (50%) */}
       {items.length > 0 && (
         <div className="miw-fab-container">
-          <button
-            className="btn btn-primary miw-btn-fab miw-btn-fab-primary miw-flex miw-items-center miw-justify-between"
+          <Button
+            variant="primary"
+            className="miw-btn-fab miw-btn-fab-primary miw-flex miw-items-center miw-justify-between"
             onClick={() => setIsFormExpanded(true)}
           >
             <Plus size={18} />
             Add Item
-          </button>
+          </Button>
 
-          <button
-            className="btn btn-success miw-btn-fab miw-btn-fab-success"
+          <Button
+            variant="success"
+            className="miw-btn-fab miw-btn-fab-success"
             onClick={handleContinue}
           >
             Continue ({items.length})
-          </button>
+          </Button>
         </div>
       )}
     </div>

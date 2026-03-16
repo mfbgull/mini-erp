@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
+import { ModuleRegistry , ClientSideRowModelModule } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import {
   AlertTriangle,
   Package,
@@ -10,11 +12,10 @@ import {
   Tag,
   Hash
 } from 'lucide-react';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './InventoryReports.css';
 
@@ -283,7 +284,7 @@ export default function LowStockReport() {
         ) : reportData && reportData.length > 0 ? (
           <>
             {/* Desktop view - AG Grid */}
-            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+            <div className="ag-theme-quartz desktop-view ag-grid-container">
               <AgGridReact
                 rowData={reportData}
                 columnDefs={columnDefs}

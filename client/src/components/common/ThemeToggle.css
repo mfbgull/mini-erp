@@ -1,9 +1,15 @@
 /* Theme Toggle Button Styles */
-.theme-toggle {
+.theme-toggle-group {
   position: fixed;
   top: var(--space-md);
   right: var(--space-md);
   z-index: 10000;
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.theme-toggle {
+  position: relative;
 }
 
 .theme-toggle-btn {
@@ -84,18 +90,8 @@
 }
 
 /* Responsive */
-@media (max-width: 640px) {
-  .theme-toggle {
-    top: var(--space-sm);
-    right: var(--space-sm);
-  }
-
-  .theme-toggle-btn {
-    padding: var(--space-xs) var(--space-sm);
-    min-width: auto;
-  }
-
-  .theme-toggle-label {
-    display: none;
+@media (max-width: 768px) {
+  .theme-toggle-group {
+    display: none !important;
   }
 }

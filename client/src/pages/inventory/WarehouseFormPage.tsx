@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
+
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { warehouseSchema } from '../../schemas';
 import api from '../../utils/api';
-import toast from 'react-hot-toast';
 import './WarehouseForm.css';
 
 interface WarehouseFormProps {
@@ -22,22 +26,17 @@ interface FormData {
   location: string;
 }
 
-interface Errors {
-  warehouse_code?: string;
-  warehouse_name?: string;
-}
-
 export default function WarehouseForm({ warehouse, onClose, onSuccess }: WarehouseFormProps) {
   const isEdit = !!warehouse;
   const queryClient = useQueryClient();
-  
+
   const [formData, setFormData] = useState<FormData>({
     warehouse_code: warehouse?.warehouse_code || '',
     warehouse_name: warehouse?.warehouse_name || '',
     location: warehouse?.location || ''
   });
 
-  const [errors, setErrors] = useState<Errors>({});
+  const { errors, validate, clearErrors } = useFormValidation(warehouseSchema);
 
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -59,31 +58,21 @@ export default function WarehouseForm({ warehouse, onClose, onSuccess }: Warehou
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
+
     setFormData({
       ...formData,
       [name]: value
     });
-    
+
     // Clear error when field is modified
-    if (errors[name as keyof Errors]) {
-      setErrors({ ...errors, [name]: undefined });
+    if (errors[name]) {
+      clearErrors();
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Basic validation
-    const newErrors: Errors = {};
-    if (!formData.warehouse_code.trim()) newErrors.warehouse_code = 'Warehouse code is required';
-    if (!formData.warehouse_name.trim()) newErrors.warehouse_name = 'Warehouse name is required';
-    
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
+    if (!validate(formData)) return;
     mutation.mutate(formData);
   };
 

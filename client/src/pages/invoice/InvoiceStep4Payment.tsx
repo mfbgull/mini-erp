@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { useInvoice } from '../../context/InvoiceContext';
-import { ChevronDown, ChevronUp, CreditCard } from 'lucide-react';
-import StickyFooter from './components/StickyFooter';
 import toast from 'react-hot-toast';
-import './MobileInvoice.css';
+
+import { ChevronDown, ChevronUp, CreditCard } from 'lucide-react';
+
+import StickyFooter from './components/StickyFooter';
+import { useInvoice } from '../../context/InvoiceContext';
+import '../../styles/pages/invoice.css';
 
 export default function InvoiceStep4Payment() {
   const { 
@@ -114,9 +116,8 @@ export default function InvoiceStep4Payment() {
               <ChevronDown size={18} className="miw-expand-icon" />
             )}
           </div>
-          <div 
-            className={`miw-added-items-list ${isItemsExpanded ? 'expanded' : 'collapsed'}`}
-            style={{ maxHeight: isItemsExpanded ? '300px' : '0' }}
+          <div
+            className={`miw-added-items-list ${isItemsExpanded ? 'miw-items-list-expanded-short' : 'miw-items-list-collapsed'}`}
           >
             {items.map((item: InvoiceItem, index: number) => (
               <div 

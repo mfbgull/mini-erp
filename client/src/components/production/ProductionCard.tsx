@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+
 import { MoreVertical, Edit, X, CheckCircle, Trash2, Loader2 } from 'lucide-react';
+
+import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import './ProductionCard.css';
 
@@ -21,6 +24,7 @@ interface Production {
   output_uom: string;
   finished_goods_warehouse_name: string;
   remarks?: string;
+  overhead_cost?: number;
   inputs?: ProductionInput[];
   created_at?: string;
   updated_at?: string;
@@ -37,6 +41,7 @@ export function ProductionCard({ production, onEdit, onDelete }: ProductionCardP
   const [showDetails, setShowDetails] = useState(false);
   const [detailedProduction, setDetailedProduction] = useState<Production | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { formatCurrency } = useSettings();
   const menuRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -257,6 +262,24 @@ export function ProductionCard({ production, onEdit, onDelete }: ProductionCardP
                       </div>
                     </div>
                   </section>
+
+                  {(() => {
+                    const prod = detailedProduction || production;
+                    const overheadCost = prod.overhead_cost ?? 0;
+                    // Only show cost breakdown if overhead_cost is set (non-zero)
+                    if (overheadCost <= 0) return null;
+                    return (
+                      <section className="production-section">
+                        <h3 className="production-section-title">Cost Breakdown</h3>
+                        <div className="production-details-grid">
+                          <div className="production-detail-item">
+                            <span className="production-detail-label">Overhead Cost</span>
+                            <span className="production-detail-value">{formatCurrency(overheadCost)}</span>
+                          </div>
+                        </div>
+                      </section>
+                    );
+                  })()}
 
                   {(detailedProduction?.remarks || production.remarks) && (
                     <section className="production-section">

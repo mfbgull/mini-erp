@@ -1,41 +1,38 @@
-import { useState, useMemo } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useSettings } from '../context/SettingsContext';
-import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { Line, Doughnut } from 'react-chartjs-2';
 import { Link } from 'react-router-dom';
-import { Package, DollarSign, ShoppingCart, Factory, BarChart3, ClipboardList, AlertTriangle } from 'lucide-react';
+
+import { useQuery } from '@tanstack/react-query';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
   ArcElement,
   Title,
   Tooltip,
   Legend
 } from 'chart.js';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
-import api from '../utils/api';
+import { Package, DollarSign, ShoppingCart, Factory, BarChart3, ClipboardList, AlertTriangle } from 'lucide-react';
+
 import FloatingActionButton from '../components/layout/FloatingActionButton';
-import { InvoiceWizard } from '../components/invoice/InvoiceWizard';
+import { useAuth } from '../context/AuthContext';
+import { useSettings } from '../context/SettingsContext';
+import api from '../utils/api';
 import './Dashboard.css';
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  BarElement,
   ArcElement,
   Title,
   Tooltip,
   Legend
 );
 
-// Helper function to get last 7 days - defined outside component to avoid recreation
 const getLast7Days = () => {
   const days = [];
   for (let i = 6; i >= 0; i--) {
@@ -48,210 +45,134 @@ const getLast7Days = () => {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [showInvoiceWizard, setShowInvoiceWizard] = useState(false);
+  const { formatCurrency } = useSettings();
 
-  // Parallel data fetching - all queries fire simultaneously
-  const { data: dashboardData, isLoading } = useQuery({
-    queryKey: ['dashboard-data'],
+  const { data, isLoading } = useQuery({
+    queryKey: ['dashboard-summary'],
     queryFn: async () => {
-      const [
-        itemsResponse,
-        salesResponse,
-        purchasesResponse,
-        productionsResponse,
-        stockBalancesResponse
-      ] = await Promise.all([
-        api.get('/inventory/items'),
-        api.get('/invoices'),
-        api.get('/purchases'),
-        api.get('/productions'),
-        api.get('/inventory/stock-balances')
-      ]);
-
-      return {
-        items: itemsResponse.data.data || [],
-        sales: salesResponse.data.data || [],
-        purchases: purchasesResponse.data || [],
-        productions: productionsResponse.data || [],
-        stockBalances: (stockBalancesResponse.data || []).filter(sb => sb.quantity > 0)
-      };
+      const response = await api.get('/dashboard/summary');
+      return response.data.data;
     },
-    // Stale time to prevent unnecessary refetches
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Extract data with defaults
-  const items = dashboardData?.items || [];
-  const sales = dashboardData?.sales || [];
-  const purchases = dashboardData?.purchases || [];
-  const productions = dashboardData?.productions || [];
-  const stockBalances = dashboardData?.stockBalances || [];
-
-  // Memoized statistics calculations
-  const stats = useMemo(() => {
-    const itemsArray = Array.isArray(items) ? items : [];
-    const salesArray = Array.isArray(sales) ? sales : [];
-    const purchasesArray = Array.isArray(purchases) ? purchases : [];
-    const stockBalancesArray = Array.isArray(stockBalances) ? stockBalances : [];
-
-    const totalItems = itemsArray.length;
-    const totalStockValue = itemsArray.reduce((sum, item) =>
-      sum + (parseFloat(item.current_stock || 0) * parseFloat(item.standard_cost || 0)), 0
-    );
-    const totalSalesRevenue = salesArray.reduce((sum, sale) =>
-      sum + parseFloat(sale.total_amount || 0), 0
-    );
-    const totalPurchases = purchasesArray.reduce((sum, purchase) =>
-      sum + parseFloat(purchase.total_cost || 0), 0
-    );
-    const lowStockItems = itemsArray.filter(item =>
-      item.reorder_level > 0 && item.current_stock <= item.reorder_level
-    );
-
-    return {
-      totalItems,
-      totalStockValue,
-      totalSalesRevenue,
-      totalPurchases,
-      lowStockItems,
-      warehouseCount: stockBalancesArray.length
-    };
-  }, [items, sales, purchases, stockBalances]);
-
-  // Memoized category data for chart
-  const stockByCategoryData = useMemo(() => {
-    const itemsArray = Array.isArray(items) ? items : [];
-    const categoryData = itemsArray.reduce((acc, item) => {
-      if (!acc[item.category]) acc[item.category] = 0;
-      acc[item.category] += parseFloat(item.current_stock || 0);
-      return acc;
-    }, {});
-
-    return {
-      labels: Object.keys(categoryData),
-      datasets: [{
-        label: 'Stock Quantity',
-        data: Object.values(categoryData),
-        backgroundColor: [
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-          'rgba(255, 159, 64, 0.6)'
-        ],
-        borderColor: [
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 99, 132, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)'
-        ],
-        borderWidth: 1
-      }]
-    };
-  }, [items]);
-
-  // Memoized sales vs purchases trend data
   const salesPurchasesTrendData = useMemo(() => {
-    const salesArray = Array.isArray(sales) ? sales : [];
-    const purchasesArray = Array.isArray(purchases) ? purchases : [];
     const last7Days = getLast7Days();
-
-    const salesByDay = last7Days.map(day =>
-      salesArray.filter(s => s.sale_date === day)
-        .reduce((sum, s) => sum + parseFloat(s.total_amount || 0), 0)
-    );
-    const purchasesByDay = last7Days.map(day =>
-      purchasesArray.filter(p => p.purchase_date === day)
-        .reduce((sum, p) => sum + parseFloat(p.total_cost || 0), 0)
-    );
+    const salesMap = Object.fromEntries((data?.salesByDay || []).map(d => [d.date, d.total]));
+    const purchasesMap = Object.fromEntries((data?.purchasesByDay || []).map(d => [d.date, d.total]));
 
     return {
       labels: last7Days.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
       datasets: [
         {
           label: 'Sales',
-          data: salesByDay,
+          data: last7Days.map(d => salesMap[d] || 0),
           borderColor: 'rgb(75, 192, 192)',
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
           tension: 0.4
         },
         {
           label: 'Purchases',
-          data: purchasesByDay,
+          data: last7Days.map(d => purchasesMap[d] || 0),
           borderColor: 'rgb(255, 99, 132)',
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           tension: 0.4
         }
       ]
     };
-  }, [sales, purchases]);
+  }, [data]);
 
-  // Memoized production chart data
-  const productionChartData = useMemo(() => {
-    const productionsArray = Array.isArray(productions) ? productions : [];
-    const productionData = productionsArray.slice(0, 5).reduce((acc, prod) => {
-      if (!acc[prod.output_item_name]) acc[prod.output_item_name] = 0;
-      acc[prod.output_item_name] += parseFloat(prod.output_quantity || 0);
-      return acc;
-    }, {});
+  const stockByCategoryData = useMemo(() => ({
+    labels: (data?.stockByCategory || []).map(c => c.category),
+    datasets: [{
+      label: 'Stock Quantity',
+      data: (data?.stockByCategory || []).map(c => c.total_stock),
+      backgroundColor: [
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)'
+      ],
+      borderColor: [
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 99, 132, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)'
+      ],
+      borderWidth: 1
+    }]
+  }), [data]);
 
-    return {
-      labels: Object.keys(productionData),
-      datasets: [{
-        label: 'Production Output',
-        data: Object.values(productionData),
-        backgroundColor: 'rgba(153, 102, 255, 0.6)',
-        borderColor: 'rgba(153, 102, 255, 1)',
-        borderWidth: 1
-      }]
-    };
-  }, [productions]);
-
-  const { formatCurrency } = useSettings();
+  if (isLoading) {
+    return (
+      <div className="dashboard">
+        <div className="dashboard-loading">
+          <div className="loading-spinner" />
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard">
       {/* Header */}
       <div className="dashboard-header">
         <div>
-          <h1>Dashboard</h1>
+          <h1>Welcome back, {user?.username || 'User'}</h1>
+          <p className="dashboard-subtitle">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="kpi-grid">
         <div className="kpi-card">
+          <div className="kpi-icon kpi-icon--primary">
+            <Package size={24} />
+          </div>
           <div className="kpi-content">
             <div className="kpi-label">Total Items</div>
-            <div className="kpi-value">{stats.totalItems}</div>
-            <div className="kpi-subtitle">{stats.warehouseCount} warehouses with stock</div>
+            <div className="kpi-value">{data?.totalItems ?? 0}</div>
+            <div className="kpi-subtitle">{data?.warehouseStockCount ?? 0} warehouse stocks</div>
           </div>
         </div>
 
         <div className="kpi-card">
+          <div className="kpi-icon kpi-icon--success">
+            <DollarSign size={24} />
+          </div>
           <div className="kpi-content">
             <div className="kpi-label">Stock Value</div>
-            <div className="kpi-value">{formatCurrency(stats.totalStockValue)}</div>
+            <div className="kpi-value">{formatCurrency(data?.totalStockValue ?? 0)}</div>
             <div className="kpi-subtitle">Current inventory worth</div>
           </div>
         </div>
 
         <div className="kpi-card">
+          <div className="kpi-icon kpi-icon--indigo">
+            <ShoppingCart size={24} />
+          </div>
           <div className="kpi-content">
             <div className="kpi-label">Sales Revenue</div>
-            <div className="kpi-value">{formatCurrency(stats.totalSalesRevenue)}</div>
-            <div className="kpi-subtitle">{Array.isArray(sales) ? sales.length : 0} total sales</div>
+            <div className="kpi-value">{formatCurrency(data?.totalSalesRevenue ?? 0)}</div>
+            <div className="kpi-subtitle">Total sales</div>
           </div>
         </div>
 
         <div className="kpi-card">
+          <div className="kpi-icon kpi-icon--warning">
+            <Factory size={24} />
+          </div>
           <div className="kpi-content">
             <div className="kpi-label">Production</div>
-            <div className="kpi-value">{Array.isArray(productions) ? productions.length : 0}</div>
-            <div className="kpi-subtitle">Total production runs</div>
+            <div className="kpi-value">{data?.recentProductions ?? 0}</div>
+            <div className="kpi-subtitle">Runs in last 30 days</div>
           </div>
         </div>
       </div>
@@ -299,48 +220,24 @@ export default function Dashboard() {
         {/* Low Stock Alerts */}
         <div className="alert-card">
           <h3><AlertTriangle size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Low Stock Alerts</h3>
-          {stats.lowStockItems.length === 0 ? (
+          {(data?.lowStockItems || []).length === 0 ? (
             <p className="no-alerts">All items are well stocked!</p>
           ) : (
             <div className="alert-list">
-              {stats.lowStockItems.slice(0, 5).map(item => (
+              {data.lowStockItems.slice(0, 5).map(item => (
                 <Link to="/inventory/items" key={item.id} className="alert-item">
                   <div>
                     <div className="alert-item-name">{item.item_name}</div>
                     <div className="alert-item-code">{item.item_code}</div>
                   </div>
                   <div className="alert-item-stock">
-                    <span className="stock-low">{item.current_stock} {item.unit_of_measure}</span>
+                    <span className="stock-low">{item.current_stock}</span>
                     <span className="stock-reorder">Reorder: {item.reorder_level}</span>
                   </div>
                 </Link>
               ))}
             </div>
           )}
-        </div>
-
-        {/* Production Chart */}
-        <div className="chart-card">
-          <h3>Recent Production Output</h3>
-          <div className="chart-container" style={{ height: '250px' }}>
-            {productions.length === 0 ? (
-              <div className="no-data">No production data available</div>
-            ) : (
-              <Bar
-                data={productionChartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: { display: false }
-                  },
-                  scales: {
-                    y: { beginAtZero: true }
-                  }
-                }}
-              />
-            )}
-          </div>
         </div>
 
         {/* Quick Actions */}
@@ -377,12 +274,6 @@ export default function Dashboard() {
 
       {/* Floating Quick Actions (Mobile) */}
       <FloatingActionButton />
-
-      {/* Invoice Wizard Modal */}
-      <InvoiceWizard
-        isOpen={showInvoiceWizard}
-        onClose={() => setShowInvoiceWizard(false)}
-      />
     </div>
   );
 }

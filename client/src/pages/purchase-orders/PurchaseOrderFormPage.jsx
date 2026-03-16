@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSettings } from '../../context/SettingsContext';
 import toast from 'react-hot-toast';
-import api from '../../utils/api';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
 import { PurchaseOrderWizard } from '../../components/purchase-order/PurchaseOrderWizard';
+import { useSettings } from '../../context/SettingsContext';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { purchaseOrderSchema } from '../../schemas';
+import api from '../../utils/api';
 
 export default function PurchaseOrderFormPage({ mode }) {
   const { id } = useParams();
@@ -42,6 +46,9 @@ export default function PurchaseOrderFormPage({ mode }) {
   const [items, setItems] = useState([
     { id: Date.now(), item_id: '', quantity: '', unit_price: '' }
   ]);
+
+  const [formErrors, setFormErrors] = useState({});
+  const { errors: validationErrors, validate, clearErrors } = useFormValidation(purchaseOrderSchema);
 
   // Fetch suppliers
   const { data: suppliers = [] } = useQuery({
@@ -147,30 +154,29 @@ export default function PurchaseOrderFormPage({ mode }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate
-    if (!formData.supplier_id) {
-      toast.error('Please select a supplier');
-      return;
-    }
+    // Prepare data for validation
+    const validItems = items
+      .filter(item => item.item_id && item.quantity && item.unit_price)
+      .map(item => ({
+        item_id: parseInt(item.item_id),
+        quantity: parseFloat(item.quantity),
+        unit_price: parseFloat(item.unit_price)
+      }));
 
-    const validItems = items.filter(item =>
-      item.item_id && item.quantity && item.unit_price
-    );
+    const dataToValidate = {
+      ...formData,
+      supplier_id: parseInt(formData.supplier_id),
+      warehouse_id: formData.warehouse_id ? parseInt(formData.warehouse_id) : null,
+      items: validItems
+    };
 
-    if (validItems.length === 0) {
-      toast.error('Please add at least one valid item');
-      return;
-    }
+    if (!validate(dataToValidate)) return;
 
     const data = {
       ...formData,
       supplier_id: parseInt(formData.supplier_id),
       warehouse_id: formData.warehouse_id ? parseInt(formData.warehouse_id) : null,
-      items: validItems.map(item => ({
-        item_id: parseInt(item.item_id),
-        quantity: parseFloat(item.quantity),
-        unit_price: parseFloat(item.unit_price)
-      }))
+      items: validItems
     };
 
     mutation.mutate(data);

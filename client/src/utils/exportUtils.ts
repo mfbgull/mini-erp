@@ -1,5 +1,4 @@
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 
 interface Column {
@@ -58,7 +57,7 @@ export const exportToPDF = (
 
   doc.setTextColor(100, 100, 100);
   doc.setFontSize(7);
-  let metadataY = 32;
+  const metadataY = 32;
 
   const timestamp = new Date().toLocaleString();
   doc.text(`Generated: ${timestamp}`, margin, metadataY);

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSettings } from '../../context/SettingsContext';
-import { Calendar, DollarSign, Download, Printer } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../../utils/api';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import { useQuery } from '@tanstack/react-query';
+import { Calendar, DollarSign, Download, Printer } from 'lucide-react';
+
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import './CustomerStatement.css';
 
 export default function CustomerStatement() {

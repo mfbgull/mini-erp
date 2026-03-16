@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useMobileDetection } from '../../hooks/useMobileDetection';
 import toast from 'react-hot-toast';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
-import api from '../../utils/api';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
-import FormInput from '../../components/common/FormInput';
-import { ItemCard } from '../../components/common/ItemCard';
 import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet } from 'lucide-react';
+
+import Button from '../../components/common/Button';
+import CompactItemCardView from '../../components/common/CompactItemCard';
+import FormInput from '../../components/common/FormInput';
+import Modal from '../../components/common/Modal';
+import { useSettings } from '../../context/SettingsContext';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { itemSchema } from '../../schemas';
+import api from '../../utils/api';
 import './ItemsPage.css';
 
 export default function ItemsPage() {
@@ -520,19 +524,14 @@ export default function ItemsPage() {
         </div>
       ) : isMobile ? (
         <>
-          <div className="mobile-items-container">
-            {filteredItems.map((item) => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                onEdit={(item) => {
-                  setEditingItem(item);
-                  setIsModalOpen(true);
-                }}
-                onDelete={handleDeleteItem}
-              />
-            ))}
-          </div>
+          <CompactItemCardView
+            items={filteredItems}
+            onEdit={(item) => {
+              setEditingItem(item);
+              setIsModalOpen(true);
+            }}
+            onDelete={handleDeleteItem}
+          />
           <div className="mobile-action-bar">
             <Button variant="primary" onClick={handleNewItem}>
               + New Item
@@ -595,6 +594,8 @@ function ItemForm({ item, onClose, onSuccess }) {
     is_manufactured: item?.is_manufactured || false
   });
 
+  const { errors, validate, clearErrors } = useFormValidation(itemSchema);
+
   const mutation = useMutation({
     mutationFn: async (data) => {
       if (isEdit) {
@@ -618,10 +619,18 @@ function ItemForm({ item, onClose, onSuccess }) {
       ...formData,
       [name]: type === 'checkbox' ? checked : value
     });
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      clearErrors();
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validate(formData)) return;
+
     mutation.mutate(formData);
   };
 

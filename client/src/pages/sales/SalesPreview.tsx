@@ -1,6 +1,8 @@
 import React from 'react';
-import { X, Eye, Edit2, Check, AlertTriangle, XCircle, MinusCircle, Info } from 'lucide-react';
+
 import { format } from 'date-fns';
+import { X, Eye, Edit2, Check, AlertTriangle, XCircle, MinusCircle, Info } from 'lucide-react';
+
 import { formatCurrency } from '../../utils/formatters';
 import './SalesPreview.css';
 
@@ -42,8 +44,7 @@ export default function SalesPreview({ invoice, onClose, onView, onEdit }: Sales
       <div className="sales-preview-container" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div 
-          className="sales-preview-header"
-          style={{ background: `linear-gradient(135deg, ${statusInfo.bg} 0%, white 100%)` }}
+          className={`sales-preview-header ${invoice.status?.toLowerCase()}`}
         >
           <div className="sales-preview-title-section">
             <div className="invoice-status-large">

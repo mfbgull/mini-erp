@@ -1,16 +1,21 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useSettings } from '../../context/SettingsContext';
-import { Plus } from 'lucide-react';
-import api from '../../utils/api';
+
+import { useQuery } from '@tanstack/react-query';
+import { Plus, Search } from 'lucide-react';
+
 import { PurchaseOrderCard } from '../../components/common/PurchaseOrderCard';
+import { useSettings } from '../../context/SettingsContext';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
+import api from '../../utils/api';
 import './PurchaseOrdersPage.css';
 
 export default function PurchaseOrdersPage() {
   const navigate = useNavigate();
   const { formatCurrency } = useSettings();
   const [statusFilter, setStatusFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const { isMobile } = useMobileDetection();
 
   const { data: pos = [], isLoading } = useQuery({
     queryKey: ['purchaseOrders', statusFilter],
@@ -22,14 +27,26 @@ export default function PurchaseOrdersPage() {
     }
   });
 
-  // Calculate summary stats
+  // Filter POs based on search term
+  const filteredPos = pos.filter(po => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      po.po_no?.toLowerCase().includes(search) ||
+      po.supplier_name?.toLowerCase().includes(search) ||
+      po.warehouse_name?.toLowerCase().includes(search) ||
+      po.status?.toLowerCase().includes(search)
+    );
+  });
+
+  // Calculate summary stats from filtered results
   const stats = {
-    total: pos.length,
-    draft: pos.filter(po => po.status === 'Draft').length,
-    submitted: pos.filter(po => po.status === 'Submitted').length,
-    partial: pos.filter(po => po.status === 'Partially Received').length,
-    completed: pos.filter(po => po.status === 'Completed').length,
-    totalValue: pos.reduce((sum, po) => sum + parseFloat(po.total_amount), 0)
+    total: filteredPos.length,
+    draft: filteredPos.filter(po => po.status === 'Draft').length,
+    submitted: filteredPos.filter(po => po.status === 'Submitted').length,
+    partial: filteredPos.filter(po => po.status === 'Partially Received').length,
+    completed: filteredPos.filter(po => po.status === 'Completed').length,
+    totalValue: filteredPos.reduce((sum, po) => sum + parseFloat(po.total_amount || 0), 0)
   };
 
   return (
@@ -81,7 +98,17 @@ export default function PurchaseOrdersPage() {
           </div>
 
           <div className="filters-bar">
-            <label>Status Filter:</label>
+            <div className="search-box">
+              <Search size={18} className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search PO..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </div>
+            <label>Status:</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -95,13 +122,13 @@ export default function PurchaseOrdersPage() {
             </select>
           </div>
 
-          {pos.length === 0 ? (
+          {filteredPos.length === 0 ? (
             <div className="no-pos">
-              <p>No purchase orders found</p>
+              <p>{searchTerm || statusFilter ? 'No purchase orders match your search' : 'No purchase orders found'}</p>
             </div>
           ) : (
             <div className="po-cards-grid">
-              {pos.map((po) => (
+              {filteredPos.map((po) => (
                 <PurchaseOrderCard key={po.id} po={po} />
               ))}
             </div>

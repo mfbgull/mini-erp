@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
+import { Chart } from 'chart.js'
+
 // Available themes
 export const THEMES = {
   DEFAULT: 'default',
@@ -45,7 +47,9 @@ const THEME_CSS_FILES: Record<ThemeType, string> = {
 interface ThemeContextType {
   currentTheme: ThemeType;
   themeName: string;
+  isDarkMode: boolean;
   toggleTheme: () => void;
+  toggleDarkMode: () => void;
   setTheme: (theme: ThemeType) => void;
   themes: typeof THEMES;
 }
@@ -75,11 +79,16 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   // Load theme from localStorage or use ERPNext as default
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(() => {
     const saved = localStorage.getItem('miniERP-theme') as ThemeType | null;
-    // Default to ERPNext theme if no saved preference
     return saved || THEMES.ERPNEXT;
   });
 
-  // Apply theme to document
+  // Load dark mode from localStorage
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('miniERP-darkMode');
+    return saved === 'true';
+  });
+
+  // Apply theme and dark mode to document
   useEffect(() => {
     const root = document.documentElement;
     const body = document.body;
@@ -92,12 +101,32 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     root.classList.add(`theme-${currentTheme}`);
     body.classList.add(`theme-${currentTheme}`);
 
+    // Apply dark mode
+    if (isDarkMode) {
+      root.classList.add('dark');
+      body.classList.add('dark');
+      
+      // Set Chart.js defaults for dark mode
+      Chart.defaults.color = '#9CA3AF';
+      Chart.defaults.borderColor = '#4B5563';
+      Chart.defaults.backgroundColor = '#1F2937';
+    } else {
+      root.classList.remove('dark');
+      body.classList.remove('dark');
+      
+      // Reset Chart.js defaults for light mode
+      Chart.defaults.color = '#374151';
+      Chart.defaults.borderColor = '#E5E7EB';
+      Chart.defaults.backgroundColor = '#FFFFFF';
+    }
+
     // Dynamically load theme CSS
     loadThemeCSS(currentTheme);
 
     // Save to localStorage
     localStorage.setItem('miniERP-theme', currentTheme);
-  }, [currentTheme]);
+    localStorage.setItem('miniERP-darkMode', String(isDarkMode));
+  }, [currentTheme, isDarkMode]);
 
   // Toggle between themes
   const toggleTheme = () => {
@@ -114,10 +143,17 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     }
   };
 
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
   const value: ThemeContextType = {
     currentTheme,
     themeName: THEME_NAMES[currentTheme],
+    isDarkMode,
     toggleTheme,
+    toggleDarkMode,
     setTheme,
     themes: THEMES
   };

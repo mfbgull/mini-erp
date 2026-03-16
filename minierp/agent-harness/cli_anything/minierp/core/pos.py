@@ -14,7 +14,7 @@ def create_pos_sale(
     """Create a POS sale."""
     client = make_client()
     return client.post(
-        "/sale",
+        "/pos/sale",
         body={
             "customer_id": customer_id,
             "items": items,
@@ -28,4 +28,4 @@ def create_pos_sale(
 def list_pos_transactions(page: int = 1, limit: int = 50) -> dict:
     """List POS transactions."""
     client = make_client()
-    return client.get("/transactions", params={"page": page, "limit": limit})
+    return client.get("/pos/transactions", params={"page": page, "limit": limit})

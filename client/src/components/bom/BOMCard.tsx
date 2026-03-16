@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
+
 import { MoreVertical, Edit, X, Power, Trash2, Loader2 } from 'lucide-react';
+
 import api from '../../utils/api';
+import { handleError } from '../../utils/errors';
 import './BOMCard.css';
 
 interface BOMItem {
@@ -114,7 +117,7 @@ export function BOMCard({ bom, onEdit, onToggleStatus, onDelete }: BOMCardProps)
         const response = await api.get(`/boms/${bom.id}`);
         setDetailedBom(response.data);
       } catch (error) {
-        console.error('Failed to load BOM details:', error);
+        handleError(error, 'BOMCard.handleCardClick');
       } finally {
         setIsLoading(false);
       }

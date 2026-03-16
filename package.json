@@ -13,7 +13,8 @@
     "start-electron": "electron .",
     "dist": "npm run build-all && electron-builder",
     "dist-win": "npm run build-all && electron-builder --win --x64",
-    "dist-all": "npm run build-all && electron-builder -wlm"
+    "dist-all": "npm run build-all && electron-builder -wlm",
+    "prepare": "husky"
   },
   "dependencies": {
     "@playwright/test": "^1.58.1",

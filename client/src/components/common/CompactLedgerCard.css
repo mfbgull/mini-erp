@@ -1,21 +1,5 @@
 /* Compact Ledger Card Styles */
-.compact-ledger-card {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 0.875rem 1rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.compact-ledger-card:hover {
-  border-color: #3b82f6;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
-}
+/* Wrapper styles removed as they are handled by Card component */
 
 .ledger-date {
   display: flex;

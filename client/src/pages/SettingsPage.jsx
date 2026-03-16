@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import api from '../utils/api';
-import FormInput from '../components/common/FormInput';
-import Button from '../components/common/Button';
-import { useTheme, THEMES, THEME_NAMES, THEME_ICONS, THEME_DESCRIPTIONS } from '../context/ThemeContext';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DollarSign, Building2, Palette, Lightbulb, Eye, Check } from 'lucide-react';
+
+import Button from '../components/common/Button';
+import FormInput from '../components/common/FormInput';
+import { useTheme, THEMES, THEME_NAMES, THEME_ICONS, THEME_DESCRIPTIONS } from '../context/ThemeContext';
+import { useFormValidation } from '../hooks/useFormValidation';
+import { settingsSchema } from '../schemas';
+import api from '../utils/api';
+
 import './SettingsPage.css';
 
 export default function SettingsPage() {
@@ -66,12 +71,16 @@ export default function SettingsPage() {
     }
   });
 
+  const { errors, validate, clearErrors } = useFormValidation(settingsSchema);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) clearErrors();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate(formData)) return;
     updateMutation.mutate(formData);
   };
 
@@ -109,7 +118,7 @@ export default function SettingsPage() {
         {/* Currency Settings */}
         <div className="settings-section">
           <div className="section-header">
-            <h2><DollarSign size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Currency Settings</h2>
+            <h2><DollarSign size={24} className="icon-valign-middle icon-mr-sm" />Currency Settings</h2>
             <p className="section-description">Configure currency display preferences</p>
           </div>
           <div className="settings-grid">
@@ -120,6 +129,7 @@ export default function SettingsPage() {
               onChange={handleChange}
               placeholder="e.g., $, €, £, Rs"
               required
+              error={errors.currency_symbol}
               helpText="This symbol will appear before all monetary values"
             />
             <FormInput
@@ -129,6 +139,7 @@ export default function SettingsPage() {
               onChange={handleChange}
               placeholder="e.g., USD, EUR, GBP, PKR"
               required
+              error={errors.currency_code}
               helpText="Standard 3-letter currency code"
             />
             <FormInput
@@ -140,6 +151,7 @@ export default function SettingsPage() {
               value={formData.decimal_places}
               onChange={handleChange}
               required
+              error={errors.decimal_places}
               helpText="Number of decimal places for currency amounts"
             />
           </div>
@@ -148,7 +160,7 @@ export default function SettingsPage() {
         {/* Company Settings */}
         <div className="settings-section">
           <div className="section-header">
-            <h2><Building2 size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Company Settings</h2>
+            <h2><Building2 size={24} className="icon-valign-middle icon-mr-sm" />Company Settings</h2>
             <p className="section-description">Basic company information</p>
           </div>
           <div className="settings-grid">
@@ -159,6 +171,7 @@ export default function SettingsPage() {
               onChange={handleChange}
               placeholder="e.g., ABC Manufacturing Ltd."
               required
+              error={errors.company_name}
               helpText="Your company or business name"
             />
           </div>
@@ -167,7 +180,7 @@ export default function SettingsPage() {
         {/* Display Settings */}
         <div className="settings-section">
           <div className="section-header">
-            <h2><Palette size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Display Settings</h2>
+            <h2><Palette size={24} className="icon-valign-middle icon-mr-sm" />Display Settings</h2>
             <p className="section-description">Customize how information is displayed</p>
           </div>
           <div className="settings-grid">
@@ -192,7 +205,7 @@ export default function SettingsPage() {
         {/* Tooltip Settings */}
         <div className="settings-section">
           <div className="section-header">
-            <h2><Lightbulb size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Tooltip Settings</h2>
+            <h2><Lightbulb size={24} className="icon-valign-middle icon-mr-sm" />Tooltip Settings</h2>
             <p className="section-description">Configure tooltip behavior</p>
           </div>
           <div className="settings-grid">
@@ -214,7 +227,7 @@ export default function SettingsPage() {
         {/* Theme Selection */}
         <div className="settings-section">
           <div className="section-header">
-            <h2><Palette size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Theme Selection</h2>
+            <h2><Palette size={24} className="icon-valign-middle icon-mr-sm" />Theme Selection</h2>
             <p className="section-description">Choose your preferred visual theme</p>
           </div>
           <div className="theme-selector">
@@ -240,7 +253,7 @@ export default function SettingsPage() {
         {/* Preview Section */}
         <div className="settings-section preview-section">
           <div className="section-header">
-            <h2><Eye size={24} style={{ verticalAlign: 'middle', marginRight: '8px' }} />Preview</h2>
+            <h2><Eye size={24} className="icon-valign-middle icon-mr-sm" />Preview</h2>
             <p className="section-description">See how your settings will look</p>
           </div>
           <div className="preview-content">

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
+import { ModuleRegistry , ClientSideRowModelModule } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import {
   Calendar,
   DollarSign,
@@ -14,13 +16,14 @@ import {
   Clock,
   Hash
 } from 'lucide-react';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
+import Card from '../../components/common/Card';
 import FormInput from '../../components/common/FormInput';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
+import '../../styles/components/card.css';
 import './ARReportsPage.css';
 
 // Register AG Grid modules
@@ -494,7 +497,7 @@ function ARAgingReport({ data, loading, formatCurrency, asOfDate }) {
       <div className="aging-grid-container">
         <h3>AR Aging as of {new Date(asOfDate).toLocaleDateString()}</h3>
         <>
-          <div className="ag-theme-quartz desktop-view" style={{ height: 500, width: '100%' }}>
+          <div className="ag-theme-quartz desktop-view ag-grid-container-lg">
             <AgGridReact
               rowData={data.agingBuckets || []}
               columnDefs={columnDefs}
@@ -522,24 +525,27 @@ function ARAgingReport({ data, loading, formatCurrency, asOfDate }) {
 
           <div className="mobile-ar-aging-list">
             {(data.agingBuckets || []).map((aging, index) => (
-              <div
+              <Card
                 key={`${aging.customer_id || aging.customer_name}-${index}`}
-                className="ar-aging-card"
+                variant="compact"
+                hoverable
                 onClick={() => handleCardClick(aging)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleCardClick(aging);
-                  }
-                }}
+                className="compact-item-card"
               >
-                <div className="ar-aging-card-content">
-                  <h3 className="ar-aging-customer">{aging.customer_name}</h3>
-                  <span className="ar-aging-amount">{formatCurrency(aging.total_outstanding || 0)}</span>
-                </div>
-              </div>
+                <Card.Row justify="space-between" align="center" className="card-content-clickable">
+                  <div className="item-info-section">
+                    <p className="item-item-name">{aging.customer_name}</p>
+                    <div className="item-meta">
+                      <span className="item-item-code">{aging.customer_code || '—'}</span>
+                    </div>
+                  </div>
+                  <div className="item-stock-row">
+                    <div className="quantity-display">
+                      <span className="qty-text qty-zero">{formatCurrency(aging.total_outstanding || 0)}</span>
+                    </div>
+                  </div>
+                </Card.Row>
+              </Card>
             ))}
           </div>
         </>
@@ -808,7 +814,7 @@ function TopDebtorsReport({ data, loading, formatCurrency }) {
   return (
     <div className="top-debtors-report">
       <>
-        <div className="ag-theme-quartz desktop-view" style={{ height: 500, width: '100%' }}>
+        <div className="ag-theme-quartz desktop-view ag-grid-container-lg">
           <AgGridReact
             rowData={data}
             columnDefs={columnDefs}
@@ -836,15 +842,26 @@ function TopDebtorsReport({ data, loading, formatCurrency }) {
 
         <div className="mobile-top-debtors-list">
           {data.map((debtor, index) => (
-            <div
+            <Card
               key={`${debtor.customer_id || debtor.customer_name}-${index}`}
-              className="top-debtor-card"
+              variant="compact"
+              hoverable
+              className="compact-item-card"
             >
-              <div className="top-debtor-card-content">
-                <h3 className="top-debtor-name">{debtor.customer_name}</h3>
-                <span className="top-debtor-balance">{formatCurrency(debtor.balance || 0)}</span>
-              </div>
-            </div>
+              <Card.Row justify="space-between" align="center" className="card-content-clickable">
+                <div className="item-info-section">
+                  <p className="item-item-name">{debtor.customer_name}</p>
+                  <div className="item-meta">
+                    <span className="item-item-code">{debtor.customer_code || '—'}</span>
+                  </div>
+                </div>
+                <div className="item-stock-row">
+                  <div className="quantity-display">
+                    <span className="qty-text qty-zero">{formatCurrency(debtor.outstanding_balance || 0)}</span>
+                  </div>
+                </div>
+              </Card.Row>
+            </Card>
           ))}
         </div>
       </>

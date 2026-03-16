@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo, ChangeEvent } from 'react';
+
 import { Check } from 'lucide-react';
-import './SearchableSelect.css';
+import '../../styles/components/form.css';
 
 interface SelectOption {
   value: string | number;

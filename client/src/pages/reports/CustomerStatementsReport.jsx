@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
+import { ModuleRegistry , ClientSideRowModelModule } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import {
   Users,
   FileText,
@@ -13,12 +15,11 @@ import {
   Hash,
   TrendingUp
 } from 'lucide-react';
-import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './CustomerStatementsReport.css';
 
@@ -267,7 +268,7 @@ export default function CustomerStatementsReport() {
           </div>
         ) : reportData?.statements && reportData.statements.length > 0 ? (
           <>
-            <div className="ag-theme-quartz desktop-view" style={{ height: 600, width: '100%' }}>
+            <div className="ag-theme-quartz desktop-view ag-grid-container">
               <AgGridReact
                 rowData={reportData.statements}
                 columnDefs={columnDefs}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, memo } from 'react';
-import { Search, X, Command } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+import { Search, X, Command } from 'lucide-react';
 
 interface SearchModalProps {
   isOpen: boolean;

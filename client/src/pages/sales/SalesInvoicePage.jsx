@@ -1,20 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSettings } from '../../context/SettingsContext';
-import { useMobileDetection } from '../../hooks/useMobileDetection';
 import toast from 'react-hot-toast';
-import api from '../../utils/api';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
-import FormInput from '../../components/common/FormInput';
-import { CompactItemCard } from '../../components/common/CompactItemCard';
-import BorderAccentItemCard from '../../components/common/BorderAccentItemCard';
-import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
-import PriceHistoryHint from '../../components/invoice/PriceHistoryHint';
-import { Search, ArrowLeft, Printer, Download, Edit2, Mail, Share2, Plus, Trash2, Eye, Send, Hash, DollarSign, CreditCard } from 'lucide-react';
-import jsPDF from 'jspdf';
+import { useNavigate, useParams } from 'react-router-dom';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { Search, ArrowLeft, Printer, Download, Edit2, Mail, Share2, Plus, Trash2, Eye, Send, Hash, DollarSign, CreditCard } from 'lucide-react';
+
+import Button from '../../components/common/Button';
+import { CompactItemCard } from '../../components/common/CompactItemCard';
+import FormInput from '../../components/common/FormInput';
+import Modal from '../../components/common/Modal';
+import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
+import { useSettings } from '../../context/SettingsContext';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
+import api from '../../utils/api';
+import PriceHistoryHint from '../../components/invoice/PriceHistoryHint';
+import { invoiceSchema } from '../../schemas';
+
 import './SalesInvoicePage.css';
 
 export default function SalesInvoicePage() {
@@ -104,6 +108,8 @@ export default function SalesInvoicePage() {
       { id: Date.now(), method: 'Cash', amount: 0, reference_no: '' }
     ]
   });
+
+  const { errors, validate, clearErrors } = useFormValidation(invoiceSchema);
 
   const [editingCell, setEditingCell] = useState(null);
   const [existingPayments, setExistingPayments] = useState([]);
@@ -1034,6 +1040,28 @@ export default function SalesInvoicePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Prepare validation data
+    const validationData = {
+      customer_id: invoice.customer_id,
+      invoice_date: invoice.invoice_date,
+      due_date: invoice.due_date,
+      notes: invoice.notes,
+      terms: invoice.terms,
+      discount_type: invoice.discount.type,
+      discount_value: invoice.discount.value,
+      items: invoice.items.map(item => ({
+        item_id: item.item_id,
+        quantity: item.quantity,
+        rate: item.rate,
+        description: item.description,
+        tax: item.tax,
+        discount_type: item.discount.type,
+        discount_value: item.discount.value
+      }))
+    };
+
+    if (!validate(validationData)) return;
 
     if (!invoice.customer_id) {
       toast.error('Please select a customer');

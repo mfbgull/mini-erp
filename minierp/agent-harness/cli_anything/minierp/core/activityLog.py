@@ -26,7 +26,7 @@ def list_activity_logs(
         params["start_date"] = start_date
     if end_date:
         params["end_date"] = end_date
-    return client.get("/", params=params)
+    return client.get("/activity-logs", params=params)
 
 
 def get_activity_stats(
@@ -40,37 +40,39 @@ def get_activity_stats(
         params["start_date"] = start_date
     if end_date:
         params["end_date"] = end_date
-    return client.get("/stats", params=params)
+    return client.get("/activity-logs/stats", params=params)
 
 
 def get_recent_activity(limit: int = 20) -> dict:
     """Get recent activity for dashboard."""
     client = make_client()
-    return client.get("/recent", params={"limit": limit})
+    return client.get("/activity-logs/recent", params={"limit": limit})
 
 
 def get_entity_types() -> dict:
     """Get available entity types for filtering."""
     client = make_client()
-    return client.get("/entity-types")
+    return client.get("/activity-logs/entity-types")
 
 
 def get_actions() -> dict:
     """Get available actions for filtering."""
     client = make_client()
-    return client.get("/actions")
+    return client.get("/activity-logs/actions")
 
 
 def get_users() -> dict:
     """Get all users for filtering."""
     client = make_client()
-    return client.get("/users")
+    return client.get("/activity-logs/users")
 
 
 def get_user_activity(user_id: int, page: int = 1, limit: int = 50) -> dict:
     """Get activity logs for a specific user."""
     client = make_client()
-    return client.get(f"/user/{user_id}", params={"page": page, "limit": limit})
+    return client.get(
+        f"/activity-logs/user/{user_id}", params={"page": page, "limit": limit}
+    )
 
 
 def get_entity_activity(
@@ -79,7 +81,8 @@ def get_entity_activity(
     """Get activity logs for a specific entity."""
     client = make_client()
     return client.get(
-        f"/entity/{entity_type}/{entity_id}", params={"page": page, "limit": limit}
+        f"/activity-logs/entity/{entity_type}/{entity_id}",
+        params={"page": page, "limit": limit},
     )
 
 

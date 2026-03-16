@@ -1,16 +1,7 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
-import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Calculator,
-  Download,
-  Filter,
-  BarChart3
-} from 'lucide-react';
 import { Bar } from 'react-chartjs-2';
+
+import { useQuery } from '@tanstack/react-query';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -20,9 +11,20 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import api from '../../utils/api';
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Calculator,
+  Download,
+  Filter,
+  BarChart3
+} from 'lucide-react';
+
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './FinancialReports.css';
 
@@ -233,8 +235,8 @@ export default function ProfitLossReport() {
         </div>
       ) : reportData ? (
         <div className="report-content">
-          <div className="financial-summary">
-            <div className="summary-item revenue">
+          <div className="pl-summary-grid">
+            <div className="pl-summary-card">
               <div className="summary-content">
                 <div className="summary-icon">
                   <DollarSign size={24} />
@@ -246,7 +248,7 @@ export default function ProfitLossReport() {
               </div>
             </div>
 
-            <div className="summary-item cogs">
+            <div className="pl-summary-card">
               <div className="summary-content">
                 <div className="summary-icon">
                   <TrendingDown size={24} />
@@ -258,7 +260,7 @@ export default function ProfitLossReport() {
               </div>
             </div>
 
-            <div className="summary-item gross-profit">
+            <div className="pl-summary-card">
               <div className="summary-content">
                 <div className="summary-icon">
                   <TrendingUp size={24} />
@@ -270,7 +272,7 @@ export default function ProfitLossReport() {
               </div>
             </div>
 
-            <div className="summary-item expenses">
+            <div className="pl-summary-card">
               <div className="summary-content">
                 <div className="summary-icon">
                   <Calculator size={24} />
@@ -282,7 +284,7 @@ export default function ProfitLossReport() {
               </div>
             </div>
 
-            <div className="summary-item net-profit">
+            <div className="pl-summary-card">
               <div className="summary-content">
                 <div className="summary-icon">
                   <DollarSign size={24} />
@@ -293,36 +295,34 @@ export default function ProfitLossReport() {
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="financial-metrics">
-            <div className="metric-card">
-              <div className="metric-content">
-                <div className="metric-icon">
+            <div className="pl-summary-card">
+              <div className="summary-content">
+                <div className="summary-icon">
                   <TrendingUp size={24} />
                 </div>
-                <div className="metric-text">
-                  <div className="metric-value">{reportData.grossProfitMargin}%</div>
-                  <div className="metric-label">Gross Profit Margin</div>
+                <div className="summary-text">
+                  <div className="summary-value">{reportData.grossProfitMargin}%</div>
+                  <div className="summary-label">Gross Profit Margin</div>
                 </div>
               </div>
             </div>
 
-            <div className="metric-card">
-              <div className="metric-content">
-                <div className="metric-icon">
-                  <TrendingUp size={24} />
+            <div className="pl-summary-card">
+              <div className="summary-content">
+                <div className="summary-icon">
+                  <BarChart3 size={24} />
                 </div>
-                <div className="metric-text">
-                  <div className="metric-value">{reportData.netProfitMargin}%</div>
-                  <div className="metric-label">Net Profit Margin</div>
+                <div className="summary-text">
+                  <div className="summary-value">{reportData.netProfitMargin}%</div>
+                  <div className="summary-label">Net Profit Margin</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="chart-container">
-            <Bar data={chartData} options={chartOptions} />
+            <Bar key="profit-loss-chart" data={chartData} options={chartOptions} />
           </div>
         </div>
       ) : (

@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ModuleRegistry , ClientSideRowModelModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule } from 'ag-grid-community';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import {
   ArrowLeft,
   DollarSign,
@@ -24,18 +27,17 @@ import {
   Image,
   FileSpreadsheet
 } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import toast from 'react-hot-toast';
-import { useSettings } from '../../context/SettingsContext';
-import api from '../../utils/api';
+
+
 import Button from '../../components/common/Button';
+import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
+import CompactLedgerCardView from '../../components/common/CompactLedgerCard';
+import CompactPaymentCardView from '../../components/common/CompactPaymentCard';
 import Modal from '../../components/common/Modal';
 import PaymentModal from '../../components/customers/PaymentModal';
-import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
-import CompactPaymentCardView from '../../components/common/CompactPaymentCard';
-import CompactLedgerCardView from '../../components/common/CompactLedgerCard';
+import { useSettings } from '../../context/SettingsContext';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import api from '../../utils/api';
 import './CustomerDetailPage.css';
 
 // Register AG Grid modules
@@ -1052,7 +1054,7 @@ function LedgerTab({ ledger, loading, customerName }) {
       // Table headers
       const headers = ['Date', 'Type', 'Reference', 'Description', 'Debit', 'Credit', 'Balance'];
       const colWidths = [25, 25, 30, 80, 30, 30, 30];
-      let startX = 14;
+      const startX = 14;
       let startY = 32;
 
       // Draw header row

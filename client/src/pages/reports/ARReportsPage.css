@@ -40,7 +40,7 @@
 .report-type-btn {
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--neutral-200);
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-md);
   cursor: pointer;
   display: flex;
@@ -85,7 +85,7 @@
 }
 
 .report-content {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -134,7 +134,7 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--card-bg);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: var(--space-md);
@@ -410,10 +410,11 @@
   
   .summary-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-sm);
   }
   
   .report-summary {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--space-sm);
   }
   
@@ -430,48 +431,6 @@
     flex-direction: column;
     gap: var(--space-md);
     padding: var(--space-md);
-  }
-
-  .ar-aging-card {
-    background: var(--neutral-100);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--neutral-200);
-    padding: var(--space-md);
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .ar-aging-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-    border-color: var(--primary-200);
-  }
-
-  .ar-aging-card-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-md);
-  }
-
-  .ar-aging-customer {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--neutral-900);
-    margin: 0;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .ar-aging-amount {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--error);
-    white-space: nowrap;
-    flex-shrink: 0;
   }
 
   .ar-modal-overlay {
@@ -599,37 +558,4 @@
     padding: var(--space-md);
   }
 
-  .top-debtor-card {
-    background: var(--neutral-100);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--neutral-200);
-    padding: var(--space-md);
-  }
-
-  .top-debtor-card-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-md);
-  }
-
-  .top-debtor-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--neutral-900);
-    margin: 0;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .top-debtor-balance {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--error);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
 }

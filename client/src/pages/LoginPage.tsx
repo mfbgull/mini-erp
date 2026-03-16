@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+
 import Button from '../components/common/Button';
+import { useAuth } from '../context/AuthContext';
+import { useFormValidation } from '../hooks/useFormValidation';
+import { loginSchema } from '../schemas';
 import './Login.css';
 
 export default function Login() {
@@ -10,9 +13,11 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { errors, validate, clearErrors } = useFormValidation(loginSchema);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate({ username, password })) return;
     setLoading(true);
 
     const result = await login(username, password);
@@ -34,29 +39,29 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
+          <div className={`form-group ${errors.username ? 'has-error' : ''}`}>
             <label htmlFor="username">Username</label>
             <input
               id="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => { setUsername(e.target.value); if (errors.username) clearErrors(); }}
               placeholder="Enter your username"
-              required
               autoFocus
             />
+            {errors.username && <span className="error-message">{errors.username}</span>}
           </div>
 
-          <div className="form-group">
+          <div className={`form-group ${errors.password ? 'has-error' : ''}`}>
             <label htmlFor="password">Password</label>
             <input
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); if (errors.password) clearErrors(); }}
               placeholder="Enter your password"
-              required
             />
+            {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
 
           <Button type="submit" variant="primary" loading={loading} className="login-button">

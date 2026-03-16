@@ -1,21 +1,21 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import PageLoader from './components/common/PageLoader';
+import SearchModal from './components/common/SearchModal';
+import ErrorBoundary from './components/ErrorBoundary';
+import FloatingActionButton from './components/layout/FloatingActionButton';
+import Sidebar from './components/layout/Sidebar';
+import TopMenu from './components/layout/TopMenu';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { InvoiceProvider } from './context/InvoiceContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { InvoiceProvider } from './context/InvoiceContext';
-import SearchModal from './components/common/SearchModal';
-import PageLoader from './components/common/PageLoader';
-import ErrorBoundary from './components/ErrorBoundary';
-import WebMCPStatus from './components/WebMCPStatus';
-
-// Eager loaded - Critical path components
-import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
-import Sidebar from './components/layout/Sidebar';
-import FloatingActionButton from './components/layout/FloatingActionButton';
+import LoginPage from './pages/LoginPage';
 
 // Lazy loaded - Inventory module
 const ItemsPage = lazy(() => import('./pages/inventory/ItemsPage'));
@@ -43,7 +43,7 @@ const SalesPage = lazy(() => import('./pages/sales/SalesPage'));
 const SalesInvoicePage = lazy(() => import('./pages/sales/SalesInvoicePage'));
 const InvoiceViewPage = lazy(() => import('./pages/sales/InvoiceViewPage'));
 const InvoiceRouter = lazy(() => import('./components/invoice/InvoiceRouter'));
-const MobileInvoiceWizard = lazy(() => import('./pages/invoice/MobileInvoiceWizard'));
+const InvoiceWizardPage = lazy(() => import('./pages/invoice/InvoiceWizardPage'));
 
 // Lazy loaded - Customers module
 const CustomersPage = lazy(() => import('./pages/customers/CustomersPage'));
@@ -79,6 +79,9 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'));
 const ExpensesPage = lazy(() => import('./pages/expenses/ExpensesPage'));
 const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
+const ForecastDashboard = lazy(() => import('./pages/forecasts/ForecastDashboard'));
+const DemandForecast = lazy(() => import('./pages/forecasts/DemandForecast'));
+const ForecastTrends = lazy(() => import('./pages/forecasts/ForecastTrends'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -110,10 +113,19 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 }
 
 function AppLayout() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    return localStorage.getItem('sidebarCollapsed') === 'true';
+  const [isDesktop, setIsDesktop] = useState(() => {
+    return window.innerWidth > 768;
   });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth > 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -127,21 +139,12 @@ function AppLayout() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  useEffect(() => {
-    const handleSidebarToggle = (event: Event) => {
-      const customEvent = event as CustomEvent<{ collapsed: boolean }>;
-      setSidebarCollapsed(customEvent.detail.collapsed);
-    };
-
-    window.addEventListener('sidebarToggle', handleSidebarToggle);
-    return () => window.removeEventListener('sidebarToggle', handleSidebarToggle);
-  }, []);
-
   return (
     <SettingsProvider>
       <div className="app-container">
-        <Sidebar />
-        <div className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        {/* Navigation: TopMenu (desktop) or Sidebar (mobile) */}
+        {isDesktop ? <TopMenu /> : <Sidebar />}
+        <div className="main-content">
           <div className="content">
             <ErrorBoundary>
               <Suspense fallback={<PageLoader />}>
@@ -190,11 +193,14 @@ function AppLayout() {
               <Route path="/sales/invoice/:id" element={<InvoiceRouter />} />
               <Route path="/sales/invoice/:id/view" element={<InvoiceViewPage />} />
               <Route path="/sales/invoice/:id/edit" element={<InvoiceRouter defaultMode="edit" />} />
-              <Route path="/invoices/create" element={<MobileInvoiceWizard />} />
+              <Route path="/invoices/create" element={<InvoiceWizardPage />} />
               <Route path="/pos" element={<POSPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/integrations" element={<IntegrationsPage />} />
               <Route path="/activity-log" element={<ActivityLogPage />} />
+              <Route path="/forecasts" element={<ForecastDashboard />} />
+              <Route path="/forecasts/demand" element={<DemandForecast />} />
+              <Route path="/forecasts/trends" element={<ForecastTrends />} />
               <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Suspense>
@@ -263,7 +269,6 @@ export default function App() {
                 }
               }}
             />
-            <WebMCPStatus />
           </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>

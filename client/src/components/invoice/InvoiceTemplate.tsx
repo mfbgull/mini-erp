@@ -81,7 +81,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
         month: 'long',
         day: 'numeric'
       });
-    } catch (error) {
+    } catch {
       return dateString || '';
     }
   };
@@ -119,7 +119,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       subtotal += subtotal * (taxRate / 100);
 
       return Math.max(0, subtotal); // Ensure non-negative result
-    } catch (error) {
+    } catch {
       return 0;
     }
   };
@@ -146,7 +146,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
         return sum + itemSubtotal;
       }, 0);
-    } catch (error) {
+    } catch {
       return 0;
     }
   };
@@ -197,7 +197,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       }
 
       return Math.max(0, discount); // Ensure non-negative result
-    } catch (error) {
+    } catch {
       return 0;
     }
   };
@@ -234,7 +234,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
 
         return sum + taxAmount;
       }, 0);
-    } catch (error) {
+    } catch {
       return 0;
     }
   };
@@ -413,7 +413,7 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
       </div>
     </div>
   );
-} catch (error) {
+  } catch (error) {
   console.error('Error in InvoiceTemplate rendering:', error);
   return (
     <div className="invoice-template">

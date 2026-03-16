@@ -1,21 +1,24 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMobileDetection } from '../../hooks/useMobileDetection';
 import toast from 'react-hot-toast';
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { Search, X, Factory } from 'lucide-react';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
+import { CompactWarehouseCard } from '../../components/common/CompactWarehouseCard';
 import FormInput from '../../components/common/FormInput';
-import BorderAccentWarehouseCard from '../../components/common/BorderAccentWarehouseCard';
+import Modal from '../../components/common/Modal';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { warehouseSchema } from '../../schemas';
+import api from '../../utils/api';
 import './WarehousesPage.css';
 
 export default function WarehousesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [openDetailsWarehouse, setOpenDetailsWarehouse] = useState(null);
   const { isMobile } = useMobileDetection();
   const queryClient = useQueryClient();
 
@@ -97,7 +100,7 @@ export default function WarehousesPage() {
           <h1>Warehouses</h1>
           <p className="page-subtitle">Manage storage locations</p>
         </div>
-        {!isMobile && !openDetailsWarehouse && (
+        {!isMobile && (
           <Button variant="primary" onClick={handleNew}>
             + New Warehouse
           </Button>
@@ -137,30 +140,19 @@ export default function WarehousesPage() {
           <Button variant="secondary" onClick={() => setSearchTerm('')}>Clear Search</Button>
         </div>
       ) : isMobile ? (
-        <>
-          <div className="mobile-warehouses-container">
-            {filteredWarehouses.map((warehouse) => (
-              <BorderAccentWarehouseCard
-                key={warehouse.id}
-                warehouse={warehouse}
-                showItems={openDetailsWarehouse?.id === warehouse.id}
-                onShowItemsChange={(show) => setOpenDetailsWarehouse(show ? warehouse : null)}
-                onEdit={(warehouse) => {
-                  setEditingWarehouse(warehouse);
-                  setIsModalOpen(true);
-                }}
-                onDelete={handleDeleteWarehouse}
-              />
-            ))}
-          </div>
-          {openDetailsWarehouse === null && (
-          <div className="mobile-action-bar">
-            <Button variant="primary" onClick={handleNew}>
-              + New Warehouse
-            </Button>
-          </div>
-          )}
-        </>
+        <div className="mobile-warehouses-container">
+          {filteredWarehouses.map((warehouse) => (
+            <CompactWarehouseCard
+              key={warehouse.id}
+              warehouse={warehouse}
+              onEdit={(warehouse) => {
+                setEditingWarehouse(warehouse);
+                setIsModalOpen(true);
+              }}
+              onDelete={handleDeleteWarehouse}
+            />
+          ))}
+        </div>
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
@@ -208,6 +200,8 @@ function WarehouseForm({ warehouse, onClose, onSuccess }) {
     description: warehouse?.description || ''
   });
 
+  const { errors, validate, clearErrors } = useFormValidation(warehouseSchema);
+
   const mutation = useMutation({
     mutationFn: async (data) => {
       if (isEdit) {
@@ -227,10 +221,18 @@ function WarehouseForm({ warehouse, onClose, onSuccess }) {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    // Clear error when user starts typing
+    if (errors[e.target.name]) {
+      clearErrors();
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validate(formData)) return;
+
     mutation.mutate(formData);
   };
 

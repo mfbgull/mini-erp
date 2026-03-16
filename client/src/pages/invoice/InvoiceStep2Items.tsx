@@ -1,6 +1,8 @@
-import { useInvoice } from '../../context/InvoiceContext';
 import { Trash2, Plus, ChevronRight } from 'lucide-react';
-import './MobileInvoice.css';
+
+import Button from '../../components/common/Button';
+import { useInvoice } from '../../context/InvoiceContext';
+import '../../styles/pages/invoice.css';
 
 export default function InvoiceStep2Items() {
   const { 
@@ -45,14 +47,14 @@ export default function InvoiceStep2Items() {
           <div className="miw-empty-title">No items yet</div>
           <div className="miw-empty-message">Add items to your invoice</div>
         </div>
-        <div className="miw-wizard-actions" style={{ marginTop: '24px' }}>
-          <button 
-            className="btn btn-primary"
+        <div className="miw-wizard-actions miw-mt-24">
+          <Button
+            variant="primary"
             onClick={() => goToStep(3)}
           >
             <Plus size={18} />
             Add Item
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -86,13 +88,7 @@ export default function InvoiceStep2Items() {
               />
               <button
                 onClick={() => handleDeleteItem(item.id)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#dc2626',
-                  cursor: 'pointer',
-                  padding: '4px'
-                }}
+                className="miw-delete-btn"
               >
                 <Trash2 size={18} />
               </button>
@@ -109,14 +105,14 @@ export default function InvoiceStep2Items() {
       )}
 
       <div className="miw-wizard-actions">
-        <button className="btn btn-secondary" onClick={() => goToStep(3)}>
+        <Button variant="secondary" onClick={() => goToStep(3)}>
           <Plus size={18} />
           Add More
-        </button>
-        <button className="btn btn-primary" onClick={handleContinue}>
+        </Button>
+        <Button variant="primary" onClick={handleContinue}>
           Continue
           <ChevronRight size={16} />
-        </button>
+        </Button>
       </div>
     </div>
   );

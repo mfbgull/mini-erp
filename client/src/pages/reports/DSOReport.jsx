@@ -1,6 +1,16 @@
 import { useState } from 'react';
+import { Bar } from 'react-chartjs-2';
+
 import { useQuery } from '@tanstack/react-query';
-import { useSettings } from '../../context/SettingsContext';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import {
   Calendar,
   DollarSign,
@@ -11,19 +21,11 @@ import {
   Filter,
   BarChart3
 } from 'lucide-react';
-import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import api from '../../utils/api';
+
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import { useSettings } from '../../context/SettingsContext';
+import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './DSOReport.css';
 
@@ -314,7 +316,7 @@ export default function DSOReport() {
           </div>
 
           <div className="chart-container">
-            <Bar data={chartData} options={chartOptions} />
+            <Bar key="dso-chart" data={chartData} options={chartOptions} />
           </div>
 
           <div className="dso-info">
