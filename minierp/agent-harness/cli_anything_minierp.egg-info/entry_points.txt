@@ -1,0 +1,2 @@
+[console_scripts]
+cli-anything-minierp = cli_anything.minierp.minierp_cli:main

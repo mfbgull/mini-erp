@@ -1,0 +1,1030 @@
+/* Mobile-Responsive Enhancements for Mini ERP */
+/* Target: 320px - 768px screens */
+
+/* Desktop main-content - accounts for 56px top menu */
+@media (min-width: 769px) {
+  .main-content {
+    margin-top: 56px;
+    min-height: calc(100vh - 56px);
+    padding: var(--space-lg);
+    margin-left: 0;
+  }
+  
+  .content {
+    padding: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  /* ============================================
+     LAYOUT & CONTAINER ADJUSTMENTS
+     ============================================ */
+
+  .main-content {
+    margin-left: 0 !important;
+    margin-top: 60px;
+    padding: 0 var(--space-sm) var(--space-lg) var(--space-sm) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+   .main-content.sidebar-collapsed {
+     margin-left: 0 !important;
+     padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+   }
+
+   .content {
+    padding: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ensure content takes full width on mobile */
+  .content,
+  .content > .customers-page,
+  .content > .sales-page,
+  .content > .purchases-page,
+  .content > .inventory-page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  /* ============================================
+     PAGE HEADER & HEADINGS
+     ============================================ */
+  
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--space-md) !important;
+    margin-bottom: var(--space-md) !important;
+  }
+  
+  .page-header h1 {
+    font-size: 24px !important;
+  }
+  
+  .page-header .header-actions {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .page-header .header-actions .btn {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+    text-align: center;
+    padding: var(--space-sm) var(--space-md) !important;
+  }
+  
+  /* ============================================
+     SIDEBAR & NAVIGATION
+     ============================================ */
+  
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 60px !important;
+    flex-direction: row !important;
+    z-index: 1000 !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+  
+  .sidebar-menu {
+    display: none !important;
+    position: absolute !important;
+    top: 60px !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-height: calc(100vh - 60px) !important;
+    overflow-y: auto !important;
+    background: var(--neutral-100) !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+  
+  .sidebar-menu.open {
+    display: block !important;
+  }
+  
+  .sidebar-item {
+    padding: var(--space-md) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+  
+  .sidebar-toggle {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 16px !important;
+    right: 16px !important;
+    z-index: 1001 !important;
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 50% !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+  
+  /* ============================================
+     FORMS & INPUTS
+     ============================================ */
+  
+  .form-row {
+    flex-direction: column !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .form-group {
+    width: 100% !important;
+  }
+  
+  .form-group label {
+    display: block !important;
+    margin-bottom: var(--space-xs) !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100% !important;
+    padding: var(--space-sm) !important;
+    font-size: 16px !important;
+    min-height: 48px !important;
+    border-radius: var(--radius-md) !important;
+  }
+  
+  .filters-form .filters-row {
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .filters-form .filter-group {
+    width: 100% !important;
+  }
+  
+  .filters-form .filter-group label {
+    display: block !important;
+    margin-bottom: 4px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: var(--text-secondary) !important;
+  }
+  
+  .filters-form .filter-group select,
+  .filters-form .filter-group input {
+    width: 100% !important;
+    padding: var(--space-sm) !important;
+    min-height: 44px !important;
+    font-size: 14px !important;
+  }
+  
+  /* ============================================
+     BUTTONS
+     ============================================ */
+  
+  .btn {
+    min-height: 48px !important;
+    padding: var(--space-sm) var(--space-md) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: var(--radius-md) !important;
+  }
+  
+  .btn-sm,
+  .btn-small {
+    min-height: 40px !important;
+    padding: var(--space-xs) var(--space-sm) !important;
+    font-size: 13px !important;
+  }
+  
+  /* ============================================
+     CARDS & STATS
+     ============================================ */
+  
+  .stats-cards {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .stat-card {
+    padding: var(--space-sm) !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--space-xs) !important;
+    text-align: center !important;
+  }
+  
+  .stat-card .kpi-icon {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.2rem !important;
+    margin-bottom: var(--space-xs) !important;
+  }
+  
+  .stat-card .kpi-value {
+    font-size: 1.2rem !important;
+  }
+  
+  /* ============================================
+     MODALS & DIALOGS
+     ============================================ */
+  
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: var(--space-sm) !important;
+  }
+  
+  .modal {
+    width: 100% !important;
+    max-height: 90vh !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+  }
+  
+  .modal-header {
+    padding: var(--space-md) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+  }
+  
+  .modal-body {
+    padding: var(--space-md) !important;
+    max-height: calc(90vh - 140px) !important;
+    overflow-y: auto !important;
+  }
+  
+  .modal-footer {
+    padding: var(--space-md) !important;
+    border-top: 1px solid var(--border-color) !important;
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .modal-footer .btn {
+    width: 100% !important;
+    min-height: 48px !important;
+  }
+  
+  /* ============================================
+     SEARCH MODAL
+     ============================================ */
+  
+  .search-modal .modal {
+    max-height: 80vh !important;
+  }
+  
+  .search-input-wrapper {
+    padding: var(--space-md) !important;
+  }
+  
+  .search-input-wrapper input {
+    width: 100% !important;
+    min-height: 48px !important;
+    font-size: 16px !important;
+  }
+  
+  /* ============================================
+     CHARTS & VISUALIZATIONS
+     ============================================ */
+  
+  .charts-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .chart-card {
+    padding: var(--space-md) !important;
+    overflow: hidden !important;
+  }
+  
+  .chart-card canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+   /* ============================================
+      KPI CARDS
+      ============================================ */
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .kpi-card {
+    padding: var(--space-sm) !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    text-align: center !important;
+  }
+  
+  .kpi-card .kpi-value {
+    font-size: 1.1rem !important;
+  }
+  
+  .kpi-card .kpi-content {
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .kpi-card .kpi-label {
+    font-size: 0.7rem !important;
+  }
+  
+  .kpi-card .kpi-subtitle {
+    font-size: 0.65rem !important;
+  }
+  
+  /* ============================================
+     PAGINATION
+     ============================================ */
+  
+  .pagination {
+    flex-wrap: wrap !important;
+    gap: var(--space-sm) !important;
+    justify-content: center !important;
+  }
+  
+  .pagination .btn {
+    min-width: 80px !important;
+  }
+  
+  .pagination .page-info {
+    width: 100% !important;
+    text-align: center !important;
+    order: -1 !important;
+  }
+  
+  /* ============================================
+     EMPTY STATES & LOADING
+     ============================================ */
+  
+  .empty-state {
+    padding: var(--space-xl) var(--space-md) !important;
+  }
+  
+  .loading-overlay {
+    padding: var(--space-xl) var(--space-md) !important;
+  }
+  
+  /* ============================================
+     TOAST NOTIFICATIONS
+     ============================================ */
+  
+  .toast-container {
+    top: 70px !important;
+    right: var(--space-sm) !important;
+    left: var(--space-sm) !important;
+    max-width: none !important;
+  }
+  
+  .toast {
+    width: 100% !important;
+    margin-bottom: var(--space-sm) !important;
+  }
+}
+
+/* ============================================
+   MOBILE ACCORDION TABLE STYLES
+   Option 2: Expandable Card Layout
+   Full-width, theme-consistent design
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* ============================================
+     ACCORDION TABLE CONTAINER
+     ============================================ */
+  
+  .data-table-container {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: visible !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  
+  .data-table {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+    width: 100% !important;
+  }
+  
+  /* ============================================
+     ACCORDION HEADER (Summary Row)
+     ============================================ */
+  
+  .data-table thead {
+    display: none !important;
+  }
+  
+  .data-table tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+    width: 100% !important;
+  }
+  
+  /* Accordion Item Container */
+  .data-table tbody tr.accordion-item {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    background: var(--neutral-100) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .data-table tbody tr.accordion-item:active {
+    transform: scale(0.99) !important;
+  }
+  
+  .data-table tbody tr.accordion-item.expanded {
+    box-shadow: var(--shadow-md) !important;
+    border-color: var(--primary-500) !important;
+  }
+  
+  /* ============================================
+     ACCORDION SUMMARY (Always Visible)
+     ============================================ */
+  
+  .accordion-summary {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: var(--space-md) !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  .accordion-summary-content {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: var(--space-sm) var(--space-md) !important;
+    flex: 1 !important;
+    align-items: center !important;
+  }
+  
+  .accordion-key {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: var(--text-tertiary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    min-width: 60px !important;
+  }
+  
+  .accordion-value {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--text-primary) !important;
+    flex: 1 !important;
+    min-width: 100px !important;
+  }
+  
+  /* Chevron Indicator */
+  .accordion-chevron {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px !important;
+    height: 32px !important;
+    color: var(--text-tertiary) !important;
+    transition: transform 0.2s ease !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .accordion-item.expanded .accordion-chevron {
+    transform: rotate(180deg) !important;
+    color: var(--primary-500) !important;
+  }
+  
+  /* ============================================
+     ACCORDION DETAILS (Expandable Content)
+     ============================================ */
+  
+  .accordion-details {
+    display: none !important;
+    width: 100% !important;
+    border-top: 1px solid var(--border-color-light) !important;
+    background: var(--neutral-50) !important;
+    padding: var(--space-md) !important;
+    animation: accordionFadeIn 0.2s ease !important;
+  }
+  
+  .accordion-item.expanded .accordion-details {
+    display: block !important;
+  }
+  
+  @keyframes accordionFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Detail Grid */
+  .accordion-detail-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--space-sm) var(--space-md) !important;
+    margin-bottom: var(--space-md) !important;
+  }
+  
+  .accordion-detail-item {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+  
+  .accordion-detail-label {
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    color: var(--text-tertiary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+  
+  .accordion-detail-value {
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+    word-break: break-word !important;
+  }
+  
+  .accordion-detail-value.status-tag {
+    display: inline-block !important;
+    padding: 4px 10px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    text-transform: capitalize !important;
+  }
+  
+  /* ============================================
+     ACCORDION ACTIONS
+     ============================================ */
+  
+  .accordion-actions {
+    display: flex !important;
+    gap: var(--space-sm) !important;
+    padding-top: var(--space-md) !important;
+    border-top: 1px solid var(--border-color-light) !important;
+    margin-top: var(--space-md) !important;
+  }
+  
+  .accordion-actions .btn {
+    flex: 1 !important;
+    min-height: 44px !important;
+    padding: var(--space-sm) var(--space-md) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border-radius: var(--radius-md) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--space-xs) !important;
+  }
+  
+  .accordion-actions .btn-primary {
+    background: var(--primary-500) !important;
+    color: white !important;
+    border: none !important;
+  }
+  
+  .accordion-actions .btn-secondary {
+    background: var(--neutral-200) !important;
+    color: var(--neutral-700) !important;
+    border: none !important;
+  }
+  
+  .accordion-actions .btn-danger {
+    background: var(--error) !important;
+    color: white !important;
+    border: none !important;
+  }
+  
+  .accordion-actions .btn-icon {
+    padding: var(--space-sm) !important;
+    min-width: 44px !important;
+  }
+  
+  /* ============================================
+     EMPTY STATE
+     ============================================ */
+  
+  .data-table .empty-state {
+    display: block !important;
+    width: 100% !important;
+    padding: var(--space-xl) var(--space-md) !important;
+    text-align: center !important;
+    background: var(--neutral-100) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--neutral-400) !important;
+    font-style: italic !important;
+  }
+  
+  .data-table .empty-state::before {
+    display: none !important;
+  }
+  
+  /* ============================================
+     LOADING STATE
+     ============================================ */
+  
+  .data-table-loading {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: var(--space-xl) !important;
+    width: 100% !important;
+  }
+  
+  .data-table-loading .spinner {
+    width: 40px !important;
+    height: 40px !important;
+    border: 3px solid var(--neutral-200) !important;
+    border-top-color: var(--primary-500) !important;
+  }
+  
+  /* ============================================
+     STATUS BADGES IN ACCORDION
+     ============================================ */
+  
+  .accordion-detail-value.status-draft {
+    background: #E9ECEF !important;
+    color: var(--neutral-700) !important;
+  }
+  
+  .accordion-detail-value.status-submitted,
+  .accordion-detail-value.status-confirmed {
+    background: #D1ECF1 !important;
+    color: #0C5460 !important;
+  }
+  
+  .accordion-detail-value.status-completed,
+  .accordion-detail-value.status-paid {
+    background: #D4EDDA !important;
+    color: var(--success) !important;
+  }
+  
+  .accordion-detail-value.status-cancelled,
+  .accordion-detail-value.status-rejected {
+    background: #F8D7DA !important;
+    color: var(--error) !important;
+  }
+  
+  .accordion-detail-value.status-overdue {
+    background: #FFF3CD !important;
+    color: #856404 !important;
+  }
+  
+  /* ============================================
+     TOUCH OPTIMIZATION
+     ============================================ */
+  
+  .accordion-summary {
+    min-height: 60px !important;
+    padding: var(--space-md) !important;
+  }
+  
+  .accordion-summary:active {
+    background: var(--hover-bg) !important;
+  }
+  
+  /* Prevent text selection on tap */
+  .accordion-summary {
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
+  }
+  
+  /* Focus state for accessibility */
+  .accordion-summary:focus {
+    outline: 2px solid var(--primary-500) !important;
+    outline-offset: -2px !important;
+  }
+  
+  /* ============================================
+     MULTI-LINE CONTENT
+     ============================================ */
+  
+  .accordion-value.multiline {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  
+  .accordion-detail-value.multiline {
+    -webkit-line-clamp: 3 !important;
+  }
+  
+  /* ============================================
+     DATE/TIME FORMATTING
+     ============================================ */
+  
+  .accordion-detail-value.date {
+    font-size: 13px !important;
+    color: var(--text-secondary) !important;
+  }
+  
+  .accordion-detail-value.amount {
+    font-weight: 600 !important;
+    color: var(--success) !important;
+  }
+  
+  .accordion-detail-value.amount.negative {
+    color: var(--error) !important;
+  }
+  
+  /* ============================================
+     RESPONSIVE ADJUSTMENTS
+     ============================================ */
+  
+  @media (max-width: 413px) {
+    .accordion-summary {
+      padding: var(--space-sm) !important;
+      min-height: 56px !important;
+    }
+    
+    .accordion-detail-grid {
+      grid-template-columns: 1fr !important;
+      gap: var(--space-sm) !important;
+    }
+    
+    .accordion-actions {
+      flex-direction: column !important;
+    }
+    
+    .accordion-actions .btn {
+      width: 100% !important;
+    }
+    
+    .accordion-value {
+      font-size: 13px !important;
+      min-width: 80px !important;
+    }
+  }
+  
+  @media (min-width: 414px) and (max-width: 768px) {
+    .accordion-actions {
+      flex-wrap: wrap !important;
+    }
+    
+    .accordion-actions .btn {
+      flex: 1 1 45% !important;
+    }
+  }
+}
+
+/* ============================================
+   ENHANCED MOBILE UTILITIES
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Hide elements on mobile */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Show elements on mobile */
+  .mobile-only {
+    display: block !important;
+  }
+  
+  /* Full width on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  /* Touch-friendly spacing */
+  .touch-friendly {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  /* Safe area padding for notched devices */
+  .safe-area-padding {
+    padding-left: env(safe-area-inset-left) !important;
+    padding-right: env(safe-area-inset-right) !important;
+  }
+  
+  /* Prevent horizontal scroll */
+  .no-horizontal-scroll {
+    overflow-x: hidden !important;
+  }
+  
+  /* Better text rendering on mobile */
+  .mobile-text-optimized {
+    -webkit-text-size-adjust: 100% !important;
+    text-rendering: optimizeLegibility !important;
+  }
+}
+
+/* ============================================
+   LARGE MOBILE DEVICES (414px - 768px)
+   ============================================ */
+
+@media (min-width: 414px) and (max-width: 768px) {
+  .page-header .header-actions .btn {
+    flex: 0 1 auto !important;
+    min-width: auto !important;
+  }
+  
+  .filters-form .filters-row {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .filters-form .filter-group {
+    flex: 1 1 45% !important;
+  }
+  
+  .filters-form .filter-group.search-group {
+    flex: 1 1 100% !important;
+  }
+  
+  .stat-card,
+  .kpi-card {
+    padding: var(--space-md) !important;
+  }
+  
+  .modal {
+    max-width: 90% !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE DEVICES (< 414px)
+   ============================================ */
+
+@media (max-width: 413px) {
+  .content {
+    padding: 0 !important;
+  }
+  
+  .page-header h1 {
+    font-size: 20px !important;
+  }
+  
+  .page-header .header-actions {
+    flex-direction: column !important;
+  }
+  
+  .page-header .header-actions .btn {
+    width: 100% !important;
+  }
+  
+  .data-table tbody tr {
+    padding: var(--space-sm) !important;
+  }
+  
+  .data-table td {
+    padding: var(--space-xs) 0 !important;
+    font-size: 13px !important;
+  }
+  
+  .data-table .table-actions .btn {
+    min-width: 36px !important;
+    height: 36px !important;
+    font-size: 10px !important;
+  }
+  
+  .btn {
+    min-height: 44px !important;
+    padding: var(--space-xs) var(--space-sm) !important;
+    font-size: 13px !important;
+  }
+  
+  .kpi-card {
+    padding: var(--space-sm) !important;
+    gap: 2px !important;
+  }
+  
+  .kpi-card .kpi-icon {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 20px !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .kpi-card .kpi-label {
+    font-size: 0.65rem !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .kpi-card .kpi-value {
+    font-size: 1.1rem !important;
+    margin-bottom: 2px !important;
+    line-height: 1.2 !important;
+  }
+  
+  .kpi-card .kpi-subtitle {
+    font-size: 0.6rem !important;
+    margin-top: 2px !important;
+    line-height: 1.2 !important;
+  }
+  
+  .stat-card .kpi-value,
+  .kpi-card .kpi-value {
+    font-size: 24px !important;
+  }
+  
+  .modal-footer .btn {
+    min-height: 48px !important;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Focus states for touch devices */
+  *:focus-visible {
+    outline: 2px solid var(--primary-500) !important;
+    outline-offset: 2px !important;
+  }
+  
+  /* Minimum touch target size */
+  .btn,
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .filter-group select,
+  .filter-group input {
+    min-height: 44px !important;
+  }
+  
+  /* Better tap highlight */
+  html {
+    -webkit-tap-highlight-color: rgba(54, 123, 245, 0.2) !important;
+  }
+  
+  /* Prevent zoom on iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth !important;
+  }
+  
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* GPU acceleration for transforms */
+  .btn,
+  .data-table tbody tr,
+  .stat-card,
+  .kpi-card {
+    transform: translateZ(0) !important;
+    will-change: transform, background-color !important;
+  }
+  
+  /* Efficient rendering */
+  .data-table tbody tr {
+    backface-visibility: hidden !important;
+  }
+}

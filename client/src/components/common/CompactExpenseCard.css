@@ -1,0 +1,117 @@
+/* Compact Expense Card & Preview Styles */
+
+/* Expense Loading */
+.expense-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  gap: var(--space-md);
+  color: var(--text-secondary);
+}
+
+.expense-spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary-500);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Expense Status Badges */
+.expense-status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.expense-status-paid {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.expense-status-approved {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.expense-status-pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.expense-status-rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Expense Preview Section */
+.expense-preview-section {
+  margin-bottom: var(--space-lg);
+}
+
+.expense-preview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.expense-preview-row:last-child {
+  border-bottom: none;
+}
+
+.expense-preview-label {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.expense-preview-value {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
+}
+
+.expense-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--success);
+}
+
+/* Expense Description Section */
+.expense-description-section {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.expense-description-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.expense-description-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Item Date in card */
+.item-date {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-left: var(--space-sm);
+}

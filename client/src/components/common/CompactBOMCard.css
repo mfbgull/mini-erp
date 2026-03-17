@@ -1,0 +1,187 @@
+/* Compact BOM Card & Preview Styles */
+
+/* BOM Preview Loading */
+.bom-compact-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  gap: var(--space-md);
+  color: var(--text-secondary);
+}
+
+.bom-compact-spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary-500);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* BOM Preview Section */
+.bom-preview-section {
+  margin-bottom: var(--space-lg);
+}
+
+.bom-preview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.bom-preview-row:last-child {
+  border-bottom: none;
+}
+
+.bom-preview-label {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.bom-preview-value {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
+}
+
+.bom-preview-value.status-active {
+  color: var(--success);
+}
+
+.bom-preview-value.status-inactive {
+  color: var(--text-tertiary);
+}
+
+.bom-total-cost {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-600);
+}
+
+/* BOM Items Section */
+.bom-items-section {
+  margin-top: var(--space-lg);
+}
+
+.bom-items-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-md) 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.bom-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.bom-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm);
+  background: var(--neutral-50);
+  border-radius: var(--radius-md);
+}
+
+.bom-item-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.bom-item-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bom-item-code {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: monospace;
+}
+
+.bom-item-qty {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  margin-left: var(--space-md);
+}
+
+.bom-item-cost {
+  font-size: 13px;
+  color: var(--primary-600);
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: var(--space-md);
+}
+
+/* BOM Description Section */
+.bom-description-section {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.bom-description-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.bom-description-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Item Preview Footer - reuse from ItemPreview */
+.item-preview-footer {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-top: 1px solid var(--border-color);
+  background: var(--neutral-50);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.item-preview-footer .preview-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  flex: 1;
+  padding: var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: var(--primary-500);
+  color: white;
+}
+
+.item-preview-footer .preview-action-btn:hover {
+  background: var(--primary-600);
+}

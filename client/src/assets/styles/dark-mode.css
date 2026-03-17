@@ -1,0 +1,963 @@
+/* ============================================
+   DARK MODE STYLES
+   ============================================ */
+
+/* Base dark mode - only background and text colors */
+html.dark,
+html.dark body {
+  background-color: #111827 !important;
+  color: #F9FAFB !important;
+}
+
+/* CSS Variables for dark mode */
+html.dark {
+  --primary: #22D3EE;
+  --primary-500: #22D3EE;
+  --primary-700: #0891B2;
+  --neutral-50: #1F2937;
+  --neutral-100: #374151;
+  --neutral-200: #4B5563;
+  --neutral-300: #6B7280;
+  --neutral-400: #9CA3AF;
+  --neutral-500: #D1D5DB;
+  --neutral-600: #E5E7EB;
+  --neutral-700: #F3F4F6;
+  --neutral-800: #F9FAFB;
+  --neutral-900: #FFFFFF;
+  --card-bg: #1F2937;
+  --input-bg: #374151;
+  --bg-light: #111827;
+  --bg-subtle: #1F2937;
+  --border-color: #4B5563;
+  --border-color-light: #374151;
+  --text-primary: #F9FAFB;
+  --text-secondary: #E5E7EB;
+  --text-muted: #9CA3AF;
+  --success: #34D399;
+  --error: #F87171;
+  --warning: #FBBF24;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* App container and main content */
+html.dark .app-container,
+html.dark .main-content,
+html.dark .content,
+html.dark .page,
+html.dark .dashboard {
+  background-color: #111827 !important;
+}
+
+/* Card styles */
+html.dark .card,
+html.dark .kpi-card,
+html.dark .chart-card,
+html.dark .stat-card,
+html.dark .panel,
+html.dark .box {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Text colors */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6,
+html.dark p,
+html.dark span,
+html.dark div,
+html.dark label {
+  color: #F9FAFB !important;
+}
+
+html.dark .text-muted,
+html.dark .text-secondary,
+html.dark .muted {
+  color: #9CA3AF !important;
+}
+
+/* Links */
+html.dark a {
+  color: #22D3EE !important;
+}
+
+/* Form inputs */
+html.dark input,
+html.dark select,
+html.dark textarea,
+html.dark .form-control,
+html.dark .form-input {
+  background-color: #374151 !important;
+  border-color: #4B5563 !important;
+  color: #F9FAFB !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* Buttons */
+html.dark .btn-primary {
+  background-color: #22D3EE !important;
+  color: #0F172A !important;
+}
+
+html.dark .btn-secondary {
+  background-color: #374151 !important;
+  color: #F9FAFB !important;
+  border-color: #4B5563 !important;
+}
+
+/* Modal overlay - semi-transparent */
+html.dark .modal-overlay,
+html.dark .item-preview-overlay,
+html.dark .overlay {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .modal,
+html.dark .modal-content,
+html.dark .modal-container {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+  border-color: #374151 !important;
+}
+
+/* Quick Actions Panel */
+html.dark .quick-actions-backdrop.mobile-layout {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .quick-actions-panel.mobile-layout,
+html.dark .quick-actions-panel.desktop-layout {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+}
+
+/* Search Modal */
+html.dark .search-modal-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .search-modal {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* AG Grid Dark Mode */
+html.dark .ag-theme-quartz,
+html.dark .ag-theme-quartz-dark {
+  --ag-background-color: #1F2937 !important;
+  --ag-header-background-color: #374151 !important;
+  --ag-odd-row-background-color: #1F2937 !important;
+  --ag-even-row-background-color: #1F2937 !important;
+  --ag-foreground-color: #F9FAFB !important;
+  --ag-secondary-foreground-color: #9CA3AF !important;
+  --ag-border-color: #4B5563 !important;
+  --ag-header-foreground-color: #F9FAFB !important;
+  --ag-input-focus-border-color: #22D3EE !important;
+  --ag-range-selection-border-color: #22D3EE !important;
+}
+
+html.dark .ag-theme-quartz .ag-header,
+html.dark .ag-theme-quartz .ag-header-cell {
+  background-color: #374151 !important;
+  color: #F9FAFB !important;
+}
+
+html.dark .ag-theme-quartz .ag-row {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+}
+
+html.dark .ag-theme-quartz .ag-cell {
+  color: #F9FAFB !important;
+}
+
+html.dark .ag-theme-quartz .ag-root-wrapper {
+  border-color: #4B5563 !important;
+  background-color: #1F2937 !important;
+}
+
+/* Sidebar */
+html.dark .sidebar {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+html.dark .nav-item,
+html.dark .nav-link {
+  color: #D1D5DB !important;
+}
+
+html.dark .nav-item.active,
+html.dark .nav-link.active {
+  background-color: #22D3EE !important;
+  color: #0F172A !important;
+}
+
+/* Dropdowns */
+html.dark .dropdown-menu,
+html.dark .dropdown-content {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+html.dark .dropdown-item {
+  color: #F9FAFB !important;
+}
+
+html.dark .dropdown-item:hover {
+  background-color: #374151 !important;
+}
+
+/* Badges and tags */
+html.dark .badge,
+html.dark .tag,
+html.dark .chip {
+  background-color: #374151 !important;
+  color: #F9FAFB !important;
+}
+
+/* Item Preview */
+html.dark .item-preview-container {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+}
+
+html.dark .item-preview-header {
+  background-color: #374151 !important;
+  border-bottom-color: #4B5563 !important;
+}
+
+html.dark .item-preview-actions {
+  background-color: #374151 !important;
+  border-top-color: #4B5563 !important;
+}
+
+/* Tables */
+html.dark table {
+  background-color: #1F2937 !important;
+}
+
+html.dark th,
+html.dark td {
+  border-color: #374151 !important;
+  color: #F9FAFB !important;
+}
+
+/* Scrollbar */
+html.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #1F2937;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #4B5563;
+  border-radius: 4px;
+}
+
+/* Loading states */
+html.dark .loading,
+html.dark .loading-spinner,
+html.dark .loading-overlay {
+  background-color: #111827 !important;
+}
+
+/* Empty states */
+html.dark .empty-state {
+  color: #9CA3AF !important;
+}
+
+/* Mobile cards */
+html.dark .compact-mobile-cards-wrapper {
+  background-color: #111827 !important;
+}
+
+html.dark .compact-item-card,
+html.dark .compact-warehouse-card,
+html.dark .compact-customer-card {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Invoice and document styles */
+html.dark .invoice-container,
+html.dark .invoice-preview {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+}
+
+/* Settings */
+html.dark .settings-section {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Tabs */
+html.dark .tab,
+html.dark .tab-item {
+  color: #9CA3AF !important;
+}
+
+html.dark .tab.active {
+  background-color: #1F2937 !important;
+  color: #F9FAFB !important;
+}
+
+/* Progress bars */
+html.dark .progress,
+html.dark .progress-bar {
+  background-color: #374151 !important;
+}
+
+/* Switch and toggle */
+html.dark .switch,
+html.dark .toggle {
+  background-color: #374151 !important;
+}
+
+html.dark .switch.active,
+html.dark .toggle.active {
+  background-color: #22D3EE !important;
+}
+
+/* Print styles */
+@media print {
+  html.dark {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* Quick Actions Buttons - Add missing dark mode styles */
+html.dark .quick-action-btn {
+  background: var(--neutral-50) !important;
+  color: var(--neutral-800) !important;
+  border-color: transparent !important;
+}
+
+html.dark .quick-action-btn:hover {
+  background: var(--primary) !important;
+  color: white !important;
+  border-color: var(--primary) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+html.dark .action-icon {
+  color: var(--primary) !important;
+}
+
+html.dark .quick-action-btn:hover .action-icon {
+  color: white !important;
+}
+
+/* Charts Cards - Add missing dark mode styles */
+html.dark .chart-card {
+  background: var(--card-bg) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  border: none !important;
+}
+
+html.dark .chart-card h3 {
+  color: var(--neutral-800) !important;
+}
+
+html.dark .chart-container {
+  background: var(--card-bg) !important;
+}
+
+html.dark .no-data {
+  color: var(--neutral-400) !important;
+}
+
+/* Dashboard Alert Card - Add missing dark mode styles */
+html.dark .alert-card {
+  background: var(--card-bg) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  border: none !important;
+}
+
+html.dark .alert-card h3 {
+  color: var(--neutral-800) !important;
+}
+
+html.dark .no-alerts {
+  color: var(--neutral-500) !important;
+}
+
+html.dark .alert-list {
+  background: var(--card-bg) !important;
+}
+
+html.dark .alert-item {
+  background: var(--neutral-50) !important;
+  border-left: 4px solid var(--warning) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--neutral-800) !important;
+}
+
+html.dark .alert-item:hover {
+  background: var(--neutral-100) !important;
+  transform: none !important;
+}
+
+html.dark .alert-item-name {
+  color: var(--neutral-800) !important;
+}
+
+html.dark .alert-item-code {
+  color: var(--neutral-500) !important;
+}
+
+html.dark .alert-item-stock {
+  color: var(--neutral-800) !important;
+}
+
+html.dark .stock-low {
+  color: var(--warning) !important;
+}
+
+html.dark .stock-reorder {
+  color: var(--neutral-500) !important;
+}
+
+/* Floating Action Button - Add missing dark mode styles */
+html.dark .fab {
+  background: var(--primary-500) !important;
+  color: white !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+html.dark .fab:hover {
+  background: var(--primary-700) !important;
+  transform: scale(1.05) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+html.dark .fab:active {
+  transform: scale(0.95) !important;
+}
+
+/* Add missing dark mode styles for Reports Dashboard */
+html.dark .stat-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .stat-card .stat-label {
+  color: var(--neutral-500) !important;
+}
+
+html.dark .stat-card .stat-value {
+  color: var(--neutral-900) !important;
+}
+
+html.dark .stat-card .stat-subtitle {
+  color: var(--neutral-400) !important;
+}
+
+html.dark .quick-action-btn {
+  background: var(--neutral-50) !important;
+  border-color: var(--border-color) !important;
+  color: var(--neutral-700) !important;
+}
+
+html.dark .quick-action-btn:hover {
+  background: var(--primary-50) !important;
+  border-color: var(--primary-500) !important;
+  color: var(--primary-700) !important;
+}
+
+html.dark .report-category {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .category-header {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+html.dark .category-title {
+  color: var(--neutral-800) !important;
+}
+
+html.dark .report-card {
+  background: transparent !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--neutral-900) !important;
+}
+
+html.dark .report-card:hover {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%) !important;
+  color: var(--neutral-800) !important;
+}
+
+html.dark .report-name {
+  color: var(--neutral-900) !important;
+}
+
+html.dark .report-description {
+  color: var(--neutral-600) !important;
+}
+
+html.dark .report-icon {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%) !important;
+  color: var(--neutral-200) !important;
+}
+/* Add missing dark mode styles for Item Preview */
+html.dark .item-preview-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark .item-preview-container {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .item-preview-header {
+  background: var(--neutral-50) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+html.dark .item-preview-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .item-preview-code {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .item-preview-close {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .item-preview-close:hover {
+  background: var(--hover-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .item-preview-content {
+  background: var(--card-bg) !important;
+}
+
+html.dark .item-preview-stats {
+  background: var(--neutral-50) !important;
+  border-radius: var(--radius-md) !important;
+}
+
+html.dark .preview-stat-label {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .preview-stat-value {
+  color: var(--text-primary) !important;
+}
+
+html.dark .category-badge {
+  background: var(--neutral-400) !important;
+  color: var(--neutral-800) !important;
+}
+
+html.dark .tag.raw-material {
+  background: var(--neutral-400) !important;
+  color: var(--neutral-800) !important;
+}
+
+html.dark .tag.finished-good {
+  background: var(--neutral-400) !important;
+  color: var(--neutral-800) !important;
+}
+
+html.dark .tag.purchased {
+  background: var(--neutral-400) !important;
+  color: var(--neutral-800) !important;
+}
+
+html.dark .tag.manufactured {
+  background: var(--neutral-400) !important;
+  color: var(--neutral-800) !important;
+}
+
+html.dark .stock-alert {
+  background: var(--neutral-400) !important;
+  border-color: var(--warning) !important;
+}
+
+html.dark .stock-alert.error {
+  background: var(--neutral-400) !important;
+  border-color: var(--error) !important;
+}
+
+html.dark .preview-alert .alert-text {
+  color: var(--text-primary) !important;
+}
+
+html.dark .stock-alert.error .alert-text {
+  color: var(--error) !important;
+}
+
+html.dark .item-preview-actions {
+  background: var(--neutral-50) !important;
+  border-top-color: var(--border-color) !important;
+}
+
+html.dark .preview-action-btn.edit-btn {
+  background: var(--primary-500) !important;
+  color: white !important;
+}
+
+html.dark .preview-action-btn.edit-btn:hover {
+  background: var(--primary-600) !important;
+}
+
+html.dark .preview-action-btn.delete-btn {
+  background: var(--neutral-200) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .preview-action-btn.delete-btn:hover {
+  background: var(--error) !important;
+  color: white !important;
+}
+/* Add missing dark mode styles for Sales Preview */
+html.dark .sales-preview-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+html.dark .sales-preview-container {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .sales-preview-header {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+html.dark .sales-preview-header .status-label {
+  color: var(--neutral-800) !important;
+}
+html.dark .sales-preview-code {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--neutral-300) !important;
+}
+html.dark .sales-preview-close {
+  color: var(--neutral-200) !important;
+}
+html.dark .sales-preview-close:hover {
+  background: var(--neutral-400) !important;
+  color: var(--neutral-50) !important;
+}
+html.dark .sales-preview-content {
+  background: var(--card-bg) !important;
+}
+html.dark .amount-card {
+  background: #1F2937 !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .amount-label {
+  color: var(--neutral-400) !important;
+}
+html.dark .amount-value {
+  color: var(--neutral-900) !important;
+}
+html.dark .amount-balance {
+  color: var(--warning) !important;
+}
+html.dark .preview-details-grid {
+  background: var(--card-bg) !important;
+}
+html.dark .preview-detail-item {
+  background: #1F2937 !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .preview-detail-label {
+  color: var(--neutral-400) !important;
+}
+html.dark .preview-detail-value {
+  color: var(--neutral-900) !important;
+}
+html.dark .sales-info-notice {
+  background: #374151 !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .notice-text {
+  color: var(--neutral-200) !important;
+}
+html.dark .sales-preview-actions {
+  background: #1F2937 !important;
+  border-top-color: var(--border-color) !important;
+}
+html.dark .preview-action-btn.secondary {
+  background: var(--neutral-400) !important;
+  border-color: var(--border-color) !important;
+  color: var(--neutral-900) !important;
+}
+html.dark .preview-action-btn.secondary:hover {
+  background: var(--neutral-500) !important;
+}
+/* Add missing dark mode styles for Purchase Preview */
+html.dark .mobile-preview-backdrop {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+html.dark .mobile-preview-container {
+  background: var(--card-bg) !important;
+}
+html.dark .mobile-preview-header {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%) !important;
+  border-bottom-color: var(--border-color) !important;
+  color: var(--neutral-50) !important;
+}
+html.dark .preview-close-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--neutral-50) !important;
+}
+html.dark .preview-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+html.dark .mobile-preview-content {
+  background: var(--card-bg) !important;
+}
+html.dark .preview-stat-card {
+  background: var(--neutral-50) !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .stat-label {
+  color: var(--neutral-400) !important;
+}
+html.dark .stat-value {
+  color: var(--neutral-900) !important;
+}
+html.dark .stat-value.purchase-value {
+  color: var(--primary) !important;
+}
+html.dark .preview-section {
+  background: var(--neutral-50) !important;
+}
+html.dark .preview-section-title {
+  color: var(--neutral-800) !important;
+}
+html.dark .preview-detail-item {
+  background: var(--neutral-50) !important;
+  border-color: var(--border-color) !important;
+}
+html.dark .detail-label {
+  color: var(--neutral-400) !important;
+}
+html.dark .detail-value {
+  color: var(--neutral-900) !important;
+}
+html.dark .detail-value.highlight {
+  color: var(--primary) !important;
+}
+html.dark .preview-remarks {
+  background: var(--neutral-50) !important;
+  border-color: var(--border-color) !important;
+  color: var(--neutral-200) !important;
+}
+html.dark .mobile-preview-actions {
+  background: var(--neutral-50) !important;
+  border-top-color: var(--border-color) !important;
+}
+html.dark .preview-action-btn.secondary {
+  background: var(--neutral-400) !important;
+  border-color: var(--border-color) !important;
+  color: var(--neutral-900) !important;
+}
+html.dark .preview-action-btn.secondary:hover {
+  background: var(--neutral-500) !important;
+}
+/* Add missing dark mode styles for Sales Page Summary Cards */
+html.dark .summary-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .summary-card.success {
+  background: linear-gradient(135deg, var(--card-bg) 0%, #064e3b 100%) !important;
+  border-color: var(--success) !important;
+}
+
+html.dark .summary-card.warning {
+  background: linear-gradient(135deg, var(--card-bg) 0%, #78350f 100%) !important;
+  border-color: var(--warning) !important;
+}
+
+html.dark .summary-label {
+  color: var(--neutral-400) !important;
+}
+
+html.dark .summary-value {
+  color: var(--neutral-900) !important;
+}
+
+html.dark .summary-icon.invoices {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+}
+
+html.dark .summary-icon.revenue {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+}
+
+/* Invoice Preview Dark Mode */
+html.dark .invoice-preview-container {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .invoice-status-banner {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .invoice-preview-stats {
+  background: var(--card-bg) !important;
+}
+
+html.dark .preview-stat {
+  background: #1F2937 !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .preview-stat-label {
+  color: var(--neutral-400) !important;
+}
+
+html.dark .preview-stat-value {
+  color: var(--neutral-900) !important;
+}
+
+html.dark .invoice-preview-content {
+  background: var(--card-bg) !important;
+}
+
+html.dark .invoice-preview-actions {
+  background: #1F2937 !important;
+  border-top-color: var(--border-color) !important;
+}
+
+/* Customer Detail Page Dark Mode */
+  background: #1F2937 !important;
+  border-top-color: var(--border-color) !important;
+}
+
+/* Customer Detail Page Dark Mode */
+  background: #1F2937 !important;
+  border-top-color: var(--border-color) !important;
+}
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+html.dark .invoice-preview-actions {
+  background: #1F2937 !important;
+  border-top-color: var(--border-color) !important;
+}
+
+/* Customer Detail Page Dark Mode */
+html.dark .customer-detail-page {
+  background: #111827 !important;
+}
+
+html.dark .detail-card,
+html.dark .customer-detail-card,
+html.dark .customer-info-card,
+html.dark .customer-stats-card,
+html.dark .ledger-card,
+html.dark .payment-summary-card,
+html.dark .invoice-history-card {
+  background: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+html.dark .customer-detail-header,
+html.dark .customer-profile-section,
+html.dark .customer-stats-header,
+html.dark .ledger-header,
+html.dark .payment-summary-header,
+html.dark .invoice-history-header {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%) !important;
+  border-bottom-color: #374151 !important;
+}
+
+html.dark .customer-name,
+html.dark .customer-email,
+html.dark .customer-phone,
+html.dark .customer-address,
+html.dark .detail-label,
+html.dark .detail-value {
+  color: #F9FAFB !important;
+}
+
+html.dark .stat-value,
+html.dark .balance-amount,
+html.dark .invoice-no,
+html.dark .transaction-date,
+html.dark .transaction-description {
+  color: #F9FAFB !important;
+}
+
+html.dark .stat-label,
+html.dark .transaction-type {
+  color: #9CA3AF !important;
+}
+
+html.dark .btn-primary,
+html.dark .btn-edit,
+html.dark .btn-new-invoice {
+  background: #22D3EE !important;
+  color: #111827 !important;
+}
+
+html.dark .btn-secondary,
+html.dark .btn-back {
+  background: #374151 !important;
+  color: #F9FAFB !important;
+  border-color: #4B5563 !important;
+}
+
+/* Customer Preview Dark Mode */
+html.dark .customer-preview-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .customer-preview-container {
+  background: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+html.dark .customer-preview-header {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 100%) !important;
+  border-bottom-color: #374151 !important;
+}
+
+html.dark .customer-preview-content {
+  background: #1F2937 !important;
+}
+
+html.dark .customer-preview-actions {
+  background: #374151 !important;
+  border-top-color: #4B5563 !important;
+}
+
+html.dark .customer-preview-stat-card {
+  background: #374151 !important;
+  border-color: #4B5563 !important;
+}
+
+html.dark .customer-preview-detail-item {
+  background: #374151 !important;
+  border-color: #4B5563 !important;
+}
+}
