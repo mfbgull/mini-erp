@@ -149,3 +149,4 @@ CLI-Anything/
 # !package-lock.json
 # !README.md
 # !.gitignore
+.worktrees/
