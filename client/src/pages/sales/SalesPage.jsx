@@ -11,6 +11,7 @@ import InvoicePreview from './InvoicePreview';
 import Button from '../../components/common/Button';
 import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
 import { useSettings } from '../../context/SettingsContext';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
 import './SalesPage.css';
@@ -21,6 +22,18 @@ export default function SalesPage() {
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
   const [previewInvoice, setPreviewInvoice] = useState(null);
+
+  useKeyboardShortcut('Alt+N', () => {
+    navigate('/sales/invoice');
+  }, { context: 'sales', id: 'sales-new-invoice' });
+
+  useKeyboardShortcut('Alt+O', () => {
+    navigate('/pos');
+  }, { context: 'sales', id: 'sales-open-pos' });
+
+  useKeyboardShortcut('Alt+C', () => {
+    navigate('/customers');
+  }, { context: 'sales', id: 'sales-open-customers' });
 
   // Fetch invoices
   const { data: invoices = [], isLoading: invoicesLoading } = useQuery({
