@@ -73,48 +73,55 @@ Page-Specific Shortcuts (Form/Detail aware)
 | `Ctrl+K` or `Cmd+K` | Open search/command palette | App.tsx | Already implemented |
 | `Ctrl+/` or `Ctrl+?` | Show keyboard shortcuts help | KeyboardShortcutsContext | New |
 | `Escape` | Close modals, dialogs, search | Global handler | Already partially implemented |
-| `Ctrl+F` | Focus search/find | SearchContext | Enhancement |
 | `Ctrl+P` | Print current view | Global handler | New |
+
+**Note on Browser Shortcuts:** The following browser shortcuts are NOT overridden to prevent conflicts:
+- `Ctrl+F` - Browser native search (use `Ctrl+K` for app search instead)
+- `Ctrl+N` - Browser new window (use `Alt+N` for new item)
+- `Ctrl+W` - Browser close tab (use `Alt+W` for warehouses)
+- `Ctrl+R` - Browser reload (use `Alt+R` for refresh)
 
 ### 3.2 Context-Aware Shortcuts
 
 #### 3.2.1 Dashboard Context
 | Shortcut | Action | Description |
 |----------|--------|-------------|
-| `Ctrl+N` | Quick Add | Opens most relevant form based on recent activity |
-| `Ctrl+R` | Refresh | Refreshes all dashboard widgets |
+| `Alt+N` | Quick Add | Opens most relevant form based on recent activity |
+| `Alt+R` | Refresh | Refreshes all dashboard widgets |
 
 #### 3.2.2 Inventory Context
 | Shortcut | Action | Target Route |
 |----------|--------|--------------|
-| `Ctrl+N` | Create New Item | `/inventory/items` (create mode) |
-| `Ctrl+I` | Open Items List | `/inventory/items` |
-| `Ctrl+W` | Open Warehouses | `/inventory/warehouses` |
-| `Ctrl+M` | Stock Movements | `/inventory/stock-movements` |
+| `Alt+N` | Create New Item | `/inventory/items` (create mode) |
+| `Alt+I` | Open Items List | `/inventory/items` |
+| `Alt+W` | Open Warehouses | `/inventory/warehouses` |
+| `Alt+M` | Stock Movements | `/inventory/stock-movements` |
 
 #### 3.2.3 Sales Context
 | Shortcut | Action | Target Route |
 |----------|--------|--------------|
-| `Ctrl+N` | Create New Invoice | `/sales/invoice` |
-| `Ctrl+O` | Open POS Terminal | `/pos` |
-| `Ctrl+C` | Open Customers | `/customers` |
+| `Alt+N` | Create New Invoice | `/sales/invoice` |
+| `Alt+O` | Open POS Terminal | `/pos` |
+| `Alt+C` | Open Customers | `/customers` |
 | `Ctrl+S` | Save Current Invoice | (Form context) |
 
 #### 3.2.4 Reports Context
 | Shortcut | Action | Target Route |
 |----------|--------|--------------|
-| `Ctrl+N` | Generate New Report | `/reports` |
-| `Ctrl+E` | Export Current Report | (Current report page) |
-| `Ctrl+R` | Refresh Report Data | (Current report page) |
+| `Alt+N` | Generate New Report | `/reports` |
+| `Alt+E` | Export Current Report | (Current report page) |
+| `Alt+R` | Refresh Report Data | (Current report page) |
 
 #### 3.2.5 General Context-Aware Actions
 | Shortcut | Action | Context |
 |----------|--------|---------|
 | `Ctrl+S` | Save current form | Any form/edit page |
-| `Ctrl+E` | Edit current item | Detail pages |
-| `Ctrl+D` | Delete current item | Detail pages |
-| `Ctrl+N` | Create new item | List pages |
-| `Ctrl+B` | Back to list | Detail pages |
+| `Alt+E` | Edit current item | Detail pages |
+| `Alt+D` | Delete current item | Detail pages |
+| `Alt+N` | Create new item | List pages |
+| `Alt+B` | Back to list | Detail pages |
+
+**Note:** `Alt` key is used instead of `Ctrl` for context actions to avoid browser conflicts.
 
 ### 3.3 Form-Specific Shortcuts
 
@@ -167,11 +174,82 @@ interface KeyboardShortcutsContextType {
 
 #### 4.1.3 `client/src/hooks/useKeyboardShortcut.ts`
 ```typescript
+import { useEffect, useRef } from 'react';
+import { useCurrentContext } from '../utils/contextDetection';
+import { shouldIgnoreShortcut } from '../utils/inputGuard';
+
 function useKeyboardShortcut(
   key: string,
   handler: () => void,
-  options?: { context?: string; enabled?: boolean }
-): void
+  options?: { 
+    context?: string; 
+    enabled?: boolean | (() => boolean); // Support both value and function
+    preventDefault?: boolean;
+  }
+): void {
+  const handlerRef = useRef(handler);
+  const enabledRef = useRef(options?.enabled);
+  
+  // Update refs on changes to avoid stale closures
+  useEffect(() => {
+    handlerRef.current = handler;
+    enabledRef.current = options?.enabled;
+  }, [handler, options?.enabled]);
+  
+  const currentContext = useCurrentContext();
+  
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if shortcut should be ignored (user typing in input)
+      if (shouldIgnoreShortcut(event)) {
+        return;
+      }
+      
+      // Check context match
+      if (options?.context && options.context !== currentContext) {
+        return;
+      }
+      
+      // Check if enabled
+      const isEnabled = typeof enabledRef.current === 'function' 
+        ? enabledRef.current() 
+        : (enabledRef.current !== false); // Default to true if undefined
+      
+      if (!isEnabled) {
+        return;
+      }
+      
+      // Check key combination
+      const isModKey = event.ctrlKey || event.metaKey;
+      const isAltKey = event.altKey;
+      const isShiftKey = event.shiftKey;
+      
+      // Parse key combination (e.g., "Ctrl+S", "Alt+N")
+      const [modifier, targetKey] = key.split('+');
+      
+      let matches = false;
+      if (modifier === 'Ctrl' && isModKey && event.key.toLowerCase() === targetKey.toLowerCase()) {
+        matches = true;
+      } else if (modifier === 'Alt' && isAltKey && event.key.toLowerCase() === targetKey.toLowerCase()) {
+        matches = true;
+      } else if (modifier === 'Shift' && isShiftKey && event.key.toLowerCase() === targetKey.toLowerCase()) {
+        matches = true;
+      } else if (!modifier && event.key === key) {
+        matches = true;
+      }
+      
+      if (matches) {
+        if (options?.preventDefault !== false) {
+          event.preventDefault();
+        }
+        handlerRef.current();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [key, options?.context, currentContext, options?.preventDefault]);
+}
 ```
 
 #### 4.1.4 `client/src/utils/shortcuts.ts`
@@ -198,9 +276,15 @@ function useKeyboardShortcut(
 
 ### 4.3 Context Detection Logic
 
+**Important:** Context detection must use React Router hooks to ensure re-renders on navigation.
+
 ```typescript
-function getCurrentContext(): string {
-  const pathname = window.location.pathname;
+// ContextDetection.ts
+import { useLocation } from 'react-router-dom';
+
+export function useCurrentContext(): string {
+  const location = useLocation();
+  const pathname = location.pathname;
 
   if (pathname === '/') return 'dashboard';
   if (pathname.startsWith('/inventory')) return 'inventory';
@@ -212,6 +296,39 @@ function getCurrentContext(): string {
   if (pathname.includes('/detail') || pathname.includes('/view')) return 'detail';
 
   return 'global';
+}
+```
+
+### 4.4 Input Guard Logic
+
+**Critical:** Prevent shortcuts from firing when user is typing in input fields.
+
+```typescript
+// InputGuard.ts
+export function shouldIgnoreShortcut(event: KeyboardEvent): boolean {
+  const activeElement = document.activeElement;
+  
+  // Ignore if typing in input/textarea
+  if (activeElement && (
+    activeElement.tagName === 'INPUT' ||
+    activeElement.tagName === 'TEXTAREA' ||
+    activeElement.getAttribute('contenteditable') === 'true'
+  )) {
+    // Exception: Allow Ctrl+S in forms (save action)
+    if (event.ctrlKey || event.metaKey) {
+      if (event.key === 's') {
+        return false; // Allow save shortcut in forms
+      }
+    }
+    return true; // Ignore all other shortcuts while typing
+  }
+  
+  // Check if AG-Grid cell is being edited
+  if (activeElement && activeElement.classList.contains('ag-cell-edit-handle')) {
+    return true;
+  }
+  
+  return false;
 }
 ```
 
@@ -312,6 +429,44 @@ Inventory  [Ctrl+2]
 - Unregister shortcuts when components unmount
 - Limit registry size (prevent memory leaks)
 - Lazy load help panel content
+
+### 8.3 AG-Grid Integration
+Since Mini ERP uses AG-Grid for desktop data tables, shortcuts must not interfere with AG-Grid's native keyboard navigation:
+
+**AG-Grid Keyboard Events to Preserve:**
+- Arrow keys: Navigate cells
+- Enter: Edit cell
+- Tab: Move to next cell
+- F2: Edit cell
+- Delete: Clear cell
+- Ctrl+C/V: Copy/Paste
+
+**Implementation Strategy:**
+1. Check if AG-Grid cell is focused before processing shortcuts
+2. Use AG-Grid's `isCellEditing()` API to detect edit mode
+3. Global shortcuts (Ctrl+K, Ctrl+?, Ctrl+P) work even in AG-Grid
+4. Context shortcuts disabled when AG-Grid cell is being edited
+
+```typescript
+// AG-Grid Integration Helper
+import { GridApi } from 'ag-grid-community';
+
+export function isAGGridEditing(api: GridApi | null): boolean {
+  if (!api) return false;
+  return api.getEditingCells().length > 0;
+}
+
+export function isAGGridCellFocused(api: GridApi | null): boolean {
+  if (!api) return false;
+  const focusedCell = api.getFocusedCell();
+  return focusedCell !== null;
+}
+```
+
+### 8.4 Mobile Considerations
+- **Shortcuts Disabled on Mobile:** Keyboard shortcuts are only active on desktop (window.innerWidth > 768px)
+- **Help Panel:** Hidden on mobile devices
+- **Alternative UI:** Mobile users rely on tap interactions and bottom navigation
 
 ---
 
