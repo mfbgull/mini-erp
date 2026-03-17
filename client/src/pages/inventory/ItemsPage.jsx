@@ -12,6 +12,7 @@ import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import { useSettings } from '../../context/SettingsContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { itemSchema } from '../../schemas';
 import api from '../../utils/api';
@@ -27,6 +28,19 @@ export default function ItemsPage() {
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
   const queryClient = useQueryClient();
+
+  useKeyboardShortcut('Alt+N', () => {
+    navigate('/inventory/items/create');
+  }, { context: 'inventory', id: 'inventory-new-item' });
+
+  useKeyboardShortcut('Alt+I', () => {
+    const searchInput = document.querySelector('input[type="search"]') || document.querySelector('input[placeholder*="Search"]');
+    if (searchInput) searchInput.focus();
+  }, { context: 'inventory', id: 'inventory-focus-items' });
+
+  useKeyboardShortcut('Alt+W', () => {
+    navigate('/inventory/warehouses');
+  }, { context: 'inventory', id: 'inventory-go-warehouses' });
 
   // Get warehouse filter from URL
   const warehouseId = searchParams.get('warehouse');
