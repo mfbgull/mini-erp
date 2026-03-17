@@ -14,6 +14,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { InvoiceProvider } from './context/InvoiceContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { KeyboardShortcutsProvider } from './context/KeyboardShortcutsContext';
+import { KeyboardShortcutsHelp } from './components/common/KeyboardShortcutsHelp';
 import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/LoginPage';
 
@@ -242,33 +244,36 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-<AuthProvider>
+        <AuthProvider>
           <ThemeProvider>
-            <InvoiceProvider>
-              <AppRoutesOuter />
-            </InvoiceProvider>
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 3000,
-                style: {
-                  background: '#363636',
-                  color: '#fff'
-                },
-                success: {
-                  iconTheme: {
-                    primary: 'var(--success)',
-                    secondary: '#fff'
+            <KeyboardShortcutsProvider>
+              <InvoiceProvider>
+                <AppRoutesOuter />
+              </InvoiceProvider>
+              <KeyboardShortcutsHelp />
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    background: '#363636',
+                    color: '#fff'
+                  },
+                  success: {
+                    iconTheme: {
+                      primary: 'var(--success)',
+                      secondary: '#fff'
+                    }
+                  },
+                  error: {
+                    iconTheme: {
+                      primary: 'var(--error)',
+                      secondary: '#fff'
+                    }
                   }
-                },
-                error: {
-                  iconTheme: {
-                    primary: 'var(--error)',
-                    secondary: '#fff'
-                  }
-                }
-              }}
-            />
+                }}
+              />
+            </KeyboardShortcutsProvider>
           </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>
