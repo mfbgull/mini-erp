@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Line, Doughnut } from 'react-chartjs-2';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -19,6 +19,7 @@ import { Package, DollarSign, ShoppingCart, Factory, BarChart3, ClipboardList, A
 import FloatingActionButton from '../components/layout/FloatingActionButton';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
+import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 import api from '../utils/api';
 import './Dashboard.css';
 
@@ -46,6 +47,15 @@ const getLast7Days = () => {
 export default function Dashboard() {
   const { user } = useAuth();
   const { formatCurrency } = useSettings();
+  const navigate = useNavigate();
+
+  useKeyboardShortcut('Alt+N', () => {
+    navigate('/inventory/items/create');
+  }, { context: 'dashboard', id: 'dashboard-quick-add' });
+
+  useKeyboardShortcut('Alt+R', () => {
+    window.location.reload();
+  }, { context: 'dashboard', id: 'dashboard-refresh' });
 
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard-summary'],
