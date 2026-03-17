@@ -9,6 +9,7 @@ import {
 
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useKeyboardShortcuts } from '../../context/KeyboardShortcutsContext';
 import './TopMenu.css';
 
 interface NavItem {
@@ -84,6 +85,7 @@ const NAV_ITEMS: NavItem[] = [
 const TopMenu = memo(function TopMenu() {
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const { showHelp } = useKeyboardShortcuts();
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -136,6 +138,7 @@ const TopMenu = memo(function TopMenu() {
               className={({ isActive }) => `top-menu-item ${isActive ? 'active' : ''}`}
             >
               <span>{item.label}</span>
+              {item.path === '/' && <span className="shortcut-hint">Alt+1</span>}
             </NavLink>
           )
         ))}
@@ -167,6 +170,9 @@ const TopMenu = memo(function TopMenu() {
             <div className="top-menu-user-info">
               <div className="top-menu-user-role">{user?.role}</div>
             </div>
+            <button className="top-menu-help-btn" onClick={showHelp}>
+              <span>Keyboard Shortcuts</span>
+            </button>
             <button className="top-menu-logout-btn" onClick={logout}>
               <LogOut size={16} />
               <span>Logout</span>

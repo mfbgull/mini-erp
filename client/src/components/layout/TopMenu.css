@@ -329,3 +329,35 @@ html.dark .top-menu-user-name {
 html.dark .top-menu-user-trigger:hover {
   background: var(--neutral-700);
 }
+
+.shortcut-hint {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-left: 6px;
+  background: #f3f4f6;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+html.dark .shortcut-hint {
+  background: var(--neutral-700);
+  color: #9ca3af;
+}
+
+.top-menu-help-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  color: var(--neutral-700);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.top-menu-help-btn:hover {
+  background: var(--neutral-100);
+}
