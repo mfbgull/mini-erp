@@ -10,6 +10,7 @@ import { requestLogger, errorLogger } from './middleware/requestLogger';
 // Import routes
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
+import roleRoutes from './routes/roles';
 import activityLogRoutes from './routes/activityLog';
 import inventoryRoutes from './routes/inventory';
 import purchaseRoutes from './routes/purchases';
@@ -84,6 +85,7 @@ app.get('/health', (req: express.Request, res: express.Response) => {
 // API Routes - MUST come before SPA catch-all
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/roles', roleRoutes);
 app.use('/api/activity-logs', activityLogRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/expenses', expenseRoutes);

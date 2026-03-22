@@ -21,7 +21,7 @@ interface CreateUserDTO {
   email: string;
   password: string;
   full_name: string;
-  role: string;
+  role_id: number;
   is_active?: boolean;
 }
 
@@ -29,7 +29,7 @@ interface UpdateUserDTO {
   username?: string;
   email?: string;
   full_name?: string;
-  role?: string;
+  role_id?: number;
   is_active?: boolean;
 }
 
@@ -119,18 +119,18 @@ function getUser(req: AuthRequest, res: Response): void {
  */
 function createUser(req: AuthRequest, res: Response): void {
   try {
-    const { username, email, password, full_name, role, is_active = true }: CreateUserDTO = req.body;
+    const { username, email, password, full_name, role_id, is_active = true }: CreateUserDTO = req.body;
 
     // Validation
-    if (!username || !email || !password || !full_name || !role) {
+    if (!username || !email || !password || !full_name || !role_id) {
       res.status(400).json({ error: 'Username, email, password, full name, and role are required' });
       return;
     }
 
-    // Validate role
-    const validRoles = ['admin', 'user'];
-    if (!validRoles.includes(role)) {
-      res.status(400).json({ error: 'Invalid role. Must be "admin" or "user"' });
+    // Check if role exists
+    const roleExists = db.prepare('SELECT id FROM roles WHERE id = ?').get(role_id);
+    if (!roleExists) {
+      res.status(400).json({ error: 'Invalid role' });
       return;
     }
 
@@ -159,9 +159,9 @@ function createUser(req: AuthRequest, res: Response): void {
 
     // Insert user
     const result = db.prepare(`
-      INSERT INTO users (username, email, password_hash, full_name, role, is_active)
+      INSERT INTO users (username, email, password_hash, full_name, role_id, is_active)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run(username, email, passwordHash, full_name, role, is_active ? 1 : 0);
+    `).run(username, email, passwordHash, full_name, role_id, is_active ? 1 : 0);
 
     const userId = result.lastInsertRowid as number;
 
@@ -170,7 +170,7 @@ function createUser(req: AuthRequest, res: Response): void {
       'USER_CREATE' as any,
       req.user!.id as number,
       `User ${username} created by ${req.user!.username}`,
-      { username, email, role },
+      { username, email, role_id },
       String(req.ip || '')
     );
 
@@ -199,7 +199,7 @@ function updateUser(req: AuthRequest, res: Response): void {
   try {
     const { id } = req.params;
     const userId = parseInt(String(id), 10);
-    const { username, email, full_name, role, is_active }: UpdateUserDTO = req.body;
+    const { username, email, full_name, role_id, is_active }: UpdateUserDTO = req.body;
 
     // Check if user exists
     const existingUser = db.prepare('SELECT id, username FROM users WHERE id = ?').get(userId) as UserRow | undefined;
@@ -209,16 +209,20 @@ function updateUser(req: AuthRequest, res: Response): void {
     }
 
     // Prevent admin from demoting themselves
-    if (req.user!.id === userId && role && role !== 'admin') {
-      res.status(400).json({ error: 'Cannot change your own role' });
-      return;
+    if (req.user!.id === userId && role_id) {
+      const currentUserRole = db.prepare('SELECT role_id FROM users WHERE id = ?').get(req.user!.id) as { role_id: number };
+      const newRole = db.prepare('SELECT role_name FROM roles WHERE id = ?').get(role_id) as { role_name: string };
+      if (newRole.role_name !== 'Admin') {
+        res.status(400).json({ error: 'Cannot change your own role' });
+        return;
+      }
     }
 
-    // Validate role if provided
-    if (role) {
-      const validRoles = ['admin', 'user'];
-      if (!validRoles.includes(role)) {
-        res.status(400).json({ error: 'Invalid role. Must be "admin" or "user"' });
+    // Check role exists if provided
+    if (role_id) {
+      const roleExists = db.prepare('SELECT id FROM roles WHERE id = ?').get(role_id);
+      if (!roleExists) {
+        res.status(400).json({ error: 'Invalid role' });
         return;
       }
     }
@@ -257,9 +261,9 @@ function updateUser(req: AuthRequest, res: Response): void {
       updates.push('full_name = ?');
       values.push(full_name);
     }
-    if (role) {
-      updates.push('role = ?');
-      values.push(role);
+    if (role_id) {
+      updates.push('role_id = ?');
+      values.push(role_id);
     }
     if (is_active !== undefined) {
       updates.push('is_active = ?');

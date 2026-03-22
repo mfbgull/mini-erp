@@ -79,6 +79,7 @@ const ExpensesReport = lazy(() => import('./pages/reports/ExpensesReport'));
 // Lazy loaded - Other pages
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const UsersPage = lazy(() => import('./pages/users/UsersPage'));
+const RolesPage = lazy(() => import('./pages/roles/RolesPage'));
 const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'));
 const ExpensesPage = lazy(() => import('./pages/expenses/ExpensesPage'));
 const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
@@ -200,6 +201,7 @@ function AppLayout() {
               <Route path="/pos" element={<POSPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/roles" element={<RolesPage />} />
               <Route path="/integrations" element={<IntegrationsPage />} />
               <Route path="/activity-log" element={<ActivityLogPage />} />
               <Route path="/forecasts" element={<ForecastDashboard />} />

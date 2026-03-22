@@ -295,9 +295,18 @@ function UserFormModal({ user, onClose, onSuccess }) {
     username: user?.username || '',
     email: user?.email || '',
     full_name: user?.full_name || '',
-    role: user?.role || 'user',
+    role_id: user?.role_id || '',
     is_active: user?.is_active !== undefined ? user.is_active : true,
     password: '',
+  });
+
+  // Fetch roles for dropdown
+  const { data: roles = [] } = useQuery({
+    queryKey: ['roles'],
+    queryFn: async () => {
+      const response = await api.get('/roles');
+      return response.data.data || [];
+    },
   });
 
   const mutation = useMutation({
@@ -399,13 +408,13 @@ function UserFormModal({ user, onClose, onSuccess }) {
 
         <FormInput
           label="Role *"
-          name="role"
+          name="role_id"
           type="select"
-          value={formData.role}
+          value={formData.role_id}
           onChange={handleChange}
           options={[
-            { value: 'user', label: 'User' },
-            { value: 'admin', label: 'Admin' },
+            { value: '', label: 'Select Role' },
+            ...roles.map((r) => ({ value: r.id, label: r.role_name })),
           ]}
           required
         />

@@ -614,6 +614,7 @@ runProductionInputsWarehouseMigration();
 runMobileInvoiceMigration();
 runMissingIndexesMigration();
 runProductionOverheadMigration();
+runRolesPermissionsMigration();
 
 export default db;
 
@@ -629,5 +630,118 @@ function runProductionOverheadMigration(): void {
     }
   } catch (error: any) {
     logger.error('Production overhead migration error:', error.message);
+  }
+}
+
+function runRolesPermissionsMigration(): void {
+  try {
+    const rolesTableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='roles'
+    `).get() as { name: string } | undefined;
+
+    if (!rolesTableCheck) {
+      logger.info('Running roles and permissions migration...');
+
+      const rolesPermissionsSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-roles-permissions.sql'),
+        'utf8'
+      );
+
+      db.exec(rolesPermissionsSQL);
+
+      logger.info('✅ Roles and permissions migration completed!');
+
+      // Seed default permissions
+      seedDefaultPermissions();
+    }
+  } catch (error: any) {
+    logger.error('Roles and permissions migration error:', error.message);
+  }
+}
+
+function seedDefaultPermissions(): void {
+  try {
+    logger.info('Seeding default permissions...');
+
+    // Define all permissions by module
+    const permissions = [
+      // Dashboard
+      { name: 'dashboard:read', module: 'dashboard', action: 'read', description: 'View dashboard' },
+      
+      // Users
+      { name: 'users:read', module: 'users', action: 'read', description: 'View users' },
+      { name: 'users:create', module: 'users', action: 'create', description: 'Create users' },
+      { name: 'users:update', module: 'users', action: 'update', description: 'Update users' },
+      { name: 'users:delete', module: 'users', action: 'delete', description: 'Delete users' },
+      
+      // Inventory
+      { name: 'inventory:read', module: 'inventory', action: 'read', description: 'View inventory' },
+      { name: 'inventory:create', module: 'inventory', action: 'create', description: 'Create inventory items' },
+      { name: 'inventory:update', module: 'inventory', action: 'update', description: 'Update inventory items' },
+      { name: 'inventory:delete', module: 'inventory', action: 'delete', description: 'Delete inventory items' },
+      
+      // Sales
+      { name: 'sales:read', module: 'sales', action: 'read', description: 'View sales' },
+      { name: 'sales:create', module: 'sales', action: 'create', description: 'Create sales' },
+      { name: 'sales:update', module: 'sales', action: 'update', description: 'Update sales' },
+      { name: 'sales:delete', module: 'sales', action: 'delete', description: 'Delete sales' },
+      
+      // Purchases
+      { name: 'purchases:read', module: 'purchases', action: 'read', description: 'View purchases' },
+      { name: 'purchases:create', module: 'purchases', action: 'create', description: 'Create purchases' },
+      { name: 'purchases:update', module: 'purchases', action: 'update', description: 'Update purchases' },
+      { name: 'purchases:delete', module: 'purchases', action: 'delete', description: 'Delete purchases' },
+      
+      // Reports
+      { name: 'reports:read', module: 'reports', action: 'read', description: 'View reports' },
+      
+      // Settings
+      { name: 'settings:read', module: 'settings', action: 'read', description: 'View settings' },
+      { name: 'settings:update', module: 'settings', action: 'update', description: 'Update settings' },
+      
+      // Roles & Permissions
+      { name: 'roles:read', module: 'roles', action: 'read', description: 'View roles' },
+      { name: 'roles:create', module: 'roles', action: 'create', description: 'Create roles' },
+      { name: 'roles:update', module: 'roles', action: 'update', description: 'Update roles' },
+      { name: 'roles:delete', module: 'roles', action: 'delete', description: 'Delete roles' },
+    ];
+
+    // Insert permissions
+    for (const perm of permissions) {
+      db.prepare(`
+        INSERT OR IGNORE INTO permissions (permission_name, module, action, description)
+        VALUES (?, ?, ?, ?)
+      `).run(perm.name, perm.module, perm.action, perm.description);
+    }
+
+    // Assign all permissions to Admin role
+    const adminRole = db.prepare('SELECT id FROM roles WHERE role_name = ?').get('Admin') as { id: number };
+    const allPermissions = db.prepare('SELECT id FROM permissions').all() as { id: number }[];
+    
+    for (const perm of allPermissions) {
+      db.prepare(`
+        INSERT OR IGNORE INTO role_permissions (role_id, permission_id)
+        VALUES (?, ?)
+      `).run(adminRole.id, perm.id);
+    }
+
+    // Assign read-only permissions to User role
+    const userRole = db.prepare('SELECT id FROM roles WHERE role_name = ?').get('User') as { id: number };
+    const readPermissions = db.prepare(`
+      SELECT id FROM permissions WHERE action = 'read'
+      AND module NOT IN ('roles', 'settings')
+    `).all() as { id: number }[];
+    
+    for (const perm of readPermissions) {
+      db.prepare(`
+        INSERT OR IGNORE INTO role_permissions (role_id, permission_id)
+        VALUES (?, ?)
+      `).run(userRole.id, perm.id);
+    }
+
+    logger.info('✅ Default permissions seeded successfully!');
+  } catch (error: any) {
+    logger.error('Seed default permissions error:', error.message);
   }
 }
