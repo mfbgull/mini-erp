@@ -82,12 +82,14 @@ export function CompactExpenseCard({ expense, onEdit, onDelete }: CompactExpense
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu(false);
+    setShowDetails(false);
     onEdit(expense);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowMenu(false);
+    setShowDetails(false);
     onDelete(expense.id);
   };
 
