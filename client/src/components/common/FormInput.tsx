@@ -44,7 +44,7 @@ export default function FormInput({
   const inputId = `input-${name || 'default'}`;
 
   return (
-    <div className="form-input-group">
+    <div className={`form-input-group ${className || ''}`}>
       {type !== 'searchable-select' && (
         <div className="form-label-container">
           <label htmlFor={inputId} className="form-label">
@@ -133,7 +133,7 @@ export default function FormInput({
           required={required}
           disabled={disabled}
           step={step || (type === 'number' ? '0.01' : undefined)}
-          className={className || "form-input"}
+          className={className ? `${className} form-input` : "form-input"}
         />
       )}
     </div>

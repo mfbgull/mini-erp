@@ -418,6 +418,11 @@
   grid-column: 1 / -1;
 }
 
+/* Make FormInput wrapper span full width */
+.expense-form-grid .form-input-group.full-width {
+  grid-column: 1 / -1;
+}
+
 .form-row {
   display: flex;
   gap: var(--space-md);
