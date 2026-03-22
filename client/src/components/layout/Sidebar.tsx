@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import {
   Menu, X, LogOut,
   LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
-  ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, TrendingUp
+  ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, TrendingUp, Users
 } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
@@ -76,6 +76,7 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/bom', label: 'Bill of Materials', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
   { path: '/production', label: 'Production', icon: <Factory size={20} strokeWidth={1.5} /> },
   { path: '/expenses', label: 'Expenses', icon: <Receipt size={20} strokeWidth={1.5} /> },
+  { path: '/users', label: 'Users', icon: <Users size={20} strokeWidth={1.5} /> },
   { path: '/activity-log', label: 'Activity Log', icon: <FileText size={20} strokeWidth={1.5} /> },
   { path: '/integrations', label: 'Integrations', icon: <Link2 size={20} strokeWidth={1.5} /> },
   { path: '/settings', label: 'Settings', icon: <Settings size={20} strokeWidth={1.5} /> }
