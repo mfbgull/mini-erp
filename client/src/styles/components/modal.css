@@ -76,6 +76,7 @@
   padding: var(--space-lg);
   overflow-y: auto;
   flex: 1;
+  min-height: 0; /* Allow flex child to shrink below content size */
 }
 
 /* Mobile responsive adjustments */
