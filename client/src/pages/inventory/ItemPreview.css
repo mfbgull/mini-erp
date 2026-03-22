@@ -106,6 +106,7 @@
 /* Content */
 .item-preview-content {
   padding: var(--space-lg);
+  background: var(--neutral-100);
 }
 
 /* Quick Stats */
