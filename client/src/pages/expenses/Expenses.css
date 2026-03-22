@@ -396,40 +396,31 @@
 .expense-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--space-md);
   width: 100%;
   max-width: 100%;
 }
 
 .expense-form-grid {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 15px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
 }
 
 .expense-form .form-field {
   display: flex;
   flex-direction: column;
-  min-width: 200px;
-}
-
-.expense-form-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: var(--space-xs);
+  width: 100%;
 }
 
 .expense-form-grid .full-width {
   grid-column: 1 / -1;
 }
 
-.expense-form .form-row > * {
-  min-width: 200px;
-}
-
 .form-row {
   display: flex;
-  gap: 15px;
+  gap: var(--space-md);
 }
 
 .form-row > * {

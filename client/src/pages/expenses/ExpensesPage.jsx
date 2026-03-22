@@ -656,210 +656,147 @@ export default function ExpensesPage() {
           resetForm();
         }}
         title={selectedExpense ? "Edit Expense" : "Add New Expense"}
-        size="large"
+        size="medium"
       >
         <form onSubmit={handleFormSubmit} className="expense-form w-full">
           <div className="expense-form-grid">
-            {/* Column 1 */}
-            <div className="form-field">
-              <label className="form-label">
-                Category *<span className="required">*</span>
-              </label>
-              <select
-                value={expenseForm.expense_category}
-                onChange={(e) =>
-                  setExpenseForm((prev) => ({
-                    ...prev,
-                    expense_category: e.target.value,
-                  }))
-                }
-                required
-                className="form-input"
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  appearance: "none",
-                  maxHeight: "none",
-                  overflow: "visible",
-                }}
-              >
-                <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.category_name}>
-                    {cat.category_name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Row 1 */}
+            <FormInput
+              label="Category *"
+              name="expense_category"
+              type="select"
+              value={expenseForm.expense_category}
+              onChange={(e) =>
+                setExpenseForm((prev) => ({
+                  ...prev,
+                  expense_category: e.target.value,
+                }))
+              }
+              options={[
+                { value: "", label: "Select Category" },
+                ...categories.map((cat) => ({
+                  value: cat.category_name,
+                  label: cat.category_name,
+                })),
+              ]}
+              required
+            />
 
-            <div className="form-field">
-              <label className="form-label">
-                Amount *<span className="required">*</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={expenseForm.amount}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setExpenseForm((prev) => ({ ...prev, amount: value }));
-                }}
-                required
-                className="form-input w-full"
-                className="w-full"
-              />
-            </div>
+            <FormInput
+              label="Amount *"
+              name="amount"
+              type="number"
+              step="0.01"
+              value={expenseForm.amount}
+              onChange={(e) => {
+                const value = e.target.value;
+                setExpenseForm((prev) => ({ ...prev, amount: value }));
+              }}
+              required
+            />
 
-            <div className="form-field">
-              <label className="form-label">
-                Date *<span className="required">*</span>
-              </label>
-              <input
-                type="date"
-                value={expenseForm.expense_date}
-                onChange={(e) =>
-                  setExpenseForm((prev) => ({
-                    ...prev,
-                    expense_date: e.target.value,
-                  }))
-                }
-                required
-                className="form-input w-full"
-                className="w-full"
-              />
-            </div>
+            {/* Row 2 */}
+            <FormInput
+              label="Date *"
+              name="expense_date"
+              type="date"
+              value={expenseForm.expense_date}
+              onChange={(e) =>
+                setExpenseForm((prev) => ({
+                  ...prev,
+                  expense_date: e.target.value,
+                }))
+              }
+              required
+            />
 
-            {/* Column 2 */}
-            <div className="form-field">
-              <label className="form-label">Description</label>
-              <input
-                type="text"
-                value={expenseForm.description}
-                onChange={(e) =>
-                  setExpenseForm((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-                className="form-input"
-                className="w-full"
-              />
-            </div>
+            <FormInput
+              label="Payment Method"
+              name="payment_method"
+              type="select"
+              value={expenseForm.payment_method}
+              onChange={(e) =>
+                setExpenseForm((prev) => ({
+                  ...prev,
+                  payment_method: e.target.value,
+                }))
+              }
+              options={paymentMethodOptions}
+            />
 
-            <div className="form-field">
-              <label className="form-label">
-                Vendor Name
-                <span className="required">*</span>
-              </label>
-              <input
-                type="text"
-                value={expenseForm.vendor_name}
-                onChange={(e) =>
-                  setExpenseForm((prev) => ({
-                    ...prev,
-                    vendor_name: e.target.value,
-                  }))
-                }
-                className="form-input"
-                className="w-full"
-                required
-              />
-            </div>
+            {/* Row 3 */}
+            <FormInput
+              label="Status"
+              name="status"
+              type="select"
+              value={expenseForm.status}
+              onChange={(e) =>
+                setExpenseForm((prev) => ({
+                  ...prev,
+                  status: e.target.value,
+                }))
+              }
+              options={statusOptions}
+            />
 
-            <div className="form-field">
-              <label className="form-label">Project</label>
-              <input
-                type="text"
-                value={expenseForm.project}
-                onChange={(e) =>
-                  setExpenseForm((prev) => ({
-                    ...prev,
-                    project: e.target.value,
-                  }))
-                }
-                className="form-input"
-                className="w-full"
-              />
-            </div>
+            <FormInput
+              label="Reference No"
+              name="reference_no"
+              type="text"
+              value={expenseForm.reference_no}
+              onChange={(e) =>
+                setExpenseForm((prev) => ({
+                  ...prev,
+                  reference_no: e.target.value,
+                }))
+              }
+            />
 
-            {/* Column 3 */}
-            <div className="form-field">
-              <label className="form-label">Status</label>
-              <select
-                value={expenseForm.status}
-                onChange={(e) =>
-                  setExpenseForm((prev) => ({
-                    ...prev,
-                    status: e.target.value,
-                  }))
-                }
-                className="form-input"
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  appearance: "none",
-                  maxHeight: "none",
-                  overflow: "visible",
-                }}
-              >
-                <option value="">Select Status</option>
-                {statusOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Row 4 - Full Width */}
+            <FormInput
+              label="Vendor Name *"
+              name="vendor_name"
+              type="text"
+              value={expenseForm.vendor_name}
+              onChange={(e) =>
+                setExpenseForm((prev) => ({
+                  ...prev,
+                  vendor_name: e.target.value,
+                }))
+              }
+              required
+              className="full-width"
+            />
 
-            <div className="form-field">
-              <label className="form-label">Payment Method</label>
-              <select
-                value={expenseForm.payment_method}
-                onChange={(e) =>
-                  setExpenseForm((prev) => ({
-                    ...prev,
-                    payment_method: e.target.value,
-                  }))
-                }
-                className="form-input"
-                style={{
-                  width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  appearance: "none",
-                  maxHeight: "none",
-                  overflow: "visible",
-                }}
-              >
-                <option value="">Select Payment Method</option>
-                {paymentMethodOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Row 5 - Full Width */}
+            <FormInput
+              label="Description"
+              name="description"
+              type="text"
+              value={expenseForm.description}
+              onChange={(e) =>
+                setExpenseForm((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              className="full-width"
+            />
 
-            <div className="form-field">
-              <label className="form-label">Reference No</label>
-              <input
-                type="text"
-                value={expenseForm.reference_no}
-                onChange={(e) =>
-                  setExpenseForm((prev) => ({
-                    ...prev,
-                    reference_no: e.target.value,
-                  }))
-                }
-                className="form-input"
-                className="w-full"
-              />
-            </div>
+            {/* Row 6 - Full Width */}
+            <FormInput
+              label="Project"
+              name="project"
+              type="text"
+              value={expenseForm.project}
+              onChange={(e) =>
+                setExpenseForm((prev) => ({
+                  ...prev,
+                  project: e.target.value,
+                }))
+              }
+              className="full-width"
+            />
           </div>
 
           <div className="form-actions">
