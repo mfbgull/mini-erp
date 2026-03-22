@@ -338,7 +338,7 @@ function UserFormModal({ user, onClose, onSuccess }) {
 
   return (
     <Modal
-      isOpen={isModalOpen}
+      isOpen={true}
       onClose={onClose}
       title={isEdit ? 'Edit User' : 'Add New User'}
       size="medium"
