@@ -152,24 +152,24 @@ export function CompactExpenseCard({ expense, onEdit, onDelete }: CompactExpense
       </Card>
 
       {showDetails && (
-        <div className="item-preview-overlay" onClick={() => setShowDetails(false)}>
+        <div className="expense-preview-overlay" onClick={() => setShowDetails(false)}>
           <div
-            className="Item-preview-container"
+            className="expense-preview-container"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="swipe-indicator"></div>
 
-            <div className="item-preview-header">
-              <div className="item-preview-title-section">
-                <h2 className="item-preview-title">{displayExp.expense_no}</h2>
-                <span className="item-preview-code">{displayExp.expense_category}</span>
+            <div className="expense-preview-header">
+              <div className="expense-preview-title-section">
+                <h2 className="expense-preview-title">{displayExp.expense_no}</h2>
+                <span className="expense-preview-code">{displayExp.expense_category}</span>
               </div>
-              <button className="item-preview-close" onClick={() => setShowDetails(false)}>
+              <button className="expense-preview-close" onClick={() => setShowDetails(false)}>
                 <X size={24} />
               </button>
             </div>
 
-            <div className="item-preview-content">
+            <div className="expense-preview-content">
               {isLoading ? (
                 <div className="expense-loading">
                   <Loader2 size={28} className="expense-spinner" />
@@ -189,8 +189,8 @@ export function CompactExpenseCard({ expense, onEdit, onDelete }: CompactExpense
                     <div className="expense-preview-row">
                       <span className="expense-preview-label">Date</span>
                       <span className="expense-preview-value">
-                        {displayExp.expense_date 
-                          ? new Date(displayExp.expense_date).toLocaleDateString() 
+                        {displayExp.expense_date
+                          ? new Date(displayExp.expense_date).toLocaleDateString()
                           : '-'}
                       </span>
                     </div>
@@ -242,10 +242,14 @@ export function CompactExpenseCard({ expense, onEdit, onDelete }: CompactExpense
               )}
             </div>
 
-            <div className="item-preview-footer">
-              <button className="preview-action-btn" onClick={handleEdit}>
+            <div className="expense-preview-actions">
+              <button className="expense-preview-action-btn edit-btn" onClick={handleEdit}>
                 <Edit size={18} />
-                Edit Expense
+                Edit
+              </button>
+              <button className="expense-preview-action-btn delete-btn" onClick={handleDelete}>
+                <Trash2 size={18} />
+                Delete
               </button>
             </div>
           </div>

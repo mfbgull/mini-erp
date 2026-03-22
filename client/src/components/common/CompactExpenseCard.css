@@ -52,6 +52,117 @@
   color: #dc2626;
 }
 
+/* Expense Preview - Match Item Preview Structure */
+.expense-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  padding: var(--space-md);
+  animation: fadeIn 0.2s ease;
+}
+
+.expense-preview-container {
+  background: var(--neutral-100);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.25s ease;
+}
+
+/* Swipe indicator */
+.swipe-indicator {
+  width: 40px;
+  height: 4px;
+  background: var(--neutral-300);
+  border-radius: 2px;
+  margin: var(--space-sm) auto;
+  margin-top: var(--space-md);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Expense Preview Header */
+.expense-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--neutral-50);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.expense-preview-title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.expense-preview-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.expense-preview-code {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  font-family: monospace;
+}
+
+.expense-preview-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  margin-left: var(--space-md);
+}
+
+.expense-preview-close:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+/* Expense Preview Content */
+.expense-preview-content {
+  padding: var(--space-lg);
+  background: var(--neutral-100);
+}
+
 /* Expense Preview Section */
 .expense-preview-section {
   margin-bottom: var(--space-lg);
@@ -109,9 +220,91 @@
   margin: 0;
 }
 
+/* Expense Preview Actions */
+.expense-preview-actions {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-top: 1px solid var(--border-color);
+  background: var(--neutral-50);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.expense-preview-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  flex: 1;
+  padding: var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.expense-preview-action-btn.edit-btn {
+  background: var(--primary-500);
+  color: white;
+}
+
+.expense-preview-action-btn.edit-btn:hover {
+  background: var(--primary-600);
+}
+
+.expense-preview-action-btn.delete-btn {
+  background: var(--neutral-200);
+  color: var(--text-primary);
+}
+
+.expense-preview-action-btn.delete-btn:hover {
+  background: #fee2e2;
+  color: var(--error);
+}
+
 /* Item Date in card */
 .item-date {
   font-size: 11px;
   color: var(--text-tertiary);
   margin-left: var(--space-sm);
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .expense-preview-overlay {
+    padding: 0;
+    align-items: flex-end;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .expense-preview-container {
+    max-width: 100%;
+    width: 100%;
+    max-height: 85vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .expense-preview-header {
+    padding: var(--space-md);
+  }
+
+  .expense-preview-title {
+    font-size: 16px;
+  }
+
+  .expense-preview-content {
+    padding: var(--space-md);
+  }
+
+  .expense-preview-actions {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .expense-preview-action-btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 13px;
+  }
 }
