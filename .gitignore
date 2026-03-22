@@ -19,6 +19,9 @@ yarn-error.log*
 database/erp.db
 database/erp.db-shm
 database/erp.db-wal
+server/database/erp.db
+server/database/erp.db-shm
+server/database/erp.db-wal
 database/backups/*.db
 database/backups/*.db-journal
 *.sqlite
@@ -75,6 +78,10 @@ yarn-error.log*
 Thumbs.db
 *.pid
 *.seed
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
 
 # ----------------------------------------
 # IDE & EDITOR FILES
