@@ -665,13 +665,10 @@ export default function SalesInvoicePage() {
 
   const handleCustomerSelect = async (customer) => {
     try {
-      // Fetch detailed customer information including balance
       const response = await api.get(`/customers/${customer.id}/balance`);
       const customerBalance = response.data.data;
-
-      // Update invoice with customer details and balance information
-      setInvoice({
-        ...invoice,
+      setInvoice(prev => ({
+        ...prev,
         customer_id: customer.id,
         customer_name: customer.customer_name,
         customer_email: customer.email,
@@ -682,18 +679,16 @@ export default function SalesInvoicePage() {
         customer_credit_utilization: customer.credit_limit && customer.credit_limit > 0
           ? (customerBalance.currentBalance / customer.credit_limit) * 100
           : 0
-      });
+      }));
     } catch (error) {
-      // If balance fetch fails, still update with basic customer info
-      setInvoice({
-        ...invoice,
+      setInvoice(prev => ({
+        ...prev,
         customer_id: customer.id,
         customer_name: customer.customer_name,
         customer_email: customer.email,
         customer_phone: customer.phone,
         customer_address: customer.billing_address
-      });
-      console.error('Error fetching customer balance:', error);
+      }));
     }
   };
 
@@ -1041,6 +1036,9 @@ export default function SalesInvoicePage() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Ensure invoice_no is generated before submission
+    const invoiceNo = invoice.invoice_no || `INV-${new Date().getFullYear()}-${String(Date.now() % 1000000).padStart(6, '0')}`;
+
     // Prepare validation data
     const validationData = {
       customer_id: invoice.customer_id,
@@ -1078,7 +1076,7 @@ export default function SalesInvoicePage() {
       // For new invoices, don't send status - backend will determine it
       // For existing invoices, send the status
       ...(invoiceId && { status: invoice.status }),
-      invoice_no: invoice.invoice_no,
+      invoice_no: invoiceNo,
       customer_id: invoice.customer_id,
       invoice_date: invoice.invoice_date,
       due_date: invoice.due_date,
@@ -1200,9 +1198,7 @@ export default function SalesInvoicePage() {
                 value={invoice.customer_name}
                 onChange={(e) => {
                   const customer = Array.isArray(customers) ? customers.find(c => c.customer_name === e.target.value) : null;
-                  if (customer) {
-                    handleCustomerSelect(customer);
-                  }
+                  if (customer) handleCustomerSelect(customer);
                 }}
                 options={Array.isArray(customers)
                   ? customers.map(c => ({
@@ -1216,6 +1212,9 @@ export default function SalesInvoicePage() {
                 small
                 disabled={customersLoading || !!customersError}
               />
+              {errors.customer_id && (
+                <div className="field-error">{errors.customer_id}</div>
+              )}
               <div className="contact-info-modern">
                 <div>{invoice.customer_email}</div>
                 <div>{invoice.customer_phone}</div>
@@ -1295,6 +1294,9 @@ export default function SalesInvoicePage() {
               Add Item
             </button>
           </div>
+          {errors.items && (
+            <div className="field-error items-error">{errors.items}</div>
+          )}
 
           <div className="items-table-container-modern">
             <table className="items-table-modern">

@@ -53,7 +53,7 @@ export class ErrorBoundary extends Component<Props, State> {
               We apologize for the inconvenience. An unexpected error has occurred.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <pre className="error-boundary-error">
                 {this.state.error.message}
               </pre>

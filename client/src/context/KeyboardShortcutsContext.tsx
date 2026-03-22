@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useCurrentContext } from '../utils/contextDetection';
 import { shouldIgnoreShortcut } from '../utils/inputGuard';
 
@@ -39,22 +39,25 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const currentContext = useCurrentContext();
 
-  const registerShortcut = (shortcut: KeyboardShortcut) => {
+  const registerShortcut = useCallback((shortcut: KeyboardShortcut) => {
     setShortcuts(prev => {
       if (prev.find(s => s.id === shortcut.id)) {
         return prev.map(s => s.id === shortcut.id ? shortcut : s);
       }
       return [...prev, shortcut];
     });
-  };
+  }, []);
 
-  const unregisterShortcut = (id: string) => {
+  const unregisterShortcut = useCallback((id: string) => {
     setShortcuts(prev => prev.filter(s => s.id !== id));
-  };
+  }, []);
 
-  const getShortcutsForContext = (context: string) => {
+  const getShortcutsForContext = useCallback((context: string) => {
     return shortcuts.filter(s => s.context === context && s.enabled !== false);
-  };
+  }, [shortcuts]);
+
+  const showHelp = useCallback(() => setIsHelpOpen(true), []);
+  const hideHelp = useCallback(() => setIsHelpOpen(false), []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -101,8 +104,8 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
     registerShortcut,
     unregisterShortcut,
     getShortcutsForContext,
-    showHelp: () => setIsHelpOpen(true),
-    hideHelp: () => setIsHelpOpen(false),
+    showHelp,
+    hideHelp,
     isHelpOpen,
   };
 
