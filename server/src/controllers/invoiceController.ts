@@ -111,26 +111,65 @@ interface StockMovementRow {
 // ============ Helpers ============
 
 /**
- * Generate the next payment number atomically using INSERT ON CONFLICT.
+ * Generate the next payment number atomically using a transaction.
  * This prevents race conditions where two concurrent requests could
  * read the same MAX(payment_no) and generate duplicates.
  */
 function generatePaymentNoAtomic(): string {
   const settingKey = 'PAY_last_no';
 
-  // Atomic increment: insert '1' if not exists, otherwise increment
-  db.prepare(`
-    INSERT INTO settings (key, value, updated_at)
-    VALUES (?, '1', CURRENT_TIMESTAMP)
-    ON CONFLICT(key) DO UPDATE SET
-      value = CAST(CAST(settings.value AS INTEGER) + 1 AS TEXT),
-      updated_at = CURRENT_TIMESTAMP
-  `).run(settingKey);
+  // Use a transaction to ensure atomicity
+  const generateInTransaction = db.transaction(() => {
+    // Get current value from settings
+    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
 
-  const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string };
-  const nextNo = parseInt(setting.value, 10);
+    let nextNo: number;
+    if (!setting) {
+      // Setting doesn't exist - find the last payment number from the payments table
+      const lastPayment = db.prepare(`
+        SELECT payment_no FROM payments 
+        WHERE payment_no LIKE 'PAY%' 
+        ORDER BY payment_no DESC 
+        LIMIT 1
+      `).get() as { payment_no: string } | undefined;
 
-  return `PAY${String(nextNo).padStart(3, '0')}`;
+      if (lastPayment) {
+        // Extract the number from the last payment (e.g., 'PAY030' -> 30)
+        const lastNoMatch = lastPayment.payment_no.match(/PAY(\d+)/);
+        if (lastNoMatch) {
+          nextNo = parseInt(lastNoMatch[1], 10) + 1;
+        } else {
+          nextNo = 1;
+        }
+      } else {
+        // No payments exist at all
+        nextNo = 1;
+      }
+
+      // Initialize the setting with the correct value
+      db.prepare(`
+        INSERT INTO settings (key, value, updated_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+      `).run(settingKey, nextNo.toString());
+    } else {
+      nextNo = parseInt(setting.value, 10);
+      // Handle case where value might be invalid (NaN)
+      if (isNaN(nextNo) || nextNo < 1) {
+        nextNo = 1;
+      } else {
+        nextNo = nextNo + 1;
+      }
+      // Update the counter
+      db.prepare(`
+        UPDATE settings SET value = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE key = ?
+      `).run(nextNo.toString(), settingKey);
+    }
+
+    return `PAY${String(nextNo).padStart(3, '0')}`;
+  });
+
+  return generateInTransaction();
 }
 
 /**
@@ -560,7 +599,9 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
     res.status(201).json(createdInvoice);
   } catch (error: unknown) {
     // FIX #7: Generic error message, log detail server-side
-    logger.error('Create invoice error:', { error });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorCode = (error as { code?: string }).code;
+    logger.error('Create invoice error:', { error: errorMessage, code: errorCode, stack: error instanceof Error ? error.stack : undefined });
     res.status(500).json({ error: 'Failed to create invoice' });
   }
 }

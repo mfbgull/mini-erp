@@ -136,13 +136,13 @@ export const bomItemSchema = z.object({
 
 // ── Production ────────────────────────────────────────────────────
 export const productionSchema = z.object({
-  output_item_id: z.string().min(1, 'Output product is required'),
-  output_quantity: z.string().refine(
+  output_item_id: z.union([z.string(), z.number()]).transform(val => String(val)).refine(val => val && val !== '', 'Output product is required'),
+  output_quantity: z.union([z.string(), z.number()]).transform(val => String(val)).refine(
     val => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
     'Output quantity must be greater than 0'
   ),
-  warehouse_id: z.string().min(1, 'Finished goods warehouse is required'),
-  raw_materials_warehouse_id: z.string().optional(),
+  warehouse_id: z.union([z.string(), z.number()]).transform(val => String(val)).refine(val => val && val !== '', 'Finished goods warehouse is required'),
+  raw_materials_warehouse_id: z.union([z.string(), z.number()]).optional(),
   production_date: z.string().min(1, 'Production date is required'),
   remarks: z.string().optional(),
 });
@@ -170,7 +170,7 @@ export const invoiceItemSchema = z.object({
   rate: z.coerce.number().min(0, 'Rate must be 0 or greater'),
   description: z.string().optional(),
   tax: z.coerce.number().min(0).default(0),
-  discount_type: z.enum(['none', 'percent', 'fixed']).optional(),
+  discount_type: z.enum(['none', 'percent', 'fixed', 'flat']).optional(),
   discount_value: z.coerce.number().min(0).default(0),
 });
 
@@ -180,7 +180,7 @@ export const invoiceSchema = z.object({
   due_date: z.string().optional(),
   notes: z.string().optional(),
   terms: z.string().optional(),
-  discount_type: z.enum(['none', 'percent', 'fixed']).optional(),
+  discount_type: z.enum(['none', 'percent', 'fixed', 'flat']).optional(),
   discount_value: z.coerce.number().min(0).default(0),
   items: z.array(invoiceItemSchema).min(1, 'At least one item is required'),
 });

@@ -569,6 +569,7 @@ function ProductionForm({ production, onClose, onSuccess }) {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
+      console.log("Submitting production data:", data);
       return api.post("/productions", data);
     },
     onSuccess: () => {
@@ -576,6 +577,9 @@ function ProductionForm({ production, onClose, onSuccess }) {
       onSuccess();
     },
     onError: (error) => {
+      console.error("Production error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error stack:", error.stack);
       toast.error(error.response?.data?.error || "Failed to record production");
     },
   });
@@ -688,8 +692,26 @@ function ProductionForm({ production, onClose, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("=== FORM SUBMIT ===");
+    console.log("Form data:", formData);
+    console.log("Selected BOM:", selectedBOMId);
+    console.log("Calculated items:", calculatedInputItems);
+    console.log("Errors:", errors);
 
-    if (!validate(formData)) return;
+    // Validate form data
+    const isValid = validate(formData);
+    console.log("Validation result:", isValid);
+    if (!isValid) {
+      // Show first validation error as toast
+      const errorKeys = Object.keys(errors);
+      console.log("Validation errors:", errorKeys, errors);
+      if (errorKeys.length > 0) {
+        toast.error(errors[errorKeys[0]]);
+      } else {
+        toast.error("Please fill in all required fields");
+      }
+      return;
+    }
 
     // Use calculated input items when BOM is selected
     let inputItemsToUse = [];
