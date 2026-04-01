@@ -21,6 +21,36 @@ import { invoiceSchema } from '../../schemas';
 
 import './SalesInvoicePage.css';
 
+// Helper: generate empty invoice item row
+const createEmptyItemRow = (index) => ({
+  id: Date.now() + index,
+  item_id: '',
+  description: '',
+  quantity: 1,
+  rate: 0,
+  tax: 0,
+  discount: { type: 'flat', value: 0 }
+});
+
+// Helper: pad items array to minimum 10 rows
+const padItemsToMinimum = (items, min = 10) => {
+  if (items.length >= min) return items;
+  const padded = [...items];
+  const now = Date.now();
+  for (let i = items.length; i < min; i++) {
+    padded.push({
+      id: now + i + 1000,
+      item_id: '',
+      description: '',
+      quantity: 1,
+      rate: 0,
+      tax: 0,
+      discount: { type: 'flat', value: 0 }
+    });
+  }
+  return padded;
+};
+
 export default function SalesInvoicePage() {
   const { id: invoiceId } = useParams();
   const navigate = useNavigate();
@@ -75,17 +105,7 @@ export default function SalesInvoicePage() {
     customer_address: '',
     discountScope: 'invoice',
     discount: { type: 'flat', value: 0 },
-    items: [
-      {
-        id: Date.now(),
-        item_id: '',
-        description: '',
-        quantity: 1,
-        rate: 0,
-        tax: 0,
-        discount: { type: 'flat', value: 0 }
-      }
-    ],
+    items: Array.from({ length: 10 }, (_, i) => createEmptyItemRow(i)),
     notes: 'Thank you for your business. Payment is due within 14 days.',
     terms: 'Net 14 days. Late payments subject to 1.5% monthly interest.',
     created_by: null,
@@ -112,6 +132,8 @@ export default function SalesInvoicePage() {
   const { errors, validate, clearErrors } = useFormValidation(invoiceSchema);
 
   const [editingCell, setEditingCell] = useState(null);
+  const lastFocusedCellRef = useRef(null);
+  const tableContainerRef = useRef(null);
   const [existingPayments, setExistingPayments] = useState([]);
   const [showNewPaymentForm, setShowNewPaymentForm] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
@@ -306,7 +328,7 @@ export default function SalesInvoicePage() {
 
            setInvoice({
              ...invoiceData,
-             items: formattedItems,
+             items: padItemsToMinimum(formattedItems),
              customer_id: invoiceData.customer_id,
              customer_name: invoiceData.customer_name,
              customer_email: invoiceData.customer_email,
@@ -860,6 +882,7 @@ export default function SalesInvoicePage() {
             onKeyDown={handleKeyDown}
             onFocus={(e) => {
               e.target.select();
+              lastFocusedCellRef.current = `${itemId}-description`;
               // Show dropdown with all sellable items if field is empty
               if (!tempValue.trim() && items.length > 0) {
                 const sellableItems = items.filter(item =>
@@ -913,7 +936,59 @@ export default function SalesInvoicePage() {
           setTempValue(value || '');
           setEditingCell(`${itemId}-description`);
         }}
+        onFocus={() => { lastFocusedCellRef.current = `${itemId}-description`; }}
+        onKeyDown={(e) => {
+          const focusTargetCell = (targetItemId, targetField) => {
+            setTimeout(() => {
+              const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
+              if (el) el.focus();
+            }, 0);
+          };
+
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            setTempValue(value || '');
+            setEditingCell(`${itemId}-description`);
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
+            if (currentItemIndex < invoice.items.length - 1) {
+              const nextItemId = invoice.items[currentItemIndex + 1].id;
+              focusTargetCell(nextItemId, 'description');
+            }
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
+            if (currentItemIndex > 0) {
+              const prevItemId = invoice.items[currentItemIndex - 1].id;
+              focusTargetCell(prevItemId, 'description');
+            }
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            const nextField = getNextField('description');
+            if (nextField) {
+              focusTargetCell(itemId, nextField);
+            }
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+          } else if (e.key === 'Tab') {
+            e.preventDefault();
+            const nextField = getNextField('description');
+            if (nextField) {
+              focusTargetCell(itemId, nextField);
+            } else if (isLastItem) {
+              const newItemId = addNewItem();
+              setTimeout(() => {
+                setEditingCell(`${newItemId}-description`);
+                const el = document.querySelector(`[data-cell-id="${newItemId}-description"]`);
+                if (el) el.focus();
+              }, 50);
+            }
+          }
+        }}
         className="editable-cell"
+        tabIndex={0}
+        data-cell-id={`${itemId}-description`}
       >
         {value || <span className="cell-placeholder">Click to add item...</span>}
         <Edit2 className="edit-icon" />
@@ -971,12 +1046,18 @@ export default function SalesInvoicePage() {
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         moveToCell(1, 0);
-      } else if (e.key === 'ArrowLeft' && e.target.selectionStart === 0) {
-        e.preventDefault();
-        moveToCell(0, -1);
-      } else if (e.key === 'ArrowRight' && e.target.selectionStart === e.target.value.length) {
-        e.preventDefault();
-        moveToCell(0, 1);
+      } else if (e.key === 'ArrowLeft') {
+        const atStart = type === 'number' || e.target.selectionStart === 0;
+        if (atStart) {
+          e.preventDefault();
+          moveToCell(0, -1);
+        }
+      } else if (e.key === 'ArrowRight') {
+        const atEnd = type === 'number' || e.target.selectionStart === e.target.value.length;
+        if (atEnd) {
+          e.preventDefault();
+          moveToCell(0, 1);
+        }
       } else if (e.key === 'Enter') {
         e.preventDefault();
         handleSave();
@@ -1025,7 +1106,73 @@ export default function SalesInvoicePage() {
           setTempValue(value);
           setEditingCell(`${itemId}-${field}`);
         }}
+        onFocus={() => { lastFocusedCellRef.current = `${itemId}-${field}`; }}
+        onKeyDown={(e) => {
+          const fieldOrder = invoice.discountScope === 'item'
+            ? ['description', 'quantity', 'rate', 'discountValue', 'tax']
+            : ['description', 'quantity', 'rate', 'tax'];
+          const currentFieldIndex = fieldOrder.indexOf(field);
+          const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
+
+          const focusTargetCell = (targetItemId, targetField) => {
+            setTimeout(() => {
+              const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
+              if (el) el.focus();
+            }, 0);
+          };
+
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            setTempValue(value);
+            setEditingCell(`${itemId}-${field}`);
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (currentItemIndex > 0) {
+              const prevItemId = invoice.items[currentItemIndex - 1].id;
+              focusTargetCell(prevItemId, field);
+            }
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (currentItemIndex < invoice.items.length - 1) {
+              const nextItemId = invoice.items[currentItemIndex + 1].id;
+              focusTargetCell(nextItemId, field);
+            }
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            if (currentFieldIndex > 0) {
+              focusTargetCell(itemId, fieldOrder[currentFieldIndex - 1]);
+            } else if (currentItemIndex > 0) {
+              const prevItemId = invoice.items[currentItemIndex - 1].id;
+              focusTargetCell(prevItemId, fieldOrder[fieldOrder.length - 1]);
+            }
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            if (currentFieldIndex < fieldOrder.length - 1) {
+              focusTargetCell(itemId, fieldOrder[currentFieldIndex + 1]);
+            } else if (currentItemIndex < invoice.items.length - 1) {
+              const nextItemId = invoice.items[currentItemIndex + 1].id;
+              focusTargetCell(nextItemId, fieldOrder[0]);
+            }
+          } else if (e.key === 'Tab') {
+            e.preventDefault();
+            if (currentFieldIndex < fieldOrder.length - 1) {
+              focusTargetCell(itemId, fieldOrder[currentFieldIndex + 1]);
+            } else if (currentItemIndex < invoice.items.length - 1) {
+              const nextItemId = invoice.items[currentItemIndex + 1].id;
+              focusTargetCell(nextItemId, 'description');
+            } else {
+              const newItemId = addNewItem();
+              setTimeout(() => {
+                setEditingCell(`${newItemId}-description`);
+                const el = document.querySelector(`[data-cell-id="${newItemId}-description"]`);
+                if (el) el.focus();
+              }, 50);
+            }
+          }
+        }}
         className="editable-cell"
+        tabIndex={0}
+        data-cell-id={`${itemId}-${field}`}
       >
         {value}
         <Edit2 className="edit-icon" />
@@ -1039,6 +1186,9 @@ export default function SalesInvoicePage() {
     // Ensure invoice_no is generated before submission
     const invoiceNo = invoice.invoice_no || `INV-${new Date().getFullYear()}-${String(Date.now() % 1000000).padStart(6, '0')}`;
 
+    // Filter out empty rows (rows with no item_id and no description)
+    const filledItems = invoice.items.filter(item => item.item_id || item.description);
+
     // Prepare validation data
     const validationData = {
       customer_id: invoice.customer_id,
@@ -1048,7 +1198,7 @@ export default function SalesInvoicePage() {
       terms: invoice.terms,
       discount_type: invoice.discount.type,
       discount_value: invoice.discount.value,
-      items: invoice.items.map(item => ({
+      items: filledItems.map(item => ({
         item_id: item.item_id,
         quantity: item.quantity,
         rate: item.rate,
@@ -1066,7 +1216,7 @@ export default function SalesInvoicePage() {
       return;
     }
 
-    if (invoice.items.length === 0) {
+    if (filledItems.length === 0) {
       toast.error('Please add at least one item');
       return;
     }
@@ -1086,7 +1236,7 @@ export default function SalesInvoicePage() {
       discount_value: invoice.discount.value,
       notes: invoice.notes,
       terms: invoice.terms,
-      items: invoice.items.map(item => ({
+      items: filledItems.map(item => ({
         item_id: item.item_id,
         description: item.description,
         quantity: item.quantity,
@@ -1298,10 +1448,20 @@ export default function SalesInvoicePage() {
             <div className="field-error items-error">{errors.items}</div>
           )}
 
-          <div className="items-table-container-modern">
+          <div
+            ref={tableContainerRef}
+            className="items-table-container-modern"
+            onMouseEnter={() => {
+              if (lastFocusedCellRef.current) {
+                const el = document.querySelector(`[data-cell-id="${lastFocusedCellRef.current}"]`);
+                if (el) el.focus();
+              }
+            }}
+          >
             <table className="items-table-modern">
               <thead>
                 <tr>
+                  <th className="text-center serial-col">#</th>
                   <th className="text-left">Description</th>
                   <th className="text-right">Quantity</th>
                   <th className="text-right">Rate</th>
@@ -1316,14 +1476,15 @@ export default function SalesInvoicePage() {
               <tbody>
                 {invoice.items.map((item, index) => (
                   <tr key={item.id}>
-                    <td>
+                    <td className="text-center serial-col">{index + 1}</td>
+                    <td className="invoice-item-cell">
                       <SearchableDescriptionCell
                         value={item.description}
                         itemId={item.id}
                         isLastItem={index === invoice.items.length - 1}
                       />
                     </td>
-                    <td className="text-right">
+                    <td className="text-right invoice-item-cell">
                       <EditableCell
                         value={item.quantity}
                         itemId={item.id}
@@ -1332,7 +1493,7 @@ export default function SalesInvoicePage() {
                         isLastItem={index === invoice.items.length - 1}
                       />
                     </td>
-                    <td className="text-right rate-cell-container" data-rate-cell={item.id}>
+                    <td className="text-right rate-cell-container invoice-item-cell" data-rate-cell={item.id}>
                       <EditableCell
                         value={item.rate.toFixed(2)}
                         itemId={item.id}
@@ -1342,7 +1503,7 @@ export default function SalesInvoicePage() {
                       />
                     </td>
                     {invoice.discountScope === 'item' && (
-                      <td className="text-right">
+                      <td className="text-right invoice-item-cell">
                         <div className="discount-cell-modern">
                           <select
                             value={item.discount.type}
@@ -1362,7 +1523,7 @@ export default function SalesInvoicePage() {
                         </div>
                       </td>
                     )}
-                    <td className="text-right">
+                    <td className="text-right invoice-item-cell">
                       <EditableCell
                         value={item.tax}
                         itemId={item.id}
@@ -1374,7 +1535,7 @@ export default function SalesInvoicePage() {
                     <td className="text-right amount-cell-modern">
                       {formatCurrency(calculateItemTotal(item))}
                     </td>
-                    <td className="text-center">
+                    <td className="text-center invoice-item-cell">
                       <button
                         onClick={() => removeItem(item.id)}
                         className="remove-btn-modern"
@@ -1441,7 +1602,7 @@ export default function SalesInvoicePage() {
                           ...invoice,
                           discount: { ...invoice.discount, value: Number(e.target.value) || 0 }
                         })}
-                        onFocus={(e) => e.target.select()}
+          onFocus={(e) => { e.target.select(); lastFocusedCellRef.current = `${itemId}-${field}`; }}
                         className="discount-value-input"
                         placeholder="0"
                       />

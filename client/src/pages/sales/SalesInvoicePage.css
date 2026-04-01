@@ -277,6 +277,7 @@
 .items-table-modern {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .items-table-modern thead {
@@ -291,6 +292,11 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #6b7280;
+  border-right: 1px solid #e5e7eb;
+}
+
+.items-table-modern th:last-child {
+  border-right: none;
 }
 
 .items-table-modern tbody tr {
@@ -305,6 +311,12 @@
 .items-table-modern td {
   padding: 0.75rem 1rem;
   color: #111827;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.items-table-modern td:last-child {
+  border-right: none;
 }
 
 .text-left {
@@ -319,6 +331,95 @@
   text-align: center;
 }
 
+/* Serial Number Column */
+.serial-col {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+  font-weight: 600;
+  color: #9ca3af;
+  font-size: 0.75rem;
+  user-select: none;
+}
+
+/* Editable cell focus ring for keyboard navigation */
+.editable-cell:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+  background: #eff6ff;
+}
+
+/* Invoice Item Cells - Match Quotation Style */
+.invoice-item-cell {
+  padding: 0 !important;
+  vertical-align: middle;
+}
+
+.invoice-item-cell .editable-cell {
+  padding: 0.75rem 1rem;
+  border-radius: 0;
+  min-height: 2.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+}
+
+.invoice-item-cell .editable-cell:hover {
+  background: #f3f4f6;
+}
+
+.invoice-item-cell .editable-cell:focus-visible {
+  outline: none;
+  background: #eff6ff;
+}
+
+.invoice-item-cell .editable-input {
+  border: 1px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  background: transparent;
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.invoice-item-cell .editable-input:hover {
+  background: #f3f4f6;
+}
+
+.invoice-item-cell .editable-input:focus {
+  border-color: #2563eb;
+  background: white;
+}
+
+.invoice-item-cell .searchable-cell-container {
+  width: 100%;
+}
+
+.invoice-item-cell .searchable-cell-container .editable-input {
+  width: 100%;
+}
+
+.invoice-item-cell .remove-btn-modern {
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.invoice-item-cell .remove-btn-modern:hover {
+  opacity: 1;
+}
+
 /* Editable Cell */
 .editable-cell {
   cursor: pointer;
@@ -328,6 +429,8 @@
   min-height: 1.5rem;
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .editable-cell:hover {
@@ -356,6 +459,9 @@
   border-radius: 0.25rem;
   outline: none;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  box-sizing: border-box;
+  font-size: inherit;
+  font-family: inherit;
 }
 
 /* Searchable Cell with Dropdown */
