@@ -1,25 +1,48 @@
 import { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger';
+import { sendInternalError } from '../utils/apiResponse';
 
-function errorHandler(err: any, req: Request, res: Response, next: NextFunction): void {
-  console.error('Error:', err);
-
+function errorHandler(
+  err: { status?: number; message?: string; stack?: string },
+  req: Request,
+  res: Response,
+  _next: NextFunction
+): void {
   const status = err.status || 500;
   const message = err.message || 'Internal server error';
 
-  res.status(status).json({
+  logger.error('Unhandled error', {
+    requestId: (req as any).requestId,
+    method: req.method,
+    url: req.originalUrl || req.url,
+    statusCode: status,
     error: message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    stack: err.stack,
+    userId: (req as any).user?.id,
   });
+
+  if (process.env.NODE_ENV === 'development') {
+    res.status(status).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message,
+        stack: err.stack,
+      },
+    });
+  } else {
+    sendInternalError(res);
+  }
 }
 
 function notFoundHandler(req: Request, res: Response): void {
   res.status(404).json({
-    error: 'Route not found',
-    path: req.path
+    success: false,
+    error: {
+      code: 'NOT_FOUND',
+      message: `Route not found: ${req.path}`,
+    },
   });
 }
 
-export default {
-  errorHandler,
-  notFoundHandler
-};
+export default { errorHandler, notFoundHandler };

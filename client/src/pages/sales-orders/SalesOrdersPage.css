@@ -1,0 +1,149 @@
+.sales-orders-page {
+  padding: 20px;
+}
+
+.sales-orders-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sales-orders-page .header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sales-orders-page .header-title h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.sales-orders-page .summary-cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.sales-orders-page .summary-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px 24px;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sales-orders-page .summary-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.sales-orders-page .summary-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sales-orders-page .grid-container {
+  width: 100%;
+  height: calc(100vh - 250px);
+}
+
+.sales-orders-page .link-text {
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sales-orders-page .link-text:hover {
+  text-decoration: underline;
+}
+
+.sales-orders-page .status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sales-orders-page .status-draft {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.sales-orders-page .status-confirmed {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.sales-orders-page .status-invoiced {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.sales-orders-page .status-completed {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+
+.sales-orders-page .status-cancelled {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.sales-orders-page .action-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.sales-orders-page .icon-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sales-orders-page .icon-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.sales-orders-page .icon-btn.danger:hover {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .sales-orders-page {
+    padding: 12px;
+  }
+
+  .sales-orders-page .page-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .sales-orders-page .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sales-orders-page .summary-card {
+    min-width: auto;
+    padding: 12px;
+  }
+}

@@ -444,6 +444,68 @@ function runSalesMigration(): void {
 
       logger.info('✅ Sales migration completed!');
     }
+
+    // Check and run sales cycle migration (quotations & sales orders)
+    const salesCycleCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='quotations'
+    `).get() as { name: string } | undefined;
+
+    if (!salesCycleCheck) {
+      logger.info('Running sales cycle migration (quotations & sales orders)...');
+
+      try {
+        // Create quotations table
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS quotations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            quotation_no VARCHAR(50) UNIQUE NOT NULL,
+            customer_id INTEGER NOT NULL,
+            customer_name VARCHAR(200),
+            quotation_date DATE NOT NULL,
+            expiry_date DATE,
+            status VARCHAR(20) DEFAULT 'Draft',
+            source_type VARCHAR(20),
+            total_amount DECIMAL(15,2) DEFAULT 0,
+            notes TEXT,
+            terms TEXT,
+            warehouse_id INTEGER,
+            created_by INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+
+        // Create quotation_items table
+        db.exec(`
+          CREATE TABLE IF NOT EXISTS quotation_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            quotation_id INTEGER NOT NULL,
+            item_id INTEGER NOT NULL,
+            item_code VARCHAR(50),
+            item_name VARCHAR(200),
+            quantity DECIMAL(15,3) NOT NULL,
+            unit_price DECIMAL(15,2) NOT NULL,
+            discount_type VARCHAR(20) DEFAULT 'none',
+            discount_value DECIMAL(15,2) DEFAULT 0,
+            tax_rate DECIMAL(5,2) DEFAULT 0,
+            amount DECIMAL(15,2) NOT NULL
+          )
+        `);
+
+        // Add columns to existing tables if not exist
+        try { db.exec(`ALTER TABLE sales_orders ADD COLUMN source_type VARCHAR(20)`); } catch {}
+        try { db.exec(`ALTER TABLE sales_orders ADD COLUMN source_id INTEGER`); } catch {}
+        try { db.exec(`ALTER TABLE sales_orders ADD COLUMN customer_name VARCHAR(200)`); } catch {}
+        try { db.exec(`ALTER TABLE invoices ADD COLUMN source_type VARCHAR(20)`); } catch {}
+        try { db.exec(`ALTER TABLE invoices ADD COLUMN quotation_id INTEGER`); } catch {}
+        try { db.exec(`ALTER TABLE invoices ADD COLUMN customer_name VARCHAR(200)`); } catch {}
+
+        logger.info('✅ Sales cycle migration completed!');
+      } catch (migrationError: any) {
+        logger.error('Sales cycle migration error:', String(migrationError));
+      }
+    }
   } catch (error: any) {
     logger.error('Sales migration error:', error.message);
   }

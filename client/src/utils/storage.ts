@@ -1,37 +1,13 @@
 import { User } from '../types';
 
 const STORAGE_KEYS = {
-  TOKEN: 'token',
-  USER: 'user',
+  // Token is stored in httpOnly cookie by the server - client MUST NOT store tokens
+  USER: 'miniERP-user',
   THEME: 'miniERP-theme',
-  SIDEBAR_COLLAPSED: 'sidebarCollapsed',
+  SIDEBAR_COLLAPSED: 'miniERP-sidebarCollapsed',
 } as const;
 
 export const storage = {
-  getToken: (): string | null => {
-    try {
-      return localStorage.getItem(STORAGE_KEYS.TOKEN);
-    } catch {
-      return null;
-    }
-  },
-  
-  setToken: (token: string): void => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
-    } catch (error) {
-      console.error('Failed to save token:', error);
-    }
-  },
-  
-  removeToken: (): void => {
-    try {
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
-    } catch (error) {
-      console.error('Failed to remove token:', error);
-    }
-  },
-  
   getUser: (): User | null => {
     try {
       const user = localStorage.getItem(STORAGE_KEYS.USER);
@@ -40,37 +16,36 @@ export const storage = {
       }
       return JSON.parse(user);
     } catch (error) {
-      console.error('Failed to parse user:', error);
       localStorage.removeItem(STORAGE_KEYS.USER);
       return null;
     }
   },
-  
+
   setUser: (user: User): void => {
     try {
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
     } catch (error) {
-      console.error('Failed to save user:', error);
+      // Silent fail - don't expose internal errors
     }
   },
-  
+
   removeUser: (): void => {
     try {
       localStorage.removeItem(STORAGE_KEYS.USER);
     } catch (error) {
-      console.error('Failed to remove user:', error);
+      // Silent fail
     }
   },
-  
+
   clearAuth: (): void => {
     try {
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      // Only clear user - token is cleared server-side via cookie
       localStorage.removeItem(STORAGE_KEYS.USER);
     } catch (error) {
-      console.error('Failed to clear auth:', error);
+      // Silent fail
     }
   },
-  
+
   getTheme: (): string | null => {
     try {
       return localStorage.getItem(STORAGE_KEYS.THEME);
@@ -78,15 +53,15 @@ export const storage = {
       return null;
     }
   },
-  
+
   setTheme: (theme: string): void => {
     try {
       localStorage.setItem(STORAGE_KEYS.THEME, theme);
     } catch (error) {
-      console.error('Failed to save theme:', error);
+      // Silent fail
     }
   },
-  
+
   getSidebarCollapsed: (): boolean => {
     try {
       return localStorage.getItem(STORAGE_KEYS.SIDEBAR_COLLAPSED) === 'true';
@@ -94,12 +69,12 @@ export const storage = {
       return false;
     }
   },
-  
+
   setSidebarCollapsed: (collapsed: boolean): void => {
     try {
       localStorage.setItem(STORAGE_KEYS.SIDEBAR_COLLAPSED, String(collapsed));
     } catch (error) {
-      console.error('Failed to save sidebar state:', error);
+      // Silent fail
     }
   },
 };

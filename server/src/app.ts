@@ -44,15 +44,32 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
       imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
     },
   },
+  crossOriginEmbedderPolicy: false,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
 }));
 
 // CORS configuration
+const getAllowedOrigins = (): string | string[] => {
+  if (process.env.NODE_ENV === 'production') {
+    const origins = process.env.ALLOWED_ORIGINS;
+    if (!origins) {
+      throw new Error('FATAL: ALLOWED_ORIGINS must be set in production. Set it in your environment variables.');
+    }
+    return origins.split(',').map(o => o.trim());
+  }
+  return ['http://localhost:5173', 'http://localhost:3010', 'http://localhost:3013', 'http://localhost:3015', 'http://127.0.0.1:5173'];
+};
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? (process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3010'])
-    : ['http://localhost:5173', 'http://localhost:3010', 'http://localhost:3013', 'http://localhost:3015', 'http://127.0.0.1:5173'],
+  origin: getAllowedOrigins(),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],

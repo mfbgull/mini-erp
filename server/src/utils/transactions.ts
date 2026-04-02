@@ -4,6 +4,7 @@
  */
 
 import Database from 'better-sqlite3';
+import logger from './logger';
 
 export interface TransactionContext {
   db: Database.Database;
@@ -35,10 +36,8 @@ export async function withTransaction<T>(
     
     return result;
   } catch (error) {
-    // Rollback on error
     db.prepare('ROLLBACK').run();
-    
-    console.error('Transaction failed, rolled back:', error);
+    logger.error('Transaction failed, rolled back:', { error: (error as Error).message });
     throw error;
   }
 }
@@ -59,7 +58,7 @@ export function withTransactionSync<T>(
     return result;
   } catch (error) {
     db.prepare('ROLLBACK').run();
-    console.error('Transaction failed, rolled back:', error);
+    logger.error('Transaction failed, rolled back:', { error: (error as Error).message });
     throw error;
   }
 }

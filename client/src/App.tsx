@@ -47,6 +47,12 @@ const InvoiceViewPage = lazy(() => import('./pages/sales/InvoiceViewPage'));
 const InvoiceRouter = lazy(() => import('./components/invoice/InvoiceRouter'));
 const InvoiceWizardPage = lazy(() => import('./pages/invoice/InvoiceWizardPage'));
 
+// Quotations & Sales Orders
+const QuotationsPage = lazy(() => import('./pages/quotations/QuotationsPage'));
+const QuotationFormPage = lazy(() => import('./pages/quotations/QuotationFormPage'));
+const SalesOrdersPage = lazy(() => import('./pages/sales-orders/SalesOrdersPage'));
+const SalesOrderFormPage = lazy(() => import('./pages/sales-orders/SalesOrderFormPage'));
+
 // Lazy loaded - Customers module
 const CustomersPage = lazy(() => import('./pages/customers/CustomersPage'));
 const CustomerDetailPage = lazy(() => import('./pages/customers/CustomerDetailPage'));
@@ -193,6 +199,14 @@ function AppLayout() {
               <Route path="/reports/expenses" element={<ExpensesReport />} />
               <Route path="/expenses" element={<ExpensesPage />} />
 <Route path="/sales" element={<SalesPage />} />
+              <Route path="/quotations" element={<QuotationsPage />} />
+              <Route path="/quotations/create" element={<QuotationFormPage mode="create" />} />
+              <Route path="/quotations/:id" element={<QuotationFormPage mode="view" />} />
+              <Route path="/quotations/:id/edit" element={<QuotationFormPage mode="edit" />} />
+              <Route path="/sales-orders" element={<SalesOrdersPage />} />
+              <Route path="/sales-orders/create" element={<SalesOrderFormPage mode="create" />} />
+              <Route path="/sales-orders/:id" element={<SalesOrderFormPage mode="view" />} />
+              <Route path="/sales-orders/:id/edit" element={<SalesOrderFormPage mode="edit" />} />
               <Route path="/sales/invoice" element={<SalesInvoicePage />} />
               <Route path="/sales/invoice/:id" element={<InvoiceRouter />} />
               <Route path="/sales/invoice/:id/view" element={<InvoiceViewPage />} />

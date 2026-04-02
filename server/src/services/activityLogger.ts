@@ -5,6 +5,7 @@
  */
 
 import db from '../config/database';
+import logger from '../utils/logger';
 
 // Activity types enumeration
 export enum ActionType {
@@ -139,7 +140,7 @@ class ActivityLoggerService {
   log(entry: ActivityLogEntry): void {
     // Validate required fields
     if (!entry.action || !entry.entityType) {
-      console.error('[ActivityLogger] Missing required fields:', entry);
+      // Validation failure - log skipped silently
       return;
     }
 
@@ -244,7 +245,7 @@ class ActivityLoggerService {
         );
       }
     } catch (error: any) {
-      console.error('[ActivityLogger] Failed to flush logs:', error.message);
+      logger.error('[ActivityLogger] Failed to flush logs:', { error: error.message });
       // Re-add failed entries to queue
       this.logQueue.unshift(...batch);
     } finally {
@@ -265,7 +266,7 @@ class ActivityLoggerService {
         LIMIT ?
       `).all(limit) as any[];
     } catch (error: any) {
-      console.error('[ActivityLogger] Failed to get recent logs:', error.message);
+      logger.error('[ActivityLogger] Failed to get recent logs:', { error: error.message });
       return [];
     }
   }
@@ -284,7 +285,7 @@ class ActivityLoggerService {
         LIMIT ?
       `).all(userId, limit) as any[];
     } catch (error: any) {
-      console.error('[ActivityLogger] Failed to get user logs:', error.message);
+      logger.error('[ActivityLogger] Failed to get user logs:', { error: error.message });
       return [];
     }
   }
@@ -303,7 +304,7 @@ class ActivityLoggerService {
         LIMIT ?
       `).all(entityType, entityId, limit) as any[];
     } catch (error: any) {
-      console.error('[ActivityLogger] Failed to get entity logs:', error.message);
+      logger.error('[ActivityLogger] Failed to get entity logs:', { error: error.message });
       return [];
     }
   }
@@ -350,7 +351,7 @@ class ActivityLoggerService {
 
       return { actions, users, dailyActivity };
     } catch (error: any) {
-      console.error('[ActivityLogger] Failed to get stats:', error.message);
+      logger.error('[ActivityLogger] Failed to get stats:', { error: error.message });
       return { actions: [], users: [], dailyActivity: [] };
     }
   }
@@ -366,11 +367,11 @@ class ActivityLoggerService {
       `).run(retentionDays);
 
       if (result.changes > 0) {
-        console.log(`[ActivityLogger] Cleaned up ${result.changes} old log entries`);
+        logger.info(`[ActivityLogger] Cleaned up ${result.changes} old log entries`);
       }
       return result.changes;
     } catch (error: any) {
-      console.error('[ActivityLogger] Failed to cleanup logs:', error.message);
+      logger.error('[ActivityLogger] Failed to cleanup logs:', { error: error.message });
       return 0;
     }
   }

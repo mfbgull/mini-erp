@@ -248,3 +248,164 @@ export interface Warehouse {
   created_at?: string;
   updated_at?: string;
 }
+
+// ============ Quotation Types ============
+export type QuotationStatus = 'Draft' | 'Sent' | 'Accepted' | 'Expired' | 'Converted' | 'Rejected';
+export type QuotationSourceType = 'DIRECT' | null;
+
+export interface QuotationItem {
+  id?: number;
+  item_id: number;
+  item_code?: string;
+  item_name?: string;
+  quantity: number;
+  unit_price: number;
+  discount_type?: 'none' | 'percentage' | 'amount';
+  discount_value?: number;
+  tax_rate?: number;
+  amount: number;
+}
+
+export interface Quotation {
+  id: number;
+  quotation_no: string;
+  customer_id: number;
+  customer_name?: string;
+  quotation_date: string;
+  expiry_date?: string;
+  status: QuotationStatus;
+  source_type?: QuotationSourceType;
+  total_amount: number;
+  notes?: string;
+  terms?: string;
+  warehouse_id?: number;
+  warehouse_code?: string;
+  warehouse_name?: string;
+  created_by: number;
+  created_by_username?: string;
+  created_at: string;
+  updated_at: string;
+  items?: QuotationItem[];
+}
+
+export interface CreateQuotationItemDTO {
+  item_id: number;
+  quantity: number;
+  unit_price: number;
+  discount_type?: 'none' | 'percentage' | 'amount';
+  discount_value?: number;
+  tax_rate?: number;
+}
+
+export interface CreateQuotationDTO {
+  customer_id: number;
+  customer_name?: string;
+  quotation_date: string;
+  expiry_date?: string;
+  status?: QuotationStatus;
+  source_type?: QuotationSourceType;
+  notes?: string;
+  terms?: string;
+  warehouse_id?: number;
+  items: CreateQuotationItemDTO[];
+}
+
+// ============ Sales Order Types ============
+export type SalesOrderStatus = 'Draft' | 'Confirmed' | 'Delivered' | 'Invoiced' | 'Completed' | 'Cancelled';
+export type SalesOrderSourceType = 'QUOTATION' | 'DIRECT' | null;
+
+export interface SalesOrderItem {
+  id?: number;
+  item_id: number;
+  item_code?: string;
+  item_name?: string;
+  quantity: number;
+  delivered_quantity?: number;
+  unit_price: number;
+  amount: number;
+}
+
+export interface SalesOrder {
+  id: number;
+  so_no: string;
+  customer_id: number;
+  customer_name?: string;
+  so_date: string;
+  delivery_date?: string;
+  status: SalesOrderStatus;
+  source_type?: SalesOrderSourceType;
+  source_id?: number; // quotation_id when source_type is 'QUOTATION'
+  total_amount: number;
+  notes?: string;
+  warehouse_id?: number;
+  warehouse_code?: string;
+  warehouse_name?: string;
+  created_by: number;
+  created_by_username?: string;
+  created_at: string;
+  updated_at: string;
+  items?: SalesOrderItem[];
+  quotation_no?: string; // Joined field when source_type is 'QUOTATION'
+}
+
+export interface CreateSalesOrderItemDTO {
+  item_id: number;
+  quantity: number;
+  unit_price: number;
+}
+
+export interface CreateSalesOrderDTO {
+  customer_id: number;
+  customer_name?: string;
+  so_date: string;
+  delivery_date?: string;
+  status?: SalesOrderStatus;
+  source_type?: SalesOrderSourceType;
+  source_id?: number;
+  notes?: string;
+  warehouse_id?: number;
+  items: CreateSalesOrderItemDTO[];
+}
+
+// ============ Enhanced Invoice Types (with source tracking) ============
+export interface InvoiceWithSource extends Invoice {
+  so_id?: number;
+  so_no?: string;
+  source_type?: 'SALES_ORDER' | 'DIRECT' | null;
+  quotation_id?: number;
+  quotation_no?: string;
+  warehouse_id?: number;
+  warehouse_code?: string;
+  warehouse_name?: string;
+}
+
+// ============ Sales Cycle Chain Types ============
+export interface SalesCycleChain {
+  quotation?: Quotation;
+  salesOrder?: SalesOrder;
+  invoice?: InvoiceWithSource;
+}
+
+// ============ Sales Dashboard Types ============
+export interface SalesDashboardSummary {
+  quotations: {
+    total: number;
+    draft: number;
+    sent: number;
+    pending_conversion: number;
+  };
+  sales_orders: {
+    total: number;
+    draft: number;
+    confirmed: number;
+    pending_invoicing: number;
+  };
+  invoices: {
+    total: number;
+    unpaid: number;
+    paid: number;
+    partially_paid: number;
+    total_revenue: number;
+    outstanding_receivables: number;
+  };
+}

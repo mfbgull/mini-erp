@@ -1,0 +1,111 @@
+/* Quotation View Page - Print-Ready Design */
+.quotation-view-page {
+  min-height: 100vh;
+  background: #f1f5f9;
+}
+
+.quotation-view-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.toolbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quotation-view-container {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.quotation-preview-wrapper {
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Mobile Action Bar */
+.mobile-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px 20px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  z-index: 100;
+}
+
+.mobile-action-bar .fab-button {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Print Styles */
+@media print {
+  .quotation-view-toolbar {
+    display: none !important;
+  }
+
+  .quotation-view-page {
+    background: white;
+    min-height: auto;
+  }
+
+  .quotation-view-container {
+    padding: 0;
+  }
+
+  .quotation-preview-wrapper {
+    max-width: 100%;
+  }
+
+  .mobile-action-bar {
+    display: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .quotation-view-toolbar {
+    padding: 12px 16px;
+  }
+
+  .toolbar-title {
+    font-size: 1rem;
+  }
+
+  .toolbar-right {
+    gap: 8px;
+  }
+
+  .quotation-view-container {
+    padding: 16px;
+  }
+}

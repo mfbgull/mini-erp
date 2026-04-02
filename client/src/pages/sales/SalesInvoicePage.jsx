@@ -139,6 +139,7 @@ export default function SalesInvoicePage() {
   const [editingPayment, setEditingPayment] = useState(null);
   const [deletedPayments, setDeletedPayments] = useState([]);
   const [priceHint, setPriceHint] = useState(null); // { itemId, rowId, history } for showing price hint tooltip
+  const [newItemId, setNewItemId] = useState(null); // Track newly added item ID for auto-focus
 
   // Fetch customers
   const { data: customers = [], error: customersError, isLoading: customersLoading } = useQuery({
@@ -376,8 +377,79 @@ export default function SalesInvoicePage() {
         invoice_no: newInvoiceNo,
         paymentMethods: prev.paymentMethods // Preserve payment methods array
       }));
+      
+      // Auto-focus first cell for new invoice after a short delay
+      setTimeout(() => {
+        const firstCell = document.querySelector('[data-cell-id$="-description"]');
+        if (firstCell) {
+          firstCell.focus();
+        }
+      }, 200);
     }
   }, [invoiceId, navigate]);
+
+  // Auto-focus first cell when invoice items change (for new invoices)
+  useEffect(() => {
+    if (!invoiceId && invoice.items.length > 0) {
+      const timer = setTimeout(() => {
+        const firstCell = document.querySelector('[data-cell-id$="-description"]');
+        if (firstCell && document.activeElement !== firstCell) {
+          firstCell.focus();
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [invoice.items.length, invoiceId]);
+
+  // Focus first cell on initial mount for new invoices
+  useEffect(() => {
+    if (!invoiceId && invoice.items.length > 0) {
+      const timer = setTimeout(() => {
+        const firstCell = document.querySelector('[data-cell-id$="-description"]');
+        if (firstCell) {
+          // Set editing cell to enter edit mode
+          setEditingCell(`${invoice.items[0]?.id}-description`);
+          // Focus the cell
+          firstCell.focus();
+          // Also focus the input inside after it renders
+          setTimeout(() => {
+            const input = firstCell.querySelector('input');
+            if (input) {
+              input.focus();
+              input.select();
+            }
+          }, 50);
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, []); // Run once on mount
+
+  // Auto-focus newly added row's description cell
+  useEffect(() => {
+    if (newItemId) {
+      const timer = setTimeout(() => {
+        const newCell = document.querySelector(`[data-cell-id="${newItemId}-description"]`);
+        if (newCell) {
+          // Set editing cell to enter edit mode
+          setEditingCell(`${newItemId}-description`);
+          // Focus the cell
+          newCell.focus();
+          // Also focus the input inside after it renders
+          setTimeout(() => {
+            const input = newCell.querySelector('input');
+            if (input) {
+              input.focus();
+              input.select();
+            }
+          }, 50);
+        }
+        // Clear the newItemId after focusing
+        setNewItemId(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [newItemId]);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -633,6 +705,10 @@ export default function SalesInvoicePage() {
       ...invoice,
       items: [...invoice.items, newItem]
     });
+    
+    // Set the new item ID to trigger auto-focus effect
+    setNewItemId(newItemId);
+    
     return newItemId;
   };
 
@@ -702,6 +778,22 @@ export default function SalesInvoicePage() {
           ? (customerBalance.currentBalance / customer.credit_limit) * 100
           : 0
       }));
+
+      // Auto-focus first item cell and enter edit mode after customer is selected
+      setTimeout(() => {
+        const firstCell = document.querySelector(`[data-cell-id="${invoice.items[0]?.id}-description"]`);
+        if (firstCell) {
+          setEditingCell(`${invoice.items[0]?.id}-description`);
+          firstCell.focus();
+          setTimeout(() => {
+            const input = firstCell.querySelector('input');
+            if (input) {
+              input.focus();
+              input.select();
+            }
+          }, 50);
+        }
+      }, 100);
     } catch (error) {
       setInvoice(prev => ({
         ...prev,
@@ -711,6 +803,22 @@ export default function SalesInvoicePage() {
         customer_phone: customer.phone,
         customer_address: customer.billing_address
       }));
+
+      // Auto-focus first item cell and enter edit mode after customer is selected
+      setTimeout(() => {
+        const firstCell = document.querySelector(`[data-cell-id="${invoice.items[0]?.id}-description"]`);
+        if (firstCell) {
+          setEditingCell(`${invoice.items[0]?.id}-description`);
+          firstCell.focus();
+          setTimeout(() => {
+            const input = firstCell.querySelector('input');
+            if (input) {
+              input.focus();
+              input.select();
+            }
+          }, 50);
+        }
+      }, 100);
     }
   };
 
@@ -730,34 +838,40 @@ export default function SalesInvoicePage() {
       }
     }, [value, isEditing]);
 
+    // Get sellable items (exclude raw materials)
+    const getSellableItems = () => {
+      return items.filter(item =>
+        !item.is_raw_material &&
+        (item.is_finished_good === 1 || item.is_purchased === 1)
+      ).slice(0, 10);
+    };
+
     const handleInputChange = (e) => {
       const searchValue = e.target.value;
       setTempValue(searchValue);
 
-      // Filter out raw materials (only show finished goods and purchasable items for sale)
-      const sellableItems = items.filter(item =>
-        !item.is_raw_material && // Exclude raw materials
-        (item.is_finished_good === 1 || item.is_purchased === 1) // Include finished goods or purchasable items
-      );
-
+      // Filter items based on search value
+      const sellableItems = getSellableItems();
+      
       if (searchValue.trim()) {
+        // Filter by name or code (case-insensitive)
         const matches = sellableItems.filter(item =>
           item.item_name.toLowerCase().includes(searchValue.toLowerCase()) ||
           item.item_code.toLowerCase().includes(searchValue.toLowerCase())
-        ).slice(0, 10);
+        );
         setFilteredItems(matches);
         setShowDropdown(matches.length > 0);
-        setSelectedIndex(matches.length > 0 ? 0 : -1); // Auto-select first item
+        setSelectedIndex(matches.length > 0 ? 0 : -1);
       } else {
-        const allSellableItems = sellableItems.slice(0, 10);
-        setFilteredItems(allSellableItems);
-        setShowDropdown(allSellableItems.length > 0);
-        setSelectedIndex(allSellableItems.length > 0 ? 0 : -1);
+        // Empty search - show all items
+        setFilteredItems(sellableItems);
+        setShowDropdown(sellableItems.length > 0);
+        setSelectedIndex(sellableItems.length > 0 ? 0 : -1);
       }
     };
 
     const selectItem = (item, moveNext = true) => {
-      // Immediately update all fields in one state update
+      // Update invoice state with selected item
       setInvoice(prev => ({
         ...prev,
         items: prev.items.map(invItem => {
@@ -779,13 +893,10 @@ export default function SalesInvoicePage() {
       setFilteredItems([]);
       setSelectedIndex(-1);
 
-      // Move to next field after selection
+      // Move to quantity field after selection
       if (moveNext) {
         setTimeout(() => {
-          const nextField = getNextField('description');
-          if (nextField) {
-            setEditingCell(`${itemId}-${nextField}`);
-          }
+          setEditingCell(`${itemId}-quantity`);
         }, 0);
       } else {
         setEditingCell(null);
@@ -801,20 +912,77 @@ export default function SalesInvoicePage() {
       setEditingCell(null);
     };
 
+    const closeDropdown = () => {
+      setShowDropdown(false);
+      setFilteredItems([]);
+      setSelectedIndex(-1);
+    };
+
+    const openDropdown = () => {
+      const sellableItems = getSellableItems();
+      setFilteredItems(sellableItems);
+      setShowDropdown(sellableItems.length > 0);
+      setSelectedIndex(sellableItems.length > 0 ? 0 : -1);
+    };
+
     const handleKeyDown = (e) => {
+      // When dropdown is open with items, arrow keys navigate the list
+      if (showDropdown && filteredItems.length > 0) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSelectedIndex(prev => (prev < filteredItems.length - 1 ? prev + 1 : 0));
+          return;
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (selectedIndex === 0) {
+            // At first item - close dropdown and stay in edit mode
+            closeDropdown();
+            return;
+          }
+          setSelectedIndex(prev => (prev > 0 ? prev - 1 : filteredItems.length - 1));
+          return;
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (selectedIndex >= 0 && filteredItems[selectedIndex]) {
+            selectItem(filteredItems[selectedIndex], true);
+          }
+          return;
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          closeDropdown();
+          // Keep focus in the input, don't exit edit mode
+          inputRef.current?.focus();
+          return;
+        } else if (e.key === 'Tab') {
+          // Tab with dropdown open - select current item
+          if (selectedIndex >= 0 && filteredItems[selectedIndex]) {
+            e.preventDefault();
+            selectItem(filteredItems[selectedIndex], true);
+          }
+          return;
+        }
+      }
+
+      // Dropdown is closed or has no results - handle navigation
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        if (showDropdown && filteredItems.length > 0) {
-          setSelectedIndex(prev => (prev < filteredItems.length - 1 ? prev + 1 : 0));
-        } else if (!showDropdown && tempValue.trim()) {
-          // Re-trigger search if dropdown was closed
-          handleInputChange({ target: { value: tempValue } });
-        }
+        // Open dropdown with all items when pressing Down Arrow
+        openDropdown();
       } else if (e.key === 'ArrowUp') {
+        // Up Arrow when dropdown closed - do nothing (stay in cell)
         e.preventDefault();
-        if (showDropdown && filteredItems.length > 0) {
-          setSelectedIndex(prev => (prev > 0 ? prev - 1 : filteredItems.length - 1));
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        // Right Arrow - move to next column (Qty)
+        setEditingCell(`${itemId}-quantity`);
+      } else if (e.key === 'ArrowLeft') {
+        // Left Arrow in description column - act as Escape (close dropdown if open)
+        if (showDropdown) {
+          e.preventDefault();
+          closeDropdown();
+          inputRef.current?.focus();
         }
+        // Don't navigate to previous column from description
       } else if (e.key === 'Enter') {
         e.preventDefault();
         if (showDropdown && selectedIndex >= 0 && filteredItems[selectedIndex]) {
@@ -847,10 +1015,14 @@ export default function SalesInvoicePage() {
           }
         }
       } else if (e.key === 'Escape') {
-        setTempValue(value);
-        setShowDropdown(false);
-        setFilteredItems([]);
-        setEditingCell(null);
+        e.preventDefault();
+        if (showDropdown) {
+          closeDropdown();
+          inputRef.current?.focus();
+        } else {
+          setTempValue(value);
+          setEditingCell(null);
+        }
       }
     };
 
@@ -883,47 +1055,46 @@ export default function SalesInvoicePage() {
             onFocus={(e) => {
               e.target.select();
               lastFocusedCellRef.current = `${itemId}-description`;
-              // Show dropdown with all sellable items if field is empty
-              if (!tempValue.trim() && items.length > 0) {
-                const sellableItems = items.filter(item =>
-                  !item.is_raw_material && // Exclude raw materials
-                  (item.is_finished_good || item.is_purchased) // Include finished goods or purchasable items
-                ).slice(0, 10);
-                setFilteredItems(sellableItems);
-                setShowDropdown(sellableItems.length > 0);
-                setSelectedIndex(sellableItems.length > 0 ? 0 : -1);
-              }
+              // Do NOT open dropdown on focus - only on typing or Down Arrow
             }}
             autoFocus
             className="editable-input"
             placeholder="Type to search items..."
           />
-          {showDropdown && filteredItems.length > 0 && (
+          {showDropdown && (
             <div className="item-dropdown">
-              {filteredItems.map((item, index) => (
-                <div
-                  key={item.id}
-                  className={`item-dropdown-option ${index === selectedIndex ? 'selected' : ''}`}
-                  onMouseDown={(e) => {
-                    e.preventDefault(); // Prevent blur from firing
-                    selectItem(item, true);
-                  }}
-                  onMouseEnter={() => setSelectedIndex(index)}
-                >
-                  <div className="item-dropdown-main">
-                    <span className="item-dropdown-name">{item.item_name}</span>
-                    <span className="item-dropdown-code">{item.item_code}</span>
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className={`item-dropdown-option ${index === selectedIndex ? 'selected' : ''}`}
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // Prevent blur from firing
+                      selectItem(item, true);
+                    }}
+                    onMouseEnter={() => setSelectedIndex(index)}
+                  >
+                    <div className="item-dropdown-main">
+                      <span className="item-dropdown-name">{item.item_name}</span>
+                      <span className="item-dropdown-code">{item.item_code}</span>
+                    </div>
+                    <div className="item-dropdown-details">
+                      <span className="item-dropdown-stock">
+                        Stock: {item.current_stock || 0}
+                      </span>
+                      <span className="item-dropdown-price">
+                        {formatCurrency(item.standard_selling_price || 0)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="item-dropdown-details">
-                    <span className="item-dropdown-stock">
-                      Stock: {item.current_stock || 0}
-                    </span>
-                    <span className="item-dropdown-price">
-                      {formatCurrency(item.standard_selling_price || 0)}
-                    </span>
+                ))
+              ) : (
+                tempValue.trim() && (
+                  <div className="item-dropdown-no-results">
+                    No products found matching "{tempValue}"
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           )}
         </div>
@@ -936,8 +1107,16 @@ export default function SalesInvoicePage() {
           setTempValue(value || '');
           setEditingCell(`${itemId}-description`);
         }}
-        onFocus={() => { lastFocusedCellRef.current = `${itemId}-description`; }}
+        onFocus={() => {
+          lastFocusedCellRef.current = `${itemId}-description`;
+          // Auto-enter edit mode when focused
+          setTempValue(value || '');
+          setEditingCell(`${itemId}-description`);
+        }}
         onKeyDown={(e) => {
+          const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
+          const isLastItem = currentItemIndex === invoice.items.length - 1;
+          
           const focusTargetCell = (targetItemId, targetField) => {
             setTimeout(() => {
               const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
@@ -951,14 +1130,12 @@ export default function SalesInvoicePage() {
             setEditingCell(`${itemId}-description`);
           } else if (e.key === 'ArrowDown') {
             e.preventDefault();
-            const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
             if (currentItemIndex < invoice.items.length - 1) {
               const nextItemId = invoice.items[currentItemIndex + 1].id;
               focusTargetCell(nextItemId, 'description');
             }
           } else if (e.key === 'ArrowUp') {
             e.preventDefault();
-            const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
             if (currentItemIndex > 0) {
               const prevItemId = invoice.items[currentItemIndex - 1].id;
               focusTargetCell(prevItemId, 'description');
@@ -968,9 +1145,16 @@ export default function SalesInvoicePage() {
             const nextField = getNextField('description');
             if (nextField) {
               focusTargetCell(itemId, nextField);
+            } else if (currentItemIndex < invoice.items.length - 1) {
+              const nextItemId = invoice.items[currentItemIndex + 1].id;
+              focusTargetCell(nextItemId, 'description');
             }
           } else if (e.key === 'ArrowLeft') {
             e.preventDefault();
+            if (currentItemIndex > 0) {
+              const prevItemId = invoice.items[currentItemIndex - 1].id;
+              focusTargetCell(prevItemId, 'tax');
+            }
           } else if (e.key === 'Tab') {
             e.preventDefault();
             const nextField = getNextField('description');
@@ -1047,14 +1231,18 @@ export default function SalesInvoicePage() {
         e.preventDefault();
         moveToCell(1, 0);
       } else if (e.key === 'ArrowLeft') {
-        const atStart = type === 'number' || e.target.selectionStart === 0;
-        if (atStart) {
+        // For number fields, always navigate left
+        // For text fields, only navigate when cursor is at start
+        const shouldNavigate = type === 'number' || e.target.selectionStart === 0;
+        if (shouldNavigate) {
           e.preventDefault();
           moveToCell(0, -1);
         }
       } else if (e.key === 'ArrowRight') {
-        const atEnd = type === 'number' || e.target.selectionStart === e.target.value.length;
-        if (atEnd) {
+        // For number fields, always navigate right
+        // For text fields, only navigate when cursor is at end
+        const shouldNavigate = type === 'number' || e.target.selectionStart === e.target.value.length;
+        if (shouldNavigate) {
           e.preventDefault();
           moveToCell(0, 1);
         }
@@ -1106,7 +1294,12 @@ export default function SalesInvoicePage() {
           setTempValue(value);
           setEditingCell(`${itemId}-${field}`);
         }}
-        onFocus={() => { lastFocusedCellRef.current = `${itemId}-${field}`; }}
+        onFocus={() => {
+          lastFocusedCellRef.current = `${itemId}-${field}`;
+          // Auto-enter edit mode when focused
+          setTempValue(value);
+          setEditingCell(`${itemId}-${field}`);
+        }}
         onKeyDown={(e) => {
           const fieldOrder = invoice.discountScope === 'item'
             ? ['description', 'quantity', 'rate', 'discountValue', 'tax']
@@ -1462,15 +1655,15 @@ export default function SalesInvoicePage() {
               <thead>
                 <tr>
                   <th className="text-center serial-col">#</th>
-                  <th className="text-left">Description</th>
-                  <th className="text-right">Quantity</th>
-                  <th className="text-right">Rate</th>
+                  <th className="text-left description-col">Description</th>
+                  <th className="text-right quantity-col">Quantity</th>
+                  <th className="text-right rate-col">Rate</th>
                   {invoice.discountScope === 'item' && (
-                    <th className="text-right">Discount</th>
+                    <th className="text-right discount-col">Discount</th>
                     )}
-                  <th className="text-right">Tax %</th>
-                  <th className="text-right">Amount</th>
-                  <th></th>
+                  <th className="text-right tax-col">Tax %</th>
+                  <th className="text-right amount-col">Amount</th>
+                  <th className="delete-col"></th>
                 </tr>
               </thead>
               <tbody>

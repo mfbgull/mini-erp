@@ -277,7 +277,7 @@
 .items-table-modern {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .items-table-modern thead {
@@ -340,6 +340,56 @@
   color: #9ca3af;
   font-size: 0.75rem;
   user-select: none;
+}
+
+/* Description Column - Widest column */
+.items-table-modern th.description-col,
+.items-table-modern td.description-col {
+  width: 35%;
+  min-width: 200px;
+}
+
+/* Quantity Column - Narrow */
+.items-table-modern th.quantity-col,
+.items-table-modern td.quantity-col {
+  width: 90px;
+  min-width: 80px;
+}
+
+/* Rate Column - Narrow */
+.items-table-modern th.rate-col,
+.items-table-modern td.rate-col {
+  width: 90px;
+  min-width: 80px;
+}
+
+/* Discount Column - Narrow */
+.items-table-modern th.discount-col,
+.items-table-modern td.discount-col {
+  width: 100px;
+  min-width: 90px;
+}
+
+/* Tax Column - Narrow */
+.items-table-modern th.tax-col,
+.items-table-modern td.tax-col {
+  width: 70px;
+  min-width: 60px;
+}
+
+/* Amount Column - Medium width */
+.items-table-modern th.amount-col,
+.items-table-modern td.amount-col {
+  width: 110px;
+  min-width: 100px;
+}
+
+/* Delete Column - Always narrow */
+.items-table-modern th.delete-col,
+.items-table-modern td.delete-col {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
 }
 
 /* Editable cell focus ring for keyboard navigation */
@@ -515,6 +565,15 @@
   background: linear-gradient(to right, #eff6ff, #dbeafe);
   border-left: 3px solid #2563eb;
   padding-left: calc(0.75rem - 3px);
+}
+
+.item-dropdown-no-results {
+  padding: 0.75rem;
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.875rem;
+  text-align: center;
+  background: #f9fafb;
 }
 
 .item-dropdown-main {

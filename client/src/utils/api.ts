@@ -25,9 +25,8 @@ api.interceptors.response.use(
   (response: AxiosResponse): AxiosResponse => response,
   (error: AxiosError): Promise<never> => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      // Unauthorized or forbidden (expired token) - clear local user data and redirect
-      localStorage.removeItem('user');
-      // No need to clear token from localStorage as it's in a cookie
+      // Unauthorized or forbidden - clear local user data and redirect
+      localStorage.removeItem('miniERP-user');
       
       // Only redirect if not already on login page to prevent loops
       if (!window.location.pathname.includes('/login')) {

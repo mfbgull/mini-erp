@@ -342,6 +342,17 @@ function PermissionsModal({ role, onClose, onSuccess }) {
                       type="checkbox"
                       checked={selectedPermissions.includes(perm.id)}
                       onChange={() => togglePermission(perm.id)}
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        accentColor: '#2563eb',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '4px',
+                        backgroundColor: '#ffffff',
+                        cursor: 'pointer',
+                        opacity: 1,
+                        visibility: 'visible'
+                      }}
                     />
                     <span className="permission-label">
                       <span className="permission-action">{perm.action}</span>

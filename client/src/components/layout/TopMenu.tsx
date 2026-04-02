@@ -36,7 +36,9 @@ const NAV_ITEMS: NavItem[] = [
     icon: <DollarSign size={18} strokeWidth={1.5} />,
     children: [
       { path: '/pos', label: 'POS Terminal' },
-      { path: '/sales', label: 'Sales' },
+      { path: '/sales', label: 'Invoices' },
+      { path: '/quotations', label: 'Quotations' },
+      { path: '/sales-orders', label: 'Sales Orders' },
       { path: '/sales/invoice', label: 'Create Invoice' },
       { path: '/customers', label: 'Customers' }
     ]

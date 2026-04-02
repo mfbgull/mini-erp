@@ -1,18 +1,20 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { AuthUser, AuthRequest } from '../types';
+import logger from '../utils/logger';
 
 if (!process.env.JWT_SECRET) {
   if (process.env.NODE_ENV === 'production') {
     throw new Error('FATAL: JWT_SECRET environment variable is not set. Server cannot start in production mode without a secure secret.');
   }
-  console.warn('WARNING: JWT_SECRET not set. Set JWT_SECRET environment variable before deploying!');
+  if (process.env.NODE_ENV === 'test') {
+    // Allow test environment to use hardcoded test secret
+  } else {
+    throw new Error('FATAL: JWT_SECRET environment variable must be set. Generate one with: openssl rand -base64 64');
+  }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || (() => {
-  if (process.env.NODE_ENV === 'test') return 'test-secret';
-  throw new Error('JWT_SECRET environment variable must be set');
-})();
+const JWT_SECRET = process.env.JWT_SECRET || 'test-secret-for-test-env-only';
 
 export function authenticateToken(
   req: AuthRequest,
@@ -39,7 +41,7 @@ export function authenticateToken(
     req.user = user;
     next();
   } catch (err: any) {
-    console.warn(`[Auth] Token verification failed: ${err.name} from IP ${req.ip}`);
+    logger.warn(`[Auth] Token verification failed: ${err.name} from IP ${req.ip}`);
     
     // In production, return generic error to prevent information leakage
     if (process.env.NODE_ENV === 'production') {
@@ -68,7 +70,7 @@ export function requireAdmin(
   }
 
   if (req.user.role !== 'admin') {
-    console.warn(`[Auth] Admin access denied for user ${req.user.username} (${req.user.id})`);
+    logger.warn(`[Auth] Admin access denied for user ${req.user.username} (${req.user.id})`);
     res.status(403).json({ error: 'Admin access required' });
     return;
   }
