@@ -40,7 +40,7 @@
 .top-menu-logo-text {
   font-size: 18px;
   font-weight: 700;
-  color: var(--primary-600);
+  color: var(--primary);
 }
 
 /* Center Section - Navigation */
@@ -68,11 +68,11 @@
 
 .top-menu-item:hover {
   background: var(--neutral-50);
-  color: var(--primary-600);
+  color: var(--primary);
 }
 
 .top-menu-item.active {
-  background: var(--primary-50);
+  background: var(--primary-light);
   color: var(--primary-700);
 }
 
@@ -99,11 +99,11 @@
 
 .top-menu-dropdown-trigger:hover {
   background: var(--neutral-50);
-  color: var(--primary-600);
+  color: var(--primary);
 }
 
 .top-menu-dropdown.active .top-menu-dropdown-trigger {
-  background: var(--primary-50);
+  background: var(--primary-light);
   color: var(--primary-700);
 }
 
@@ -277,24 +277,24 @@
 
 /* Dark Mode Support */
 html.dark .top-menu {
-  background: var(--neutral-800);
-  border-color: var(--neutral-700);
+  background: #111916;
+  border-color: #2D3D36;
 }
 
 html.dark .top-menu-item,
 html.dark .top-menu-dropdown-trigger {
-  color: var(--neutral-300);
+  color: var(--neutral-400);
 }
 
 html.dark .top-menu-item:hover,
 html.dark .top-menu-dropdown-trigger:hover {
-  background: var(--neutral-700);
+  background: #1A2820;
   color: var(--primary-400);
 }
 
 html.dark .top-menu-item.active,
 html.dark .top-menu-dropdown.active .top-menu-dropdown-trigger {
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(16, 185, 129, 0.15);
   color: var(--primary-400);
 }
 
@@ -360,4 +360,48 @@ html.dark .shortcut-hint {
 
 .top-menu-help-btn:hover {
   background: var(--neutral-100);
+}
+
+/* Responsive breakpoints */
+
+/* Desktop: ≥1200px - show 6 items + More */
+@media (min-width: 1200px) {
+  .top-menu-nav > :nth-child(n+8) {
+    display: none !important;
+  }
+}
+
+/* Laptop: 900px - 1199px - show top 4 items (Dashboard, Inventory, Sales, Reports) */
+@media (max-width: 1199px) and (min-width: 900px) {
+  .top-menu-nav > :nth-child(n+5) {
+    display: none !important;
+  }
+}
+
+/* Tablet: < 900px - show Dashboard and Sales only */
+@media (max-width: 899px) {
+  .top-menu-nav > :nth-child(n+3) {
+    display: none !important;
+  }
+  
+  .shortcut-hint {
+    display: none;
+  }
+  
+  .top-menu-item,
+  .top-menu-dropdown-trigger {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .top-menu-logo-text {
+    display: none;
+  }
+}
+
+/* Ensure "More" dropdown always appears when needed */
+@media (max-width: 1199px) {
+  .top-menu-nav > :last-child {
+    display: flex !important;
+  }
 }
