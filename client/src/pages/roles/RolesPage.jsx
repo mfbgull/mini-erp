@@ -9,7 +9,7 @@ import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import CompactRoleCard from '../../components/common/CompactRoleCard';
-import { useMobileDetection } from '../../utils/mobileDetection';
+import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
 
 import './RolesPage.css';
