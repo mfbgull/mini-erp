@@ -43,12 +43,6 @@
      PAGE HEADER & HEADINGS
      ============================================ */
   
-  .page-header {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: var(--space-md) !important;
-    margin-bottom: var(--space-md) !important;
-  }
   
   .page-header h1 {
     font-size: 24px !important;
@@ -68,9 +62,9 @@
   }
   
   /* ============================================
-     SIDEBAR & NAVIGATION
-     ============================================ */
-  
+      SIDEBAR & NAVIGATION
+      ============================================ */
+
   .sidebar {
     position: fixed !important;
     top: 0 !important;
@@ -80,8 +74,9 @@
     flex-direction: row !important;
     z-index: 1000 !important;
     box-shadow: var(--shadow-md) !important;
+    background: var(--card-bg) !important;
   }
-  
+
   .sidebar-menu {
     display: none !important;
     position: absolute !important;
@@ -90,11 +85,12 @@
     width: 100% !important;
     max-height: calc(100vh - 60px) !important;
     overflow-y: auto !important;
-    background: var(--neutral-100) !important;
+    background: var(--card-bg) !important;
     box-shadow: var(--shadow-md) !important;
   }
-  
-  .sidebar-menu.open {
+
+  .sidebar-menu.open,
+  body.sidebar-open .sidebar-menu {
     display: block !important;
   }
   

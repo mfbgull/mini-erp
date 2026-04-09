@@ -140,7 +140,7 @@
     min-height: 0 !important;
     overflow-y: auto !important;
     padding: var(--space-md) !important;
-    background: transparent !important;
+    background: var(--card-bg) !important;
   }
   
   /* Mobile sidebar footer */

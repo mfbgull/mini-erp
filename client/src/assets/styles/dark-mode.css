@@ -196,19 +196,32 @@ html.dark .ag-theme-quartz .ag-root-wrapper {
 
 /* Sidebar */
 html.dark .sidebar {
-  background-color: #1F2937 !important;
-  border-color: #374151 !important;
+  background-color: #111916 !important;
+  border-color: #2D3D36 !important;
 }
 
 html.dark .nav-item,
 html.dark .nav-link {
-  color: #D1D5DB !important;
+  color: var(--neutral-400) !important;
 }
 
 html.dark .nav-item.active,
 html.dark .nav-link.active {
-  background-color: #22D3EE !important;
-  color: #0F172A !important;
+  background-color: var(--primary-light) !important;
+  color: var(--primary-400) !important;
+}
+
+/* Mobile sidebar menu */
+@media (max-width: 768px) {
+  html.dark .sidebar,
+  html.dark .sidebar.mobile-open {
+    background-color: #111916 !important;
+  }
+
+  html.dark .sidebar-menu,
+  html.dark .sidebar.mobile-open .sidebar-menu {
+    background-color: #111916 !important;
+  }
 }
 
 /* Dropdowns */
