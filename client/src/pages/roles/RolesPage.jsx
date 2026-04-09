@@ -135,12 +135,15 @@ export default function RolesPage() {
         </div>
       ) : isMobile ? (
         <>
-          <CompactRoleCard
-            roles={roles}
-            onEdit={(role) => { setEditingRole(role); setIsModalOpen(true); }}
-            onDelete={handleDeleteRole}
-            onEditPermissions={handleEditPermissions}
-          />
+          {roles.map((role) => (
+            <CompactRoleCard
+              key={role.id}
+              role={role}
+              onEdit={(r) => { setEditingRole(r); setIsModalOpen(true); }}
+              onDelete={handleDeleteRole}
+              onEditPermissions={handleEditPermissions}
+            />
+          ))}
           <div className="mobile-action-bar">
             <Button variant="primary" onClick={() => { setEditingRole(null); setIsModalOpen(true); }}>
               + New Role
