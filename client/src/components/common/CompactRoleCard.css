@@ -1,6 +1,12 @@
 /* Compact Role Card Styles */
 .compact-role-card {
   margin-bottom: var(--space-md);
+  overflow: visible !important;
+}
+
+.compact-role-card .card,
+.compact-role-card .card-body {
+  overflow: visible !important;
 }
 
 .role-info-section {
@@ -9,6 +15,7 @@
   align-items: flex-start;
   width: 100%;
   gap: var(--space-md);
+  overflow: visible;
 }
 
 .role-header {
