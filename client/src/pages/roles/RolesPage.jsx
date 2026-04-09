@@ -8,6 +8,8 @@ import toast from 'react-hot-toast';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
+import CompactRoleCard from '../../components/common/CompactRoleCard';
+import { useMobileDetection } from '../../utils/mobileDetection';
 import api from '../../utils/api';
 
 import './RolesPage.css';
@@ -21,6 +23,7 @@ export default function RolesPage() {
   const [selectedRole, setSelectedRole] = useState(null);
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const queryClient = useQueryClient();
+  const { isMobile } = useMobileDetection();
 
   const { data: roles = [], isLoading } = useQuery({
     queryKey: ['roles'],
@@ -115,23 +118,53 @@ export default function RolesPage() {
           <p className="page-subtitle">Manage user roles and access permissions</p>
         </div>
         <div className="action-right">
-          <Button variant="primary" onClick={() => { setEditingRole(null); setIsModalOpen(true); }}>
+          <Button variant="primary" onClick={() => { setEditingRole(null); setIsModalOpen(true); }} className="btn-compact">
             <Plus size={18} />
             Create Role
           </Button>
         </div>
       </div>
 
-      <div className="ag-theme-quartz roles-grid">
-        <AgGridReact
-          rowData={roles}
-          columnDefs={columnDefs}
-          defaultColDef={{ resizable: true, sortable: true, filter: true }}
-          loading={isLoading}
-          overlayLoadingTemplate='<div class="ag-overlay-loading-center">Loading roles...</div>'
-          overlayNoRowsTemplate='<div class="ag-overlay-no-rows-center">No roles found</div>'
-        />
-      </div>
+      {isLoading ? (
+        <div className="loading-state">Loading roles...</div>
+      ) : roles.length === 0 ? (
+        <div className="no-results">
+          <Shield className="no-results-icon" size={48} />
+          <h3>No roles found</h3>
+          <p>Create your first role to get started.</p>
+        </div>
+      ) : isMobile ? (
+        <>
+          <CompactRoleCard
+            roles={roles}
+            onEdit={(role) => { setEditingRole(role); setIsModalOpen(true); }}
+            onDelete={handleDeleteRole}
+            onEditPermissions={handleEditPermissions}
+          />
+          <div className="mobile-action-bar">
+            <Button variant="primary" onClick={() => { setEditingRole(null); setIsModalOpen(true); }}>
+              + New Role
+            </Button>
+          </div>
+        </>
+      ) : (
+        <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>
+          <AgGridReact
+            rowData={roles}
+            columnDefs={columnDefs}
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true
+            }}
+            pagination={true}
+            paginationPageSize={15}
+            paginationPageSizeSelector={[10, 15, 25, 50]}
+            rowSelection={{ mode: 'singleRow' }}
+            loading={isLoading}
+          />
+        </div>
+      )}
 
       {isModalOpen && (
         <RoleFormModal
