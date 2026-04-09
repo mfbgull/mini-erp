@@ -1,4 +1,154 @@
 /* ============================================
+   SIDEBAR BASE STYLES (Desktop)
+   ============================================ */
+
+/* Desktop sidebar */
+.sidebar {
+  width: var(--sidebar-width, 260px);
+  height: 100vh;
+  background: var(--card-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--transition-normal);
+}
+
+.sidebar-logo {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+}
+
+.sidebar-logo-image {
+  height: 40px;
+  display: block;
+  margin: 0 auto;
+}
+
+.sidebar-menu {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.nav-section {
+  margin-bottom: var(--space-2);
+}
+
+.nav-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  transition: all var(--transition-fast);
+}
+
+.nav-item:hover {
+  background: var(--hover-bg);
+  color: var(--primary);
+}
+
+.nav-item.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.nav-children {
+  padding-left: var(--space-4);
+  display: none;
+}
+
+.nav-section.dropdown-active .nav-children {
+  display: block;
+}
+
+.nav-sub-item {
+  font-size: 13px;
+  padding: var(--space-2) var(--space-3);
+}
+
+.sidebar-footer {
+  padding: var(--space-3);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-2);
+  margin-top: var(--space-2);
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--error);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.logout-btn:hover {
+  background: var(--error-light);
+  border-color: var(--error);
+}
+
+/* ============================================
    MOBILE SIDEBAR STYLES (Hamburger Menu)
    ============================================ */
 
