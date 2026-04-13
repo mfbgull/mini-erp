@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, RefObject } from 'react';
 
 import '../../styles/components/form.css';
 import SearchableSelect from './SearchableSelect';
@@ -24,6 +24,7 @@ interface FormInputProps {
   tooltip?: string;
   step?: string;
   className?: string;
+  inputRef?: RefObject<HTMLInputElement>;
 }
 
 export default function FormInput({
@@ -39,7 +40,8 @@ export default function FormInput({
   rows = 3,
   tooltip,
   step,
-  className
+  className,
+  inputRef
 }: FormInputProps) {
   const inputId = `input-${name || 'default'}`;
 
@@ -124,6 +126,7 @@ export default function FormInput({
         </div>
       ) : (
         <input
+          ref={inputRef}
           id={inputId}
           type={type}
           name={name}

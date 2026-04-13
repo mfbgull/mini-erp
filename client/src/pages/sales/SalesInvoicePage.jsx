@@ -42,7 +42,7 @@ const padItemsToMinimum = (items, min = 10) => {
       id: now + i + 1000,
       item_id: '',
       description: '',
-      quantity: 1,
+      quantity: 0,
       rate: 0,
       tax: 0,
       discount: { type: 'flat', value: 0 }
@@ -134,6 +134,8 @@ export default function SalesInvoicePage() {
   const [editingCell, setEditingCell] = useState(null);
   const lastFocusedCellRef = useRef(null);
   const tableContainerRef = useRef(null);
+  const pendingFocusRef = useRef(null);
+  const paymentAmountInputRef = useRef(null);
   const [existingPayments, setExistingPayments] = useState([]);
   const [showNewPaymentForm, setShowNewPaymentForm] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
@@ -431,11 +433,8 @@ export default function SalesInvoicePage() {
       const timer = setTimeout(() => {
         const newCell = document.querySelector(`[data-cell-id="${newItemId}-description"]`);
         if (newCell) {
-          // Set editing cell to enter edit mode
           setEditingCell(`${newItemId}-description`);
-          // Focus the cell
           newCell.focus();
-          // Also focus the input inside after it renders
           setTimeout(() => {
             const input = newCell.querySelector('input');
             if (input) {
@@ -444,12 +443,47 @@ export default function SalesInvoicePage() {
             }
           }, 50);
         }
-        // Clear the newItemId after focusing
-        setNewItemId(null);
-      }, 100);
+      }, 150);
       return () => clearTimeout(timer);
     }
   }, [newItemId]);
+
+  // Prevent focus loss when items array changes
+  useEffect(() => {
+    if (pendingFocusRef.current) {
+      const itemId = pendingFocusRef.current;
+      pendingFocusRef.current = null;
+      
+      const timer = setTimeout(() => {
+        const cell = document.querySelector(`[data-cell-id="${itemId}-description"]`);
+        if (cell) {
+          setEditingCell(`${itemId}-description`);
+          cell.focus();
+          setTimeout(() => {
+            const input = cell.querySelector('input');
+            if (input) {
+              input.focus();
+              input.select();
+            }
+          }, 50);
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [invoice.items]);
+
+  // Global keyboard handler for Shift+Enter to focus payment amount field
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Enter' && e.shiftKey) {
+        e.preventDefault();
+        paymentAmountInputRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -706,7 +740,7 @@ export default function SalesInvoicePage() {
       items: [...invoice.items, newItem]
     });
     
-    // Set the new item ID to trigger auto-focus effect
+    pendingFocusRef.current = newItemId;
     setNewItemId(newItemId);
     
     return newItemId;
@@ -964,13 +998,35 @@ export default function SalesInvoicePage() {
       }
 
       // Dropdown is closed or has no results - handle navigation
-      if (e.key === 'ArrowDown') {
+      if (e.ctrlKey && e.key === 'ArrowDown') {
+        e.preventDefault();
+        // Move to next row in description column
+        handleSave();
+        const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
+        if (currentItemIndex < invoice.items.length - 1) {
+          const nextItemId = invoice.items[currentItemIndex + 1].id;
+          setTimeout(() => setEditingCell(`${nextItemId}-description`), 0);
+        } else if (currentItemIndex === invoice.items.length - 1) {
+          // At last row - add new item and navigate to it
+          const newItemId = addNewItem();
+          setNewItemId(newItemId);
+        }
+      } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         // Open dropdown with all items when pressing Down Arrow
         openDropdown();
       } else if (e.key === 'ArrowUp') {
-        // Up Arrow when dropdown closed - do nothing (stay in cell)
         e.preventDefault();
+        // Move to previous row in description column
+        const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
+        if (currentItemIndex > 0) {
+          const prevItemId = invoice.items[currentItemIndex - 1].id;
+          handleSave();
+          setTimeout(() => setEditingCell(`${prevItemId}-description`), 0);
+        } else if (currentItemIndex === 0) {
+          // Already at first row - just stay in current cell
+          handleSave();
+        }
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         // Right Arrow - move to next column (Qty)
@@ -992,7 +1048,7 @@ export default function SalesInvoicePage() {
           // Move to next row or field
           if (isLastField('description') && isLastItem) {
             const newItemId = addNewItem();
-            setTimeout(() => setEditingCell(`${newItemId}-description`), 50);
+            setNewItemId(newItemId);
           } else {
             const nextField = getNextField('description');
             if (nextField) {
@@ -1011,7 +1067,7 @@ export default function SalesInvoicePage() {
             setTimeout(() => setEditingCell(`${itemId}-${nextField}`), 0);
           } else if (isLastItem) {
             const newItemId = addNewItem();
-            setTimeout(() => setEditingCell(`${newItemId}-description`), 50);
+            setNewItemId(newItemId);
           }
         }
       } else if (e.key === 'Escape') {
@@ -1043,6 +1099,15 @@ export default function SalesInvoicePage() {
     };
 
     if (isEditing) {
+      const inputElement = document.querySelector(`[data-cell-id="${itemId}-description"] input`);
+      const inputRect = inputElement?.getBoundingClientRect();
+      const dropdownStyle = inputRect ? {
+        position: 'fixed',
+        top: `${inputRect.bottom + 2}px`,
+        left: `${inputRect.left}px`,
+        minWidth: `${inputRect.width}px`
+      } : {};
+
       return (
         <div className="searchable-cell-container">
           <input
@@ -1062,7 +1127,7 @@ export default function SalesInvoicePage() {
             placeholder="Type to search items..."
           />
           {showDropdown && (
-            <div className="item-dropdown">
+            <div className="item-dropdown" style={dropdownStyle}>
               {filteredItems.length > 0 ? (
                 filteredItems.map((item, index) => (
                   <div
@@ -1162,11 +1227,7 @@ export default function SalesInvoicePage() {
               focusTargetCell(itemId, nextField);
             } else if (isLastItem) {
               const newItemId = addNewItem();
-              setTimeout(() => {
-                setEditingCell(`${newItemId}-description`);
-                const el = document.querySelector(`[data-cell-id="${newItemId}-description"]`);
-                if (el) el.focus();
-              }, 50);
+              setNewItemId(newItemId);
             }
           }
         }}
@@ -1209,7 +1270,7 @@ export default function SalesInvoicePage() {
           // Add new row when going down past last row
           handleSave();
           const newItemId = addNewItem();
-          setTimeout(() => setEditingCell(`${newItemId}-description`), 50);
+          setNewItemId(newItemId);
         }
       }
 
@@ -1224,7 +1285,34 @@ export default function SalesInvoicePage() {
     };
 
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowUp') {
+      // Ctrl+ArrowUp: Increment value
+      if (e.ctrlKey && e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (['quantity', 'rate', 'tax', 'discountValue'].includes(field)) {
+          let newValue = (parseFloat(tempValue) || 0) + 1;
+          // Tax % should not exceed 100
+          if (field === 'tax' && newValue > 100) newValue = 100;
+          // Quantity should not go below 0
+          if (field === 'quantity' && newValue < 0) newValue = 0;
+          setTempValue(newValue);
+        }
+      }
+      // Ctrl+ArrowDown: Decrement value
+      else if (e.ctrlKey && e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (['quantity', 'rate', 'tax', 'discountValue'].includes(field)) {
+          const currentVal = parseFloat(tempValue) || 0;
+          let newValue = currentVal - 1;
+          // Tax % should not go below 0
+          if (field === 'tax' && newValue < 0) newValue = 0;
+          // Quantity should not go below 0
+          if (field === 'quantity' && newValue < 0) newValue = 0;
+          // Rate and discount should not go below 0
+          if ((field === 'rate' || field === 'discountValue') && newValue < 0) newValue = 0;
+          setTempValue(newValue);
+        }
+      }
+      else if (e.key === 'ArrowUp') {
         e.preventDefault();
         moveToCell(-1, 0);
       } else if (e.key === 'ArrowDown') {
@@ -1248,10 +1336,16 @@ export default function SalesInvoicePage() {
         }
       } else if (e.key === 'Enter') {
         e.preventDefault();
+        // Shift+Enter: Focus payment amount field
+        if (e.shiftKey) {
+          handleSave();
+          paymentAmountInputRef.current?.focus();
+          return;
+        }
         handleSave();
         if (isLastField(field) && isLastItem) {
           const newItemId = addNewItem();
-          setTimeout(() => setEditingCell(`${newItemId}-description`), 50);
+          setNewItemId(newItemId);
         } else {
           moveToCell(1, 0); // Move down on Enter
         }
@@ -1263,7 +1357,7 @@ export default function SalesInvoicePage() {
           setEditingCell(`${itemId}-${nextField}`);
         } else if (isLastItem) {
           const newItemId = addNewItem();
-          setTimeout(() => setEditingCell(`${newItemId}-description`), 50);
+          setNewItemId(newItemId);
         } else {
           moveToCell(1, 0);
         }
@@ -1355,11 +1449,7 @@ export default function SalesInvoicePage() {
               focusTargetCell(nextItemId, 'description');
             } else {
               const newItemId = addNewItem();
-              setTimeout(() => {
-                setEditingCell(`${newItemId}-description`);
-                const el = document.querySelector(`[data-cell-id="${newItemId}-description"]`);
-                if (el) el.focus();
-              }, 50);
+              setNewItemId(newItemId);
             }
           }
         }}
@@ -1460,60 +1550,12 @@ export default function SalesInvoicePage() {
 
   return (
     <div className="sales-invoice-page-modern">
-      {/* Action Bar */}
-      <div className="action-bar-modern">
-        <div className="action-left">
-          <select
-            value={invoiceId ? (invoice.status || 'Unpaid') : getExpectedStatus()}
-            onChange={(e) => setInvoice({ ...invoice, status: e.target.value })}
-            className={`status-select-modern ${getStatusColor(invoiceId ? (invoice.status || 'Unpaid') : getExpectedStatus())}`}
-            disabled={!invoiceId} // Disable for new invoices
-            title={invoiceId ? 'Change invoice status' : 'Status determined automatically based on payment'}
-          >
-            <option value="Draft">Draft</option>
-            <option value="Sent">Sent</option>
-            <option value="Unpaid">Unpaid</option>
-            <option value="Partially Paid">Partially Paid</option>
-            <option value="Paid">Paid</option>
-            <option value="Overdue">Overdue</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-        </div>
-
-        <div className="action-right">
-          <Button variant="secondary" onClick={() => navigate('/sales')}>
-            Cancel
-          </Button>
-          {invoice.customer_id && (
-            <button
-              className="action-btn-secondary"
-              onClick={() => navigate(`/customers/${invoice.customer_id}`)}
-            >
-              <span>View Customer</span>
-            </button>
-          )}
-          {invoiceId && (
-            <button
-              className="action-btn-secondary"
-              onClick={() => navigate(`/sales/invoice/${invoiceId}/view`)}
-            >
-              <Eye className="action-icon" />
-              <span>Preview</span>
-            </button>
-          )}
-          <Button variant="primary" onClick={handleSubmit} loading={mutation.isPending}>
-            <Send className="action-icon" />
-            {invoiceId ? 'Update' : 'Create'} Invoice
-          </Button>
-        </div>
-      </div>
-
       {/* Invoice Document */}
       <div className="invoice-document-modern">
-        {/* Compact Header */}
+        {/* Invoice Header - Clean Layout */}
         <div className="invoice-header-modern">
           <div className="header-grid-modern">
-            {/* Invoice Title & Number - 25% */}
+            {/* Invoice Title & Number */}
             <div className="header-section">
               <h1 className="invoice-title-modern">INVOICE</h1>
               <div className="invoice-number-modern">
@@ -1522,583 +1564,547 @@ export default function SalesInvoicePage() {
               </div>
             </div>
 
-            {/* From - 25% */}
-            <div className="header-section">
-              <div className="section-label-modern">FROM</div>
-              <div className="company-name-modern">{invoice.company.name}</div>
-              <div className="contact-info-modern">
-                <div>{invoice.company.email}</div>
-                <div>{invoice.company.phone}</div>
+            {/* Bill To + Dates Row */}
+            <div className="header-section customer-section" style={{ display: 'flex', flexDirection: 'row', gap: '0.75rem', alignItems: 'flex-start', flex: 1 }}>
+              {/* Customer Field */}
+              <div style={{ flex: 1 }}>
+                <div className="section-label-modern">BILL TO</div>
+                <FormInput
+                  name="customer_name"
+                  type="searchable-select"
+                  value={invoice.customer_name}
+                  onChange={(e) => {
+                    const customer = Array.isArray(customers) ? customers.find(c => c.customer_name === e.target.value) : null;
+                    if (customer) handleCustomerSelect(customer);
+                  }}
+                  options={Array.isArray(customers)
+                    ? customers.map(c => ({
+                        value: c.customer_name,
+                        label: `${c.customer_name}${c.customer_code ? ` (${c.customer_code})` : ''}`
+                      }))
+                    : []
+                  }
+                  placeholder={customersLoading ? "Loading..." : customersError ? "Error" : "Select customer..."}
+                  required
+                  small
+                  disabled={customersLoading || !!customersError}
+                />
+                {errors.customer_id && (
+                  <div className="field-error">{errors.customer_id}</div>
+                )}
+                {invoice.customer_id && (
+                  <div className="customer-balance-inline">
+                    Balance: <span className={`balance-amount ${invoice.customer_current_balance > 0 ? 'balance-positive' : 'balance-zero'}`}>{formatCurrency(Math.abs(invoice.customer_current_balance || 0))}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Dates - Inline with Customer */}
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                <div className="date-field">
+                  <label className="date-label">Invoice Date</label>
+                  <input
+                    type="date"
+                    className="date-input"
+                    value={invoice.invoice_date}
+                    onChange={(e) => setInvoice({ ...invoice, invoice_date: e.target.value })}
+                  />
+                </div>
+                <div className="date-field">
+                  <label className="date-label">Due Date</label>
+                  <input
+                    type="date"
+                    className="date-input"
+                    value={invoice.due_date}
+                    onChange={(e) => setInvoice({ ...invoice, due_date: e.target.value })}
+                  />
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Bill To - 25% */}
-            <div className="header-section">
-              <div className="section-label-modern">BILL TO</div>
-              <FormInput
-                name="customer_name"
-                type="searchable-select"
-                value={invoice.customer_name}
-                onChange={(e) => {
-                  const customer = Array.isArray(customers) ? customers.find(c => c.customer_name === e.target.value) : null;
-                  if (customer) handleCustomerSelect(customer);
+          <div className="header-actions">
+            <Button variant="secondary" onClick={() => navigate('/sales')}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSubmit} loading={mutation.isPending}>
+              <Send className="action-icon" />
+              {invoiceId ? 'Update' : 'Create'} Invoice
+            </Button>
+          </div>
+        </div>
+
+        {/* Two-Column Layout: Items + Payment */}
+        <div className="invoice-main-split">
+          {/* Left Column - Items and Totals */}
+          <div className="invoice-left-column">
+            {/* Items Header */}
+            <div className="items-header-modern">
+              <div className="items-header-left">
+                <h3 className="items-title-modern">Line Items</h3>
+                <div className="discount-scope-controls-modern">
+                  <span className="discount-label-modern">Discount:</span>
+                  <label className="discount-scope-option-modern">
+                    <input
+                      type="radio"
+                      name="discountScope"
+                      value="invoice"
+                      checked={invoice.discountScope === 'invoice'}
+                      onChange={(e) => setInvoice({ ...invoice, discountScope: e.target.value })}
+                    />
+                    <span>Invoice Level</span>
+                  </label>
+                  <label className="discount-scope-option-modern">
+                    <input
+                      type="radio"
+                      name="discountScope"
+                      value="item"
+                      checked={invoice.discountScope === 'item'}
+                      onChange={(e) => setInvoice({ ...invoice, discountScope: e.target.value })}
+                    />
+                    <span>Per Item</span>
+                  </label>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  const newItemId = addNewItem();
+                  setNewItemId(newItemId);
                 }}
-                options={Array.isArray(customers)
-                  ? customers.map(c => ({
-                      value: c.customer_name,
-                      label: `${c.customer_name}${c.customer_code ? ` (${c.customer_code})` : ''}`
-                    }))
-                  : []
-                }
-                placeholder={customersLoading ? "Loading customers..." : customersError ? "Error loading customers" : "Select customer..."}
-                required
-                small
-                disabled={customersLoading || !!customersError}
-              />
-              {errors.customer_id && (
-                <div className="field-error">{errors.customer_id}</div>
-              )}
-              <div className="contact-info-modern">
-                <div>{invoice.customer_email}</div>
-                <div>{invoice.customer_phone}</div>
-              </div>
-
-              {/* Customer Balance Information */}
-              {invoice.customer_id && (
-                <div className="customer-balance-info">
-                  <div className="balance-info-row">
-                    <span className="balance-label">Current Balance:</span>
-                    <span className={`balance-value ${invoice.customer_current_balance > 0 ? 'balance-positive' : 'balance-zero'}`}>
-                      {formatCurrency(Math.abs(invoice.customer_current_balance || 0))}
-                      {invoice.customer_current_balance > 0 && <span className="balance-indicator">(Due)</span>}
-                    </span>
-                  </div>
-                </div>
-              )}
+                className="add-item-btn-modern"
+              >
+                <Plus className="action-icon" />
+                Add Item
+              </button>
             </div>
-
-            {/* Invoice Details - 25% */}
-            <div className="header-section text-right">
-              <div className="invoice-total-modern">{formatCurrency(calculateTotal())}</div>
-              <div className="invoice-meta-modern">
-                <div>
-                  <span className="meta-label">Date: </span>
-                  {new Date(invoice.invoice_date).toLocaleDateString()}
-                </div>
-                <div>
-                  <span className="meta-label">Due: </span>
-                  {new Date(invoice.due_date).toLocaleDateString()}
-                </div>
-                <div className="meta-label">Net 14 Days</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Items Table */}
-        <div className="invoice-body-modern">
-          <div className="items-header-modern">
-            <div className="items-header-left">
-              <h3 className="items-title-modern">Line Items</h3>
-              <div className="discount-scope-controls-modern">
-                <span className="discount-label-modern">Discount:</span>
-                <label className="discount-scope-option-modern">
-                  <input
-                    type="radio"
-                    name="discountScope"
-                    value="invoice"
-                    checked={invoice.discountScope === 'invoice'}
-                    onChange={(e) => setInvoice({ ...invoice, discountScope: e.target.value })}
-                  />
-                  <span>Invoice Level</span>
-                </label>
-                <label className="discount-scope-option-modern">
-                  <input
-                    type="radio"
-                    name="discountScope"
-                    value="item"
-                    checked={invoice.discountScope === 'item'}
-                    onChange={(e) => setInvoice({ ...invoice, discountScope: e.target.value })}
-                  />
-                  <span>Per Item</span>
-                </label>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                const newItemId = addNewItem();
-                setTimeout(() => {
-                  setEditingCell(`${newItemId}-description`);
-                }, 50);
-              }}
-              className="add-item-btn-modern"
-            >
-              <Plus className="action-icon" />
-              Add Item
-            </button>
-          </div>
-          {errors.items && (
-            <div className="field-error items-error">{errors.items}</div>
-          )}
-
-          <div
-            ref={tableContainerRef}
-            className="items-table-container-modern"
-            onMouseEnter={() => {
-              if (lastFocusedCellRef.current) {
-                const el = document.querySelector(`[data-cell-id="${lastFocusedCellRef.current}"]`);
-                if (el) el.focus();
-              }
-            }}
-          >
-            <table className="items-table-modern">
-              <thead>
-                <tr>
-                  <th className="text-center serial-col">#</th>
-                  <th className="text-left description-col">Description</th>
-                  <th className="text-right quantity-col">Quantity</th>
-                  <th className="text-right rate-col">Rate</th>
-                  {invoice.discountScope === 'item' && (
-                    <th className="text-right discount-col">Discount</th>
-                    )}
-                  <th className="text-right tax-col">Tax %</th>
-                  <th className="text-right amount-col">Amount</th>
-                  <th className="delete-col"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoice.items.map((item, index) => (
-                  <tr key={item.id}>
-                    <td className="text-center serial-col">{index + 1}</td>
-                    <td className="invoice-item-cell">
-                      <SearchableDescriptionCell
-                        value={item.description}
-                        itemId={item.id}
-                        isLastItem={index === invoice.items.length - 1}
-                      />
-                    </td>
-                    <td className="text-right invoice-item-cell">
-                      <EditableCell
-                        value={item.quantity}
-                        itemId={item.id}
-                        field="quantity"
-                        type="number"
-                        isLastItem={index === invoice.items.length - 1}
-                      />
-                    </td>
-                    <td className="text-right rate-cell-container invoice-item-cell" data-rate-cell={item.id}>
-                      <EditableCell
-                        value={item.rate.toFixed(2)}
-                        itemId={item.id}
-                        field="rate"
-                        type="number"
-                        isLastItem={index === invoice.items.length - 1}
-                      />
-                    </td>
-                    {invoice.discountScope === 'item' && (
-                      <td className="text-right invoice-item-cell">
-                        <div className="discount-cell-modern">
-                          <select
-                            value={item.discount.type}
-                            onChange={(e) => updateItem(item.id, 'discountType', e.target.value)}
-                            className="discount-type-select-modern"
-                          >
-                            <option value="percentage">%</option>
-                            <option value="flat">{getCurrencySymbol()}</option>
-                          </select>
-                          <EditableCell
-                            value={item.discount.value}
-                            itemId={item.id}
-                            field="discountValue"
-                            type="number"
-                            isLastItem={index === invoice.items.length - 1}
-                          />
-                        </div>
-                      </td>
-                    )}
-                    <td className="text-right invoice-item-cell">
-                      <EditableCell
-                        value={item.tax}
-                        itemId={item.id}
-                        field="tax"
-                        type="number"
-                        isLastItem={index === invoice.items.length - 1}
-                      />
-                    </td>
-                    <td className="text-right amount-cell-modern">
-                      {formatCurrency(calculateItemTotal(item))}
-                    </td>
-                    <td className="text-center invoice-item-cell">
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="remove-btn-modern"
-                      >
-                        <Trash2 className="trash-icon" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Price History Tooltip - with backdrop to prevent focus loss */}
-          {priceHint && priceHint.history && (
-            <div className="price-hint-backdrop" onClick={(e) => {
-              // Only close if clicking on backdrop, not on the tooltip itself
-              if (e.target === e.currentTarget) {
-                setPriceHint(null);
-              }
-            }}>
-              <div className="price-hint-container" onMouseDown={(e) => {
-                // Prevent focus loss when clicking inside the tooltip
-                e.preventDefault();
-              }}>
-                <PriceHistoryHint
-                  history={priceHint.history}
-                  currentPrice={priceHint.currentPrice}
-                  onClose={() => setPriceHint(null)}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Totals */}
-          <div className="totals-section-modern">
-            <div className="totals-breakdown-modern">
-              <div className="total-row-modern">
-                <span>Subtotal:</span>
-                <span className="total-value">{formatCurrency(calculateSubtotal())}</span>
-              </div>
-
-              {/* Discount Section */}
-              {invoice.discountScope === 'invoice' ? (
-                <div className="total-row-modern">
-                  <div className="discount-input-modern">
-                    <span>Discount:</span>
-                    <div className="discount-controls">
-                      <select
-                        value={invoice.discount.type}
-                        onChange={(e) => setInvoice({
-                          ...invoice,
-                          discount: { ...invoice.discount, type: e.target.value }
-                        })}
-                        className="discount-type-select-modern"
-                      >
-                        <option value="percentage">%</option>
-                        <option value="flat">{getCurrencySymbol()}</option>
-                      </select>
-                      <input
-                        type="number"
-                        value={invoice.discount.value}
-                        onChange={(e) => setInvoice({
-                          ...invoice,
-                          discount: { ...invoice.discount, value: Number(e.target.value) || 0 }
-                        })}
-          onFocus={(e) => { e.target.select(); lastFocusedCellRef.current = `${itemId}-${field}`; }}
-                        className="discount-value-input"
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-                  <span className="discount-amount">
-                    -{formatCurrency(calculateDiscount())}
-                  </span>
-                </div>
-              ) : (
-                <div className="total-row-modern">
-                  <span>Discount (Per Item):</span>
-                  <span className="discount-amount">
-                    -{formatCurrency(calculateDiscount())}
-                  </span>
-                </div>
-              )}
-
-              <div className="total-row-modern border-top">
-                <span>Tax:</span>
-                <span className="total-value">{formatCurrency(calculateTax())}</span>
-              </div>
-              <div className="total-row-modern total-final">
-                <span>Total:</span>
-                <span className="total-amount-final">{formatCurrency(calculateTotal())}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Notes & Terms */}
-          <div className="invoice-footer-modern">
-            <div>
-              <label className="footer-label">NOTES</label>
-              <textarea
-                value={invoice.notes}
-                onChange={(e) => setInvoice({ ...invoice, notes: e.target.value })}
-                rows="3"
-                className="footer-textarea"
-              />
-            </div>
-            <div>
-              <label className="footer-label">TERMS & CONDITIONS</label>
-              <textarea
-                value={invoice.terms}
-                onChange={(e) => setInvoice({ ...invoice, terms: e.target.value })}
-                rows="3"
-                className="footer-textarea"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Section */}
-        <div className="payment-section-modern">
-          <div className="payment-header">
-            <h3 className="payment-title">
-              <DollarSign size={20} />
-              Payment Information
-            </h3>
-            {!invoiceId ? (
-              <label className="payment-checkbox">
-                <input
-                  type="checkbox"
-                  checked={invoice.payment.record_payment}
-                  onChange={(e) => setInvoice({
-                    ...invoice,
-                    payment: {
-                      ...invoice.payment,
-                      record_payment: e.target.checked
-                    }
-                  })}
-                />
-                <span>Record payment for this invoice</span>
-              </label>
-            ) : (
-              <div className="payment-summary-header">
-                <span className="payment-summary-item">
-                  Total: <strong>{formatCurrency(invoice.total_amount || 0)}</strong>
-                </span>
-                <span className="payment-summary-item">
-                  Paid: <strong className="text-green">{formatCurrency(invoice.paid_amount || 0)}</strong>
-                </span>
-                <span className="payment-summary-item">
-                  Balance: <strong className={invoice.balance_amount > 0 ? 'text-red' : 'text-green'}>
-                    {formatCurrency(invoice.balance_amount || 0)}
-                  </strong>
-                </span>
-              </div>
+            {errors.items && (
+              <div className="field-error items-error">{errors.items}</div>
             )}
-          </div>
 
-          {/* Existing Payments - Show when editing invoice */}
-          {invoiceId && existingPayments.filter(p => !deletedPayments.includes(p.id)).length > 0 && (
-            <div className="existing-payments">
-              <h4 className="existing-payments-title">
-                <CreditCard size={16} />
-                Payment History
-              </h4>
-              <table className="payments-table">
+            {/* Items Table */}
+            <div
+              ref={tableContainerRef}
+              className="items-table-container-modern"
+              onMouseEnter={() => {
+                if (lastFocusedCellRef.current) {
+                  const el = document.querySelector(`[data-cell-id="${lastFocusedCellRef.current}"]`);
+                  if (el) el.focus();
+                }
+              }}
+            >
+              <table className="items-table-modern">
                 <thead>
                   <tr>
-                    <th>Payment No</th>
-                    <th>Date</th>
-                    <th>Method</th>
-                    <th>Reference</th>
-                    <th className="text-right">Amount</th>
-                    <th className="text-center">Actions</th>
+                    <th className="text-center serial-col">#</th>
+                    <th className="text-left description-col">Description</th>
+                    <th className="text-right quantity-col">Qty</th>
+                    <th className="text-right rate-col">Rate</th>
+                    {invoice.discountScope === 'item' && (
+                      <th className="text-right discount-col">Discount</th>
+                    )}
+                    <th className="text-right tax-col">Tax %</th>
+                    <th className="text-right amount-col">Amount</th>
+                    <th className="delete-col"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {existingPayments.map(payment => (
-                    <tr key={payment.id}>
-                      <td>{payment.payment_no}</td>
-                      <td>{new Date(payment.payment_date).toLocaleDateString()}</td>
-                      <td>{payment.payment_method}</td>
-                      <td>{payment.reference_no || '-'}</td>
-                      <td className="text-right">{formatCurrency(payment.amount)}</td>
-                      <td className="text-center">
-                        <div className="payment-actions">
-                          <button
-                            className="action-btn-small"
-                            onClick={() => handleEditPayment(payment)}
-                            title="Edit Payment"
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                          <button
-                            className="action-btn-small delete"
-                            onClick={() => handleDeletePayment(payment.id)}
-                            title="Delete Payment"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
+                  {invoice.items.map((item, index) => (
+                    <tr key={item.id}>
+                      <td className="text-center serial-col">{index + 1}</td>
+                      <td className="invoice-item-cell">
+                        <SearchableDescriptionCell
+                          value={item.description}
+                          itemId={item.id}
+                          isLastItem={index === invoice.items.length - 1}
+                        />
+                      </td>
+                      <td className="text-right invoice-item-cell">
+                        <EditableCell
+                          value={item.quantity}
+                          itemId={item.id}
+                          field="quantity"
+                          type="number"
+                          isLastItem={index === invoice.items.length - 1}
+                        />
+                      </td>
+                      <td className="text-right rate-cell-container invoice-item-cell" data-rate-cell={item.id}>
+                        <EditableCell
+                          value={item.rate.toFixed(2)}
+                          itemId={item.id}
+                          field="rate"
+                          type="number"
+                          isLastItem={index === invoice.items.length - 1}
+                        />
+                      </td>
+                      {invoice.discountScope === 'item' && (
+                        <td className="text-right invoice-item-cell">
+                          <div className="discount-cell-modern">
+                            <select
+                              value={item.discount.type}
+                              onChange={(e) => updateItem(item.id, 'discountType', e.target.value)}
+                              className="discount-type-select-modern"
+                            >
+                              <option value="percentage">%</option>
+                              <option value="flat">{getCurrencySymbol()}</option>
+                            </select>
+                            <EditableCell
+                              value={item.discount.value}
+                              itemId={item.id}
+                              field="discountValue"
+                              type="number"
+                              isLastItem={index === invoice.items.length - 1}
+                            />
+                          </div>
+                        </td>
+                      )}
+                      <td className="text-right invoice-item-cell">
+                        <EditableCell
+                          value={item.tax}
+                          itemId={item.id}
+                          field="tax"
+                          type="number"
+                          isLastItem={index === invoice.items.length - 1}
+                        />
+                      </td>
+                      <td className="text-right amount-cell-modern">
+                        {formatCurrency(calculateItemTotal(item))}
+                      </td>
+                      <td className="text-center invoice-item-cell">
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          className="remove-btn-modern"
+                          title="Remove item"
+                        >
+                          <Trash2 className="trash-icon" />
+                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          )}
 
-          {/* No payments message for existing invoice */}
-          {invoiceId && existingPayments.filter(p => !deletedPayments.includes(p.id)).length === 0 && (
-            <div className="no-payments-message">
-              <p>No payments recorded for this invoice. Use the form below to add a payment.</p>
-            </div>
-          )}
+            {/* Price History Tooltip */}
+            {priceHint && priceHint.history && (
+              <div className="price-hint-backdrop" onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setPriceHint(null);
+                }
+              }}>
+                <div className="price-hint-container" onMouseDown={(e) => {
+                  e.preventDefault();
+                }}>
+                  <PriceHistoryHint
+                    history={priceHint.history}
+                    currentPrice={priceHint.currentPrice}
+                    onClose={() => setPriceHint(null)}
+                  />
+                </div>
+              </div>
+            )}
 
-          {/* Payment Form - Always visible when editing invoice */}
-          {(!invoiceId && invoice.payment.record_payment) || invoiceId ? (
-            <div className="payment-fields">
-              <div className="payment-row">
-                <FormInput
-                  label="Payment Date"
-                  name="payment_date"
-                  type="date"
-                  value={invoice.payment.payment_date}
-                  onChange={(e) => setInvoice({
-                    ...invoice,
-                    payment: { ...invoice.payment, payment_date: e.target.value }
-                  })}
-                />
+            {/* Totals + Notes & Terms Row */}
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+              {/* Notes & Terms - Left Side */}
+              <div className="invoice-footer-modern" style={{ flex: 1, minWidth: 0 }}>
+                <div>
+                  <label className="footer-label">NOTES</label>
+                  <textarea
+                    value={invoice.notes}
+                    onChange={(e) => setInvoice({ ...invoice, notes: e.target.value })}
+                    rows="3"
+                    className="footer-textarea"
+                    placeholder="Thank you for your business..."
+                  />
+                </div>
+                <div>
+                  <label className="footer-label">TERMS & CONDITIONS</label>
+                  <textarea
+                    value={invoice.terms}
+                    onChange={(e) => setInvoice({ ...invoice, terms: e.target.value })}
+                    rows="3"
+                    className="footer-textarea"
+                    placeholder="Payment terms..."
+                  />
+                </div>
               </div>
 
-              {/* Multi Payment Methods Section */}
-              <div className="multi-payment-section">
-                <div className="multi-payment-header">
-                  <h4>Payment Methods</h4>
-                  <button type="button" className="add-payment-method-btn" onClick={addPaymentMethod}>
-                    + Add Payment Method
-                  </button>
+              {/* Totals Card - Right Side */}
+              <div className="totals-breakdown-modern" style={{ width: '280px', flexShrink: 0 }}>
+                <div className="total-row-modern">
+                  <span>Subtotal:</span>
+                  <span className="total-value">{formatCurrency(calculateSubtotal())}</span>
                 </div>
 
-                {(invoice.paymentMethods || []).map((method, index) => (
-                  <div key={method.id} className="payment-method-row">
-                    <div className="payment-method-grid">
-                      <div className="payment-method-field">
-                        <label>Method</label>
+                {/* Discount Section */}
+                {invoice.discountScope === 'invoice' ? (
+                  <div className="total-row-modern">
+                    <div className="discount-input-modern">
+                      <span>Discount:</span>
+                      <div className="discount-controls">
                         <select
-                          value={method.method}
-                          onChange={(e) => updatePaymentMethod(method.id, 'method', e.target.value)}
-                          className="payment-method-select"
+                          value={invoice.discount.type}
+                          onChange={(e) => setInvoice({
+                            ...invoice,
+                            discount: { ...invoice.discount, type: e.target.value }
+                          })}
+                          className="discount-type-select-modern"
                         >
-                          <option value="Cash">Cash</option>
-                          <option value="Check">Check</option>
-                          <option value="Bank Transfer">Bank Transfer</option>
-                          <option value="Credit Card">Credit Card</option>
-                          <option value="Online Payment">Online Payment</option>
+                          <option value="percentage">%</option>
+                          <option value="flat">{getCurrencySymbol()}</option>
                         </select>
-                      </div>
-
-                      <div className="payment-method-field">
-                        <label>Amount</label>
                         <input
                           type="number"
-                          step="0.01"
-                          value={method.amount}
-                          onChange={(e) => updatePaymentMethod(method.id, 'amount', e.target.value)}
-                          placeholder="0.00"
-                          className="payment-method-amount"
+                          value={invoice.discount.value}
+                          onChange={(e) => setInvoice({
+                            ...invoice,
+                            discount: { ...invoice.discount, value: Number(e.target.value) || 0 }
+                          })}
+                          className="discount-value-input"
+                          placeholder="0"
                         />
                       </div>
-
-                      <div className="payment-method-field">
-                        <label>Reference No</label>
-                        <input
-                          type="text"
-                          value={method.reference_no}
-                          onChange={(e) => updatePaymentMethod(method.id, 'reference_no', e.target.value)}
-                          placeholder="Check #, Transaction ID, etc."
-                          className="payment-method-reference"
-                        />
-                      </div>
-
-                      {(invoice.paymentMethods || []).length > 1 && (
-                        <div className="payment-method-field remove-field">
-                          <label>&nbsp;</label>
-                          <button
-                            type="button"
-                            className="remove-payment-method-btn"
-                            onClick={() => removePaymentMethod(method.id)}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      )}
                     </div>
+                    <span className="discount-amount">
+                      -{formatCurrency(calculateDiscount())}
+                    </span>
                   </div>
-                ))}
+                ) : (
+                  <div className="total-row-modern">
+                    <span>Discount (Per Item):</span>
+                    <span className="discount-amount">
+                      -{formatCurrency(calculateDiscount())}
+                    </span>
+                  </div>
+                )}
 
-                {/* Payment Summary */}
-                <div className="payment-summary">
-                  <div className="payment-summary-row">
-                    <span>Payment Total:</span>
-                    <span>
-                      {formatCurrency(
-                        (invoice.paymentMethods || []).reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0)
-                      )}
-                    </span>
-                  </div>
-                  <div className="payment-summary-row">
-                    <span>Invoice Balance:</span>
-                    <span>{formatCurrency(invoiceId ? (invoice.balance_amount || 0) : calculateTotal())}</span>
-                  </div>
-                  <div className="payment-summary-row">
-                    <span>Remaining Balance:</span>
-                    <span className={
-                      (invoiceId ? (invoice.balance_amount || 0) : calculateTotal()) -
-                      (invoice.paymentMethods || []).reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0) > 0
-                      ? 'text-red' : 'text-green'
-                    }>
-                      {formatCurrency(
-                        Math.max(0,
-                          (invoiceId ? (invoice.balance_amount || 0) : calculateTotal()) -
-                          (invoice.paymentMethods || []).reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0)
-                        )
-                      )}
-                    </span>
-                  </div>
+                <div className="total-row-modern border-top">
+                  <span>Tax:</span>
+                  <span className="total-value">{formatCurrency(calculateTax())}</span>
+                </div>
+                <div className="total-row-modern total-final">
+                  <span>Total:</span>
+                  <span className="total-amount-final">{formatCurrency(calculateTotal())}</span>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <div className="payment-row">
-                <FormInput
-                  label="Payment Notes"
-                  name="payment_notes"
-                  type="textarea"
-                  value={invoice.payment.payment_notes}
-                  onChange={(e) => setInvoice({
-                    ...invoice,
-                    payment: { ...invoice.payment, payment_notes: e.target.value }
-                  })}
-                  placeholder="Optional payment notes..."
-                  rows={2}
-                />
+          {/* Right Column - Payment Section */}
+          <div className="invoice-right-column">
+            <div className="payment-section-modern">
+              <div className="payment-header">
+                <h3 className="payment-title">
+                  <DollarSign size={20} />
+                  Payment
+                </h3>
+                {!invoiceId ? (
+                  <label className="payment-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={invoice.payment.record_payment}
+                      onChange={(e) => setInvoice({
+                        ...invoice,
+                        payment: {
+                          ...invoice.payment,
+                          record_payment: e.target.checked
+                        }
+                      })}
+                    />
+                    <span>Record payment now</span>
+                  </label>
+                ) : (
+                  <div className="payment-summary-header">
+                    <span className="payment-summary-item">
+                      Total: <strong>{formatCurrency(invoice.total_amount || 0)}</strong>
+                    </span>
+                    <span className="payment-summary-item">
+                      Paid: <strong className="text-green">{formatCurrency(invoice.paid_amount || 0)}</strong>
+                    </span>
+                    <span className="payment-summary-item">
+                      Balance: <strong className={invoice.balance_amount > 0 ? 'text-red' : 'text-green'}>
+                        {formatCurrency(invoice.balance_amount || 0)}
+                      </strong>
+                    </span>
+                  </div>
+                )}
               </div>
-              {/* Action buttons for existing invoice payment form */}
-              {invoiceId && showNewPaymentForm && (
-                <div className="payment-actions">
-                  <Button
-                    variant="secondary"
-                    onClick={() => setShowNewPaymentForm(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="primary"
-                    onClick={handleRecordPayment}
-                    loading={paymentMutation.isPending}
-                  >
-                    Save Payment
-                  </Button>
+
+              {/* Existing Payments */}
+              {invoiceId && existingPayments.filter(p => !deletedPayments.includes(p.id)).length > 0 && (
+                <div className="existing-payments">
+                  <h4 className="existing-payments-title">
+                    <CreditCard size={16} />
+                    Payment History
+                  </h4>
+                  <table className="payments-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th className="text-right">Amount</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {existingPayments.map(payment => (
+                        <tr key={payment.id}>
+                          <td>{new Date(payment.payment_date).toLocaleDateString()}</td>
+                          <td>{payment.payment_method}</td>
+                          <td className="text-right">{formatCurrency(payment.amount)}</td>
+                          <td>
+                            <div className="payment-actions" style={{ flexDirection: 'row', gap: '0.25rem', borderTop: 'none', paddingTop: 0, marginTop: 0 }}>
+                              <button
+                                className="action-btn-small"
+                                onClick={() => handleEditPayment(payment)}
+                                title="Edit"
+                              >
+                                <Edit2 size={12} />
+                              </button>
+                              <button
+                                className="action-btn-small delete"
+                                onClick={() => handleDeletePayment(payment.id)}
+                                title="Delete"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
-            </div>
-          ) : null}
-        </div>
 
-        {/* Footer */}
-        <div className="invoice-bottom-footer">
-          <p className="footer-thanks">Thank you for your business!</p>
-          <p className="footer-contact">Questions? Contact {invoice.company.email}</p>
+              {/* Payment Form */}
+              {(!invoiceId && invoice.payment.record_payment) || invoiceId ? (
+                <div className="payment-fields">
+                  <div className="payment-row">
+                    <FormInput
+                      inputRef={paymentAmountInputRef}
+                      label="Amount"
+                      name="payment_amount"
+                      type="number"
+                      step="0.01"
+                      value={invoice.payment.payment_amount}
+                      onChange={(e) => setInvoice({
+                        ...invoice,
+                        payment: { ...invoice.payment, payment_amount: parseFloat(e.target.value) || 0 }
+                      })}
+                    />
+                  </div>
+
+                  <div className="payment-row">
+                    <FormInput
+                      label="Payment Date"
+                      name="payment_date"
+                      type="date"
+                      value={invoice.payment.payment_date}
+                      onChange={(e) => setInvoice({
+                        ...invoice,
+                        payment: { ...invoice.payment, payment_date: e.target.value }
+                      })}
+                    />
+                  </div>
+
+                  {/* Multi Payment Methods */}
+                  <div className="multi-payment-section">
+                    <div className="multi-payment-header">
+                      <h4>Payment Methods</h4>
+                      <button type="button" className="add-payment-method-btn" onClick={addPaymentMethod}>
+                        + Add Method
+                      </button>
+                    </div>
+
+                    {(invoice.paymentMethods || []).map((method, index) => (
+                      <div key={method.id} className="payment-method-row">
+                        <div className="payment-method-grid">
+                          <div className="payment-method-field">
+                            <label>Method</label>
+                            <select
+                              value={method.method}
+                              onChange={(e) => updatePaymentMethod(method.id, 'method', e.target.value)}
+                              className="payment-method-select"
+                            >
+                              <option value="Cash">Cash</option>
+                              <option value="Check">Check</option>
+                              <option value="Bank Transfer">Bank Transfer</option>
+                              <option value="Credit Card">Credit Card</option>
+                              <option value="Online Payment">Online</option>
+                            </select>
+                          </div>
+
+                          <div className="payment-method-field">
+                            <label>Amount</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={method.amount}
+                              onChange={(e) => updatePaymentMethod(method.id, 'amount', e.target.value)}
+                              placeholder="0.00"
+                              className="payment-method-amount"
+                            />
+                          </div>
+
+                          <div className="payment-method-field">
+                            <label>Reference</label>
+                            <input
+                              type="text"
+                              value={method.reference_no}
+                              onChange={(e) => updatePaymentMethod(method.id, 'reference_no', e.target.value)}
+                              placeholder="Check #, TXN ID..."
+                              className="payment-method-reference"
+                            />
+                          </div>
+
+                          {(invoice.paymentMethods || []).length > 1 && (
+                            <div className="payment-method-field" style={{ justifyContent: 'flex-end' }}>
+                              <button
+                                type="button"
+                                className="remove-payment-method-btn"
+                                onClick={() => removePaymentMethod(method.id)}
+                                title="Remove"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Payment Summary */}
+                    <div className="payment-summary">
+                      <div className="payment-summary-row">
+                        <span>Payment Total:</span>
+                        <span>
+                          {formatCurrency(
+                            (invoice.paymentMethods || []).reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0)
+                          )}
+                        </span>
+                      </div>
+                      <div className="payment-summary-row">
+                        <span>Invoice Balance:</span>
+                        <span>{formatCurrency(invoiceId ? (invoice.balance_amount || 0) : calculateTotal())}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {invoiceId && showNewPaymentForm && (
+                    <div className="payment-actions">
+                      <Button variant="secondary" size="sm" onClick={() => setShowNewPaymentForm(false)}>
+                        Cancel
+                      </Button>
+                      <Button variant="primary" size="sm" onClick={handleRecordPayment} loading={paymentMutation.isPending}>
+                        Save Payment
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          </div>
         </div>
       </div>
     </div>
