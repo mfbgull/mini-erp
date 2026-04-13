@@ -1533,7 +1533,7 @@ export default function SalesInvoicePage() {
         record_payment: true,
         payment: {
           payment_date: invoice.payment.payment_date,
-          amount: invoice.paymentMethods.reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0),
+          amount: invoice.payment.payment_amount,
           payment_method: invoice.paymentMethods[0]?.method || 'Cash',
           reference_no: invoice.paymentMethods[0]?.reference_no || '',
           notes: invoice.payment.payment_notes
