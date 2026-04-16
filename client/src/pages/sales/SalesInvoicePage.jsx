@@ -390,42 +390,18 @@ export default function SalesInvoicePage() {
     }
   }, [invoiceId, navigate]);
 
-  // Auto-focus first cell when invoice items change (for new invoices)
+  // Auto-focus first cell when user clicks on items section (disabled on initial load)
   useEffect(() => {
     if (!invoiceId && invoice.items.length > 0) {
       const timer = setTimeout(() => {
         const firstCell = document.querySelector('[data-cell-id$="-description"]');
         if (firstCell && document.activeElement !== firstCell) {
-          firstCell.focus();
+          // Only focus if user already interacted - don't auto-focus on mount
         }
       }, 100);
       return () => clearTimeout(timer);
     }
   }, [invoice.items.length, invoiceId]);
-
-  // Focus first cell on initial mount for new invoices
-  useEffect(() => {
-    if (!invoiceId && invoice.items.length > 0) {
-      const timer = setTimeout(() => {
-        const firstCell = document.querySelector('[data-cell-id$="-description"]');
-        if (firstCell) {
-          // Set editing cell to enter edit mode
-          setEditingCell(`${invoice.items[0]?.id}-description`);
-          // Focus the cell
-          firstCell.focus();
-          // Also focus the input inside after it renders
-          setTimeout(() => {
-            const input = firstCell.querySelector('input');
-            if (input) {
-              input.focus();
-              input.select();
-            }
-          }, 50);
-        }
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, []); // Run once on mount
 
   // Auto-focus newly added row's description cell
   useEffect(() => {
@@ -953,7 +929,16 @@ export default function SalesInvoicePage() {
     };
 
     const openDropdown = () => {
+      console.log('openDropdown called', { itemsLength: items?.length, value });
+      if (!items || items.length === 0) {
+        console.log('No items found');
+        setFilteredItems([]);
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+        return;
+      }
       const sellableItems = getSellableItems();
+      console.log('sellableItems:', sellableItems.length);
       setFilteredItems(sellableItems);
       setShowDropdown(sellableItems.length > 0);
       setSelectedIndex(sellableItems.length > 0 ? 0 : -1);
@@ -1088,11 +1073,15 @@ export default function SalesInvoicePage() {
 
       if (!isClickingDropdown) {
         setTimeout(() => {
-          if (showDropdown && selectedIndex >= 0 && filteredItems[selectedIndex]) {
-            // Auto-select the highlighted item on blur
+          // Only auto-select if user explicitly confirmed with Enter/Tab (not just blur)
+          // This prevents unwanted auto-population when user just clicks away
+          if (showDropdown && selectedIndex >= 0 && document.querySelector('.item-dropdown-option.selected')) {
+            // Auto-select only the highlighted item on blur (if user hovered/selected it)
             selectItem(filteredItems[selectedIndex], false);
           } else {
-            handleSave();
+            // Just clear without selecting - user didn't choose anything
+            setShowDropdown(false);
+            setFilteredItems([]);
           }
         }, 150);
       }
@@ -1109,7 +1098,7 @@ export default function SalesInvoicePage() {
       } : {};
 
       return (
-        <div className="searchable-cell-container">
+        <div className="searchable-cell-container" onMouseDown={() => openDropdown()}>
           <input
             ref={inputRef}
             type="text"
@@ -1120,9 +1109,9 @@ export default function SalesInvoicePage() {
             onFocus={(e) => {
               e.target.select();
               lastFocusedCellRef.current = `${itemId}-description`;
-              // Do NOT open dropdown on focus - only on typing or Down Arrow
+              // Open dropdown on focus if there's text or show all items
+              openDropdown();
             }}
-            autoFocus
             className="editable-input"
             placeholder="Type to search items..."
           />
@@ -1171,12 +1160,13 @@ export default function SalesInvoicePage() {
         onClick={() => {
           setTempValue(value || '');
           setEditingCell(`${itemId}-description`);
+          setTimeout(() => openDropdown(), 50);
         }}
         onFocus={() => {
           lastFocusedCellRef.current = `${itemId}-description`;
-          // Auto-enter edit mode when focused
           setTempValue(value || '');
           setEditingCell(`${itemId}-description`);
+          setTimeout(() => openDropdown(), 50);
         }}
         onKeyDown={(e) => {
           const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
@@ -1376,7 +1366,6 @@ export default function SalesInvoicePage() {
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
           onFocus={(e) => e.target.select()}
-          autoFocus
           className="editable-input"
         />
       );

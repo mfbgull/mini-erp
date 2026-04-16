@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import {
   Menu, X, LogOut,
   LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
-  ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, TrendingUp, Users, Shield
+  ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, TrendingUp, Users, Shield, LayoutGrid, ChevronRight
 } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
@@ -78,14 +78,20 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/bom', label: 'Bill of Materials', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
   { path: '/production', label: 'Production', icon: <Factory size={20} strokeWidth={1.5} /> },
   { path: '/expenses', label: 'Expenses', icon: <Receipt size={20} strokeWidth={1.5} /> },
-  { path: '/users', label: 'Users', icon: <Users size={20} strokeWidth={1.5} /> },
-  { path: '/roles', label: 'Roles', icon: <Shield size={20} strokeWidth={1.5} /> },
+  {
+    label: 'Administrator',
+    icon: <Shield size={20} strokeWidth={1.5} />,
+    children: [
+      { path: '/users', label: 'Users' },
+      { path: '/roles', label: 'Roles' }
+    ]
+  },
   { path: '/activity-log', label: 'Activity Log', icon: <FileText size={20} strokeWidth={1.5} /> },
   { path: '/integrations', label: 'Integrations', icon: <Link2 size={20} strokeWidth={1.5} /> },
   { path: '/settings', label: 'Settings', icon: <Settings size={20} strokeWidth={1.5} /> }
 ];
 
-const Sidebar = memo(function Sidebar() {
+const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onToggleNav?: () => void; isCompact?: boolean }) {
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -114,6 +120,10 @@ const Sidebar = memo(function Sidebar() {
     setIsMobileMenuOpen(false);
   };
 
+  const toggleDropdown = (index: number) => {
+    setActiveDropdown(activeDropdown === index ? null : index);
+  };
+
   return (
     <>
       {isMobile && (
@@ -138,25 +148,39 @@ const Sidebar = memo(function Sidebar() {
         </>
       )}
 
-      <div className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-        <div className="sidebar-logo">
-          <img src="/minierp-logo.webp" alt="Mini ERP" className="sidebar-logo-image" />
-          <h3>Mini ERP</h3>
-          <p className="small">Simple & Powerful</p>
+      <div className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''} ${isCompact ? 'desktop-compact' : ''}`}>
+        <div className="sidebar-header">
+          {onToggleNav && isCompact && (
+            <button
+              type="button"
+              className="sidebar-nav-toggle"
+              onClick={onToggleNav}
+              title="Switch to Top Menu"
+              aria-label="Switch to Top Menu"
+            >
+              <LayoutGrid size={18} />
+            </button>
+          )}
+          <div className="sidebar-logo">
+            <img src="/minierp-logo.webp" alt="Mini ERP" className="sidebar-logo-image" />
+          </div>
         </div>
 
         <nav className="sidebar-menu">
           {NAV_ITEMS.map((item, index) => (
             item.children ? (
-              <div
+              <button
+                type="button"
                 key={index}
                 className={`nav-section ${activeDropdown === index ? 'dropdown-active' : ''}`}
-                onMouseEnter={() => setActiveDropdown(index)}
-                onMouseLeave={() => setActiveDropdown(null)}
+                onClick={() => toggleDropdown(index)}
+                onMouseEnter={() => !isMobile && setActiveDropdown(index)}
+                onMouseLeave={() => !isMobile && setActiveDropdown(null)}
               >
                 <div className="nav-section-title">
                   <span className="nav-icon">{item.icon}</span>
-                  {isMobileMenuOpen && <span className="nav-label">{item.label}</span>}
+                  <span className="nav-label">{item.label}</span>
+                  <ChevronRight size={16} className="nav-arrow" />
                 </div>
                 <div className="nav-children">
                   {item.children.map((child) => (
@@ -170,7 +194,7 @@ const Sidebar = memo(function Sidebar() {
                     </NavLink>
                   ))}
                 </div>
-              </div>
+              </button>
             ) : (
               <NavLink
                 key={item.path}
@@ -180,7 +204,7 @@ const Sidebar = memo(function Sidebar() {
                 onClick={handleNavClick}
               >
                 <span className="nav-icon">{item.icon}</span>
-                {isMobileMenuOpen && <span className="nav-label">{item.label}</span>}
+                <span className="nav-label">{item.label}</span>
               </NavLink>
             )
           ))}
@@ -189,18 +213,14 @@ const Sidebar = memo(function Sidebar() {
         <div className="sidebar-footer">
           <div className="user-info">
             <div className="user-avatar">{user?.full_name?.charAt(0)}</div>
-            {isMobileMenuOpen && (
-              <div className="user-details">
-                <div className="user-name">{user?.full_name}</div>
-                <div className="user-role tiny">{user?.role}</div>
-              </div>
-            )}
-          </div>
-          {isMobileMenuOpen && (
-            <button className="logout-btn" onClick={logout} title="Logout">
-              <LogOut size={18} strokeWidth={1.5} />
+            <div className="user-details">
+              <div className="user-name">{user?.full_name}</div>
+              <div className="user-role tiny">{user?.role}</div>
+            </div>
+            <button type="button" className="logout-btn" onClick={logout} title="Logout">
+              <LogOut size={16} strokeWidth={1.5} />
             </button>
-          )}
+          </div>
         </div>
       </div>
     </>
