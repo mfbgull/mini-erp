@@ -23,6 +23,7 @@ import SearchableSelect from "../../components/common/SearchableSelect";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { useTranslation } from "../../hooks/useTranslation";
 import { bomSchema, bomItemSchema } from "../../schemas";
 import api from "../../utils/api";
 import "../inventory/ItemPreview.css";
@@ -33,6 +34,7 @@ export default function BOMPage() {
   const [editingBOM, setEditingBOM] = useState(null);
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
 
@@ -266,7 +268,7 @@ export default function BOMPage() {
     <div className="bom-page">
       <div className="page-header">
         <div>
-          <h1>Bill of Materials (BOM)</h1>
+          <h1>{t('bom.billOfMaterials')}</h1>
           <p className="page-subtitle">
             Pre-configure production recipes for finished goods
           </p>
@@ -394,6 +396,7 @@ export default function BOMPage() {
             rowData={boms}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme: "legacy",
               resizable: true,
               sortable: false,
               filter: false,

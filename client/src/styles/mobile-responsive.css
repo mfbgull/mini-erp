@@ -3,15 +3,35 @@
 
 /* Desktop main-content - accounts for 56px top menu */
 @media (min-width: 769px) {
-  .main-content {
+  .main-content.topmenu-active {
     margin-top: 56px;
     min-height: calc(100vh - 56px);
     padding: var(--space-lg);
     margin-left: 0;
+    background-color: #efefef !important;
   }
   
-  .content {
+  .main-content.topmenu-active .content {
     padding: 0;
+  }
+  
+  /* Sidebar active on desktop - margin for sidebar but no top menu padding */
+  .main-content.sidebar-active {
+    margin-top: 0;
+    min-height: 100vh;
+    padding: 0;
+    margin-left: var(--sidebar-width);
+    background-color: #efefef !important;
+  }
+  
+  .main-content.sidebar-active .content {
+    padding: var(--space-lg);
+  }
+  
+  /* Form pages inside .content - remove extra padding */
+  .main-content.sidebar-active .content [class*="form-page"] {
+    padding: 0 !important;
+    max-width: 100% !important;
   }
 }
 

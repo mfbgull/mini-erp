@@ -12,13 +12,16 @@
   --primary-light: rgba(54, 123, 245, 0.1);
 
   /* Reset Neutral Colors */
-  --neutral-50: #F8F9FA;
+  --neutral-50: #F8FAFC;
   --neutral-100: #FFFFFF;
-  --neutral-200: #E9ECEF;
-  --neutral-400: #6C757D;
-  --neutral-600: #6B7280;
-  --neutral-700: #495057;
-  --neutral-900: #212529;
+  --neutral-200: #E2E8F0;
+  --neutral-300: #CBD5E1;
+  --neutral-400: #94A3B8;
+  --neutral-500: #64748B;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1E293B;
+  --neutral-900: #0F172A;
 
   /* Reset Semantic Colors */
   --success: #10B981;
@@ -26,17 +29,17 @@
   --error: #EF4444;
 
   /* Reset Text Colors */
-  --text-primary: #1F2937;
-  --text-secondary: #6B7280;
-  --text-tertiary: #9CA3AF;
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-tertiary: #64748B;
 
   /* Reset Background Colors */
   --card-bg: #FFFFFF;
   --input-bg: #FFFFFF;
-  --bg-light: #F9FAFB;
-  --hover-bg: #F3F4F6;
-  --border-color: #E5E7EB;
-  --border-color-light: #F3F4F6;
+  --bg-light: #F8FAFC;
+  --hover-bg: #F1F5F9;
+  --border-color: #E2E8F0;
+  --border-color-light: #F1F5F9;
 
   /* Reset Spacing */
   --space-xs: 8px;

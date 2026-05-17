@@ -14,12 +14,13 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import { Package, DollarSign, ShoppingCart, Factory, BarChart3, ClipboardList, AlertTriangle } from 'lucide-react';
+import { Package, DollarSign, ShoppingCart, Factory, BarChart3, ClipboardList, AlertTriangle, Waves } from 'lucide-react';
 
 import FloatingActionButton from '../components/layout/FloatingActionButton';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
+import { useTranslation } from '../hooks/useTranslation';
 import api from '../utils/api';
 import './Dashboard.css';
 
@@ -47,6 +48,7 @@ const getLast7Days = () => {
 export default function Dashboard() {
   const { user } = useAuth();
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useKeyboardShortcut('Alt+N', () => {
@@ -122,7 +124,7 @@ export default function Dashboard() {
       <div className="dashboard">
         <div className="dashboard-loading">
           <div className="loading-spinner" />
-          <p>Loading dashboard...</p>
+          <p>{t('messages.loading')}</p>
         </div>
       </div>
     );
@@ -133,7 +135,7 @@ export default function Dashboard() {
       {/* Header */}
       <div className="dashboard-header">
         <div>
-          <h1>Welcome back, {user?.username || 'User'}</h1>
+          <h1>{t('dashboard.welcome')}, {user?.username || t('common.user')}</h1>
           <p className="dashboard-subtitle">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
@@ -147,9 +149,9 @@ export default function Dashboard() {
             <Package size={24} />
           </div>
           <div className="kpi-content">
-            <div className="kpi-label">Total Items</div>
+            <div className="kpi-label">{t('dashboard.totalItems')}</div>
             <div className="kpi-value">{data?.totalItems ?? 0}</div>
-            <div className="kpi-subtitle">{data?.warehouseStockCount ?? 0} warehouse stocks</div>
+            <div className="kpi-subtitle">{data?.warehouseStockCount ?? 0} {t('dashboard.warehouseStocks')}</div>
           </div>
         </div>
 
@@ -158,9 +160,9 @@ export default function Dashboard() {
             <DollarSign size={24} />
           </div>
           <div className="kpi-content">
-            <div className="kpi-label">Stock Value</div>
+            <div className="kpi-label">{t('dashboard.stockValue')}</div>
             <div className="kpi-value">{formatCurrency(data?.totalStockValue ?? 0)}</div>
-            <div className="kpi-subtitle">Current inventory worth</div>
+            <div className="kpi-subtitle">{t('dashboard.currentInventoryWorth')}</div>
           </div>
         </div>
 
@@ -169,9 +171,9 @@ export default function Dashboard() {
             <ShoppingCart size={24} />
           </div>
           <div className="kpi-content">
-            <div className="kpi-label">Sales Revenue</div>
+            <div className="kpi-label">{t('dashboard.salesRevenue')}</div>
             <div className="kpi-value">{formatCurrency(data?.totalSalesRevenue ?? 0)}</div>
-            <div className="kpi-subtitle">Total sales</div>
+            <div className="kpi-subtitle">{t('dashboard.totalSales')}</div>
           </div>
         </div>
 
@@ -180,9 +182,9 @@ export default function Dashboard() {
             <Factory size={24} />
           </div>
           <div className="kpi-content">
-            <div className="kpi-label">Production</div>
+            <div className="kpi-label">{t('nav.production')}</div>
             <div className="kpi-value">{data?.recentProductions ?? 0}</div>
-            <div className="kpi-subtitle">Runs in last 30 days</div>
+            <div className="kpi-subtitle">{t('dashboard.runsLast30Days')}</div>
           </div>
         </div>
       </div>
@@ -190,7 +192,7 @@ export default function Dashboard() {
       {/* Charts Row */}
       <div className="charts-grid">
         <div className="chart-card">
-          <h3>Sales vs Purchases (Last 7 Days)</h3>
+          <h3>{t('dashboard.salesVsPurchases')}</h3>
           <div className="chart-container">
             <Line
               data={salesPurchasesTrendData}
@@ -209,7 +211,7 @@ export default function Dashboard() {
         </div>
 
         <div className="chart-card">
-          <h3>Stock by Category</h3>
+          <h3>{t('dashboard.stockByCategory')}</h3>
           <div className="chart-container">
             <Doughnut
               data={stockByCategoryData}
@@ -229,9 +231,9 @@ export default function Dashboard() {
       <div className="dashboard-bottom">
         {/* Low Stock Alerts */}
         <div className="alert-card">
-          <h3><AlertTriangle size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Low Stock Alerts</h3>
+          <h3><AlertTriangle size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> {t('dashboard.lowStockAlerts')}</h3>
           {(data?.lowStockItems || []).length === 0 ? (
-            <p className="no-alerts">All items are well stocked!</p>
+            <p className="no-alerts">{t('dashboard.wellStocked')}</p>
           ) : (
             <div className="alert-list">
               {data.lowStockItems.slice(0, 5).map(item => (
@@ -242,7 +244,7 @@ export default function Dashboard() {
                   </div>
                   <div className="alert-item-stock">
                     <span className="stock-low">{item.current_stock}</span>
-                    <span className="stock-reorder">Reorder: {item.reorder_level}</span>
+                    <span className="stock-reorder">{t('fields.reorder')}: {item.reorder_level}</span>
                   </div>
                 </Link>
               ))}
@@ -252,31 +254,35 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <div className="quick-actions-card">
-          <h3>Quick Actions</h3>
+          <h3>{t('dashboard.quickActions')}</h3>
           <div className="quick-actions-grid">
             <Link to="/inventory/items" className="quick-action-btn">
               <Package className="action-icon" size={28} strokeWidth={1.5} />
-              <span>New Item</span>
+              <span>{t('dashboard.newItem')}</span>
             </Link>
             <Link to="/sales" className="quick-action-btn">
               <DollarSign className="action-icon" size={28} strokeWidth={1.5} />
-              <span>Record Sale</span>
+              <span>{t('dashboard.recordSale')}</span>
             </Link>
             <Link to="/purchases" className="quick-action-btn">
               <ShoppingCart className="action-icon" size={28} strokeWidth={1.5} />
-              <span>New Purchase</span>
+              <span>{t('dashboard.newPurchase')}</span>
             </Link>
             <Link to="/production" className="quick-action-btn">
               <Factory className="action-icon" size={28} strokeWidth={1.5} />
-              <span>Production</span>
+              <span>{t('nav.production')}</span>
             </Link>
             <Link to="/inventory/stock-movements" className="quick-action-btn">
               <BarChart3 className="action-icon" size={28} strokeWidth={1.5} />
-              <span>Stock Movement</span>
+              <span>{t('dashboard.stockMovement')}</span>
             </Link>
             <Link to="/bom" className="quick-action-btn">
               <ClipboardList className="action-icon" size={28} strokeWidth={1.5} />
-              <span>BOM</span>
+              <span>{t('nav.bom')}</span>
+            </Link>
+            <Link to="/ecosystem" className="quick-action-btn" style={{ background: 'linear-gradient(135deg, rgba(0,245,212,0.1), rgba(155,93,229,0.1))', border: '1px solid rgba(0,245,212,0.3)' }}>
+              <Waves className="action-icon" size={28} strokeWidth={1.5} style={{ color: '#00f5d4' }} />
+              <span style={{ color: '#00f5d4' }}>{t('dashboard.livingEcosystem')}</span>
             </Link>
           </div>
         </div>

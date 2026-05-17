@@ -20,6 +20,7 @@ import Modal from "../../components/common/Modal";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { useTranslation } from "../../hooks/useTranslation";
 import { stockMovementSchema } from "../../schemas";
 import api from "../../utils/api";
 import "./StockMovementPage.css";
@@ -28,6 +29,7 @@ export default function StockMovementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const { data: movements = [], isLoading } = useQuery({
@@ -192,12 +194,12 @@ export default function StockMovementPage() {
     <div className="items-page">
       <div className="page-header">
         <div>
-          <h1>Stock Movements</h1>
-          <p className="page-subtitle">Track all stock transactions</p>
+          <h1>{t('stockMovements.stockMovements')}</h1>
+          <p className="page-subtitle">{t('stockMovements.trackTransactions')}</p>
         </div>
         {!isMobile && (
           <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-            + New Adjustment
+            + {t('stockMovements.newAdjustment')}
           </Button>
         )}
       </div>
@@ -207,50 +209,50 @@ export default function StockMovementPage() {
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-purple">📋</div>
           <div className="stat-content">
-            <div className="stat-label">Total Movements</div>
+            <div className="stat-label">{t('stockMovements.totalMovements')}</div>
             <div className="stat-value">{stats.totalMovements}</div>
-            <div className="stat-subtitle">All transactions</div>
+            <div className="stat-subtitle">{t('stockMovements.allTransactions')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-blue">📥</div>
           <div className="stat-content">
-            <div className="stat-label">Total In</div>
+            <div className="stat-label">{t('common.totalIn')}</div>
             <div className="stat-value">{stats.totalIn}</div>
-            <div className="stat-subtitle">Stock additions</div>
+            <div className="stat-subtitle">{t('stockMovements.stockAdditions')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-red">📤</div>
           <div className="stat-content">
-            <div className="stat-label">Total Out</div>
+            <div className="stat-label">{t('common.totalOut')}</div>
             <div className="stat-value">{stats.totalOut}</div>
-            <div className="stat-subtitle">Stock reductions</div>
+            <div className="stat-subtitle">{t('stockMovements.stockReductions')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-pink">📊</div>
           <div className="stat-content">
-            <div className="stat-label">Total Quantity</div>
+            <div className="stat-label">{t('stockMovements.totalQuantity')}</div>
             <div className="stat-value">
               {parseFloat(stats.totalQuantity).toFixed(2)}
             </div>
-            <div className="stat-subtitle">Aggregate moved</div>
+            <div className="stat-subtitle">{t('stockMovements.aggregateMoved')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-orange">🔝</div>
           <div className="stat-content">
-            <div className="stat-label">Most Active Type</div>
+            <div className="stat-label">{t('stockMovements.mostActiveType')}</div>
             <div className="stat-value text-lg">{mostActiveType}</div>
             <div className="stat-subtitle">
               {stats.mostActiveType !== "None"
-                ? `Count: ${stats.movementsByType[stats.mostActiveType]}`
-                : "No movements"}
+                ? `${t('stockMovements.count')}: ${stats.movementsByType[stats.mostActiveType]}`
+                : t('stockMovements.noMovements')}
             </div>
           </div>
         </div>
@@ -258,45 +260,45 @@ export default function StockMovementPage() {
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-green">📁</div>
           <div className="stat-content">
-            <div className="stat-label">Purchases</div>
+            <div className="stat-label">{t('common.purchases')}</div>
             <div className="stat-value">{stats.movementsByType.PURCHASE}</div>
-            <div className="stat-subtitle">Stock in</div>
+            <div className="stat-subtitle">{t('stockMovements.stockIn')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-indigo">💰</div>
           <div className="stat-content">
-            <div className="stat-label">Sales</div>
+            <div className="stat-label">{t('common.sales')}</div>
             <div className="stat-value">{stats.movementsByType.SALE}</div>
-            <div className="stat-subtitle">Stock out</div>
+            <div className="stat-subtitle">{t('stockMovements.stockOut')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-orange">🏭</div>
           <div className="stat-content">
-            <div className="stat-label">Production</div>
+            <div className="stat-label">{t('common.production')}</div>
             <div className="stat-value">{stats.movementsByType.PRODUCTION}</div>
-            <div className="stat-subtitle">Created</div>
+            <div className="stat-subtitle">{t('stockMovements.created')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-indigo">🔄</div>
           <div className="stat-content">
-            <div className="stat-label">Transfers</div>
+            <div className="stat-label">{t('common.transfers')}</div>
             <div className="stat-value">{stats.movementsByType.TRANSFER}</div>
-            <div className="stat-subtitle">Moved between warehouses</div>
+            <div className="stat-subtitle">{t('stockMovements.movedBetween')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-coral">⚙️</div>
           <div className="stat-content">
-            <div className="stat-label">Adjustments</div>
+            <div className="stat-label">{t('stockMovements.adjustments')}</div>
             <div className="stat-value">{stats.movementsByType.ADJUSTMENT}</div>
-            <div className="stat-subtitle">Manual changes</div>
+            <div className="stat-subtitle">{t('stockMovements.manualChanges')}</div>
           </div>
         </div>
       </div>
@@ -305,28 +307,28 @@ export default function StockMovementPage() {
       <div className="quick-actions">
         <button className="quick-action-btn" onClick={handleExport}>
           <span className="action-icon">📥</span>
-          <span className="action-text">Export to CSV</span>
+          <span className="action-text">{t('stockMovements.exportCsv')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/reports/inventory-movement")}
         >
           <span className="action-icon">📋</span>
-          <span className="action-text">Movement Report</span>
+          <span className="action-text">{t('stockMovements.movementReport')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/reports/stock-valuation")}
         >
           <span className="action-icon">💰</span>
-          <span className="action-text">Stock Valuation</span>
+          <span className="action-text">{t('stockMovements.stockValuation')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/inventory/stock-by-warehouse")}
         >
           <span className="action-icon">🏭</span>
-          <span className="action-text">Stock by Warehouse</span>
+          <span className="action-text">{t('stockMovements.stockByWarehouse')}</span>
         </button>
       </div>
 
@@ -344,7 +346,7 @@ export default function StockMovementPage() {
               onClick={() => setIsModalOpen(true)}
               className="fab-button"
             >
-              + New Adjustment
+              + {t('stockMovements.newAdjustment')}
             </Button>
           </div>
         </>
@@ -355,6 +357,7 @@ export default function StockMovementPage() {
             rowData={movements}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: false,
               filter: false,

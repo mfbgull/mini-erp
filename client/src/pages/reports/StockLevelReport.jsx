@@ -386,6 +386,7 @@ export default function StockLevelReport() {
                 rowData={reportData.stockLevels}
                 columnDefs={columnDefs}
                 defaultColDef={{
+              theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

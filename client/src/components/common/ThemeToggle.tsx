@@ -1,6 +1,6 @@
-import { Palette, Diamond, Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 
-import { useTheme, THEMES } from '../../context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
 import './ThemeToggle.css';
 
 const ThemeToggle = () => {
@@ -10,13 +10,14 @@ const ThemeToggle = () => {
     <div className="theme-toggle-group">
       <div className="theme-toggle">
         <button
+          type="button"
           className="theme-toggle-btn"
           onClick={toggleTheme}
-          title={`Switch to ${currentTheme === THEMES.ERPNEXT ? 'Default' : 'ERPNext'} theme`}
+          title={`Switch to ${currentTheme === 'default' ? 'Dark' : 'Light'} mode`}
           aria-label="Toggle theme"
         >
           <span className="theme-toggle-icon">
-            {currentTheme === THEMES.ERPNEXT ? <Palette size={18} /> : <Diamond size={18} />}
+            {currentTheme === 'default' ? '☀️' : '🌙'}
           </span>
           <span className="theme-toggle-label">
             {themeName}
@@ -26,6 +27,7 @@ const ThemeToggle = () => {
       </div>
       <div className="dark-mode-toggle">
         <button
+          type="button"
           className="theme-toggle-btn"
           onClick={toggleDarkMode}
           title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}

@@ -196,12 +196,12 @@
   }
   
   .stat-card {
-    padding: var(--space-sm) !important;
-    flex-direction: column !important;
+    padding: var(--space-lg) !important;
+    flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: var(--space-xs) !important;
-    text-align: center !important;
+    justify-content: flex-start !important;
+    gap: var(--space-md) !important;
+    text-align: left !important;
   }
   
   .stat-card .kpi-icon {

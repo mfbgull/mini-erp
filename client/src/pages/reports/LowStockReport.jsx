@@ -289,6 +289,7 @@ export default function LowStockReport() {
                 rowData={reportData}
                 columnDefs={columnDefs}
                 defaultColDef={{
+                  theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

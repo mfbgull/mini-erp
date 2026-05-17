@@ -156,6 +156,7 @@ export default function RolesPage() {
             rowData={roles}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: true,
               filter: true

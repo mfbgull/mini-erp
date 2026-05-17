@@ -8,6 +8,7 @@ import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import { SupplierCard } from '../../components/common/SupplierCard';
+import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import './SuppliersPage.css';
 
@@ -16,6 +17,7 @@ export default function SuppliersPage() {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('active');
+  const { t } = useTranslation();
 
   const queryClient = useQueryClient();
 
@@ -82,7 +84,7 @@ export default function SuppliersPage() {
     <div className="suppliers-page">
       <div className="page-header">
         <div>
-          <h1>Suppliers</h1>
+          <h1>{t('suppliers.suppliers')}</h1>
           <p className="page-subtitle">Manage supplier accounts and contact information</p>
         </div>
         <div className="header-actions">

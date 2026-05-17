@@ -18,16 +18,16 @@
   --cta-hover: #16A34A;
 
   /* Neutral Colors - Warm Gray */
-  --neutral-50: #F9FAFB;
-  --neutral-100: #F3F4F6;
-  --neutral-200: #E5E7EB;
-  --neutral-300: #D1D5DB;
-  --neutral-400: #9CA3AF;
-  --neutral-500: #6B7280;
-  --neutral-600: #4B5563;
-  --neutral-700: #374151;
-  --neutral-800: #1F2937;
-  --neutral-900: #111827;
+  --neutral-50: #F8FAFC;
+  --neutral-100: #F1F5F9;
+  --neutral-200: #E2E8F0;
+  --neutral-300: #CBD5E1;
+  --neutral-400: #94A3B8;
+  --neutral-500: #64748B;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1E293B;
+  --neutral-900: #0F172A;
 
   /* Semantic Colors */
   --success: #10B981;
@@ -40,16 +40,16 @@
   --info-light: rgba(59, 130, 246, 0.1);
 
   /* Text Colors */
-  --text-primary: #164E63;
-  --text-secondary: #0E7490;
+  --text-primary: #1E293B;
+  --text-secondary: #334155;
   --text-tertiary: #64748B;
   --text-muted: #94A3B8;
 
   /* Background Colors */
   --card-bg: #FFFFFF;
   --input-bg: #FFFFFF;
-  --bg-light: #ECFEFF;
-  --bg-subtle: #F0FDFF;
+  --bg-light: #EFF6FF;
+  --bg-subtle: #F0F9FF;
   --hover-bg: #F1F5F9;
   --border-color: #E2E8F0;
   --border-color-light: #F1F5F9;

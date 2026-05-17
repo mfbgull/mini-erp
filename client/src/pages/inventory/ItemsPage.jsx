@@ -14,6 +14,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { useTranslation } from '../../hooks/useTranslation';
 import { itemSchema } from '../../schemas';
 import api from '../../utils/api';
 import './ItemsPage.css';
@@ -25,6 +26,7 @@ export default function ItemsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
   const queryClient = useQueryClient();
@@ -116,7 +118,7 @@ export default function ItemsPage() {
   // Export to CSV
   const handleExport = () => {
     if (filteredItems.length === 0) {
-      toast.error('No items to export');
+      toast.error(t('inventory.noItemsExport'));
       return;
     }
 
@@ -156,7 +158,7 @@ export default function ItemsPage() {
     link.click();
     document.body.removeChild(link);
 
-    toast.success('Items exported successfully!');
+    toast.success(t('inventory.itemsExported'));
   };
 
   // Import items
@@ -174,7 +176,7 @@ export default function ItemsPage() {
           const text = event.target.result;
           const rows = text.split('\n');
           if (rows.length < 2) {
-            toast.error('CSV file is empty');
+            toast.error(t('inventory.csvEmpty'));
             return;
           }
 
@@ -212,11 +214,11 @@ export default function ItemsPage() {
             }
           }
 
-          toast.success(`Import complete: ${successCount} items imported, ${errorCount} failed`);
+          toast.success(`${t('inventory.importComplete')}: ${successCount} ${t('inventory.items')} ${t('actions.import').toLowerCase()}, ${errorCount} ${t('inventory.failed')}`);
           queryClient.invalidateQueries(['items']);
         } catch (error) {
           console.error('Import error:', error);
-          toast.error('Failed to import CSV file');
+          toast.error(t('inventory.importError'));
         }
       };
 
@@ -231,7 +233,7 @@ export default function ItemsPage() {
       return api.delete(`/inventory/items/${itemId}`);
     },
     onSuccess: () => {
-      toast.success('Item deleted successfully!');
+      toast.success(t('inventory.itemDeleted'));
       queryClient.invalidateQueries(['items']);
     },
     onError: (error) => {
@@ -240,40 +242,40 @@ export default function ItemsPage() {
   });
 
   const handleDeleteItem = (item) => {
-    if (window.confirm(`Are you sure you want to delete item: ${item.item_name}?`)) {
+    if (window.confirm(`${t('inventory.confirmDelete')}: ${item.item_name}?`)) {
       deleteItemMutation.mutate(item.id);
     }
   };
 
   const columnDefs = [
     {
-      headerName: 'Item Code',
+      headerName: t('inventory.itemCode'),
       field: 'item_code',
       sortable: true,
       filter: true,
       flex: 1
     },
     {
-      headerName: 'Item Name',
+      headerName: t('inventory.itemName'),
       field: 'item_name',
       sortable: true,
       filter: true,
       flex: 2
     },
     {
-      headerName: 'Category',
+      headerName: t('inventory.category'),
       field: 'category',
       sortable: true,
       filter: true,
       flex: 1
     },
     {
-      headerName: 'UOM',
+      headerName: t('inventory.uom'),
       field: 'unit_of_measure',
       flex: 0.7
     },
     {
-      headerName: 'Stock',
+      headerName: t('inventory.stock'),
       field: 'current_stock',
       sortable: true,
       filter: 'agNumberColumnFilter',
@@ -287,7 +289,7 @@ export default function ItemsPage() {
       }
     },
     {
-      headerName: 'Cost',
+      headerName: t('inventory.cost'),
       field: 'standard_cost',
       sortable: true,
       filter: 'agNumberColumnFilter',
@@ -295,7 +297,7 @@ export default function ItemsPage() {
       valueFormatter: params => formatCurrency(params.value || 0)
     },
     {
-      headerName: 'Price',
+      headerName: t('inventory.price'),
       field: 'standard_selling_price',
       sortable: true,
       filter: 'agNumberColumnFilter',
@@ -303,7 +305,7 @@ export default function ItemsPage() {
       valueFormatter: params => formatCurrency(params.value || 0)
     },
     {
-      headerName: 'Actions',
+      headerName: t('inventory.actions'),
       field: 'actions',
       flex: 1,
       minWidth: 120,
@@ -319,7 +321,7 @@ export default function ItemsPage() {
                 setIsModalOpen(true);
               }}
             >
-              Edit
+              {t('inventory.edit')}
             </Button>
             <Button
               variant="danger"
@@ -330,7 +332,7 @@ export default function ItemsPage() {
               }}
               disabled={deleteItemMutation.isPending}
             >
-              {deleteItemMutation.isPending ? 'Deleting...' : 'Delete'}
+              {deleteItemMutation.isPending ? t('inventory.deleting') : t('inventory.delete')}
             </Button>
           </div>
         );
@@ -367,17 +369,18 @@ export default function ItemsPage() {
               <button 
                 className="back-to-warehouses-btn"
                 onClick={handleClearWarehouseFilter}
+                type="button"
               >
                 <ArrowLeft size={20} />
-                Back to Warehouses
+                {t('inventory.backToWarehouses')}
               </button>
               <div className="warehouse-filter-info">
                 <Building2 size={20} />
-                <span>Items in: <strong>{selectedWarehouse.warehouse_name}</strong></span>
+                <span>{t('inventory.itemsIn')}: <strong>{selectedWarehouse.warehouse_name}</strong></span>
               </div>
             </>
           ) : (
-            <h1>Items</h1>
+            <h1>{t('inventory.items')}</h1>
           )}
         </div>
       </div>
@@ -388,9 +391,9 @@ export default function ItemsPage() {
             <Package size={24} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Total Items</div>
+            <div className="stat-label">{t('dashboard.totalItems')}</div>
             <div className="stat-value">{stats.totalItems}</div>
-            <div className="stat-subtitle">{warehouseId ? `in ${selectedWarehouse?.warehouse_name || 'warehouse'}` : 'Active items in catalog'}</div>
+            <div className="stat-subtitle">{warehouseId ? `${t('inventory.itemsIn')} ${selectedWarehouse?.warehouse_name || ''}` : t('inventory.activeItems')}</div>
           </div>
         </div>
 
@@ -399,9 +402,9 @@ export default function ItemsPage() {
             <DollarSign size={24} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Stock Value</div>
+            <div className="stat-label">{t('inventory.stockValue')}</div>
             <div className="stat-value">{formatCurrency(stats.totalStockValue)}</div>
-            <div className="stat-subtitle">Current inventory worth</div>
+            <div className="stat-subtitle">{t('inventory.currentInventoryWorth')}</div>
           </div>
         </div>
 
@@ -410,9 +413,9 @@ export default function ItemsPage() {
             <BarChart3 size={24} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Total Stock</div>
+            <div className="stat-label">{t('inventory.totalStock')}</div>
             <div className="stat-value">{parseFloat(stats.totalStock).toFixed(2)}</div>
-            <div className="stat-subtitle">Aggregate quantity</div>
+            <div className="stat-subtitle">{t('inventory.aggregateQty')}</div>
           </div>
         </div>
 
@@ -421,9 +424,9 @@ export default function ItemsPage() {
             <AlertTriangle size={24} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Low Stock</div>
+            <div className="stat-label">{t('inventory.lowStock')}</div>
             <div className="stat-value">{stats.lowStockAlerts}</div>
-            <div className="stat-subtitle">Below reorder level</div>
+            <div className="stat-subtitle">{t('inventory.belowReorder')}</div>
           </div>
         </div>
 
@@ -432,9 +435,9 @@ export default function ItemsPage() {
             <Ban size={24} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Out of Stock</div>
+            <div className="stat-label">{t('inventory.outOfStock')}</div>
             <div className="stat-value">{stats.outOfStock}</div>
-            <div className="stat-subtitle">Zero stock items</div>
+            <div className="stat-subtitle">{t('inventory.zeroStock')}</div>
           </div>
         </div>
 
@@ -443,9 +446,9 @@ export default function ItemsPage() {
             <FolderOpen size={24} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Categories</div>
+            <div className="stat-label">{t('inventory.categories')}</div>
             <div className="stat-value">{stats.categories}</div>
-            <div className="stat-subtitle">Unique categories</div>
+            <div className="stat-subtitle">{t('inventory.uniqueCats')}</div>
           </div>
         </div>
 
@@ -454,9 +457,9 @@ export default function ItemsPage() {
             <Wrench size={24} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Raw Materials</div>
+            <div className="stat-label">{t('inventory.rawMaterials')}</div>
             <div className="stat-value">{stats.rawMaterials}</div>
-            <div className="stat-subtitle">Material items</div>
+            <div className="stat-subtitle">{t('inventory.materialItems')}</div>
           </div>
         </div>
 
@@ -465,35 +468,37 @@ export default function ItemsPage() {
             <Factory size={24} />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Finished Goods</div>
+            <div className="stat-label">{t('inventory.finishedGoods')}</div>
             <div className="stat-value">{stats.finishedGoods}</div>
-            <div className="stat-subtitle">Manufactured products</div>
+            <div className="stat-subtitle">{t('inventory.manufacturedProducts')}</div>
           </div>
         </div>
       </div>
 
       <div className="quick-actions">
-        <button className="quick-action-btn" onClick={handleExport}>
+        <button className="quick-action-btn" onClick={handleExport} type="button">
           <Download className="action-icon" size={24} />
-          <span className="action-text">Export to CSV</span>
+          <span className="action-text">{t('inventory.exportCSV')}</span>
         </button>
-        <button className="quick-action-btn" onClick={handleImport}>
+        <button className="quick-action-btn" onClick={handleImport} type="button">
           <Upload className="action-icon" size={24} />
-          <span className="action-text">Import Items</span>
+          <span className="action-text">{t('inventory.importItems')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/low-stock')}
+          type="button"
         >
           <AlertTriangle className="action-icon" size={24} />
-          <span className="action-text">Low Stock Report</span>
+          <span className="action-text">{t('inventory.lowStockReport')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate('/reports/stock-valuation')}
+          type="button"
         >
           <Wallet className="action-icon" size={24} />
-          <span className="action-text">Stock Valuation</span>
+          <span className="action-text">{t('inventory.stockValuation')}</span>
         </button>
       </div>
 
@@ -503,7 +508,7 @@ export default function ItemsPage() {
           <input
             type="text"
             className="search-input-field"
-            placeholder="Search items by name or code..."
+            placeholder={t('inventory.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -511,6 +516,7 @@ export default function ItemsPage() {
             <button 
               className="search-clear-btn"
               onClick={() => setSearchTerm('')}
+              type="button"
             >
               <X size={16} />
             </button>
@@ -525,16 +531,16 @@ export default function ItemsPage() {
       ) : filteredItems.length === 0 && searchTerm ? (
         <div className="no-results">
           <Search className="no-results-icon" size={48} />
-          <h3>No items found</h3>
-          <p>No items match "{searchTerm}"</p>
-          <Button variant="secondary" onClick={() => setSearchTerm('')}>Clear Search</Button>
+          <h3>{t('inventory.noItemsFound')}</h3>
+          <p>{t('inventory.noItemsMatch')} "{searchTerm}"</p>
+          <Button variant="secondary" onClick={() => setSearchTerm('')}>{t('inventory.clearSearch')}</Button>
         </div>
       ) : filteredItems.length === 0 && warehouseId ? (
         <div className="no-results">
           <Package className="no-results-icon" size={48} />
-          <h3>No items in this warehouse</h3>
-          <p>This warehouse doesn't have any items yet.</p>
-          <Button variant="secondary" onClick={handleClearWarehouseFilter}>View All Items</Button>
+          <h3>{t('inventory.noItemsWarehouse')}</h3>
+          <p>{t('inventory.noItemsWarehouseYet')}</p>
+          <Button variant="secondary" onClick={handleClearWarehouseFilter}>{t('inventory.viewAllItems')}</Button>
         </div>
       ) : isMobile ? (
         <>
@@ -548,7 +554,7 @@ export default function ItemsPage() {
           />
           <div className="mobile-action-bar">
             <Button variant="primary" onClick={handleNewItem}>
-              + New Item
+              + {t('inventory.newItem')}
             </Button>
           </div>
         </>
@@ -557,11 +563,12 @@ export default function ItemsPage() {
           <AgGridReact
             rowData={filteredItems}
             columnDefs={columnDefs}
-            defaultColDef={{
+defaultColDef={{
               resizable: true,
               sortable: false,
               filter: false
             }}
+            theme="legacy"
             pagination={true}
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}

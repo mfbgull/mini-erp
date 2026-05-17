@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DollarSign, Building2, Palette, Lightbulb, Eye, Check } from 'lucide-react';
+import { DollarSign, Building2, Palette, Lightbulb, Eye } from 'lucide-react';
 
 import Button from '../components/common/Button';
 import FormInput from '../components/common/FormInput';
-import { useTheme, THEMES, THEME_NAMES, THEME_ICONS, THEME_DESCRIPTIONS } from '../context/ThemeContext';
+import { useTheme } from '../context/ThemeContext';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { settingsSchema } from '../schemas';
 import api from '../utils/api';
@@ -221,32 +221,6 @@ export default function SettingsPage() {
               required
               helpText="Auto-hide timeout for tooltips (1-10 seconds)"
             />
-          </div>
-        </div>
-
-        {/* Theme Selection */}
-        <div className="settings-section">
-          <div className="section-header">
-            <h2><Palette size={24} className="icon-valign-middle icon-mr-sm" />Theme Selection</h2>
-            <p className="section-description">Choose your preferred visual theme</p>
-          </div>
-          <div className="theme-selector">
-            {Object.values(THEMES).map((theme) => (
-              <div
-                key={theme}
-                className={`theme-option ${currentTheme === theme ? 'active' : ''}`}
-                onClick={() => setTheme(theme)}
-              >
-                <div className="theme-option-icon">{THEME_ICONS[theme]}</div>
-                <div className="theme-option-content">
-                  <div className="theme-option-name">{THEME_NAMES[theme]}</div>
-                  <div className="theme-option-description">{THEME_DESCRIPTIONS[theme]}</div>
-                </div>
-                {currentTheme === theme && (
-                  <div className="theme-option-check"><Check size={16} /></div>
-                )}
-              </div>
-            ))}
           </div>
         </div>
 

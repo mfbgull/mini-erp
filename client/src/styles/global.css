@@ -1,4 +1,33 @@
 /* Global Styles */
+
+@font-face {
+  font-family: 'Noto Nastaliq Urdu';
+  src: url('/fonts/NotoNastaliqUrdu-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Nastaliq Urdu';
+  src: url('/fonts/NotoNastaliqUrdu-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Nastaliq Urdu';
+  src: url('/fonts/NotoNastaliqUrdu-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Nastaliq Urdu';
+  src: url('/fonts/NotoNastaliqUrdu-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -46,9 +75,47 @@ h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: 
   transition: margin-left 0.3s ease;
 }
 
+.main-content.topmenu-active {
+  margin-left: 0;
+  background-color: #0A0F0D !important;
+}
+
+.main-content.sidebar-active {
+  margin-left: var(--sidebar-width);
+  background-color: #fafafa !important;
+}
+
 .main-content.sidebar-collapsed {
   margin-left: var(--sidebar-collapsed-width);
   padding-bottom: 12px;
+}
+
+/* Navigation Toggle Toolbar */
+.nav-toggle-toolbar {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+.nav-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.nav-toggle-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
 }
 
 .app-header {

@@ -27,8 +27,8 @@
   display: flex;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--neutral-200, #E5E7EB);
-  background: var(--neutral-50, #F9FAFB);
+  border-bottom: 1px solid var(--neutral-200, #E2E8F0);
+  background: var(--neutral-50, #F8FAFC);
   border-radius: 16px 16px 0 0;
 }
 
@@ -44,8 +44,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--neutral-200, #E5E7EB);
-  color: var(--neutral-500, #6B7280);
+  background: var(--neutral-200, #E2E8F0);
+  color: var(--neutral-500, #64748B);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,17 +78,17 @@
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: var(--neutral-100, #F3F4F6);
+  background: var(--neutral-100, #F1F5F9);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--neutral-600, #4B5563);
+  color: var(--neutral-600, #475569);
   transition: all 0.2s;
 }
 
 .wizard-close:hover {
-  background: var(--neutral-200, #E5E7EB);
+  background: var(--neutral-200, #E2E8F0);
 }
 
 .wizard-step {
@@ -193,12 +193,12 @@
 }
 
 .btn-secondary {
-  background: var(--neutral-100, #F3F4F6);
-  color: var(--neutral-700, #374151);
+  background: var(--neutral-100, #F1F5F9);
+  color: var(--neutral-700, #334155);
 }
 
 .btn-secondary:hover {
-  background: var(--neutral-200, #E5E7EB);
+  background: var(--neutral-200, #E2E8F0);
 }
 
 .btn-success {
@@ -221,7 +221,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: var(--neutral-50, #F9FAFB);
+  background: var(--neutral-50, #F8FAFC);
   border-radius: 8px;
   margin-bottom: 8px;
 }
@@ -290,7 +290,7 @@
 }
 
 .price-breakdown {
-  background: var(--neutral-50, #F9FAFB);
+  background: var(--neutral-50, #F8FAFC);
   border-radius: 8px;
   padding: 16px;
   margin-top: 16px;
@@ -301,7 +301,7 @@
   justify-content: space-between;
   padding: 8px 0;
   font-size: 13px;
-  color: var(--neutral-600, #4B5563);
+  color: var(--neutral-600, #475569);
 }
 
 .price-row.discount {
@@ -309,12 +309,12 @@
 }
 
 .price-row.total {
-  border-top: 1px solid var(--neutral-200, #E5E7EB);
+  border-top: 1px solid var(--neutral-200, #E2E8F0);
   margin-top: 8px;
   padding-top: 12px;
   font-weight: 700;
   font-size: 16px;
-  color: var(--neutral-900, #111827);
+  color: var(--neutral-900, #0F172A);
 }
 
 /* Review */

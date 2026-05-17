@@ -20,6 +20,8 @@ interface SettingsContextType {
   getSettingValue: (key: string, defaultValue?: string) => string;
   formatCurrency: (amount: number | string | null | undefined) => string;
   getCurrencySymbol: () => string;
+  language: string;
+  setLanguage: (lang: string) => void;
 }
 
 interface SettingsProviderProps {
@@ -39,6 +41,12 @@ export const useSettings = (): SettingsContextType => {
 export const SettingsProvider = ({ children }: SettingsProviderProps) => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [language, setLanguageState] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('minierp_locale') || 'en';
+    }
+    return 'en';
+  });
 
   const { data, isLoading, refetch } = useQuery<Settings>({
     queryKey: ['settings'],
@@ -96,13 +104,24 @@ export const SettingsProvider = ({ children }: SettingsProviderProps) => {
     return settings.currency_symbol?.value || 'Rs.';
   };
 
+  const setLanguage = (lang: string) => {
+    setLanguageState(lang);
+    localStorage.setItem('minierp_locale', lang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = 'ltr';
+    }
+  };
+
   const value: SettingsContextType = {
     settings,
     loading,
     refreshSettings,
     getSettingValue,
     formatCurrency,
-    getCurrencySymbol
+    getCurrencySymbol,
+    language,
+    setLanguage
   };
 
   return (

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 import Button from "../../components/common/Button";
+import { useTranslation } from "../../hooks/useTranslation";
 import { CompactExpenseCardView } from "../../components/common/CompactExpenseCard";
 import DateRangePicker from "../../components/common/DateRangePicker";
 import FormInput from "../../components/common/FormInput";
@@ -41,6 +42,7 @@ import "./Expenses.css";
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function ExpensesPage() {
+  const { t } = useTranslation();
   const { isMobile } = useMobileDetection();
   const [showFilters, setShowFilters] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
@@ -413,8 +415,8 @@ export default function ExpensesPage() {
     <div className="expenses-page">
       <div className="page-header">
         <div>
-          <h1>Expenses</h1>
-          <p className="page-subtitle">Track and manage business expenses</p>
+          <h1>{t('expenses.expenses')}</h1>
+          <p className="page-subtitle">{t('expenses.expenses')}</p>
         </div>
       </div>
 
@@ -616,6 +618,7 @@ export default function ExpensesPage() {
               rowData={filteredExpenses}
               columnDefs={columnDefs}
               defaultColDef={{
+              theme:"legacy",
                 resizable: true,
                 sortable: true,
                 filter: true,

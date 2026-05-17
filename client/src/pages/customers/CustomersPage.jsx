@@ -16,6 +16,7 @@ import PaymentModal from '../../components/customers/PaymentModal';
 import { useSettings } from '../../context/SettingsContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { useTranslation } from '../../hooks/useTranslation';
 import { customerSchema } from '../../schemas';
 import api from '../../utils/api';
 import './CustomersPage.css';
@@ -28,6 +29,7 @@ export default function CustomersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('all');
@@ -258,7 +260,7 @@ export default function CustomersPage() {
     <div className="customers-page">
       <div className="page-header">
         <div>
-          <h1>Customers</h1>
+          <h1>{t('customers.customers')}</h1>
           <p className="page-subtitle">Manage customer accounts and credit information</p>
         </div>
         <div className="header-actions">
@@ -335,6 +337,7 @@ export default function CustomersPage() {
             rowData={customers}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: true,
               filter: true

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { Plus, Search, Edit, Trash2, UserCheck, UserX, MoreVertical, Shield, Mail, Phone } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, UserCheck, UserX, MoreVertical, Shield, Mail, Phone, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import Button from '../../components/common/Button';
@@ -26,6 +26,7 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [selectedUserForReset, setSelectedUserForReset] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch users
@@ -248,6 +249,7 @@ export default function UsersPage() {
             rowData={users}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: true,
               filter: true,
@@ -291,6 +293,7 @@ export default function UsersPage() {
 // User Form Modal Component
 function UserFormModal({ user, onClose, onSuccess }) {
   const isEdit = !!user;
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || '',
     email: user?.email || '',
@@ -384,26 +387,56 @@ function UserFormModal({ user, onClose, onSuccess }) {
         />
 
         {!isEdit && (
-          <FormInput
-            label="Password *"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            required={!isEdit}
-            placeholder="Enter password"
-          />
+          <div className="form-input-group">
+            <div className="form-label-container">
+              <label htmlFor="password-create" className="form-label">Password *</label>
+            </div>
+            <div className="password-input-wrapper">
+              <input
+                id="password-create"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required={!isEdit}
+                placeholder="Enter password"
+                className="form-input"
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
         )}
 
         {isEdit && (
-          <FormInput
-            label="New Password (leave blank to keep current)"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter new password"
-          />
+          <div className="form-input-group">
+            <div className="form-label-container">
+              <label htmlFor="password-edit" className="form-label">New Password (leave blank to keep current)</label>
+            </div>
+            <div className="password-input-wrapper">
+              <input
+                id="password-edit"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter new password"
+                className="form-input"
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
         )}
 
         <FormInput

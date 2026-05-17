@@ -59,6 +59,11 @@
   --border-color-light: #F3F4F6;
 
   /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;

@@ -20,6 +20,7 @@ import SearchableSelect from "../../components/common/SearchableSelect";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { useTranslation } from "../../hooks/useTranslation";
 import { productionSchema } from "../../schemas";
 import api from "../../utils/api";
 import "../inventory/ItemPreview.css";
@@ -31,6 +32,7 @@ export default function ProductionPage() {
   const [editingProduction, setEditingProduction] = useState(null);
   const queryClient = useQueryClient();
   const { isMobile } = useMobileDetection();
+  const { t } = useTranslation();
 
   const {
     data: productions = [],
@@ -195,7 +197,7 @@ export default function ProductionPage() {
     <div className="production-page">
       <div className="page-header">
         <div>
-          <h1>Production</h1>
+          <h1>{t('production.production')}</h1>
           <p className="page-subtitle">
             Record manufacturing and track production output
           </p>
@@ -315,6 +317,7 @@ export default function ProductionPage() {
                   rowData={filteredProductions}
                   columnDefs={columnDefs}
                   defaultColDef={{
+                    theme:"legacy",
                     resizable: true,
                     sortable: false,
                     filter: false,

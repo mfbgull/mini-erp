@@ -5,43 +5,27 @@ import { Chart } from 'chart.js'
 // Available themes
 export const THEMES = {
   DEFAULT: 'default',
-  ERPNEXT: 'erpnext',
-  ODOO: 'odoo',
-  SAP: 'sap'
+  DARK: 'dark'
 } as const;
 
 export type ThemeType = typeof THEMES[keyof typeof THEMES];
 
 // Theme names for display
 export const THEME_NAMES: Record<ThemeType, string> = {
-  [THEMES.DEFAULT]: 'Default Theme',
-  [THEMES.ERPNEXT]: 'ERPNext Theme',
-  [THEMES.ODOO]: 'Odoo ERP Theme',
-  [THEMES.SAP]: 'SAP Fiori Theme'
+  [THEMES.DEFAULT]: 'Light Mode',
+  [THEMES.DARK]: 'Dark Mode'
 };
 
 // Theme icons for display
 export const THEME_ICONS: Record<ThemeType, string> = {
   [THEMES.DEFAULT]: '',
-  [THEMES.ERPNEXT]: '',
-  [THEMES.ODOO]: '',
-  [THEMES.SAP]: ''
+  [THEMES.DARK]: ''
 };
 
 // Theme descriptions
 export const THEME_DESCRIPTIONS: Record<ThemeType, string> = {
-  [THEMES.DEFAULT]: 'Original miniERP styling with flat colors and minimal shadows',
-  [THEMES.ERPNEXT]: 'Professional ERPNext-inspired design with gradients and enhanced depth',
-  [THEMES.ODOO]: 'Odoo ERP-inspired theme with purple/violet color palette',
-  [THEMES.SAP]: 'SAP Fiori-inspired enterprise theme with blue and gold accents'
-};
-
-// Theme CSS file mapping for dynamic loading
-const THEME_CSS_FILES: Record<ThemeType, string> = {
-  [THEMES.DEFAULT]: '/src/assets/styles/default-theme.css',
-  [THEMES.ERPNEXT]: '/src/assets/styles/erpnext-theme.css',
-  [THEMES.ODOO]: '/src/assets/styles/odoo-theme.css',
-  [THEMES.SAP]: '/src/assets/styles/sap-theme.css'
+  [THEMES.DEFAULT]: 'Light mode with clean, professional design',
+  [THEMES.DARK]: 'Dark mode for reduced eye strain'
 };
 
 interface ThemeContextType {
@@ -60,26 +44,13 @@ interface ThemeProviderProps {
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
-// Dynamically load theme CSS
-const loadThemeCSS = (theme: ThemeType) => {
-  const themeId = 'dynamic-theme-css';
-  let linkElement = document.getElementById(themeId) as HTMLLinkElement | null;
-  
-  if (!linkElement) {
-    linkElement = document.createElement('link');
-    linkElement.id = themeId;
-    linkElement.rel = 'stylesheet';
-    document.head.appendChild(linkElement);
-  }
-  
-  linkElement.href = THEME_CSS_FILES[theme];
-};
+// No dynamic CSS loading needed for simple light/dark mode
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  // Load theme from localStorage or use ERPNext as default
+  // Load theme from localStorage or use DEFAULT as default
   const [currentTheme, setCurrentTheme] = useState<ThemeType>(() => {
     const saved = localStorage.getItem('miniERP-theme') as ThemeType | null;
-    return saved || THEMES.ERPNEXT;
+    return saved || THEMES.DEFAULT;
   });
 
   // Load dark mode from localStorage
@@ -94,8 +65,8 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const body = document.body;
 
     // Remove all theme classes
-    root.classList.remove('theme-default', 'theme-erpnext', 'theme-odoo', 'theme-sap');
-    body.classList.remove('theme-default', 'theme-erpnext', 'theme-odoo', 'theme-sap');
+    root.classList.remove('theme-default', 'theme-dark');
+    body.classList.remove('theme-default', 'theme-dark');
 
     // Add current theme class
     root.classList.add(`theme-${currentTheme}`);
@@ -120,9 +91,6 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
       Chart.defaults.backgroundColor = '#FFFFFF';
     }
 
-    // Dynamically load theme CSS
-    loadThemeCSS(currentTheme);
-
     // Save to localStorage
     localStorage.setItem('miniERP-theme', currentTheme);
     localStorage.setItem('miniERP-darkMode', String(isDarkMode));
@@ -130,7 +98,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   // Toggle between themes
   const toggleTheme = () => {
-    const themeOrder: ThemeType[] = [THEMES.DEFAULT, THEMES.ERPNEXT, THEMES.ODOO, THEMES.SAP];
+    const themeOrder: ThemeType[] = [THEMES.DEFAULT, THEMES.DARK];
     const currentIndex = themeOrder.indexOf(currentTheme);
     const nextIndex = (currentIndex + 1) % themeOrder.length;
     setCurrentTheme(themeOrder[nextIndex]);

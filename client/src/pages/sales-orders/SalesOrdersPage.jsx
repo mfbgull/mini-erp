@@ -11,12 +11,14 @@ import Button from '../../components/common/Button';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { useTranslation } from '../../hooks/useTranslation';
 import { salesApi } from '../../utils/salesApi';
 import './SalesOrdersPage.css';
 
 export default function SalesOrdersPage() {
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
 
@@ -45,23 +47,23 @@ export default function SalesOrdersPage() {
       return salesApi.deleteSalesOrder(id);
     },
     onSuccess: () => {
-      toast.success('Sales order deleted successfully');
+      toast.success(t('salesOrders.deleted'));
       queryClient.invalidateQueries(['sales-orders']);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to delete sales order');
+      toast.error(error.response?.data?.error || t('salesOrders.failed'));
     }
   });
 
   const handleDelete = (order) => {
-    if (window.confirm(`Delete sales order "${order.so_no}"?`)) {
+    if (window.confirm(t('salesOrders.confirmDelete'))) {
       deleteMutation.mutate(order.id);
     }
   };
 
   const columnDefs = [
     {
-      headerName: 'SO #',
+      headerName: t('salesOrders.soNo'),
       field: 'so_no',
       sortable: true,
       filter: true,
@@ -76,7 +78,7 @@ export default function SalesOrdersPage() {
       )
     },
     {
-      headerName: 'Date',
+      headerName: t('salesOrders.date'),
       field: 'so_date',
       sortable: true,
       filter: 'agDateColumnFilter',
@@ -84,21 +86,21 @@ export default function SalesOrdersPage() {
       valueFormatter: (params) => params.value ? format(new Date(params.value), 'dd MMM yyyy') : ''
     },
     {
-      headerName: 'Customer',
+      headerName: t('salesOrders.customer'),
       field: 'customer_name',
       sortable: true,
       filter: true,
       width: 180
     },
     {
-      headerName: 'Delivery',
+      headerName: t('salesOrders.delivery'),
       field: 'delivery_date',
       sortable: true,
       width: 110,
       valueFormatter: (params) => params.value ? format(new Date(params.value), 'dd MMM yyyy') : '-'
     },
     {
-      headerName: 'Amount',
+      headerName: t('salesOrders.amount'),
       field: 'total_amount',
       sortable: true,
       width: 120,
@@ -106,7 +108,7 @@ export default function SalesOrdersPage() {
       valueFormatter: (params) => formatCurrency(parseFloat(String(params.value || 0)))
     },
     {
-      headerName: 'Status',
+      headerName: t('salesOrders.status'),
       field: 'status',
       sortable: true,
       filter: true,
@@ -126,7 +128,7 @@ export default function SalesOrdersPage() {
       }
     },
     {
-      headerName: 'Actions',
+      headerName: t('salesOrders.actions'),
       field: 'actions',
       width: 160,
       cellRenderer: (params) => (
@@ -134,7 +136,7 @@ export default function SalesOrdersPage() {
           <button
             type="button"
             className="icon-btn"
-            title="View"
+            title={t('salesOrders.viewDetails')}
             onClick={() => navigate(`/sales-orders/${params.data.id}`)}
           >
             <Eye size={16} />
@@ -142,7 +144,7 @@ export default function SalesOrdersPage() {
           <button
             type="button"
             className="icon-btn"
-            title="Edit"
+            title={t('salesOrders.edit')}
             onClick={() => navigate(`/sales-orders/${params.data.id}/edit`)}
           >
             <Edit2 size={16} />
@@ -151,7 +153,7 @@ export default function SalesOrdersPage() {
             <button
               type="button"
               className="icon-btn"
-              title="Convert to Invoice"
+              title={t('salesOrders.convertToInvoice')}
               onClick={() => navigate(`/sales-orders/${params.data.id}/convert`)}
             >
               <ArrowRight size={16} />
@@ -160,7 +162,7 @@ export default function SalesOrdersPage() {
           <button
             type="button"
             className="icon-btn danger"
-            title="Delete"
+            title={t('salesOrders.delete')}
             onClick={() => handleDelete(params.data)}
           >
             <Trash2 size={16} />
@@ -177,10 +179,10 @@ export default function SalesOrdersPage() {
   };
 
   const mobileColumns = [
-    { key: 'so_no', label: 'SO #' },
-    { key: 'customer_name', label: 'Customer' },
-    { key: 'total_amount', label: 'Amount', format: (v) => formatCurrency(parseFloat(String(v || 0))) },
-    { key: 'status', label: 'Status' }
+    { key: 'so_no', label: t('salesOrders.soNo') },
+    { key: 'customer_name', label: t('salesOrders.customer') },
+    { key: 'total_amount', label: t('salesOrders.amount'), format: (v) => formatCurrency(parseFloat(String(v || 0))) },
+    { key: 'status', label: t('salesOrders.status') }
   ];
 
   return (
@@ -188,32 +190,32 @@ export default function SalesOrdersPage() {
       <div className="page-header">
         <div className="header-title">
           <ShoppingCart size={24} />
-          <h1>Sales Orders</h1>
+          <h1>{t('salesOrders.salesOrders')}</h1>
         </div>
         <Button
           variant="primary"
           icon={<Plus size={18} />}
           onClick={() => navigate('/sales-orders/create')}
         >
-          New Sales Order
+          {t('salesOrders.newSalesOrder')}
         </Button>
       </div>
 
       <div className="summary-cards">
         <div className="summary-card">
-          <span className="summary-label">Total</span>
+          <span className="summary-label">{t('common.total')}</span>
           <span className="summary-value">{orderTotals.count}</span>
         </div>
         <div className="summary-card">
-          <span className="summary-label">Draft</span>
+          <span className="summary-label">{t('salesOrders.draft')}</span>
           <span className="summary-value">{orderTotals.draft}</span>
         </div>
         <div className="summary-card">
-          <span className="summary-label">Confirmed</span>
+          <span className="summary-label">{t('salesOrders.confirmed')}</span>
           <span className="summary-value">{orderTotals.confirmed}</span>
         </div>
         <div className="summary-card">
-          <span className="summary-label">Invoiced</span>
+          <span className="summary-label">{t('salesOrders.invoiced')}</span>
           <span className="summary-value">{orderTotals.invoiced}</span>
         </div>
       </div>

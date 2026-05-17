@@ -976,3 +976,1946 @@ html.dark .customer-preview-detail-item {
   background: #374151 !important;
   border-color: #4B5563 !important;
 }
+
+/* ============================================
+   COMPREHENSIVE DARK MODE FIXES
+   Fixing hardcoded white/light backgrounds
+   ============================================ */
+
+/* Card component dark mode */
+html.dark .card,
+html.dark .card-default,
+html.dark .card-compact,
+html.dark .card-mobile {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .card-header {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .card-footer {
+  background: var(--bg-light) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .card-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .card-subtitle {
+  color: var(--text-secondary) !important;
+}
+
+/* Item Card Dark Mode */
+html.dark .item-card,
+html.dark .item-card-content {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .item-card-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .item-card-stock {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .item-card-menu .menu-dropdown {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .item-card-menu .menu-item {
+  color: var(--text-primary) !important;
+}
+
+html.dark .item-card-menu .menu-item:hover {
+  background: var(--hover-bg) !important;
+}
+
+/* Item Modal Dark Mode */
+html.dark .item-modal {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .item-modal-header {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .item-modal-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .item-modal-code {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .item-modal-close {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .item-description {
+  background: var(--bg-light) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .item-detail-label {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .item-detail-value {
+  color: var(--text-primary) !important;
+}
+
+/* Compact Item Card Dark Mode */
+html.dark .compact-item-card,
+html.dark .compact-stock-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .compact-item-card .item-name,
+html.dark .compact-item-card .item-item-name,
+html.dark .compact-stock-card .stock-item-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .compact-item-card .stock-label,
+html.dark .compact-item-card .item-meta,
+html.dark .compact-item-card .item-item-code,
+html.dark .compact-stock-card .stock-meta,
+html.dark .compact-stock-card .stock-item-code,
+html.dark .compact-stock-card .warehouse-text {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .compact-stock-card .stock-card-warehouse-row {
+  border-color: var(--border-color) !important;
+}
+
+/* Compact Mobile Card Dark Mode */
+html.dark .compact-mobile-cards-wrapper {
+  background: var(--bg-light) !important;
+}
+
+html.dark .compact-mobile-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .compact-item-name,
+html.dark .customer-code,
+html.dark .compact-item-info .compact-item-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .compact-item-code,
+html.dark .invoice-date,
+html.dark .stock-label {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .customer-actions {
+  background: var(--bg-light) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .customer-action-btn {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .mobile-empty-state {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .mobile-empty-state .empty-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .mobile-empty-state .empty-subtitle {
+  color: var(--text-tertiary) !important;
+}
+
+/* Invoice Status Badges Dark Mode */
+html.dark .status-paid {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #34D399 !important;
+}
+
+html.dark .status-partial,
+html.dark .status-partially-paid {
+  background: rgba(245, 158, 11, 0.2) !important;
+  color: #FBBF24 !important;
+}
+
+html.dark .status-overdue {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #FB7185 !important;
+}
+
+html.dark .status-cancelled {
+  background: var(--neutral-700) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .status-pending {
+  background: rgba(59, 130, 246, 0.2) !important;
+  color: #60A5FA !important;
+}
+
+/* Dropdown Menu Dark Mode */
+html.dark .dropdown-menu {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+html.dark .dropdown-item:hover {
+  background: var(--hover-bg) !important;
+}
+
+html.dark .dropdown-item.delete {
+  color: var(--error) !important;
+}
+
+/* Details Modal Dark Mode */
+html.dark .details-modal-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .details-modal {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .details-header {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .details-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .details-code {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .close-button {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .details-content {
+  background: var(--card-bg) !important;
+}
+
+html.dark .detail-section .section-title {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .detail-item {
+  background: var(--bg-light) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .detail-label {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .detail-value {
+  color: var(--text-primary) !important;
+}
+
+html.dark .description-text {
+  background: var(--bg-light) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .type-badges .type-badge {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .type-badge.raw {
+  background: rgba(59, 130, 246, 0.2) !important;
+  color: #60A5FA !important;
+}
+
+html.dark .type-badge.finished {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #34D399 !important;
+}
+
+html.dark .type-badge.purchased {
+  background: rgba(245, 158, 11, 0.2) !important;
+  color: #FBBF24 !important;
+}
+
+html.dark .type-badge.manufactured {
+  background: rgba(139, 92, 246, 0.2) !important;
+  color: #A78BFA !important;
+}
+
+html.dark .details-actions {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* KPI Card Dark Mode */
+html.dark .kpi-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .kpi-label {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .kpi-value {
+  color: var(--text-primary) !important;
+}
+
+html.dark .kpi-subtitle {
+  color: var(--text-tertiary) !important;
+}
+
+/* Chart Card Dark Mode */
+html.dark .chart-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .chart-card h3 {
+  color: var(--text-primary) !important;
+}
+
+/* Alert Card Dark Mode */
+html.dark .alert-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .alert-list {
+  background: var(--bg-light) !important;
+}
+
+html.dark .alert-item {
+  background: var(--bg-subtle) !important;
+  border-color: var(--warning) !important;
+}
+
+html.dark .alert-item-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .alert-item-code {
+  color: var(--text-tertiary) !important;
+}
+
+/* Sidebar Dark Mode */
+html.dark .sidebar {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sidebar-nav {
+  background: transparent !important;
+}
+
+html.dark .nav-item {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .nav-item:hover {
+  background: var(--hover-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .nav-item.active {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+/* Top Menu Dark Mode */
+html.dark .top-menu {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Search Input Dark Mode */
+html.dark .search-input,
+html.dark .compact-mobile-search-input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .search-input::placeholder,
+html.dark .compact-mobile-search-input::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+/* Progress & Loading Dark Mode */
+html.dark .progress,
+html.dark .progress-bar {
+  background: var(--neutral-700) !important;
+}
+
+html.dark .loading-spinner {
+  border-color: var(--neutral-700) !important;
+  border-top-color: var(--primary) !important;
+}
+
+/* Tables Dark Mode */
+html.dark table,
+html.dark .data-table {
+  background: var(--card-bg) !important;
+}
+
+html.dark th,
+html.dark td {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .data-table thead {
+  background: var(--bg-light) !important;
+}
+
+html.dark .data-table th {
+  background: var(--bg-light) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .data-table tbody tr:hover {
+  background: var(--hover-bg) !important;
+}
+
+/* Form Inputs Dark Mode */
+html.dark input,
+html.dark select,
+html.dark textarea,
+html.dark .form-control,
+html.dark .form-input,
+html.dark .form-select,
+html.dark .form-textarea {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Page backgrounds */
+html.dark .page,
+html.dark .page-content,
+html.dark .content-area {
+  background: var(--bg-light) !important;
+}
+
+/* Empty State Dark Mode */
+html.dark .empty-state,
+html.dark .no-data {
+  color: var(--text-tertiary) !important;
+}
+
+/* Scrollbar Dark Mode */
+html.dark ::-webkit-scrollbar-track {
+  background: var(--bg-light) !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--neutral-600) !important;
+}
+
+/* Utility Classes Dark Mode */
+html.dark .text-muted {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .bg-light,
+html.dark .bg-white {
+  background: var(--card-bg) !important;
+}
+
+/* Button overrides for dark mode */
+html.dark .btn-primary {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+html.dark .btn-secondary {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .btn-success {
+  background: var(--success) !important;
+  color: white !important;
+}
+
+html.dark .btn-danger {
+  background: var(--error) !important;
+  color: white !important;
+}
+
+html.dark .btn-warning {
+  background: var(--warning) !important;
+  color: #111827 !important;
+}
+
+html.dark .btn-info {
+  background: var(--info) !important;
+  color: white !important;
+}
+
+/* Item Type Badge Dark Mode */
+html.dark .item-type-badge,
+html.dark .item-type-badge.raw,
+html.dark .item-type-badge.finished,
+html.dark .item-type-badge.purchased,
+html.dark .item-type-badge.manufactured {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Customer Card Dark Mode */
+html.dark .customer-card {
+  border-left-color: var(--success) !important;
+}
+
+/* Action Buttons Dark Mode */
+html.dark .item-action-btn {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .item-action-btn:hover {
+  background: var(--neutral-600) !important;
+}
+
+html.dark .item-action-primary {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+html.dark .item-action-primary:hover {
+  background: var(--primary-600) !important;
+}
+
+html.dark .edit-btn {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+html.dark .delete-btn {
+  background: var(--error) !important;
+  color: white !important;
+}
+
+/* Mobile Empty State Dark Mode */
+html.dark .mobile-empty-state {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Item Section Dark Mode */
+html.dark .item-section-title {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .item-section-meta {
+  border-color: var(--border-color) !important;
+}
+
+html.dark .item-meta-label {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .item-meta-value {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .item-modal-actions {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Loading State Dark Mode */
+html.dark .item-loading-state {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .item-loading-spinner {
+  color: var(--primary) !important;
+}
+
+/* Item Alert Dark Mode */
+html.dark .item-alert {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: var(--error) !important;
+}
+
+/* Detail Grid Dark Mode */
+html.dark .item-details-grid .item-detail-item {
+  background: var(--bg-light) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Reports Dashboard Dark Mode */
+html.dark .page-subtitle {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .stat-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .stat-label {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .stat-value {
+  color: var(--text-primary) !important;
+}
+
+html.dark .stat-subtitle {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .quick-action-btn {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .quick-action-btn:hover {
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+html.dark .report-category {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .category-header {
+  background: linear-gradient(135deg, var(--neutral-700) 0%, var(--neutral-600) 100%) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+html.dark .category-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .report-card {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .report-card:hover {
+  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%) !important;
+}
+
+html.dark .report-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .report-description {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .report-icon {
+  background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-600) 100%) !important;
+  color: var(--primary-200) !important;
+}
+
+/* Page-specific backgrounds - catch common hardcoded colors */
+html.dark .settings-section,
+html.dark .activity-log-page,
+html.dark .pos-page,
+html.dark .forecast-page,
+html.dark .demand-forecast-page {
+  background: var(--bg-light) !important;
+}
+
+/* Common card patterns across pages */
+html.dark .inventory-report-card,
+html.dark .report-card-wrapper,
+html.dark .page-card,
+html.dark .content-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Form sections */
+html.dark .form-section,
+html.dark .form-group,
+html.dark .form-row {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Warehouse and Item pages */
+html.dark .warehouse-card,
+html.dark .item-row,
+html.dark .stock-row {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Customer pages */
+html.dark .customer-card,
+html.dark .customer-row,
+html.dark .ledger-entry {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Sales/Purchase pages */
+html.dark .sales-card,
+html.dark .purchase-card,
+html.dark .order-card,
+html.dark .invoice-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Quote pages */
+html.dark .quotation-card,
+html.dark .quotation-row {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Production/BOM pages */
+html.dark .production-card,
+html.dark .bom-card,
+html.dark .work-order-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Expense pages */
+html.dark .expense-card,
+html.dark .expense-row {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* User/Role pages */
+html.dark .user-card,
+html.dark .role-card,
+html.dark .permission-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Supplier pages */
+html.dark .supplier-card,
+html.dark .supplier-row {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Invoice pages */
+html.dark .invoice-detail-card,
+html.dark .invoice-item-row,
+html.dark .payment-row {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Forecast pages */
+html.dark .forecast-card,
+html.dark .trend-card,
+html.dark .prediction-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Settings pages */
+html.dark .setting-item,
+html.dark .setting-group,
+html.dark .preference-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Catch remaining hardcoded backgrounds */
+html.dark [style*="background: white"],
+html.dark [style*="background:#ffffff"],
+html.dark [style*="background: #ffffff"],
+html.dark [style*="background: #fff"],
+html.dark [style*="background:#fff"] {
+  background: var(--card-bg) !important;
+}
+
+html.dark [style*="background-color: white"],
+html.dark [style*="background-color:#ffffff"],
+html.dark [style*="background-color: #ffffff"],
+html.dark [style*="background-color: #fff"],
+html.dark [style*="background-color:#fff"] {
+  background-color: var(--card-bg) !important;
+}
+
+html.dark [style*="background: #f"],
+html.dark [style*="background:#f"] {
+  background: var(--bg-light) !important;
+}
+
+html.dark [style*="background-color: #f"],
+html.dark [style*="background-color:#f"] {
+  background-color: var(--bg-light) !important;
+}
+
+/* Mobile Action Bar */
+html.dark .mobile-action-bar {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ============================================
+   POS PAGE DARK MODE
+   ============================================ */
+html.dark .pos-page {
+  background: var(--bg-light) !important;
+}
+
+html.dark .pos-header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%) !important;
+}
+
+html.dark .pos-section-header {
+  color: var(--text-primary) !important;
+}
+
+html.dark .pos-barcode-section,
+html.dark .pos-search-section,
+html.dark .pos-cart-section,
+html.dark .pos-payment-section {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .pos-barcode-input,
+html.dark .pos-search-input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .pos-barcode-input:focus,
+html.dark .pos-search-input:focus {
+  border-color: var(--primary) !important;
+}
+
+html.dark .pos-barcode-add-btn {
+  background: var(--primary) !important;
+}
+
+html.dark .pos-search-results {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .pos-search-result-item {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .pos-search-result-item:hover {
+  background: var(--hover-bg) !important;
+}
+
+html.dark .pos-item-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .pos-item-code,
+html.dark .pos-item-stock {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .pos-item-price {
+  color: var(--primary) !important;
+}
+
+html.dark .pos-cart-header {
+  background: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .pos-cart-item {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .cart-item-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .cart-item-code {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .qty-btn {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .qty-input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .cart-col-price,
+html.dark .cart-col-total {
+  color: var(--text-primary) !important;
+}
+
+html.dark .cart-col-total {
+  color: var(--primary) !important;
+}
+
+html.dark .cart-remove-btn {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: var(--error) !important;
+}
+
+html.dark .pos-cart-subtotal {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .pos-total-display {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%) !important;
+}
+
+html.dark .pos-payment-method {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .pos-payment-select,
+html.dark .pos-payment-amount,
+html.dark .pos-payment-ref {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .pos-payment-totals {
+  border-color: var(--border-color) !important;
+}
+
+html.dark .pos-cash-input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .pos-quick-cash-btn {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .pos-quick-cash-btn.exact {
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+html.dark .pos-complete-btn.active {
+  background: var(--primary) !important;
+}
+
+html.dark .pos-clear-btn {
+  background: var(--card-bg) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: var(--error) !important;
+}
+
+/* ============================================
+   SALES INVOICE PAGE DARK MODE
+   ============================================ */
+html.dark .sales-invoice-page-modern {
+  background: var(--bg-light) !important;
+}
+
+html.dark .action-bar-modern {
+  background: var(--card-bg) !important;
+}
+
+html.dark .action-btn-secondary {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .invoice-document-modern {
+  background: var(--card-bg) !important;
+}
+
+html.dark .invoice-header-modern {
+  background: var(--bg-subtle) !important;
+}
+
+html.dark .invoice-title-modern {
+  color: var(--text-primary) !important;
+}
+
+html.dark .invoice-number-modern {
+  background: var(--bg-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .section-label-modern {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .company-name-modern {
+  color: var(--text-primary) !important;
+}
+
+html.dark .contact-info-modern {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .invoice-total-modern {
+  color: var(--primary) !important;
+}
+
+html.dark .invoice-meta-modern {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .customer-section {
+  background: var(--bg-subtle) !important;
+}
+
+html.dark .date-input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .items-header-modern {
+  border-color: var(--border-color) !important;
+}
+
+html.dark .items-title-modern {
+  color: var(--text-primary) !important;
+}
+
+html.dark .discount-label-modern {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .add-item-btn-modern {
+  background: var(--primary) !important;
+}
+
+html.dark .items-table-container-modern {
+  border-color: var(--border-color) !important;
+  background: var(--card-bg) !important;
+}
+
+html.dark .items-table-modern {
+  background: var(--card-bg) !important;
+}
+
+html.dark .items-table-modern thead {
+  background: var(--bg-subtle) !important;
+}
+
+html.dark .items-table-modern th {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .items-table-modern td {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .items-table-modern tbody tr:hover {
+  background: var(--hover-bg) !important;
+}
+
+html.dark .serial-col {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .editable-cell:hover {
+  background: var(--hover-bg) !important;
+}
+
+html.dark .editable-cell {
+  color: var(--text-primary) !important;
+}
+
+html.dark .cell-placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .item-dropdown {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .item-dropdown-option {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .item-dropdown-option:hover,
+html.dark .item-dropdown-option.selected {
+  background: var(--primary-light) !important;
+}
+
+html.dark .item-dropdown-no-results {
+  background: var(--bg-subtle) !important;
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .item-dropdown-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .item-dropdown-code {
+  background: var(--bg-subtle) !important;
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .totals-breakdown-modern {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .total-row-modern {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .total-row-modern.total-final {
+  color: var(--text-primary) !important;
+}
+
+html.dark .discount-value-input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .invoice-footer-modern {
+  border-color: var(--border-color) !important;
+}
+
+html.dark .footer-label {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .footer-textarea {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .payment-section-modern {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .payment-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .payment-summary-item {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .payment-checkbox {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .payments-table {
+  background: var(--card-bg) !important;
+}
+
+html.dark .payments-table th {
+  background: var(--bg-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .payments-table td {
+  color: var(--text-primary) !important;
+}
+
+html.dark .no-payments-message {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .multi-payment-section {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .add-payment-method-btn {
+  background: var(--primary) !important;
+}
+
+html.dark .payment-method-select,
+html.dark .payment-method-amount,
+html.dark .payment-method-reference {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .price-hint-tooltip {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .price-hint-tooltip::before {
+  border-top-color: var(--border-color) !important;
+}
+
+html.dark .price-hint-tooltip::after {
+  border-top-color: var(--card-bg) !important;
+}
+
+html.dark .price-hint-header {
+  color: var(--text-primary) !important;
+}
+
+html.dark .price-hint-footer {
+  border-color: var(--border-color) !important;
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .price-hint-close {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .action-btn-small {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .action-btn-small.delete {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: var(--error) !important;
+}
+
+html.dark .remove-btn-modern {
+  color: var(--error) !important;
+}
+
+/* Invoice Status Badges */
+html.dark .status-badge {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: var(--neutral-700) !important;
+}
+
+html.dark .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+html.dark .text-blue-700 {
+  color: #60A5FA !important;
+}
+
+html.dark .bg-yellow-100 {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+html.dark .text-yellow-700 {
+  color: #FBBF24 !important;
+}
+
+html.dark .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+html.dark .text-green-700 {
+  color: var(--success) !important;
+}
+
+html.dark .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+html.dark .text-red-700 {
+  color: var(--error) !important;
+}
+
+html.dark .bg-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+/* ============================================
+   QUOTATIONS & SALES ORDERS PAGE DARK MODE
+   Fix status badge backgrounds
+   ============================================ */
+html.dark .status-sent,
+html.dark .status-accepted,
+html.dark .status-rejected,
+html.dark .status-converted,
+html.dark .status-expired,
+html.dark .status-confirmed,
+html.dark .status-invoiced,
+html.dark .status-completed,
+html.dark .status-cancelled {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotations-page .status-sent,
+html.dark .quotations-page .status-accepted,
+html.dark .quotations-page .status-rejected,
+html.dark .quotations-page .status-converted,
+html.dark .quotations-page .status-expired {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-orders-page .status-confirmed,
+html.dark .sales-orders-page .status-invoiced,
+html.dark .sales-orders-page .status-completed,
+html.dark .sales-orders-page .status-cancelled {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ============================================
+   QUOTATION FORM PAGE DARK MODE
+   ============================================ */
+html.dark .quotation-form-page {
+  background: var(--bg-light) !important;
+}
+
+html.dark .quotation-form-page .form-card {
+  background: var(--card-bg) !important;
+}
+
+html.dark .quotation-form-page .form-header {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .form-header h2 {
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .form-section-title {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .quotation-form-page .form-field label {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .quotation-form-page .form-field input,
+html.dark .quotation-form-page .form-field select,
+html.dark .quotation-form-page .form-field textarea {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .items-table {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .items-table-header {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .items-table-row {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .items-table-row select,
+html.dark .quotation-form-page .items-table-row input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .remove-item-btn {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .quotation-form-page .totals-section {
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .totals-row span:first-child {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .quotation-form-page .totals-row span:last-child {
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .totals-row.total span {
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .form-actions {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .wizard-steps {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .wizard-step {
+  background: var(--bg-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .quotation-form-page .wizard-step:hover {
+  background: var(--neutral-600) !important;
+}
+
+html.dark .quotation-form-page .wizard-step.active {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+html.dark .quotation-form-page .wizard-step-number {
+  background: var(--neutral-600) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .wizard-step.active .wizard-step-number {
+  background: white !important;
+  color: var(--primary) !important;
+}
+
+html.dark .quotation-form-page .customer-select-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .customer-select-card.selected {
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+}
+
+html.dark .quotation-form-page .customer-icon {
+  background: var(--bg-subtle) !important;
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .quotation-form-page .customer-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .customer-meta {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .quotation-form-page .customer-dropdown {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .customer-dropdown-item {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .customer-dropdown-item:hover {
+  background: var(--primary-light) !important;
+}
+
+html.dark .quotation-form-page .empty-state-icon {
+  background: var(--bg-subtle) !important;
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .quotation-form-page .empty-state-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .empty-state-message {
+  color: var(--text-tertiary) !important;
+}
+
+/* Quotation Form Page Sales Invoice Modern Styles */
+html.dark .quotation-form-page .sales-invoice-page-modern {
+  background: var(--bg-light) !important;
+}
+
+html.dark .quotation-form-page .action-bar-modern {
+  background: var(--card-bg) !important;
+}
+
+html.dark .quotation-form-page .action-btn-secondary {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .invoice-document-modern {
+  background: var(--card-bg) !important;
+}
+
+html.dark .quotation-form-page .invoice-header-modern {
+  background: var(--bg-subtle) !important;
+}
+
+html.dark .quotation-form-page .invoice-title-modern {
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .invoice-number-modern {
+  background: var(--bg-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .quotation-form-page .company-name-modern {
+  color: var(--text-primary) !important;
+}
+
+html.dark .quotation-form-page .contact-info-modern {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .quotation-form-page .invoice-total-modern {
+  color: var(--primary) !important;
+}
+
+html.dark .quotation-form-page .items-header-modern {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .quotation-form-page .items-table-modern {
+  background: var(--card-bg) !important;
+}
+
+/* ============================================
+   SALES ORDER FORM PAGE DARK MODE
+   ============================================ */
+html.dark .sales-order-form-page {
+  background: var(--bg-light) !important;
+}
+
+html.dark .sales-order-form-page .form-card {
+  background: var(--card-bg) !important;
+}
+
+html.dark .sales-order-form-page .form-header {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .form-header h2 {
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .form-section-title {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .sales-order-form-page .form-field label {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .sales-order-form-page .form-field input,
+html.dark .sales-order-form-page .form-field select,
+html.dark .sales-order-form-page .form-field textarea {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .items-table {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .items-table-header {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .items-table-row {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .items-table-row select,
+html.dark .sales-order-form-page .items-table-row input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .remove-item-btn {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .sales-order-form-page .totals-section {
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .totals-row span:first-child {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .sales-order-form-page .totals-row span:last-child {
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .totals-row.total span {
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .form-actions {
+  background: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .wizard-steps {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .wizard-step {
+  background: var(--bg-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark .sales-order-form-page .wizard-step:hover {
+  background: var(--neutral-600) !important;
+}
+
+html.dark .sales-order-form-page .wizard-step.active {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+html.dark .sales-order-form-page .wizard-step-number {
+  background: var(--neutral-600) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .wizard-step.active .wizard-step-number {
+  background: white !important;
+  color: var(--primary) !important;
+}
+
+html.dark .sales-order-form-page .customer-select-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .customer-select-card.selected {
+  background: var(--primary-light) !important;
+  border-color: var(--primary) !important;
+}
+
+html.dark .sales-order-form-page .customer-icon {
+  background: var(--bg-subtle) !important;
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .sales-order-form-page .customer-name {
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .customer-meta {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .sales-order-form-page .customer-dropdown {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .customer-dropdown-item {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .customer-dropdown-item:hover {
+  background: var(--primary-light) !important;
+}
+
+html.dark .sales-order-form-page .empty-state-icon {
+  background: var(--bg-subtle) !important;
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .sales-order-form-page .empty-state-title {
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .empty-state-message {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .sales-order-form-page.desktop-layout,
+html.dark .sales-order-form-page .sales-invoice-page-modern {
+  background: var(--bg-light) !important;
+}
+
+html.dark .sales-order-form-page .item-dropdown {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sales-order-form-page .item-dropdown-item {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .sales-order-form-page .item-dropdown-item:hover,
+html.dark .sales-order-form-page .item-dropdown-item.selected {
+  background: var(--primary-light) !important;
+}
+
+html.dark .sales-order-form-page .item-dropdown-item .item-dropdown-price {
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   AG-GRID FILTER INPUTS & MORE FORM FIXES
+   ============================================ */
+html.dark .ag-theme-quartz .ag-filter-toolbar-search,
+html.dark .ag-theme-quartz .ag-filter-toolbar-input,
+html.dark .ag-filter-toolbar-search,
+html.dark .ag-filter-toolbar-input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .ag-theme-quartz .ag-header-cell-text,
+html.dark .ag-header-cell-text {
+  color: var(--text-primary) !important;
+}
+
+html.dark .ag-theme-quartz .ag-filter-toolbar-button,
+html.dark .ag-filter-toolbar-button {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+/* Form Select Dropdowns */
+html.dark select,
+html.dark .form-select,
+html.dark select.form-control,
+html.dark select.form-input {
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Filter dropdown in AG-Grid header */
+html.dark .ag-theme-quartz .ag-header .ag-input-field-wrapper,
+html.dark .ag-input-field-wrapper {
+  background: var(--input-bg) !important;
+}
+
+/* Category/Filter chips/buttons */
+html.dark .category-btn,
+html.dark .filter-chip,
+html.dark .category-chip,
+html.dark .ag-filter-select {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .category-btn.active,
+html.dark .filter-chip.active,
+html.dark .category-chip.active,
+html.dark .ag-filter-select.active {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+/* More button styles */
+html.dark .btn,
+html.dark .button,
+html.dark button[class*="btn"] {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* BOM Page stat-card fix - override page-specific white background */
+html.dark .bom-page .stat-card,
+html.dark body .bom-page .stat-card {
+  background-color: var(--card-bg) !important;
+  background: var(--card-bg) !important;
+}
+
+/* Production Page stat-card fix */
+html.dark .production-page .stat-card,
+html.dark body .production-page .stat-card {
+  background-color: var(--card-bg) !important;
+  background: var(--card-bg) !important;
+}
+
+/* All pages with stat-card - highest specificity */
+html.dark .stat-card,
+html.dark body .stat-card,
+html.dark [class*="stat-card"],
+html.dark [class*="summary-card"] {
+  background-color: var(--card-bg) !important;
+  background: var(--card-bg) !important;
+}
+
+/* POS Page comprehensive dark mode fixes */
+html.dark .pos-page,
+html.dark .pos-page .pos-barcode-section,
+html.dark .pos-page .pos-search-section,
+html.dark .pos-page .pos-search-results,
+html.dark .pos-page .pos-cart-section,
+html.dark .pos-page .pos-payment-section,
+html.dark .pos-page .pos-cart-header,
+html.dark .pos-page .pos-payment-method,
+html.dark .pos-page .pos-quick-cash-btn,
+html.dark .pos-page .pos-complete-btn.disabled,
+html.dark .pos-page .pos-clear-btn {
+  background-color: var(--card-bg) !important;
+  background: var(--card-bg) !important;
+}
+
+/* POS Page inputs */
+html.dark .pos-page .pos-barcode-input,
+html.dark .pos-page .pos-search-input,
+html.dark .pos-page .pos-cash-input,
+html.dark .pos-page .qty-input,
+html.dark .pos-page input[type="text"],
+html.dark .pos-page input[type="number"],
+html.dark .pos-page input[type="search"] {
+  background-color: var(--input-bg) !important;
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* POS Page select dropdowns */
+html.dark .pos-page select,
+html.dark .pos-page .pos-payment-select,
+html.dark .pos-page .pos-payment-amount,
+html.dark .pos-page .pos-payment-ref {
+  background-color: var(--input-bg) !important;
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* POS search results dropdown */
+html.dark .pos-page .pos-search-result-item {
+  background-color: var(--card-bg) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+html.dark .pos-page .pos-search-result-item:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+/* POS cart items */
+html.dark .pos-page .pos-cart-item,
+html.dark .pos-page .cart-item-name,
+html.dark .pos-page .cart-item-code {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* POS remove and qty buttons */
+html.dark .pos-page .cart-remove-btn,
+html.dark .pos-page .qty-btn {
+  background-color: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* All page action buttons - Create New, Save, Cancel, etc */
+html.dark .bom-page .bom-actions .btn,
+html.dark .production-page .production-actions .btn,
+html.dark .page-header .header-actions .btn,
+html.dark .page-header-actions,
+html.dark .form-actions .btn,
+html.dark .action-buttons,
+html.dark .action-buttons .btn,
+html.dark .btn,
+html.dark .btn-primary,
+html.dark .btn-secondary,
+html.dark .btn-success,
+html.dark .btn-danger,
+html.dark .quick-action-btn,
+html.dark .btn-small {
+  background-color: var(--neutral-700) !important;
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Primary action buttons (Create, Save, etc) */
+html.dark .btn-primary,
+html.dark .form-actions .btn-primary,
+html.dark .action-buttons .primary {
+  background-color: var(--primary) !important;
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+/* Secondary/Cancel buttons */
+html.dark .btn-secondary,
+html.dark .form-actions .btn-secondary,
+html.dark .action-buttons .secondary {
+  background-color: var(--neutral-600) !important;
+  background: var(--neutral-600) !important;
+  color: var(--text-primary) !important;
+}

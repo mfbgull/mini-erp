@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,        // listen on 0.0.0.0 (external access)
-    port: 5173,
+    port: 3010,
     // SECURITY: Restrict allowed hosts in production via env var
     // In dev, allow localhost. In production, should be set explicitly.
     allowedHosts: process.env.VITE_ALLOWED_HOSTS
@@ -13,7 +13,7 @@ export default defineConfig({
       : true,
     proxy: {
       '/api': {
-        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3010',
+        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3011',
         changeOrigin: true
       }
     }

@@ -28,6 +28,7 @@ import Modal from "../../components/common/Modal";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { useTranslation } from "../../hooks/useTranslation";
 import { purchaseSchema } from "../../schemas";
 import api from "../../utils/api";
 import "./PurchasesPage.css";
@@ -37,6 +38,7 @@ export default function PurchasesPage() {
   const [previewPurchase, setPreviewPurchase] = useState(null);
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
 
@@ -87,7 +89,7 @@ export default function PurchasesPage() {
   // Export to CSV
   const handleExport = () => {
     if (purchases.length === 0) {
-      toast.error("No purchases to export");
+      toast.error(t('purchases.noPurchases'));
       return;
     }
 
@@ -131,19 +133,19 @@ export default function PurchasesPage() {
     link.click();
     document.body.removeChild(link);
 
-    toast.success("Purchases exported successfully!");
+    toast.success(t('purchases.purchaseSaved'));
   };
 
   const columnDefs = [
     {
-      headerName: "Purchase #",
+      headerName: t('purchases.purchaseNumber'),
       field: "purchase_no",
       sortable: true,
       filter: true,
       flex: 1,
     },
     {
-      headerName: "Date",
+      headerName: t('purchases.dateCol'),
       field: "purchase_date",
       sortable: true,
       filter: "agDateColumnFilter",
@@ -151,14 +153,14 @@ export default function PurchasesPage() {
       valueFormatter: (params) => format(new Date(params.value), "dd MMM yyyy"),
     },
     {
-      headerName: "Item",
+      headerName: t('purchases.itemCol'),
       field: "item_name",
       sortable: true,
       filter: true,
       flex: 2,
     },
     {
-      headerName: "Quantity",
+      headerName: t('purchases.quantityCol'),
       field: "quantity",
       sortable: true,
       filter: "agNumberColumnFilter",
@@ -167,7 +169,7 @@ export default function PurchasesPage() {
         `${parseFloat(params.value).toFixed(2)} ${params.data.unit_of_measure}`,
     },
     {
-      headerName: "Unit Cost",
+      headerName: t('purchases.unitCost'),
       field: "unit_cost",
       sortable: true,
       filter: "agNumberColumnFilter",
@@ -175,7 +177,7 @@ export default function PurchasesPage() {
       valueFormatter: (params) => formatCurrency(parseFloat(params.value)),
     },
     {
-      headerName: "Total",
+      headerName: t('purchases.totalCol'),
       field: "total_cost",
       sortable: true,
       filter: "agNumberColumnFilter",
@@ -185,7 +187,7 @@ export default function PurchasesPage() {
       ),
     },
     {
-      headerName: "Supplier",
+      headerName: t('purchases.supplierCol'),
       field: "supplier_name",
       sortable: true,
       filter: true,
@@ -193,7 +195,7 @@ export default function PurchasesPage() {
       valueFormatter: (params) => params.value || "—",
     },
     {
-      headerName: "Warehouse",
+      headerName: t('purchases.warehouseCol'),
       field: "warehouse_name",
       filter: true,
       flex: 1.5,
@@ -208,13 +210,13 @@ export default function PurchasesPage() {
     <div className="purchases-page">
       <div className="page-header">
         <div>
-          <h1>Purchases</h1>
+          <h1>{t('purchases.purchases')}</h1>
           <p className="page-subtitle">
-            Record direct purchases and track costs
+            {t('purchases.subtitle')}
           </p>
         </div>
         <Button variant="primary" onClick={handleNew}>
-          + Record Purchase
+          + {t('purchases.recordPurchase')}
         </Button>
       </div>
 
@@ -225,9 +227,9 @@ export default function PurchasesPage() {
             <ShoppingCart size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Total Purchases</div>
+            <div className="stat-label">{t('purchases.totalPurchasesCard')}</div>
             <div className="stat-value">{stats.totalPurchases}</div>
-            {!isMobile && <div className="stat-subtitle">All transactions</div>}
+            {!isMobile && <div className="stat-subtitle">{t('purchases.allTransactions')}</div>}
           </div>
         </div>
 
@@ -236,9 +238,9 @@ export default function PurchasesPage() {
             <DollarSign size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Total Value</div>
+            <div className="stat-label">{t('purchases.totalValueCard')}</div>
             <div className="stat-value">{formatCurrency(stats.totalValue)}</div>
-            {!isMobile && <div className="stat-subtitle">Purchase cost</div>}
+            {!isMobile && <div className="stat-subtitle">{t('purchases.purchaseCost')}</div>}
           </div>
         </div>
 
@@ -247,11 +249,11 @@ export default function PurchasesPage() {
             <BarChart3 size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Total Quantity</div>
+            <div className="stat-label">{t('purchases.totalQuantityCard')}</div>
             <div className="stat-value">
               {parseFloat(stats.totalQuantity).toFixed(2)}
             </div>
-            {!isMobile && <div className="stat-subtitle">Aggregate items</div>}
+            {!isMobile && <div className="stat-subtitle">{t('purchases.aggregateItems')}</div>}
           </div>
         </div>
 
@@ -260,9 +262,9 @@ export default function PurchasesPage() {
             <Building2 size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Suppliers</div>
+            <div className="stat-label">{t('purchases.suppliersCard')}</div>
             <div className="stat-value">{stats.uniqueSuppliers}</div>
-            {!isMobile && <div className="stat-subtitle">Unique vendors</div>}
+            {!isMobile && <div className="stat-subtitle">{t('purchases.uniqueVendors')}</div>}
           </div>
         </div>
 
@@ -271,10 +273,10 @@ export default function PurchasesPage() {
             <Package size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Items</div>
+            <div className="stat-label">{t('purchases.itemsCard')}</div>
             <div className="stat-value">{stats.uniqueItems}</div>
             {!isMobile && (
-              <div className="stat-subtitle">Products purchased</div>
+              <div className="stat-subtitle">{t('purchases.productsPurchased')}</div>
             )}
           </div>
         </div>
@@ -284,11 +286,11 @@ export default function PurchasesPage() {
             <TrendingUp size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Average Value</div>
+            <div className="stat-label">{t('purchases.averageValue')}</div>
             <div className="stat-value">
               {formatCurrency(stats.averagePurchaseValue)}
             </div>
-            {!isMobile && <div className="stat-subtitle">Per purchase</div>}
+            {!isMobile && <div className="stat-subtitle">{t('purchases.perPurchase')}</div>}
           </div>
         </div>
 
@@ -302,20 +304,20 @@ export default function PurchasesPage() {
             <Gem size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Largest Purchase</div>
+            <div className="stat-label">{t('purchases.largestPurchase')}</div>
             <div
               className="stat-value"
               style={isMobile ? undefined : { fontSize: "1.4rem" }}
             >
               {stats.largestPurchase.total_cost
                 ? formatCurrency(stats.largestPurchase.total_cost)
-                : "N/A"}
+                : t('purchases.noPurchasesYet')}
             </div>
             {!isMobile && (
               <div className="stat-subtitle">
                 {stats.largestPurchase.total_cost
                   ? `${formatCurrency(stats.largestPurchase.total_cost)} on ${format(new Date(stats.largestPurchase.purchase_date), "MMM dd")}`
-                  : "No purchases"}
+                  : t('purchases.noPurchasesYet')}
               </div>
             )}
           </div>
@@ -331,9 +333,9 @@ export default function PurchasesPage() {
             <CalendarDays size={isMobile ? 18 : 24} color="white" />
           </div>
           <div className="stat-content">
-            <div className="stat-label">Recent (30 Days)</div>
+            <div className="stat-label">{t('purchases.recent30Days')}</div>
             <div className="stat-value">{stats.recentPurchases}</div>
-            {!isMobile && <div className="stat-subtitle">Last month</div>}
+            {!isMobile && <div className="stat-subtitle">{t('purchases.lastMonth')}</div>}
           </div>
         </div>
       </div>
@@ -344,41 +346,42 @@ export default function PurchasesPage() {
       >
         <button className="quick-action-btn" onClick={handleExport}>
           <Download className="action-icon" size={isMobile ? 18 : 24} />
-          <span className="action-text">Export</span>
+          <span className="action-text">{t('purchases.export')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/reports/purchase-summary")}
         >
           <ClipboardList className="action-icon" size={isMobile ? 18 : 24} />
-          <span className="action-text">Summary</span>
+          <span className="action-text">{t('purchases.summary')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/reports/stock-valuation")}
         >
           <Wallet className="action-icon" size={isMobile ? 18 : 24} />
-          <span className="action-text">Valuation</span>
+          <span className="action-text">{t('purchases.valuation')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/inventory/stock-movements")}
         >
           <BarChart3 className="action-icon" size={isMobile ? 18 : 24} />
-          <span className="action-text">Movements</span>
+          <span className="action-text">{t('purchases.movements')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/inventory/items")}
         >
           <Package className="action-icon" size={isMobile ? 18 : 24} />
-          <span className="action-text">Items</span>
+          <span className="action-text">{t('purchases.itemsAction')}</span>
         </button>
       </div>
 
       {isLoading ? (
         <div className="loading">
           <div className="spinner"></div>
+          <p>{t('purchases.loading')}</p>
         </div>
       ) : isMobile ? (
         <CompactPurchaseCardView
@@ -387,7 +390,7 @@ export default function PurchasesPage() {
           onEdit={(purchase) => {
             // For now, navigate to a hypothetical edit page or open modal
             // Could implement inline edit or navigate to edit page
-            toast.info("Edit functionality coming soon");
+            toast.info(t('errors.comingSoon'));
           }}
           onNew={handleNew}
         />
@@ -397,6 +400,7 @@ export default function PurchasesPage() {
             rowData={purchases}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: false,
               filter: false,
@@ -414,7 +418,7 @@ export default function PurchasesPage() {
           purchase={previewPurchase}
           onClose={() => setPreviewPurchase(null)}
           onEdit={() => {
-            toast.info("Edit functionality coming soon");
+            toast.info(t('errors.comingSoon'));
           }}
         />
       )}
@@ -422,7 +426,7 @@ export default function PurchasesPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Record Purchase"
+        title={t('purchases.recordNewPurchase')}
         size="medium"
       >
         <PurchaseForm
@@ -476,11 +480,11 @@ function PurchaseForm({ onClose, onSuccess }) {
       return api.post("/purchases", data);
     },
     onSuccess: () => {
-      toast.success("Purchase recorded successfully!");
+      toast.success(t('purchases.purchaseSaved'));
       onSuccess();
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || "Failed to record purchase");
+      toast.error(error.response?.data?.error || t('errors.failed'));
     },
   });
 
@@ -522,7 +526,7 @@ function PurchaseForm({ onClose, onSuccess }) {
     <form onSubmit={handleSubmit} className="purchase-form">
       <div className="form-row">
         <FormInput
-          label="Item *"
+          label={t('fields.item') + " *"}
           name="item_id"
           type="searchable-select"
           value={formData.item_id}
@@ -531,12 +535,12 @@ function PurchaseForm({ onClose, onSuccess }) {
             value: item.id,
             label: `${item.item_code} - ${item.item_name}`,
           }))}
-          placeholder="Search items..."
+          placeholder={t('purchases.searchItems')}
           required
         />
 
         <FormInput
-          label="Warehouse *"
+          label={t('fields.warehouse') + " *"}
           name="warehouse_id"
           type="searchable-select"
           value={formData.warehouse_id}
@@ -545,14 +549,14 @@ function PurchaseForm({ onClose, onSuccess }) {
             value: wh.id,
             label: `${wh.warehouse_code} - ${wh.warehouse_name}`,
           }))}
-          placeholder="Search warehouses..."
+          placeholder={t('purchases.searchWarehouses')}
           required
         />
       </div>
 
       <div className="form-row">
         <FormInput
-          label="Quantity *"
+          label={t('fields.quantity') + " *"}
           name="quantity"
           type="number"
           step="0.001"
@@ -563,7 +567,7 @@ function PurchaseForm({ onClose, onSuccess }) {
         />
 
         <FormInput
-          label="Unit Cost *"
+          label={t('purchases.unitCost') + " *"}
           name="unit_cost"
           type="number"
           step="0.01"
@@ -576,14 +580,14 @@ function PurchaseForm({ onClose, onSuccess }) {
 
       {formData.quantity && formData.unit_cost && (
         <div className="total-cost-display">
-          <span>Total Cost:</span>
+          <span>{t('purchases.totalCostLabel')}</span>
           <strong>{formatCurrency(parseFloat(totalCost))}</strong>
         </div>
       )}
 
       <div className="form-row">
         <FormInput
-          label="Purchase Date *"
+          label={t('purchases.purchaseDate') + " *"}
           name="purchase_date"
           type="date"
           value={formData.purchase_date}
@@ -592,38 +596,38 @@ function PurchaseForm({ onClose, onSuccess }) {
         />
 
         <FormInput
-          label="Supplier Name"
+          label={t('purchases.supplierName')}
           name="supplier_name"
           value={formData.supplier_name}
           onChange={handleChange}
-          placeholder="e.g., ABC Suppliers"
+          placeholder={t('purchases.supplierPlaceholder')}
         />
       </div>
 
       <FormInput
-        label="Invoice Number"
+        label={t('purchases.invoiceNumber')}
         name="invoice_no"
         value={formData.invoice_no}
         onChange={handleChange}
-        placeholder="e.g., INV-2025-001"
+        placeholder={t('purchases.invoicePlaceholder')}
       />
 
       <FormInput
-        label="Remarks"
+        label={t('purchases.remarks')}
         name="remarks"
         type="textarea"
         value={formData.remarks}
         onChange={handleChange}
-        placeholder="Additional notes about this purchase..."
+        placeholder={t('purchases.remarksPlaceholder')}
         rows={3}
       />
 
       <div className="form-actions">
         <Button type="button" variant="secondary" onClick={onClose}>
-          Cancel
+          {t('purchases.cancel')}
         </Button>
         <Button type="submit" variant="primary" loading={mutation.isPending}>
-          Record Purchase
+          {t('purchases.recordPurchase')}
         </Button>
       </div>
     </form>

@@ -11,6 +11,7 @@ import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { useTranslation } from '../../hooks/useTranslation';
 import { warehouseSchema } from '../../schemas';
 import api from '../../utils/api';
 import './WarehousesPage.css';
@@ -20,6 +21,7 @@ export default function WarehousesPage() {
   const [editingWarehouse, setEditingWarehouse] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { isMobile } = useMobileDetection();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data: warehouses = [], isLoading } = useQuery({
@@ -97,7 +99,7 @@ export default function WarehousesPage() {
     <div className="items-page warehouses-page">
       <div className="page-header">
         <div>
-          <h1>Warehouses</h1>
+          <h1>{t('warehouses.warehouses')}</h1>
           <p className="page-subtitle">Manage storage locations</p>
         </div>
         {!isMobile && (
@@ -158,7 +160,7 @@ export default function WarehousesPage() {
           <AgGridReact
             rowData={filteredWarehouses}
             columnDefs={columnDefs}
-            defaultColDef={{
+defaultColDef={{
               resizable: true,
               sortable: false,
               filter: false

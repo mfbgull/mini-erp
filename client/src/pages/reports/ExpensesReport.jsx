@@ -463,6 +463,7 @@ export default function ExpensesReport() {
                 rowData={reportData.expenses}
                 columnDefs={columnDefs}
                 defaultColDef={{
+                  theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

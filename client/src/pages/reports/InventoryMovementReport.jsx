@@ -425,6 +425,7 @@ export default function InventoryMovementReport() {
                 rowData={reportData.movements}
                 columnDefs={columnDefs}
                 defaultColDef={{
+                  theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

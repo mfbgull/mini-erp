@@ -183,7 +183,12 @@ export default function DemandForecast() {
         <AgGridReact
           rowData={forecasts}
           columnDefs={columns}
-          defaultColDef={{ sortable: true, filter: true }}
+            defaultColDef={{
+              theme:"legacy",
+              resizable: true,
+              sortable: true,
+              filter: true
+            }}
           pagination={true}
           paginationPageSize={20}
           rowSelection="single"

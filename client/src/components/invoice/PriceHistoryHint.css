@@ -43,7 +43,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--erp-transition-base) var(--erp-ease);
+  transition: all var(--transition-normal) ease;
 }
 
 .hint-close:hover {
@@ -77,8 +77,8 @@
 
 .hint-header h4 {
   margin: 0;
-  font-size: var(--erp-font-size-lg);
-  font-weight: var(--erp-font-weight-bold);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
 }
 
@@ -109,19 +109,19 @@
 }
 
 .price-label {
-  font-size: var(--erp-font-size-sm);
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  font-weight: var(--erp-font-weight-medium);
+  font-weight: var(--font-weight-medium);
 }
 
 .price-value {
-  font-size: var(--erp-font-size-xl);
-  font-weight: var(--erp-font-weight-bold);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
   color: var(--text-primary);
 }
 
 .invoice-date {
-  font-size: var(--erp-font-size-xs);
+  font-size: var(--font-size-xs);
   color: var(--text-tertiary);
   display: block;
   margin-top: 2px;
@@ -178,13 +178,13 @@
   padding: var(--space-sm);
   border-radius: var(--radius-sm);
   text-align: center;
-  font-size: var(--erp-font-size-sm);
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
 
 .transaction-count {
   display: block;
-  font-weight: var(--erp-font-weight-medium);
+  font-weight: var(--font-weight-medium);
 }
 
 .avg-price {
@@ -217,7 +217,7 @@
 }
 
 .rec-text {
-  font-size: var(--erp-font-size-sm);
+  font-size: var(--font-size-sm);
   color: var(--text-primary);
   flex: 1;
 }
@@ -235,7 +235,7 @@
 
 .countdown-timer {
   text-align: center;
-  font-size: var(--erp-font-size-sm);
+  font-size: var(--font-size-sm);
   color: var(--neutral-600);
   padding: var(--space-sm) 0;
   margin-top: var(--space-md);
@@ -271,21 +271,8 @@
   }
 
   .price-value {
-    font-size: var(--erp-font-size-lg);
+    font-size: var(--font-size-lg);
   }
-}
-
-/* Theme-specific styles */
-.theme-erpnext .price-history-hint {
-  box-shadow: var(--erp-shadow-lg);
-}
-
-.theme-odoo .price-history-hint {
-  box-shadow: var(--odoo-shadow-lg);
-}
-
-.theme-sap .price-history-hint {
-  box-shadow: var(--sap-shadow-md);
 }
 
 /* Icon utility */

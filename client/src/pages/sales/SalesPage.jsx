@@ -13,12 +13,14 @@ import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import './SalesPage.css';
 
 export default function SalesPage() {
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
   const [previewInvoice, setPreviewInvoice] = useState(null);
@@ -58,16 +60,16 @@ export default function SalesPage() {
       return api.delete(`/invoices/${invoiceId}`);
     },
     onSuccess: () => {
-      toast.success('Invoice deleted successfully');
+      toast.success(t('sales.invoiceDeleted'));
       queryClient.invalidateQueries(['invoices']);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to delete invoice');
+      toast.error(error.response?.data?.error || t('messages.error'));
     }
   });
 
   const handleDeleteInvoice = (invoice) => {
-    if (window.confirm(`Are you sure you want to delete invoice "${invoice.invoice_no}"?`)) {
+    if (window.confirm(`${t('sales.confirmDelete')} "${invoice.invoice_no}"?`)) {
       deleteInvoiceMutation.mutate(invoice.id);
     }
   };
@@ -75,7 +77,7 @@ export default function SalesPage() {
   // Invoice column definitions
   const invoiceColumnDefs = [
     {
-      headerName: 'Invoice #',
+      headerName: t('sales.invoiceNo'),
       field: 'invoice_no',
       sortable: true,
       filter: true,
@@ -90,7 +92,7 @@ export default function SalesPage() {
       )
     },
     {
-      headerName: 'Date',
+      headerName: t('sales.date'),
       field: 'invoice_date',
       sortable: true,
       filter: 'agDateColumnFilter',
@@ -98,7 +100,7 @@ export default function SalesPage() {
       valueFormatter: params => params.value ? format(new Date(params.value), 'dd MMM yyyy') : ''
     },
     {
-      headerName: 'Customer',
+      headerName: t('fields.customer'),
       field: 'customer_name',
       sortable: true,
       filter: true,
@@ -106,7 +108,7 @@ export default function SalesPage() {
       minWidth: 150
     },
     {
-      headerName: 'Due Date',
+      headerName: t('sales.dueDate'),
       field: 'due_date',
       sortable: true,
       filter: 'agDateColumnFilter',
@@ -114,7 +116,7 @@ export default function SalesPage() {
       valueFormatter: params => params.value ? format(new Date(params.value), 'dd MMM yyyy') : ''
     },
     {
-      headerName: 'Total',
+      headerName: t('fields.total'),
       field: 'total_amount',
       sortable: true,
       filter: 'agNumberColumnFilter',
@@ -122,7 +124,7 @@ export default function SalesPage() {
       valueFormatter: params => formatCurrency(parseFloat(params.value || 0))
     },
     {
-      headerName: 'Paid',
+      headerName: t('status.paid'),
       field: 'paid_amount',
       sortable: true,
       filter: 'agNumberColumnFilter',
@@ -131,7 +133,7 @@ export default function SalesPage() {
       cellClass: 'text-success'
     },
     {
-      headerName: 'Balance',
+      headerName: t('fields.balance'),
       field: 'balance_amount',
       sortable: true,
       filter: 'agNumberColumnFilter',
@@ -140,7 +142,7 @@ export default function SalesPage() {
       cellClass: params => parseFloat(params.value || 0) > 0 ? 'text-danger' : ''
     },
     {
-      headerName: 'Status',
+      headerName: t('fields.status'),
       field: 'status',
       sortable: true,
       filter: true,
@@ -152,7 +154,7 @@ export default function SalesPage() {
       )
     },
     {
-      headerName: 'Actions',
+      headerName: t('sales.actions'),
       field: 'actions',
       width: 120,
       sortable: false,
@@ -182,13 +184,13 @@ export default function SalesPage() {
     <div className="sales-page">
       <div className="page-header">
         <div className="header-content">
-          <h1>Sales</h1>
-          <p className="page-subtitle">Manage invoices</p>
+          <h1>{t('nav.sales')}</h1>
+          <p className="page-subtitle">{t('sales.invoices')}</p>
         </div>
         <div className="header-actions">
           <Button variant="primary" onClick={() => navigate('/sales/invoice')}>
             <Plus size={18} />
-            New Invoice
+            {t('sales.newInvoice')}
           </Button>
         </div>
       </div>
@@ -201,7 +203,7 @@ export default function SalesPage() {
           </div>
           <div className="summary-content">
             <div className="summary-value">{invoiceTotals.count}</div>
-            <div className="summary-label">Total Invoices</div>
+            <div className="summary-label">{t('sales.allInvoices')}</div>
           </div>
         </div>
         <div className="summary-card">
@@ -210,19 +212,19 @@ export default function SalesPage() {
           </div>
           <div className="summary-content">
             <div className="summary-value">{formatCurrency(invoiceTotals.total)}</div>
-            <div className="summary-label">Total Invoiced</div>
+            <div className="summary-label">{t('sales.totalSales')}</div>
           </div>
         </div>
         <div className="summary-card success">
           <div className="summary-content">
             <div className="summary-value">{formatCurrency(invoiceTotals.paid)}</div>
-            <div className="summary-label">Total Received</div>
+            <div className="summary-label">{t('sales.totalPaid')}</div>
           </div>
         </div>
         <div className="summary-card warning">
           <div className="summary-content">
             <div className="summary-value">{formatCurrency(invoiceTotals.outstanding)}</div>
-            <div className="summary-label">Outstanding</div>
+            <div className="summary-label">{t('sales.totalDue')}</div>
           </div>
         </div>
       </div>
@@ -246,6 +248,7 @@ export default function SalesPage() {
               rowData={invoices}
               columnDefs={invoiceColumnDefs}
               defaultColDef={{
+              theme:"legacy",
                 resizable: true,
                 sortable: true,
                 filter: true

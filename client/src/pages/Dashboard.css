@@ -1,10 +1,10 @@
 .dashboard {
-  padding: 10px 0 0 0;
+ padding: 10px 0 0 0;
 }
 
 /* Header */
 .dashboard-header {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
 }
 
 .dashboard-subtitle {

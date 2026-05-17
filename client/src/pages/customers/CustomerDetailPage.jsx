@@ -904,6 +904,7 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice }) {
             rowData={invoices}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: true,
               filter: true
@@ -1275,6 +1276,7 @@ function LedgerTab({ ledger, loading, customerName }) {
               rowData={ledger}
               columnDefs={columnDefs}
               defaultColDef={{
+                theme:"legacy",
                 resizable: true,
                 sortable: true,
                 filter: true
@@ -1392,6 +1394,7 @@ function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }) {
             rowData={payments}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: true,
               filter: true

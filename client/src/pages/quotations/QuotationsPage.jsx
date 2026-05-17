@@ -11,12 +11,14 @@ import Button from '../../components/common/Button';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { useTranslation } from '../../hooks/useTranslation';
 import { salesApi } from '../../utils/salesApi';
 import './QuotationsPage.css';
 
 export default function QuotationsPage() {
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
 
@@ -45,23 +47,23 @@ export default function QuotationsPage() {
       return salesApi.deleteQuotation(id);
     },
     onSuccess: () => {
-      toast.success('Quotation deleted successfully');
+      toast.success(t('quotations.deleted'));
       queryClient.invalidateQueries(['quotations']);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to delete quotation');
+      toast.error(error.response?.data?.error || t('quotations.failed'));
     }
   });
 
   const handleDelete = (quotation) => {
-    if (window.confirm(`Delete quotation "${quotation.quotation_no}"?`)) {
+    if (window.confirm(t('quotations.confirmDelete'))) {
       deleteMutation.mutate(quotation.id);
     }
   };
 
   const columnDefs = [
     {
-      headerName: 'Quotation #',
+      headerName: t('quotations.quotation'),
       field: 'quotation_no',
       sortable: true,
       filter: true,
@@ -76,7 +78,7 @@ export default function QuotationsPage() {
       )
     },
     {
-      headerName: 'Date',
+      headerName: t('quotations.date'),
       field: 'quotation_date',
       sortable: true,
       filter: 'agDateColumnFilter',
@@ -84,21 +86,21 @@ export default function QuotationsPage() {
       valueFormatter: (params) => params.value ? format(new Date(params.value), 'dd MMM yyyy') : ''
     },
     {
-      headerName: 'Customer',
+      headerName: t('quotations.customer'),
       field: 'customer_name',
       sortable: true,
       filter: true,
       width: 180
     },
     {
-      headerName: 'Expiry',
+      headerName: t('quotations.expiry'),
       field: 'expiry_date',
       sortable: true,
       width: 110,
       valueFormatter: (params) => params.value ? format(new Date(params.value), 'dd MMM yyyy') : '-'
     },
     {
-      headerName: 'Amount',
+      headerName: t('quotations.amount'),
       field: 'total_amount',
       sortable: true,
       width: 120,
@@ -106,7 +108,7 @@ export default function QuotationsPage() {
       valueFormatter: (params) => formatCurrency(parseFloat(String(params.value || 0)))
     },
     {
-      headerName: 'Status',
+      headerName: t('quotations.status'),
       field: 'status',
       sortable: true,
       filter: true,
@@ -127,7 +129,7 @@ export default function QuotationsPage() {
       }
     },
     {
-      headerName: 'Actions',
+      headerName: t('quotations.actions'),
       field: 'actions',
       width: 160,
       cellRenderer: (params) => (
@@ -135,7 +137,7 @@ export default function QuotationsPage() {
           <button
             type="button"
             className="icon-btn"
-            title="View"
+            title={t('quotations.viewDetails')}
             onClick={() => navigate(`/quotations/${params.data.id}`)}
           >
             <Eye size={16} />
@@ -143,7 +145,7 @@ export default function QuotationsPage() {
           <button
             type="button"
             className="icon-btn"
-            title="Edit"
+            title={t('quotations.edit')}
             onClick={() => navigate(`/quotations/${params.data.id}/edit`)}
           >
             <Edit2 size={16} />
@@ -152,7 +154,7 @@ export default function QuotationsPage() {
             <button
               type="button"
               className="icon-btn"
-              title="Convert to SO"
+              title={t('quotations.convertToSo')}
               onClick={() => navigate(`/quotations/${params.data.id}/convert`)}
             >
               <ArrowRight size={16} />
@@ -161,7 +163,7 @@ export default function QuotationsPage() {
           <button
             type="button"
             className="icon-btn danger"
-            title="Delete"
+            title={t('quotations.delete')}
             onClick={() => handleDelete(params.data)}
           >
             <Trash2 size={16} />
@@ -178,10 +180,10 @@ export default function QuotationsPage() {
   };
 
   const mobileColumns = [
-    { key: 'quotation_no', label: 'Quotation #' },
-    { key: 'customer_name', label: 'Customer' },
-    { key: 'total_amount', label: 'Amount', format: (v) => formatCurrency(parseFloat(String(v || 0))) },
-    { key: 'status', label: 'Status' }
+    { key: 'quotation_no', label: t('quotations.quotation') },
+    { key: 'customer_name', label: t('quotations.customer') },
+    { key: 'total_amount', label: t('quotations.amount'), format: (v) => formatCurrency(parseFloat(String(v || 0))) },
+    { key: 'status', label: t('quotations.status') }
   ];
 
   return (
@@ -189,32 +191,32 @@ export default function QuotationsPage() {
       <div className="page-header">
         <div className="header-title">
           <FileText size={24} />
-          <h1>Quotations</h1>
+          <h1>{t('quotations.quotations')}</h1>
         </div>
         <Button
           variant="primary"
           icon={<Plus size={18} />}
           onClick={() => navigate('/quotations/create')}
         >
-          New Quotation
+          {t('quotations.newQuotation')}
         </Button>
       </div>
 
       <div className="summary-cards">
         <div className="summary-card">
-          <span className="summary-label">Total</span>
+          <span className="summary-label">{t('common.total')}</span>
           <span className="summary-value">{quotationTotals.count}</span>
         </div>
         <div className="summary-card">
-          <span className="summary-label">Draft</span>
+          <span className="summary-label">{t('quotations.draft')}</span>
           <span className="summary-value">{quotationTotals.draft}</span>
         </div>
         <div className="summary-card">
-          <span className="summary-label">Sent</span>
+          <span className="summary-label">{t('quotations.sent')}</span>
           <span className="summary-value">{quotationTotals.sent}</span>
         </div>
         <div className="summary-card">
-          <span className="summary-label">Converted</span>
+          <span className="summary-label">{t('quotations.converted')}</span>
           <span className="summary-value">{quotationTotals.converted}</span>
         </div>
       </div>

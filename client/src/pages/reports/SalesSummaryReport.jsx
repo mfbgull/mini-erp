@@ -389,6 +389,7 @@ export default function SalesSummaryReport() {
                 rowData={reportData.sales || []}
                 columnDefs={columnDefs}
                 defaultColDef={{
+              theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

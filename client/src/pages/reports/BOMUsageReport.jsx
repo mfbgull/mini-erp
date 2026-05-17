@@ -270,6 +270,7 @@ export default function BOMUsageReport() {
                 rowData={reportData.usage || []}
                 columnDefs={columnDefs}
                 defaultColDef={{
+                  theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

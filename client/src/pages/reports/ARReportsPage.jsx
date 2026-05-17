@@ -502,6 +502,7 @@ function ARAgingReport({ data, loading, formatCurrency, asOfDate }) {
               rowData={data.agingBuckets || []}
               columnDefs={columnDefs}
               defaultColDef={{
+              theme:"legacy",
                 resizable: true,
                 sortable: true,
                 filter: true
@@ -819,6 +820,7 @@ function TopDebtorsReport({ data, loading, formatCurrency }) {
             rowData={data}
             columnDefs={columnDefs}
             defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: true,
               filter: true

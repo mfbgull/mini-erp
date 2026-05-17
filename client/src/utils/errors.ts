@@ -12,9 +12,12 @@ export interface AppError {
 export function parseError(error: unknown): AppError {
   if (error instanceof AxiosError) {
     const response = error.response?.data;
+    const errorMessage = typeof response?.error === 'string'
+      ? response.error
+      : (response?.message as string);
     return {
-      message: response?.error || response?.message || error.message || 'An unexpected error occurred',
-      code: response?.code,
+      message: errorMessage || error.message || 'An unexpected error occurred',
+      code: response?.code ?? response?.error?.code,
       status: error.response?.status,
       details: response?.details,
     };

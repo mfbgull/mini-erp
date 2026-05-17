@@ -373,6 +373,7 @@ export default function StockValuationReport() {
                 rowData={reportData.stockValuation}
                 columnDefs={columnDefs}
                 defaultColDef={{
+              theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

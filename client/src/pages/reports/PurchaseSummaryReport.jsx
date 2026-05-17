@@ -413,6 +413,7 @@ export default function PurchaseSummaryReport() {
                 rowData={reportData.purchases || []}
                 columnDefs={columnDefs}
                 defaultColDef={{
+              theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

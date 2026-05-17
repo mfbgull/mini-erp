@@ -284,6 +284,7 @@ export default function SalesByCustomerReport() {
                 rowData={reportData}
                 columnDefs={columnDefs}
                 defaultColDef={{
+              theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

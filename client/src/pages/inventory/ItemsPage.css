@@ -1,5 +1,6 @@
 .items-page {
-  padding: var(--space-lg);
+  padding: var(--space-md);
+  width: 1400px;
 }
 
 .page-header {
@@ -59,25 +60,25 @@
 }
 
 .stat-label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--neutral-500);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-1);
 }
 
 .stat-value {
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--neutral-900);
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-1);
   line-height: 1.2;
 }
 
 .stat-subtitle {
   font-size: 0.8rem;
-  color: var(--neutral-400);
+  color: var(--neutral-500);
 }
 
 .quick-actions {
@@ -416,8 +417,8 @@
   }
 
   .stat-icon {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
   }
 
   .stat-icon svg {

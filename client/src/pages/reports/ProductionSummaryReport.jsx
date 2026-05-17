@@ -314,6 +314,7 @@ export default function ProductionSummaryReport() {
                 rowData={reportData.production || []}
                 columnDefs={columnDefs}
                 defaultColDef={{
+              theme:"legacy",
                   resizable: true,
                   sortable: true,
                   filter: true

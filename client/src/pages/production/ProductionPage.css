@@ -1,5 +1,6 @@
 .production-page {
-  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .production-output {
@@ -347,12 +348,12 @@
 .stat-card {
   background: white;
   border-radius: 12px;
-  padding: 20px;
+  padding: var(--space-lg);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-md);
   transition: all 0.2s ease;
 }
 
