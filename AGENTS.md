@@ -297,4 +297,25 @@ cli-anything-minierp integrations settings/update/test-email/weather/exchange-ra
 
 ---
 
+## Knowledge Graph (Optional)
+
+For architectural questions, see:
+- **Visualization**: `graphify-out/graph.html`
+- **Data**: `graphify-out/graph.json`
+
+Shows: 1199 nodes, 1411 edges, communities (AR/AP Reports, Core ERP, Activity Logging, etc.)
+
+**NOT for**: day-to-day queries. Use grep/explore agents instead.
+
+---
+
 END OF SPECIFICATION
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)

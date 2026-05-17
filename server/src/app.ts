@@ -65,7 +65,7 @@ const getAllowedOrigins = (): string | string[] => {
     }
     return origins.split(',').map(o => o.trim());
   }
-  return ['http://localhost:5173', 'http://localhost:3010', 'http://localhost:3013', 'http://localhost:3015', 'http://127.0.0.1:5173'];
+  return ['http://localhost:3010', 'http://localhost:3011', 'http://127.0.0.1:3010', 'http://127.0.0.1:3011'];
 };
 
 const corsOptions = {

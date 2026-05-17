@@ -18,8 +18,8 @@ echo.
 echo ====================================
 echo Mini ERP Started Successfully!
 echo ====================================
-echo Backend:  http://localhost:3001
-echo Frontend: http://localhost:3000
+echo Backend:  http://localhost:3011
+echo Frontend: http://localhost:3010
 echo ====================================
 echo.
 echo Press any key to exit...

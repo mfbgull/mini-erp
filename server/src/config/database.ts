@@ -743,18 +743,78 @@ function seedDefaultPermissions(): void {
       { name: 'inventory:update', module: 'inventory', action: 'update', description: 'Update inventory items' },
       { name: 'inventory:delete', module: 'inventory', action: 'delete', description: 'Delete inventory items' },
       
+      // Customers
+      { name: 'customers:read', module: 'customers', action: 'read', description: 'View customers' },
+      { name: 'customers:create', module: 'customers', action: 'create', description: 'Create customers' },
+      { name: 'customers:update', module: 'customers', action: 'update', description: 'Update customers' },
+      { name: 'customers:delete', module: 'customers', action: 'delete', description: 'Delete customers' },
+
+      // Suppliers
+      { name: 'suppliers:read', module: 'suppliers', action: 'read', description: 'View suppliers' },
+      { name: 'suppliers:create', module: 'suppliers', action: 'create', description: 'Create suppliers' },
+      { name: 'suppliers:update', module: 'suppliers', action: 'update', description: 'Update suppliers' },
+      { name: 'suppliers:delete', module: 'suppliers', action: 'delete', description: 'Delete suppliers' },
+
       // Sales
       { name: 'sales:read', module: 'sales', action: 'read', description: 'View sales' },
       { name: 'sales:create', module: 'sales', action: 'create', description: 'Create sales' },
       { name: 'sales:update', module: 'sales', action: 'update', description: 'Update sales' },
       { name: 'sales:delete', module: 'sales', action: 'delete', description: 'Delete sales' },
-      
+
+      // Sales Orders
+      { name: 'sales_orders:read', module: 'sales_orders', action: 'read', description: 'View sales orders' },
+      { name: 'sales_orders:create', module: 'sales_orders', action: 'create', description: 'Create sales orders' },
+      { name: 'sales_orders:update', module: 'sales_orders', action: 'update', description: 'Update sales orders' },
+      { name: 'sales_orders:delete', module: 'sales_orders', action: 'delete', description: 'Delete sales orders' },
+
+      // Quotations
+      { name: 'quotations:read', module: 'quotations', action: 'read', description: 'View quotations' },
+      { name: 'quotations:create', module: 'quotations', action: 'create', description: 'Create quotations' },
+      { name: 'quotations:update', module: 'quotations', action: 'update', description: 'Update quotations' },
+      { name: 'quotations:delete', module: 'quotations', action: 'delete', description: 'Delete quotations' },
+
+      // Invoices
+      { name: 'invoices:read', module: 'invoices', action: 'read', description: 'View invoices' },
+      { name: 'invoices:create', module: 'invoices', action: 'create', description: 'Create invoices' },
+      { name: 'invoices:update', module: 'invoices', action: 'update', description: 'Update invoices' },
+      { name: 'invoices:delete', module: 'invoices', action: 'delete', description: 'Delete invoices' },
+
+      // Payments
+      { name: 'payments:read', module: 'payments', action: 'read', description: 'View payments' },
+      { name: 'payments:create', module: 'payments', action: 'create', description: 'Create payments' },
+      { name: 'payments:update', module: 'payments', action: 'update', description: 'Update payments' },
+      { name: 'payments:delete', module: 'payments', action: 'delete', description: 'Delete payments' },
+
       // Purchases
       { name: 'purchases:read', module: 'purchases', action: 'read', description: 'View purchases' },
       { name: 'purchases:create', module: 'purchases', action: 'create', description: 'Create purchases' },
       { name: 'purchases:update', module: 'purchases', action: 'update', description: 'Update purchases' },
       { name: 'purchases:delete', module: 'purchases', action: 'delete', description: 'Delete purchases' },
-      
+
+      // Purchase Orders
+      { name: 'purchase_orders:read', module: 'purchase_orders', action: 'read', description: 'View purchase orders' },
+      { name: 'purchase_orders:create', module: 'purchase_orders', action: 'create', description: 'Create purchase orders' },
+      { name: 'purchase_orders:update', module: 'purchase_orders', action: 'update', description: 'Update purchase orders' },
+      { name: 'purchase_orders:delete', module: 'purchase_orders', action: 'delete', description: 'Delete purchase orders' },
+
+      // Expenses
+      { name: 'expenses:read', module: 'expenses', action: 'read', description: 'View expenses' },
+      { name: 'expenses:create', module: 'expenses', action: 'create', description: 'Create expenses' },
+      { name: 'expenses:update', module: 'expenses', action: 'update', description: 'Update expenses' },
+      { name: 'expenses:delete', module: 'expenses', action: 'delete', description: 'Delete expenses' },
+
+      // Production
+      { name: 'production:read', module: 'production', action: 'read', description: 'View production' },
+      { name: 'production:create', module: 'production', action: 'create', description: 'Create production' },
+      { name: 'production:update', module: 'production', action: 'update', description: 'Update production' },
+      { name: 'production:delete', module: 'production', action: 'delete', description: 'Delete production' },
+
+      // Bill of Materials (BOM)
+      { name: 'bom:read', module: 'bom', action: 'read', description: 'View BOMs' },
+      { name: 'bom:create', module: 'bom', action: 'create', description: 'Create BOMs' },
+      { name: 'bom:update', module: 'bom', action: 'update', description: 'Update BOMs' },
+      { name: 'bom:delete', module: 'bom', action: 'delete', description: 'Delete BOMs' },
+
       // Reports
       { name: 'reports:read', module: 'reports', action: 'read', description: 'View reports' },
       

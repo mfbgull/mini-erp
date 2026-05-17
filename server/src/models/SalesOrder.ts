@@ -163,20 +163,17 @@ class SalesOrderModel {
 
       // Insert sales order items
       const itemStmt = db.prepare(`
-        INSERT INTO sales_order_items (so_id, item_id, item_code, item_name, quantity, unit_price, amount)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO sales_order_items (so_id, item_id, quantity, unit_price, amount)
+        VALUES (?, ?, ?, ?, ?)
       `);
 
       for (const item of items) {
-        const dbItem = db.prepare('SELECT item_code, item_name FROM items WHERE id = ?').get(item.item_id) as { item_code: string; item_name: string };
         const lineAmount = item.quantity * item.unit_price;
 
         itemStmt.run(
           salesOrderId,
-          item.item_id,
-          dbItem.item_code,
-          dbItem.item_name,
-          item.quantity,
+            item.item_id,
+            item.quantity,
           item.unit_price,
           lineAmount
         );
@@ -398,20 +395,17 @@ class SalesOrderModel {
         // Insert new items
         let totalAmount = 0;
         const itemStmt = db.prepare(`
-          INSERT INTO sales_order_items (so_id, item_id, item_code, item_name, quantity, unit_price, amount)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO sales_order_items (so_id, item_id, quantity, unit_price, amount)
+          VALUES (?, ?, ?, ?, ?)
         `);
 
         for (const item of items) {
-          const dbItem = db.prepare('SELECT item_code, item_name FROM items WHERE id = ?').get(item.item_id) as { item_code: string; item_name: string };
           const lineAmount = item.quantity * item.unit_price;
           totalAmount += lineAmount;
 
           itemStmt.run(
             id,
             item.item_id,
-            dbItem.item_code,
-            dbItem.item_name,
             item.quantity,
             item.unit_price,
             lineAmount
@@ -546,22 +540,20 @@ class SalesOrderModel {
 
       const invoiceId = result.lastInsertRowid as number;
 
-      // Create invoice items
-      const invoiceItemStmt = db.prepare(`
-        INSERT INTO invoice_items (invoice_id, item_id, item_code, item_name, quantity, unit_price, amount)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `);
+       // Create invoice items
+       const invoiceItemStmt = db.prepare(`
+         INSERT INTO invoice_items (invoice_id, item_id, quantity, unit_price, amount)
+         VALUES (?, ?, ?, ?, ?)
+       `);
 
-      for (const item of salesOrder.items || []) {
-        invoiceItemStmt.run(
-          invoiceId,
-          item.item_id,
-          item.item_code,
-          item.item_name,
-          item.quantity,
-          item.unit_price,
-          item.amount
-        );
+       for (const item of salesOrder.items || []) {
+         invoiceItemStmt.run(
+           invoiceId,
+           item.item_id,
+           item.quantity,
+           item.unit_price,
+           item.amount
+         );
       }
 
       // Deduct inventory
