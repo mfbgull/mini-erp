@@ -429,7 +429,145 @@
     gap: 8px;
   }
 
-  .sales-order-form-page .form-actions button {
+.sales-order-form-page .form-actions button {
     width: 100%;
-  }
+}
+
+/* Desktop Header Fixes */
+.sales-order-form-page.desktop-layout,
+.sales-order-form-page .sales-invoice-page-modern {
+  background: #f9fafb;
+  padding: 0;
+}
+
+.sales-order-form-page .desktop-layout .invoice-document-modern {
+  padding: 1.5rem;
+  background: white;
+  margin: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.desktop-layout .header-grid-modern {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr auto;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.desktop-layout .header-section {
+  padding: 0.5rem;
+}
+
+.desktop-layout .invoice-title-modern {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.desktop-layout .invoice-number-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background: #f3f4f6;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.desktop-layout .section-label-modern {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+.desktop-layout .company-name-modern {
+  font-weight: 600;
+  color: #111827;
+}
+
+.desktop-layout .contact-info-modern {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.desktop-layout .invoice-total-modern {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.desktop-layout .invoice-meta-modern {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.desktop-layout .date-input-inline {
+  background: transparent;
+  border: none;
+  font-size: 0.875rem;
+  color: #374151;
+  width: auto;
+}
+
+/* Item Dropdown Styles */
+.searchable-cell-container {
+  position: relative;
+}
+
+.searchable-cell-container .editable-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.searchable-cell-container .editable-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.item-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.item-dropdown-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.item-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.item-dropdown-item:hover,
+.item-dropdown-item.selected {
+  background: #f9fafb;
+}
+
+.item-dropdown-item .item-dropdown-price {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
 }

@@ -72,6 +72,11 @@ export default function SalesOrderFormPage({ mode }) {
   const lastFocusedCellRef = useRef(null);
   const tableContainerRef = useRef(null);
   const [editingCell, setEditingCell] = useState(null);
+  const [showItemDropdown, setShowItemDropdown] = useState(false);
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [activeItemId, setActiveItemId] = useState(null);
+  const [itemSearchTerm, setItemSearchTerm] = useState('');
+  const [selectedDropdownIndex, setSelectedDropdownIndex] = useState(0);
 
   // Focus the cell when editingCell changes
   useEffect(() => {
@@ -773,23 +778,118 @@ export default function SalesOrderFormPage({ mode }) {
                       <tr key={item.id}>
                         <td className="text-center serial-col">{index + 1}</td>
                         <td className="invoice-item-cell">
-                            <select
-                              value={item.itemId}
-                              onChange={(e) => handleUpdateItem(item.id, { 
-                                itemId: e.target.value, 
-                                name: inventoryItems.find(i => i.id === Number(e.target.value))?.name || '', 
-                                unitPrice: inventoryItems.find(i => i.id === Number(e.target.value))?.selling_price || 0 
-                              })}
-                              className="editable-input"
-                              data-cell-id={`${item.id}-name`}
-                              onFocus={() => { lastFocusedCellRef.current = `${item.id}-name`; }}
-                              onKeyDown={(e) => handleCellKeyDown(e, item.id, 'name')}
-                            >
-                              <option value="">Select Item</option>
-                              {inventoryItems.map((i) => (
-                                <option key={i.id} value={i.id}>{i.name}</option>
-                              ))}
-                            </select>
+                            <div className="searchable-cell-container">
+                              <input
+                                type="text"
+                                value={item.name}
+                                onChange={(e) => {
+                                  const searchValue = e.target.value;
+                                  handleUpdateItem(item.id, { name: searchValue });
+                                  setItemSearchTerm(searchValue);
+                                  setActiveItemId(item.id);
+                                  const matches = inventoryItems
+                                    .filter(i => 
+                                      i.item_name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+                                      i.item_code?.toLowerCase().includes(searchValue.toLowerCase())
+                                    )
+                                    .slice(0, 10);
+                                  setFilteredItems(matches);
+                                  setShowItemDropdown(matches.length > 0);
+                                  setSelectedDropdownIndex(0);
+                                }}
+                                onFocus={() => {
+                                  setEditingCell(`${item.id}-name`);
+                                  lastFocusedCellRef.current = `${item.id}-name`;
+                                  setActiveItemId(item.id);
+                                  setItemSearchTerm(item.name);
+                                  const matches = inventoryItems
+                                    .filter(i => 
+                                      i.item_name?.toLowerCase().includes((item.name || '').toLowerCase()) ||
+                                      i.item_code?.toLowerCase().includes((item.name || '').toLowerCase())
+                                    )
+                                    .slice(0, 10);
+                                  setFilteredItems(matches);
+                                  setShowItemDropdown(matches.length > 0);
+                                  setSelectedDropdownIndex(0);
+                                }}
+                                onBlur={() => setTimeout(() => setShowItemDropdown(false), 200)}
+                                onKeyDown={(e) => {
+                                  if (showItemDropdown && activeItemId === item.id && filteredItems.length > 0) {
+                                    if (e.key === 'ArrowDown') {
+                                      e.preventDefault();
+                                      setSelectedDropdownIndex(prev => 
+                                        prev < filteredItems.length - 1 ? prev + 1 : 0
+                                      );
+                                      return;
+                                    } else if (e.key === 'ArrowUp') {
+                                      e.preventDefault();
+                                      if (selectedDropdownIndex === 0) {
+                                        setShowItemDropdown(false);
+                                        return;
+                                      }
+                                      setSelectedDropdownIndex(prev => 
+                                        prev > 0 ? prev - 1 : filteredItems.length - 1
+                                      );
+                                      return;
+                                    } else if (e.key === 'Enter' || e.key === 'Tab') {
+                                      if (filteredItems[selectedDropdownIndex]) {
+                                        e.preventDefault();
+                                        const sel = filteredItems[selectedDropdownIndex];
+                                        handleUpdateItem(item.id, {
+                                          name: sel.item_name,
+                                          unitPrice: sel.standard_selling_price || 0,
+                                          itemId: sel.id
+                                        });
+                                        setFilteredItems([]);
+                                        setShowItemDropdown(false);
+                                        setTimeout(() => {
+                                          setEditingCell(`${item.id}-quantity`);
+                                          const el = document.querySelector(`[data-cell-id="${item.id}-quantity"]`);
+                                          if (el) el.focus();
+                                        }, 0);
+                                        return;
+                                      }
+                                    } else if (e.key === 'Escape') {
+                                      e.preventDefault();
+                                      setFilteredItems([]);
+                                      setShowItemDropdown(false);
+                                      return;
+                                    }
+                                  }
+                                  handleCellKeyDown(e, item.id, 'name');
+                                }}
+                                className="editable-input"
+                                placeholder="Type to search items..."
+                                data-cell-id={`${item.id}-name`}
+                              />
+                              {showItemDropdown && activeItemId === item.id && filteredItems.length > 0 && (
+                                <div className="item-dropdown">
+                                  {filteredItems.map((invItem, idx) => (
+                                    <div
+                                      key={invItem.id}
+                                      className={`item-dropdown-item ${selectedDropdownIndex === idx ? 'selected' : ''}`}
+                                      onClick={() => {
+                                        handleUpdateItem(item.id, {
+                                          name: invItem.item_name,
+                                          unitPrice: invItem.standard_selling_price || 0,
+                                          itemId: invItem.id
+                                        });
+                                        setFilteredItems([]);
+                                        setShowItemDropdown(false);
+                                        setTimeout(() => {
+                                          setEditingCell(`${item.id}-quantity`);
+                                          const el = document.querySelector(`[data-cell-id="${item.id}-quantity"]`);
+                                          if (el) el.focus();
+                                        }, 0);
+                                      }}
+                                    >
+                                      <div>{invItem.item_name}</div>
+                                      <div className="item-dropdown-price">{formatCurrency(invItem.standard_selling_price || 0)}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </td>
                           <td className="text-right invoice-item-cell">
                             <input

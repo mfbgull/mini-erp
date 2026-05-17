@@ -892,14 +892,28 @@ export default function QuotationFormPage({ mode = 'create' }) {
                                 e.preventDefault();
                                 if (filteredItems[selectedDropdownIndex]) {
                                   handleSelectInventoryItem(item.id, filteredItems[selectedDropdownIndex]);
+                                  setTimeout(() => setEditingCell(`${item.id}-quantity`), 0);
+                                  setTimeout(() => {
+                                    const el = document.querySelector(`[data-cell-id="${item.id}-quantity"]`);
+                                    if (el) el.focus();
+                                  }, 50);
                                 }
                               } else if (e.key === 'Escape') {
                                 e.preventDefault();
                                 setShowItemDropdown(false);
                               } else if (e.key === 'Tab') {
                                 e.preventDefault();
-                                setShowItemDropdown(false);
-                                moveToCell(item.id, 'description', e.shiftKey ? 'left' : 'right');
+                                if (filteredItems[selectedDropdownIndex]) {
+                                  handleSelectInventoryItem(item.id, filteredItems[selectedDropdownIndex]);
+                                  setTimeout(() => setEditingCell(`${item.id}-quantity`), 0);
+                                  setTimeout(() => {
+                                    const el = document.querySelector(`[data-cell-id="${item.id}-quantity"]`);
+                                    if (el) el.focus();
+                                  }, 50);
+                                } else {
+                                  setShowItemDropdown(false);
+                                  moveToCell(item.id, 'description', e.shiftKey ? 'left' : 'right');
+                                }
                               } else if (e.key === 'ArrowRight') {
                                 e.preventDefault();
                                 setShowItemDropdown(false);
@@ -927,6 +941,11 @@ export default function QuotationFormPage({ mode = 'create' }) {
                                   onMouseDown={(e) => {
                                     e.preventDefault();
                                     handleSelectInventoryItem(item.id, invItem);
+                                    setTimeout(() => setEditingCell(`${item.id}-quantity`), 0);
+                                    setTimeout(() => {
+                                      const el = document.querySelector(`[data-cell-id="${item.id}-quantity"]`);
+                                      if (el) el.focus();
+                                    }, 50);
                                   }}
                                   onMouseEnter={() => setSelectedDropdownIndex(index)}
                                 >

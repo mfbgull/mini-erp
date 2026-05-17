@@ -15,8 +15,10 @@ import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
 import { useSettings } from '../../context/SettingsContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import PriceHistoryHint from '../../components/invoice/PriceHistoryHint';
+import FocusTrap from '../../utils/focusTrap.jsx';
 import { invoiceSchema } from '../../schemas';
 
 import './SalesInvoicePage.css';
@@ -56,6 +58,7 @@ export default function SalesInvoicePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { formatCurrency, getCurrencySymbol } = useSettings();
+  const { t } = useTranslation();
 
   // Customer action functions for mobile
   const editCustomer = (customerId) => {
@@ -452,8 +455,12 @@ export default function SalesInvoicePage() {
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
       if (e.key === 'Enter' && e.shiftKey) {
-        e.preventDefault();
-        paymentAmountInputRef.current?.focus();
+        // Only focus payment amount if NOT already in an input/textarea
+        const activeTag = document.activeElement?.tagName;
+        if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
+          e.preventDefault();
+          paymentAmountInputRef.current?.focus();
+        }
       }
     };
 
@@ -856,6 +863,26 @@ export default function SalesInvoicePage() {
       ).slice(0, 10);
     };
 
+    const focusTargetCell = (targetItemId, targetField) => {
+      setTimeout(() => {
+        if (targetField === 'description') {
+          setEditingCell(`${targetItemId}-description`);
+          setTimeout(() => {
+            const el = document.querySelector(`[data-cell-id="${targetItemId}-description"]`);
+            if (!el) return;
+            const input = el.querySelector('input');
+            if (input) {
+              input.focus();
+              input.select();
+            }
+          }, 100);
+        } else {
+          const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
+          if (el) el.focus();
+        }
+      }, 100);
+    };
+
     const handleInputChange = (e) => {
       const searchValue = e.target.value;
       setTempValue(searchValue);
@@ -905,9 +932,8 @@ export default function SalesInvoicePage() {
 
       // Move to quantity field after selection
       if (moveNext) {
-        setTimeout(() => {
-          setEditingCell(`${itemId}-quantity`);
-        }, 0);
+        setEditingCell(`${itemId}-quantity`);
+        focusTargetCell(itemId, 'quantity');
       } else {
         setEditingCell(null);
       }
@@ -929,16 +955,13 @@ export default function SalesInvoicePage() {
     };
 
     const openDropdown = () => {
-      console.log('openDropdown called', { itemsLength: items?.length, value });
       if (!items || items.length === 0) {
-        console.log('No items found');
         setFilteredItems([]);
         setShowDropdown(false);
         setSelectedIndex(-1);
         return;
       }
       const sellableItems = getSellableItems();
-      console.log('sellableItems:', sellableItems.length);
       setFilteredItems(sellableItems);
       setShowDropdown(sellableItems.length > 0);
       setSelectedIndex(sellableItems.length > 0 ? 0 : -1);
@@ -949,7 +972,15 @@ export default function SalesInvoicePage() {
       if (showDropdown && filteredItems.length > 0) {
         if (e.key === 'ArrowDown') {
           e.preventDefault();
-          setSelectedIndex(prev => (prev < filteredItems.length - 1 ? prev + 1 : 0));
+          const newIndex = selectedIndex < filteredItems.length - 1 ? selectedIndex + 1 : 0;
+          setSelectedIndex(newIndex);
+          setTimeout(() => {
+            const dropdown = document.querySelector('.item-dropdown');
+            const options = dropdown?.querySelectorAll('.item-dropdown-option');
+            if (options && options[newIndex]) {
+              options[newIndex].scrollIntoView({ block: 'nearest' });
+            }
+          }, 0);
           return;
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
@@ -958,7 +989,15 @@ export default function SalesInvoicePage() {
             closeDropdown();
             return;
           }
-          setSelectedIndex(prev => (prev > 0 ? prev - 1 : filteredItems.length - 1));
+          const newIndex = selectedIndex > 0 ? selectedIndex - 1 : filteredItems.length - 1;
+          setSelectedIndex(newIndex);
+          setTimeout(() => {
+            const dropdown = document.querySelector('.item-dropdown');
+            const options = dropdown?.querySelectorAll('.item-dropdown-option');
+            if (options && options[newIndex]) {
+              options[newIndex].scrollIntoView({ block: 'nearest' });
+            }
+          }, 0);
           return;
         } else if (e.key === 'Enter') {
           e.preventDefault();
@@ -990,7 +1029,8 @@ export default function SalesInvoicePage() {
         const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
         if (currentItemIndex < invoice.items.length - 1) {
           const nextItemId = invoice.items[currentItemIndex + 1].id;
-          setTimeout(() => setEditingCell(`${nextItemId}-description`), 0);
+          setEditingCell(`${nextItemId}-description`);
+          focusTargetCell(nextItemId, 'description');
         } else if (currentItemIndex === invoice.items.length - 1) {
           // At last row - add new item and navigate to it
           const newItemId = addNewItem();
@@ -1007,7 +1047,8 @@ export default function SalesInvoicePage() {
         if (currentItemIndex > 0) {
           const prevItemId = invoice.items[currentItemIndex - 1].id;
           handleSave();
-          setTimeout(() => setEditingCell(`${prevItemId}-description`), 0);
+          setEditingCell(`${prevItemId}-description`);
+          focusTargetCell(prevItemId, 'description');
         } else if (currentItemIndex === 0) {
           // Already at first row - just stay in current cell
           handleSave();
@@ -1016,6 +1057,7 @@ export default function SalesInvoicePage() {
         e.preventDefault();
         // Right Arrow - move to next column (Qty)
         setEditingCell(`${itemId}-quantity`);
+        focusTargetCell(itemId, 'quantity');
       } else if (e.key === 'ArrowLeft') {
         // Left Arrow in description column - act as Escape (close dropdown if open)
         if (showDropdown) {
@@ -1037,7 +1079,8 @@ export default function SalesInvoicePage() {
           } else {
             const nextField = getNextField('description');
             if (nextField) {
-              setTimeout(() => setEditingCell(`${itemId}-${nextField}`), 0);
+              setEditingCell(`${itemId}-${nextField}`);
+              focusTargetCell(itemId, nextField);
             }
           }
         }
@@ -1049,7 +1092,8 @@ export default function SalesInvoicePage() {
           handleSave();
           const nextField = getNextField('description');
           if (nextField) {
-            setTimeout(() => setEditingCell(`${itemId}-${nextField}`), 0);
+            setEditingCell(`${itemId}-${nextField}`);
+            focusTargetCell(itemId, nextField);
           } else if (isLastItem) {
             const newItemId = addNewItem();
             setNewItemId(newItemId);
@@ -1095,10 +1139,25 @@ export default function SalesInvoicePage() {
         top: `${inputRect.bottom + 2}px`,
         left: `${inputRect.left}px`,
         minWidth: `${inputRect.width}px`
-      } : {};
+      } : {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        minWidth: '300px',
+        zIndex: 99999
+      };
 
       return (
-        <div className="searchable-cell-container" onMouseDown={() => openDropdown()}>
+        <div 
+          className="searchable-cell-container" 
+          data-cell-id={`${itemId}-description`}
+          onClick={() => {
+            setEditingCell(`${itemId}-description`);
+            openDropdown();
+            inputRef.current?.focus();
+          }}
+        >
           <input
             ref={inputRef}
             type="text"
@@ -1109,7 +1168,6 @@ export default function SalesInvoicePage() {
             onFocus={(e) => {
               e.target.select();
               lastFocusedCellRef.current = `${itemId}-description`;
-              // Open dropdown on focus if there's text or show all items
               openDropdown();
             }}
             className="editable-input"
@@ -1172,13 +1230,6 @@ export default function SalesInvoicePage() {
           const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
           const isLastItem = currentItemIndex === invoice.items.length - 1;
           
-          const focusTargetCell = (targetItemId, targetField) => {
-            setTimeout(() => {
-              const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
-              if (el) el.focus();
-            }, 0);
-          };
-
           if (e.key === 'Enter') {
             e.preventDefault();
             setTempValue(value || '');
@@ -1241,6 +1292,22 @@ export default function SalesInvoicePage() {
       setEditingCell(null);
     };
 
+    const focusTargetCell = (targetItemId, targetField) => {
+      setTimeout(() => {
+        const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
+        if (!el) return;
+        if (targetField === 'description') {
+          const input = el.querySelector('input');
+          if (input) {
+            input.focus();
+            input.select();
+          }
+        } else {
+          el.focus();
+        }
+      }, 100);
+    };
+
     const moveToCell = (rowOffset, colOffset) => {
       const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
       const fieldOrder = invoice.discountScope === 'item'
@@ -1255,7 +1322,8 @@ export default function SalesInvoicePage() {
         if (newItemIndex >= 0 && newItemIndex < invoice.items.length) {
           const newItemId = invoice.items[newItemIndex].id;
           handleSave();
-          setTimeout(() => setEditingCell(`${newItemId}-${field}`), 0);
+          setEditingCell(`${newItemId}-${field}`);
+          focusTargetCell(newItemId, field);
         } else if (rowOffset > 0 && newItemIndex >= invoice.items.length) {
           // Add new row when going down past last row
           handleSave();
@@ -1269,7 +1337,9 @@ export default function SalesInvoicePage() {
         const newFieldIndex = currentFieldIndex + colOffset;
         if (newFieldIndex >= 0 && newFieldIndex < fieldOrder.length) {
           handleSave();
-          setTimeout(() => setEditingCell(`${itemId}-${fieldOrder[newFieldIndex]}`), 0);
+          const newField = fieldOrder[newFieldIndex];
+          setEditingCell(`${itemId}-${newField}`);
+          focusTargetCell(itemId, newField);
         }
       }
     };
@@ -1367,19 +1437,20 @@ export default function SalesInvoicePage() {
           onKeyDown={handleKeyDown}
           onFocus={(e) => e.target.select()}
           className="editable-input"
+          data-cell-id={`${itemId}-${field}`}
         />
       );
     }
 
     return (
       <div
+        data-cell-id={`${itemId}-${field}`}
         onClick={() => {
           setTempValue(value);
           setEditingCell(`${itemId}-${field}`);
         }}
         onFocus={() => {
           lastFocusedCellRef.current = `${itemId}-${field}`;
-          // Auto-enter edit mode when focused
           setTempValue(value);
           setEditingCell(`${itemId}-${field}`);
         }}
@@ -1389,13 +1460,6 @@ export default function SalesInvoicePage() {
             : ['description', 'quantity', 'rate', 'tax'];
           const currentFieldIndex = fieldOrder.indexOf(field);
           const currentItemIndex = invoice.items.findIndex(item => item.id === itemId);
-
-          const focusTargetCell = (targetItemId, targetField) => {
-            setTimeout(() => {
-              const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
-              if (el) el.focus();
-            }, 0);
-          };
 
           if (e.key === 'Enter') {
             e.preventDefault();
@@ -1444,8 +1508,7 @@ export default function SalesInvoicePage() {
         }}
         className="editable-cell"
         tabIndex={0}
-        data-cell-id={`${itemId}-${field}`}
-      >
+       >
         {value}
         <Edit2 className="edit-icon" />
       </div>
@@ -1522,7 +1585,8 @@ export default function SalesInvoicePage() {
         record_payment: true,
         payment: {
           payment_date: invoice.payment.payment_date,
-          amount: invoice.payment.payment_amount || 0,
+//          amount: invoice.payment.payment_amount || 0,
+          amount: invoice.paymentMethods.reduce((sum, method) => sum + (parseFloat(method.amount) || 0), 0),
           payment_method: invoice.paymentMethods[0]?.method || 'Cash',
           reference_no: invoice.paymentMethods[0]?.reference_no || '',
           notes: invoice.payment.payment_notes
@@ -1623,10 +1687,9 @@ export default function SalesInvoicePage() {
           </div>
         </div>
 
-        {/* Two-Column Layout: Items + Payment */}
-        <div className="invoice-main-split">
-          {/* Left Column - Items and Totals */}
-          <div className="invoice-left-column">
+      {/* Two-Column Layout: Items + Payment */}
+      <div className="invoice-main-split">
+        <div className="invoice-left-column">
             {/* Items Header */}
             <div className="items-header-modern">
               <div className="items-header-left">
