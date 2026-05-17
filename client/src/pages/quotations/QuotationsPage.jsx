@@ -176,7 +176,8 @@ export default function QuotationsPage() {
   ];
 
   const defaultColDef = {
-    resizable: true
+    resizable: true,
+    theme: "legacy"
   };
 
   const mobileColumns = [

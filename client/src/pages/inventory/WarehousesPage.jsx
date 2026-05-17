@@ -161,6 +161,7 @@ export default function WarehousesPage() {
             rowData={filteredWarehouses}
             columnDefs={columnDefs}
 defaultColDef={{
+              theme:"legacy",
               resizable: true,
               sortable: false,
               filter: false

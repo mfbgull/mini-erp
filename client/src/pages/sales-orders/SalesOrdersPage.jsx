@@ -175,7 +175,8 @@ export default function SalesOrdersPage() {
   ];
 
   const defaultColDef = {
-    resizable: true
+    resizable: true,
+    theme: "legacy"
   };
 
   const mobileColumns = [
