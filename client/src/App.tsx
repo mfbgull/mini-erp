@@ -92,6 +92,7 @@ const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
 const ForecastDashboard = lazy(() => import('./pages/forecasts/ForecastDashboard'));
 const DemandForecast = lazy(() => import('./pages/forecasts/DemandForecast'));
 const ForecastTrends = lazy(() => import('./pages/forecasts/ForecastTrends'));
+const EcosystemView = lazy(() => import('./pages/EcosystemView'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -127,6 +128,10 @@ function AppLayout() {
     return window.innerWidth > 768;
   });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [navMode, setNavMode] = useState<'topmenu' | 'sidebar'>(() => {
+    const saved = localStorage.getItem('navMode');
+    return (saved === 'topmenu' || saved === 'sidebar') ? saved : 'topmenu';
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -136,6 +141,16 @@ function AppLayout() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const toggleNavMode = () => {
+    const newMode = navMode === 'topmenu' ? 'sidebar' : 'topmenu';
+    setNavMode(newMode);
+    localStorage.setItem('navMode', newMode);
+  };
+
+  const isMobile = !isDesktop;
+  const showSidebar = isMobile || navMode === 'sidebar';
+  const showTopMenu = isDesktop && navMode === 'topmenu';
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -152,9 +167,10 @@ function AppLayout() {
   return (
     <SettingsProvider>
       <div className="app-container">
-        {/* Navigation: TopMenu (desktop) or Sidebar (mobile) */}
-        {isDesktop ? <TopMenu /> : <Sidebar />}
-        <div className="main-content">
+        {/* Navigation: TopMenu or Sidebar based on mode */}
+        {showSidebar && <Sidebar onToggleNav={toggleNavMode} isCompact={isDesktop} />}
+        {showTopMenu && <TopMenu onToggleNav={toggleNavMode} />}
+        <div className={`main-content ${showTopMenu ? 'topmenu-active' : ''} ${showSidebar && isDesktop ? 'sidebar-active' : ''}`}>
           <div className="content">
             <ErrorBoundary>
               <Suspense fallback={<PageLoader />}>
@@ -221,6 +237,7 @@ function AppLayout() {
               <Route path="/forecasts" element={<ForecastDashboard />} />
               <Route path="/forecasts/demand" element={<DemandForecast />} />
               <Route path="/forecasts/trends" element={<ForecastTrends />} />
+              <Route path="/ecosystem" element={<EcosystemView />} />
               <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Suspense>

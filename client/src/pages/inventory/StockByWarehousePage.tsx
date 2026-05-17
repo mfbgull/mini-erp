@@ -9,11 +9,13 @@ import ItemPreview from "./ItemPreview";
 import CompactStockByWarehouseCardView from "../../components/common/CompactStockByWarehouseCard";
 import SearchableSelect from "../../components/common/SearchableSelect";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { useTranslation } from "../../hooks/useTranslation";
 import api from "../../utils/api";
 import "./StockByWarehousePage.css";
 
 export default function StockByWarehousePage() {
   const { isMobile } = useMobileDetection();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<
     string | number
@@ -215,10 +217,10 @@ export default function StockByWarehousePage() {
     <div className="items-page">
       <div className="page-header">
         <div>
-          <h1>Stock by Warehouse</h1>
-          <p className="page-subtitle">
-            View current stock levels for each item by warehouse
-          </p>
+<h1>{t('nav.stockByWarehouse')}</h1>
+            <p className="page-subtitle">
+              {t('stockByWarehouse.viewByWarehouse')}
+            </p>
         </div>
       </div>
 
@@ -227,42 +229,42 @@ export default function StockByWarehousePage() {
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-purple">📦</div>
           <div className="stat-content">
-            <div className="stat-label">Total Items</div>
+            <div className="stat-label">{t('stockByWarehouse.totalItems')}</div>
             <div className="stat-value">{stats.totalItems}</div>
-            <div className="stat-subtitle">Items with stock</div>
+            <div className="stat-subtitle">{t('stockByWarehouse.itemsWithStock')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-pink">📊</div>
           <div className="stat-content">
-            <div className="stat-label">Total Stock</div>
+            <div className="stat-label">{t('common.total')}</div>
             <div className="stat-value">
-              {parseFloat(stats.totalStockValue).toFixed(2)}
+              {stats.totalStockValue.toFixed(2)}
             </div>
-            <div className="stat-subtitle">Aggregate quantity</div>
+            <div className="stat-subtitle">{t('stockByWarehouse.aggregateQty')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-blue">🏭</div>
           <div className="stat-content">
-            <div className="stat-label">Warehouses</div>
+            <div className="stat-label">{t('nav.warehouses')}</div>
             <div className="stat-value">{stats.totalWarehouses}</div>
-            <div className="stat-subtitle">Active locations</div>
+            <div className="stat-subtitle">{t('stockByWarehouse.activeLocations')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-orange">🔝</div>
           <div className="stat-content">
-            <div className="stat-label">Largest Stock</div>
+            <div className="stat-label">{t('stockByWarehouse.largestStock')}</div>
             <div className="stat-value text-lg">
               {stats.warehouseWithMostStock.warehouse_name}
             </div>
             <div className="stat-subtitle">
-              {parseFloat(stats.warehouseWithMostStock.quantity).toFixed(2)}{" "}
-              units
+              {stats.warehouseWithMostStock.quantity.toFixed(2)}{" "}
+              {t('common.units')}
             </div>
           </div>
         </div>
@@ -270,20 +272,20 @@ export default function StockByWarehousePage() {
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-green">📁</div>
           <div className="stat-content">
-            <div className="stat-label">Multi-Warehouse Items</div>
+            <div className="stat-label">{t('stockByWarehouse.multiWarehouseItems')}</div>
             <div className="stat-value">{stats.multiWarehouseItems}</div>
-            <div className="stat-subtitle">In multiple locations</div>
+            <div className="stat-subtitle">{t('stockByWarehouse.multipleLocations')}</div>
           </div>
         </div>
 
         <div className="stat-card">
           <div className="stat-icon stat-icon-gradient-indigo">📈</div>
           <div className="stat-content">
-            <div className="stat-label">Average Qty</div>
+            <div className="stat-label">{t('stockByWarehouse.averageQty')}</div>
             <div className="stat-value">
-              {parseFloat(stats.averageQuantity).toFixed(2)}
+              {stats.averageQuantity.toFixed(2)}
             </div>
-            <div className="stat-subtitle">Per stock line</div>
+            <div className="stat-subtitle">{t('stockByWarehouse.perStockLine')}</div>
           </div>
         </div>
       </div>
@@ -292,28 +294,28 @@ export default function StockByWarehousePage() {
       <div className="quick-actions">
         <button className="quick-action-btn" onClick={handleExport}>
           <span className="action-icon">📥</span>
-          <span className="action-text">Export to CSV</span>
+          <span className="action-text">{t('stockByWarehouse.exportCsv')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/inventory/stock-movements")}
         >
           <span className="action-icon">📋</span>
-          <span className="action-text">Stock Movements</span>
+          <span className="action-text">{t('nav.stockMovements')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/reports/stock-valuation")}
         >
           <span className="action-icon">💰</span>
-          <span className="action-text">Stock Valuation</span>
+          <span className="action-text">{t('nav.stockValuation')}</span>
         </button>
         <button
           className="quick-action-btn"
           onClick={() => navigate("/reports/inventory-movement")}
         >
           <span className="action-icon">🔄</span>
-          <span className="action-text">Inventory Movement</span>
+          <span className="action-text">{t('nav.inventoryMovement')}</span>
         </button>
       </div>
 
@@ -329,11 +331,11 @@ export default function StockByWarehousePage() {
               value={selectedWarehouseId}
               onChange={(e) => setSelectedWarehouseId(e.target.value)}
               options={warehouseOptions}
-              placeholder="All Warehouses"
+              placeholder={t('stockByWarehouse.allWarehouses')}
             />
 
             <div className="quantity-filter-section">
-              <label className="quantity-filter-label">Quantity:</label>
+              <label className="quantity-filter-label">{t('stockByWarehouse.quantity')}:</label>
               <div className="quantity-filter-options">
                 <label className="quantity-filter-option">
                   <input
@@ -347,7 +349,7 @@ export default function StockByWarehousePage() {
                       )
                     }
                   />
-                  <span>All</span>
+                  <span>{t('stockByWarehouse.all')}</span>
                 </label>
                 <label className="quantity-filter-option">
                   <input
@@ -361,7 +363,7 @@ export default function StockByWarehousePage() {
                       )
                     }
                   />
-                  <span>Stock</span>
+                  <span>{t('stockByWarehouse.stock')}</span>
                 </label>
                 <label className="quantity-filter-option">
                   <input
@@ -375,7 +377,7 @@ export default function StockByWarehousePage() {
                       )
                     }
                   />
-                  <span>Zero</span>
+                  <span>{t('stockByWarehouse.zero')}</span>
                 </label>
               </div>
             </div>
@@ -383,9 +385,6 @@ export default function StockByWarehousePage() {
 
           <CompactStockByWarehouseCardView
             stockData={filteredStockBalances}
-            onRowClick={(item) => {
-              setSelectedItemId(item.item_id);
-            }}
           />
 
           {filteredStockBalances.length > 0 && (
@@ -402,8 +401,8 @@ export default function StockByWarehousePage() {
             columnDefs={columnDefs}
             defaultColDef={{
               resizable: true,
-              sortable: false,
-              filter: false,
+              sortable: true,
+              filter: true
             }}
             pagination={true}
             paginationPageSize={20}

@@ -4,92 +4,116 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
   ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, 
-  TrendingUp, ChevronDown, LogOut
+  TrendingUp, ChevronDown, LogOut, PanelLeft
 } from 'lucide-react';
+
+import './TopMenu.css';
 
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useKeyboardShortcuts } from '../../context/KeyboardShortcutsContext';
-import './TopMenu.css';
+import { useTranslation, getDir } from '../../hooks/useTranslation';
+import LanguageToggle from '../common/LanguageToggle';
 
 interface NavItem {
   path?: string;
-  label: string;
+  labelKey: string;
   icon?: React.ReactNode;
   children?: NavItem[];
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={18} strokeWidth={1.5} /> },
+const getNavItems = (): NavItem[] => [
+  { path: '/', labelKey: 'nav.dashboard', icon: <LayoutDashboard size={18} strokeWidth={1.5} /> },
   {
-    label: 'Inventory',
+    labelKey: 'nav.inventory',
     icon: <Package size={18} strokeWidth={1.5} />,
     children: [
-      { path: '/inventory/items', label: 'Items' },
-      { path: '/inventory/warehouses', label: 'Warehouses' },
-      { path: '/inventory/stock-movements', label: 'Stock Movements' },
-      { path: '/inventory/stock-by-warehouse', label: 'Stock by Warehouse' }
+      { path: '/inventory/items', labelKey: 'nav.items' },
+      { path: '/inventory/warehouses', labelKey: 'nav.warehouses' },
+      { path: '/inventory/stock-movements', labelKey: 'nav.stockMovements' },
+      { path: '/inventory/stock-by-warehouse', labelKey: 'nav.stockByWarehouse' }
     ]
   },
   {
-    label: 'Sales',
+    labelKey: 'nav.sales',
     icon: <DollarSign size={18} strokeWidth={1.5} />,
     children: [
-      { path: '/pos', label: 'POS Terminal' },
-      { path: '/sales', label: 'Invoices' },
-      { path: '/quotations', label: 'Quotations' },
-      { path: '/sales-orders', label: 'Sales Orders' },
-      { path: '/sales/invoice', label: 'Create Invoice' },
-      { path: '/customers', label: 'Customers' }
+      { path: '/pos', labelKey: 'nav.pos' },
+      { path: '/sales', labelKey: 'nav.invoices' },
+      { path: '/quotations', labelKey: 'nav.quotations' },
+      { path: '/sales-orders', labelKey: 'nav.salesOrders' },
+      { path: '/sales/invoice', labelKey: 'actions.create' },
+      { path: '/customers', labelKey: 'nav.customers' }
     ]
   },
   {
-    label: 'Reports',
+    labelKey: 'nav.reports',
     icon: <BarChart3 size={18} strokeWidth={1.5} />,
     children: [
-      { path: '/reports', label: 'Dashboard' },
-      { path: '/reports/accounts-receivable', label: 'A/R Reports' },
-      { path: '/reports/sales-summary', label: 'Sales Summary' },
-      { path: '/reports/stock-level', label: 'Stock Levels' },
-      { path: '/reports/low-stock', label: 'Low Stock Alert' },
-      { path: '/reports/profit-loss', label: 'Profit & Loss' },
-      { path: '/reports/cash-flow', label: 'Cash Flow' },
-      { path: '/reports/expenses', label: 'Expenses Report' }
+      { path: '/reports', labelKey: 'nav.reportsDashboard' },
+      { path: '/reports/accounts-receivable', labelKey: 'nav.arReports' },
+      { path: '/reports/sales-summary', labelKey: 'nav.salesSummary' },
+      { path: '/reports/stock-level', labelKey: 'nav.stockLevel' },
+      { path: '/reports/low-stock', labelKey: 'nav.lowStock' },
+      { path: '/reports/profit-loss', labelKey: 'nav.profitLoss' },
+      { path: '/reports/cash-flow', labelKey: 'nav.cashFlow' },
+      { path: '/reports/expenses', labelKey: 'nav.expensesReport' }
     ]
   },
   {
-    label: 'Forecasts',
+    labelKey: 'nav.forecasts',
     icon: <TrendingUp size={18} strokeWidth={1.5} />,
     children: [
-      { path: '/forecasts', label: 'Dashboard' },
-      { path: '/forecasts/demand', label: 'Demand Forecast' },
-      { path: '/forecasts/trends', label: 'Trends' }
+      { path: '/forecasts', labelKey: 'nav.reportsDashboard' },
+      { path: '/forecasts/demand', labelKey: 'nav.demand' }
     ]
   },
   {
-    label: 'Purchases',
+    labelKey: 'nav.purchases',
     icon: <ShoppingCart size={18} strokeWidth={1.5} />,
     children: [
-      { path: '/purchases', label: 'Purchases' },
-      { path: '/purchase-orders', label: 'Purchase Orders' },
-      { path: '/purchase-orders/create', label: 'Create PO' },
-      { path: '/suppliers', label: 'Suppliers' }
+      { path: '/purchases', labelKey: 'nav.purchases' },
+      { path: '/purchase-orders', labelKey: 'nav.purchaseOrders' },
+      { path: '/suppliers', labelKey: 'nav.suppliers' }
     ]
   },
-  { path: '/bom', label: 'BOM', icon: <ClipboardList size={18} strokeWidth={1.5} /> },
-  { path: '/production', label: 'Production', icon: <Factory size={18} strokeWidth={1.5} /> },
-  { path: '/expenses', label: 'Expenses', icon: <Receipt size={18} strokeWidth={1.5} /> },
-  { path: '/activity-log', label: 'Activity', icon: <FileText size={18} strokeWidth={1.5} /> },
-  { path: '/integrations', label: 'Integrations', icon: <Link2 size={18} strokeWidth={1.5} /> },
-  { path: '/settings', label: 'Settings', icon: <Settings size={18} strokeWidth={1.5} /> }
+  { path: '/bom', labelKey: 'nav.bom', icon: <ClipboardList size={18} strokeWidth={1.5} /> },
+  { path: '/production', labelKey: 'nav.production', icon: <Factory size={18} strokeWidth={1.5} /> },
+  { path: '/expenses', labelKey: 'nav.expenses', icon: <Receipt size={18} strokeWidth={1.5} /> },
+  {
+    labelKey: 'nav.administrator',
+    icon: <Settings size={18} strokeWidth={1.5} />,
+    children: [
+      { path: '/users', labelKey: 'nav.users' },
+      { path: '/roles', labelKey: 'nav.roles' }
+    ]
+  },
+  { path: '/activity-log', labelKey: 'nav.activityLog', icon: <FileText size={18} strokeWidth={1.5} /> },
+  { path: '/integrations', labelKey: 'nav.integrations', icon: <Link2 size={18} strokeWidth={1.5} /> },
+  { path: '/settings', labelKey: 'nav.settings', icon: <Settings size={18} strokeWidth={1.5} /> }
 ];
 
-const TopMenu = memo(function TopMenu() {
+const VISIBLE_ITEMS = 8;
+
+interface TopMenuProps {
+  onToggleNav?: () => void;
+}
+
+const TopMenu = memo(function TopMenu({ onToggleNav }: TopMenuProps) {
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
   const { showHelp } = useKeyboardShortcuts();
+  const { t, locale } = useTranslation();
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.dir = getDir();
+  }, [locale]);
+
+  const navItems = getNavItems();
+  const visibleItems = navItems.slice(0, VISIBLE_ITEMS);
+  const overflowItems = navItems.slice(VISIBLE_ITEMS);
 
   const handleDropdownHover = (index: number) => {
     setActiveDropdown(index);
@@ -104,21 +128,22 @@ const TopMenu = memo(function TopMenu() {
       <div className="top-menu-left">
         <NavLink to="/" className="top-menu-logo">
           <img src="/minierp-logo.webp" alt="Mini ERP" className="top-menu-logo-image" />
-          <span className="top-menu-logo-text">Mini ERP</span>
         </NavLink>
       </div>
 
       <nav className="top-menu-nav">
-        {NAV_ITEMS.map((item, index) => (
+        {visibleItems.map((item, index) => (
           item.children ? (
             <div
-              key={index}
+              role="button"
+              tabIndex={0}
+              key={item.labelKey}
               className={`top-menu-dropdown ${activeDropdown === index ? 'active' : ''}`}
               onMouseEnter={() => handleDropdownHover(index)}
               onMouseLeave={handleDropdownLeave}
             >
-              <button className="top-menu-dropdown-trigger">
-                <span>{item.label}</span>
+              <button type="button" className="top-menu-dropdown-trigger">
+                <span>{t(item.labelKey)}</span>
                 <ChevronDown size={14} className="dropdown-arrow" />
               </button>
               <div className="top-menu-dropdown-menu">
@@ -128,7 +153,7 @@ const TopMenu = memo(function TopMenu() {
                     to={child.path!}
                     className={({ isActive }) => `top-menu-dropdown-item ${isActive ? 'active' : ''}`}
                   >
-                    {child.label}
+                    {t(child.labelKey)}
                   </NavLink>
                 ))}
               </div>
@@ -139,15 +164,64 @@ const TopMenu = memo(function TopMenu() {
               to={item.path!}
               className={({ isActive }) => `top-menu-item ${isActive ? 'active' : ''}`}
             >
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
               {item.path === '/' && <span className="shortcut-hint">Alt+1</span>}
             </NavLink>
           )
         ))}
+        {overflowItems.length > 0 && (
+          <div
+            role="button"
+            tabIndex={0}
+            className={`top-menu-dropdown ${activeDropdown === VISIBLE_ITEMS ? 'active' : ''}`}
+            onMouseEnter={() => handleDropdownHover(VISIBLE_ITEMS)}
+            onMouseLeave={handleDropdownLeave}
+          >
+            <button type="button" className="top-menu-dropdown-trigger">
+              <span>More</span>
+              <ChevronDown size={14} className="dropdown-arrow" />
+            </button>
+            <div className="top-menu-dropdown-menu">
+              {overflowItems.map((item) => (
+                item.children ? (
+                  item.children.map((child) => (
+                    <NavLink
+                      key={child.path}
+                      to={child.path!}
+                      className={({ isActive }) => `top-menu-dropdown-item ${isActive ? 'active' : ''}`}
+                    >
+                      {t(child.labelKey)}
+                    </NavLink>
+                  ))
+                ) : (
+                  <NavLink
+                    key={item.path}
+                    to={item.path!}
+                    className={({ isActive }) => `top-menu-dropdown-item ${isActive ? 'active' : ''}`}
+                  >
+                    {t(item.labelKey)}
+                  </NavLink>
+                )
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       <div className="top-menu-right">
+        {onToggleNav && (
+          <button
+            type="button"
+            className="top-menu-nav-toggle"
+            onClick={onToggleNav}
+            title="Switch to Sidebar"
+            aria-label="Switch to Sidebar"
+          >
+            <PanelLeft size={18} />
+          </button>
+        )}
         <button
+          type="button"
           className="top-menu-theme-toggle"
           onClick={toggleDarkMode}
           title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -155,13 +229,16 @@ const TopMenu = memo(function TopMenu() {
         >
           {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
         </button>
+        <LanguageToggle showLabel={false} />
 
         <div 
+          role="button"
+          tabIndex={0}
           className={`top-menu-user ${isUserMenuOpen ? 'open' : ''}`}
           onMouseEnter={() => setIsUserMenuOpen(true)}
           onMouseLeave={() => setIsUserMenuOpen(false)}
         >
-          <button className="top-menu-user-trigger">
+          <button type="button" className="top-menu-user-trigger">
             <div className="top-menu-user-avatar">
               {user?.full_name?.charAt(0)}
             </div>
@@ -172,10 +249,10 @@ const TopMenu = memo(function TopMenu() {
             <div className="top-menu-user-info">
               <div className="top-menu-user-role">{user?.role}</div>
             </div>
-            <button className="top-menu-help-btn" onClick={showHelp}>
+            <button type="button" className="top-menu-help-btn" onClick={showHelp}>
               <span>Keyboard Shortcuts</span>
             </button>
-            <button className="top-menu-logout-btn" onClick={logout}>
+            <button type="button" className="top-menu-logout-btn" onClick={logout}>
               <LogOut size={16} />
               <span>Logout</span>
             </button>

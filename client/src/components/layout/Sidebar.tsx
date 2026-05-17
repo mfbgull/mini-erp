@@ -9,100 +9,109 @@ import {
 
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useTranslation } from '../../hooks/useTranslation';
+import LanguageToggle from '../common/LanguageToggle';
 import './Sidebar.css';
 
 interface NavItem {
   path?: string;
-  label: string;
+  labelKey: string;
   icon?: React.ReactNode;
   children?: NavItem[];
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
+const getNavItems = (): NavItem[] => [
+  { path: '/', labelKey: 'nav.dashboard', icon: <LayoutDashboard size={20} strokeWidth={1.5} /> },
   {
-    label: 'Inventory',
+    labelKey: 'nav.inventory',
     icon: <Package size={20} strokeWidth={1.5} />,
     children: [
-      { path: '/inventory/items', label: 'Items' },
-      { path: '/inventory/warehouses', label: 'Warehouses' },
-      { path: '/inventory/stock-movements', label: 'Stock Movements' },
-      { path: '/inventory/stock-by-warehouse', label: 'Stock by Warehouse' }
+      { path: '/inventory/items', labelKey: 'nav.items' },
+      { path: '/inventory/warehouses', labelKey: 'nav.warehouses' },
+      { path: '/inventory/stock-movements', labelKey: 'nav.stockMovements' },
+      { path: '/inventory/stock-by-warehouse', labelKey: 'nav.stockByWarehouse' }
     ]
   },
   {
-    label: 'Sales',
+    labelKey: 'nav.sales',
     icon: <DollarSign size={20} strokeWidth={1.5} />,
     children: [
-      { path: '/pos', label: 'POS Terminal' },
-      { path: '/sales', label: 'Invoices' },
-      { path: '/quotations', label: 'Quotations' },
-      { path: '/sales-orders', label: 'Sales Orders' },
-      { path: '/sales/invoice', label: 'Create Invoice' },
-      { path: '/customers', label: 'Customers' }
+      { path: '/pos', labelKey: 'nav.pos' },
+      { path: '/sales', labelKey: 'nav.invoices' },
+      { path: '/quotations', labelKey: 'nav.quotations' },
+      { path: '/sales-orders', labelKey: 'nav.salesOrders' },
+      { path: '/sales/invoice', labelKey: 'actions.create' },
+      { path: '/customers', labelKey: 'nav.customers' }
     ]
   },
   {
-    label: 'Reports',
+    labelKey: 'nav.reports',
     icon: <BarChart3 size={20} strokeWidth={1.5} />,
     children: [
-      { path: '/reports', label: 'Dashboard' },
-      { path: '/reports/accounts-receivable', label: 'A/R Reports' },
-      { path: '/reports/sales-summary', label: 'Sales Summary' },
-      { path: '/reports/stock-level', label: 'Stock Levels' },
-      { path: '/reports/low-stock', label: 'Low Stock Alert' },
-      { path: '/reports/profit-loss', label: 'Profit & Loss' },
-      { path: '/reports/cash-flow', label: 'Cash Flow' },
-      { path: '/reports/expenses', label: 'Expenses Report' }
+      { path: '/reports', labelKey: 'nav.reportsDashboard' },
+      { path: '/reports/accounts-receivable', labelKey: 'nav.arReports' },
+      { path: '/reports/sales-summary', labelKey: 'nav.salesSummary' },
+      { path: '/reports/stock-level', labelKey: 'nav.stockLevel' },
+      { path: '/reports/low-stock', labelKey: 'nav.lowStock' },
+      { path: '/reports/profit-loss', labelKey: 'nav.profitLoss' },
+      { path: '/reports/cash-flow', labelKey: 'nav.cashFlow' },
+      { path: '/reports/expenses', labelKey: 'nav.expensesReport' }
     ]
   },
   {
-    label: 'Forecasts',
+    labelKey: 'nav.forecasts',
     icon: <TrendingUp size={20} strokeWidth={1.5} />,
     children: [
-      { path: '/forecasts', label: 'Dashboard' },
-      { path: '/forecasts/demand', label: 'Demand Forecast' },
-      { path: '/forecasts/trends', label: 'Trends' }
+      { path: '/forecasts', labelKey: 'nav.reportsDashboard' },
+      { path: '/forecasts/demand', labelKey: 'nav.demand' }
     ]
   },
   {
-    label: 'Purchases',
+    labelKey: 'nav.purchases',
     icon: <ShoppingCart size={20} strokeWidth={1.5} />,
     children: [
-      { path: '/purchases', label: 'Purchases' },
-      { path: '/purchase-orders', label: 'Purchase Orders' },
-      { path: '/purchase-orders/create', label: 'Create PO' },
-      { path: '/suppliers', label: 'Suppliers' }
+      { path: '/purchases', labelKey: 'nav.purchases' },
+      { path: '/purchase-orders', labelKey: 'nav.purchaseOrders' },
+      { path: '/suppliers', labelKey: 'nav.suppliers' }
     ]
   },
-  { path: '/bom', label: 'Bill of Materials', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
-  { path: '/production', label: 'Production', icon: <Factory size={20} strokeWidth={1.5} /> },
-  { path: '/expenses', label: 'Expenses', icon: <Receipt size={20} strokeWidth={1.5} /> },
+  { path: '/bom', labelKey: 'nav.bom', icon: <ClipboardList size={20} strokeWidth={1.5} /> },
+  { path: '/production', labelKey: 'nav.production', icon: <Factory size={20} strokeWidth={1.5} /> },
   {
-    label: 'Administrator',
+    labelKey: 'nav.expenses',
+    icon: <Receipt size={20} strokeWidth={1.5} />,
+    children: [
+      { path: '/expenses', labelKey: 'nav.expenses' }
+    ]
+  },
+  {
+    labelKey: 'nav.administrator',
     icon: <Shield size={20} strokeWidth={1.5} />,
     children: [
-      { path: '/users', label: 'Users' },
-      { path: '/roles', label: 'Roles' }
+      { path: '/users', labelKey: 'nav.users' },
+      { path: '/roles', labelKey: 'nav.roles' }
     ]
   },
-  { path: '/activity-log', label: 'Activity Log', icon: <FileText size={20} strokeWidth={1.5} /> },
-  { path: '/integrations', label: 'Integrations', icon: <Link2 size={20} strokeWidth={1.5} /> },
-  { path: '/settings', label: 'Settings', icon: <Settings size={20} strokeWidth={1.5} /> }
+  { path: '/activity-log', labelKey: 'nav.activityLog', icon: <FileText size={20} strokeWidth={1.5} /> },
+  { path: '/integrations', labelKey: 'nav.integrations', icon: <Link2 size={20} strokeWidth={1.5} /> },
+  { path: '/settings', labelKey: 'nav.settings', icon: <Settings size={20} strokeWidth={1.5} /> }
 ];
 
 const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onToggleNav?: () => void; isCompact?: boolean }) {
   const { user, logout } = useAuth();
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  const navItems = getNavItems();
 
   useEffect(() => {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkIsMobile();
     window.addEventListener('resize', checkIsMobile);
     return () => window.removeEventListener('resize', checkIsMobile);
@@ -129,6 +138,7 @@ const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onTo
       {isMobile && (
         <>
           <button
+            type="button"
             className="sidebar-toggle mobile-dark-mode-toggle"
             onClick={toggleDarkMode}
             title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -137,6 +147,7 @@ const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onTo
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
           <button
+            type="button"
             className="sidebar-toggle mobile-menu-toggle"
             onClick={toggleMobileMenu}
             title={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
@@ -167,7 +178,7 @@ const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onTo
         </div>
 
         <nav className="sidebar-menu">
-          {NAV_ITEMS.map((item, index) => (
+          {navItems.map((item, index) => (
             item.children ? (
               <button
                 type="button"
@@ -179,7 +190,7 @@ const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onTo
               >
                 <div className="nav-section-title">
                   <span className="nav-icon">{item.icon}</span>
-                  <span className="nav-label">{item.label}</span>
+                  <span className="nav-label">{t(item.labelKey)}</span>
                   <ChevronRight size={16} className="nav-arrow" />
                 </div>
                 <div className="nav-children">
@@ -190,7 +201,7 @@ const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onTo
                       className={({ isActive }) => `nav-item nav-sub-item ${isActive ? 'active' : ''}`}
                       onClick={handleNavClick}
                     >
-                      {child.label}
+                      {t(child.labelKey)}
                     </NavLink>
                   ))}
                 </div>
@@ -204,7 +215,7 @@ const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onTo
                 onClick={handleNavClick}
               >
                 <span className="nav-icon">{item.icon}</span>
-                <span className="nav-label">{item.label}</span>
+                <span className="nav-label">{t(item.labelKey)}</span>
               </NavLink>
             )
           ))}
@@ -216,6 +227,9 @@ const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onTo
             <div className="user-details">
               <div className="user-name">{user?.full_name}</div>
               <div className="user-role tiny">{user?.role}</div>
+            </div>
+            <div className="language-switcher">
+              <LanguageToggle showLabel={false} />
             </div>
             <button type="button" className="logout-btn" onClick={logout} title="Logout">
               <LogOut size={16} strokeWidth={1.5} />

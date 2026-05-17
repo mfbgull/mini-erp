@@ -166,30 +166,6 @@ export const salesApi = {
     return response.data;
   },
 
-  // Get single sales order
-  getSalesOrder: async (id: number) => {
-    const response = await api.get(`/sales-orders/${id}`);
-    return response.data;
-  },
-
-  // Create new sales order
-  createSalesOrder: async (data: Partial<SalesOrder>) => {
-    const response = await api.post('/sales-orders', data);
-    return response.data;
-  },
-
-  // Update sales order
-  updateSalesOrder: async (id: number, data: Partial<SalesOrder>) => {
-    const response = await api.put(`/sales-orders/${id}`, data);
-    return response.data;
-  },
-
-  // Delete sales order
-  deleteSalesOrder: async (id: number) => {
-    const response = await api.delete(`/sales-orders/${id}`);
-    return response.data;
-  },
-
   // Convert sales order to invoice
   convertSalesOrderToInvoice: async (id: number) => {
     const response = await api.post(`/sales-orders/${id}/convert-to-invoice`);
