@@ -1,4 +1,6 @@
 import Database from 'better-sqlite3';
+import { getNextSequenceNumber } from '../utils/sequence';
+import { SalesOrderWithWarehouse, InvoiceWithUsername } from '../types';
 
 export interface Quotation {
   id: number;
@@ -594,19 +596,7 @@ class QuotationModel {
   private static generateQuotationNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `QUOTATION_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `QUO-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
@@ -616,19 +606,7 @@ class QuotationModel {
   private static generateSalesOrderNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `SO_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `SO-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
@@ -652,7 +630,7 @@ class QuotationModel {
       LEFT JOIN warehouses w ON so.warehouse_id = w.id
       LEFT JOIN users u ON so.created_by = u.id
       WHERE so.source_id = ?
-    `).get(quotationId) as any | undefined;
+    `).get(quotationId) as SalesOrderWithWarehouse | undefined;
 
     let invoice = undefined;
     if (salesOrder) {
@@ -663,7 +641,7 @@ class QuotationModel {
         FROM invoices i
         LEFT JOIN users u ON i.created_by = u.id
         WHERE i.so_id = ?
-      `).get(salesOrder.id) as any | undefined;
+       `).get(salesOrder.id) as InvoiceWithUsername | undefined;
     }
 
     return {

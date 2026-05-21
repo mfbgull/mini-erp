@@ -1,5 +1,7 @@
 import Database from 'better-sqlite3';
 import StockMovementModel from './StockMovement';
+import { getNextSequenceNumber } from '../utils/sequence';
+import { StockBalance, PricingSummary, LastSale } from '../types';
 
 interface Sale {
   id: number;
@@ -108,10 +110,10 @@ class SaleModel {
         userId
       );
 
-      const existingBalance = db.prepare(`
-        SELECT * FROM stock_balances
-        WHERE item_id = ? AND warehouse_id = ?
-      `).get(item_id, warehouse_id) as any;
+       const existingBalance = db.prepare(`
+         SELECT * FROM stock_balances
+         WHERE item_id = ? AND warehouse_id = ?
+       `).get(item_id, warehouse_id) as StockBalance | undefined;
 
       if (existingBalance) {
         db.prepare(`
@@ -157,19 +159,7 @@ class SaleModel {
   static generateSaleNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `SALE_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `SALE-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
@@ -323,7 +313,7 @@ class SaleModel {
         AND i.customer_id = ?
     `;
 
-    const summary = db.prepare(query).get(item_id, customer_id) as any;
+    const summary = db.prepare(query).get(item_id, customer_id) as PricingSummary | undefined;
 
     if (!summary || !summary.transaction_count) {
       return null;
@@ -347,7 +337,7 @@ class SaleModel {
       LIMIT 1
     `;
 
-    const lastSale = db.prepare(lastSaleQuery).get(item_id, customer_id) as any;
+    const lastSale = db.prepare(lastSaleQuery).get(item_id, customer_id) as LastSale | undefined;
 
     return {
       customer_name: summary.customer_name,
@@ -382,6 +372,139 @@ class SaleModel {
     );
 
     return true;
+  }
+
+  static getPOSTransactions(
+    db: Database.Database,
+    startDate?: string,
+    endDate?: string,
+    limit: number = 50
+  ) {
+    let query = `
+      SELECT
+        s.invoice_no as transaction_no,
+        s.sale_date,
+        s.customer_name,
+        w.warehouse_name,
+        COUNT(*) as items_count,
+        SUM(s.total_amount) as total
+      FROM sales s
+      JOIN warehouses w ON s.warehouse_id = w.id
+      WHERE s.invoice_no LIKE 'POS-%'
+    `;
+    const params: (string | number)[] = [];
+
+    if (startDate) {
+      query += ` AND s.sale_date >= ?`;
+      params.push(startDate);
+    }
+    if (endDate) {
+      query += ` AND s.sale_date <= ?`;
+      params.push(endDate);
+    }
+    query += ` GROUP BY s.invoice_no ORDER BY s.created_at DESC LIMIT ?`;
+    params.push(limit);
+
+    return db.prepare(query).all(...params);
+  }
+
+  static createPOSSale(
+    warehouseId: number,
+    saleDate: string,
+    items: Array<{ item_id: number; quantity: number; unit_price: number }>,
+    customerName: string,
+    userId: number,
+    db: Database.Database,
+    generateTransactionNo: () => string,
+    generateSaleNo: () => string,
+    cashReceived?: number
+  ) {
+    return db.transaction(() => {
+      const transactionNo = generateTransactionNo();
+      const saleIds: number[] = [];
+      const itemDetails: Array<{
+        sale_id: number;
+        sale_no: string;
+        item_id: number;
+        item_code: string;
+        item_name: string;
+        unit_of_measure: string;
+        quantity: number;
+        unit_price: number;
+        line_total: number;
+      }> = [];
+
+      for (const item of items) {
+        const itemRecord = db.prepare('SELECT id, item_code, item_name, unit_of_measure FROM items WHERE id = ?').get(item.item_id) as { id: number; item_code: string; item_name: string; unit_of_measure: string } | undefined;
+        if (!itemRecord) {
+          throw new Error(`Item with ID ${item.item_id} not found`);
+        }
+
+        const stockBalance = db.prepare('SELECT quantity FROM stock_balances WHERE item_id = ? AND warehouse_id = ?').get(item.item_id, warehouseId) as { quantity: number } | undefined;
+        const availableStock = stockBalance ? Number(stockBalance.quantity) : 0;
+
+        if (availableStock < item.quantity) {
+          throw new Error(`Insufficient stock for ${itemRecord.item_name}. Available: ${availableStock}, Required: ${item.quantity}`);
+        }
+
+        const saleNo = generateSaleNo();
+        const lineTotal = item.quantity * item.unit_price;
+
+        const saleResult = db.prepare(`
+          INSERT INTO sales (sale_no, item_id, warehouse_id, quantity, unit_price, total_amount, customer_name, sale_date, invoice_no, remarks, created_by)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(saleNo, item.item_id, warehouseId, item.quantity, item.unit_price, lineTotal, customerName, saleDate, transactionNo, `POS Transaction: ${transactionNo}`, userId);
+
+        const saleId = saleResult.lastInsertRowid as number;
+        saleIds.push(saleId);
+
+        StockMovementModel.recordMovement({
+          item_id: item.item_id,
+          warehouse_id: warehouseId,
+          quantity: -item.quantity,
+          movement_type: 'SALE',
+          reference_doctype: 'POS',
+          reference_docno: String(saleId),
+          movement_date: saleDate,
+          remarks: `POS Sale: ${transactionNo} - ${itemRecord.item_name}`
+        }, userId, db);
+
+        itemDetails.push({
+          sale_id: saleId,
+          sale_no: saleNo,
+          item_id: item.item_id,
+          item_code: itemRecord.item_code,
+          item_name: itemRecord.item_name,
+          unit_of_measure: itemRecord.unit_of_measure,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          line_total: lineTotal
+        });
+      }
+
+      db.prepare('INSERT INTO activity_log (user_id, action, entity_type, entity_id, description) VALUES (?, ?, ?, ?, ?)').run(
+        userId, 'CREATE', 'POS', saleIds[0], `POS Transaction ${transactionNo}: ${items.length} items`
+      );
+
+      const warehouse = db.prepare('SELECT warehouse_name FROM warehouses WHERE id = ?').get(warehouseId) as { warehouse_name: string };
+      const total = itemDetails.reduce((sum, i) => sum + i.line_total, 0);
+      const cashAmount = cashReceived ?? total;
+
+      return {
+        transaction_no: transactionNo,
+        sale_date: saleDate,
+        warehouse_id: warehouseId,
+        warehouse_name: warehouse.warehouse_name,
+        customer_name: customerName,
+        items: itemDetails,
+        subtotal: total,
+        total,
+        cash_received: cashAmount,
+        change: cashAmount - total,
+        items_count: items.length,
+        sale_ids: saleIds
+      };
+    })();
   }
 }
 

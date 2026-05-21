@@ -260,3 +260,217 @@ export interface TrendData {
     trend: 'growing' | 'stable' | 'declining';
   }[];
 }
+
+// ============ Stock Balance Types ============
+export interface StockBalance {
+  id: number;
+  item_id: number;
+  warehouse_id: number;
+  quantity: number;
+  last_updated: string;
+}
+
+// ============ Warehouse Types ============
+export interface Warehouse {
+  id: number;
+  warehouse_code: string;
+  warehouse_name: string;
+  location?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// ============ Sales Order Types ============
+export interface SalesOrder {
+  id: number;
+  so_no: string;
+  customer_id: number;
+  customer_name?: string;
+  warehouse_id: number;
+  order_date: string;
+  expected_delivery_date?: string;
+  status: 'Draft' | 'Confirmed' | 'Partial' | 'Completed' | 'Cancelled';
+  total_amount: number;
+  discount_scope?: 'item' | 'invoice';
+  discount_type?: 'flat' | 'percentage';
+  discount_value?: number;
+  notes?: string;
+  terms?: string;
+  created_by?: number;
+  created_at?: string;
+  updated_at?: string;
+  source_id?: number;
+  source_type?: string;
+}
+
+export interface SalesOrderWithWarehouse extends SalesOrder {
+  warehouse_code?: string;
+  warehouse_name?: string;
+  created_by_username?: string;
+}
+
+// ============ Quotation Types ============
+export interface Quotation {
+  id: number;
+  quotation_no: string;
+  customer_id: number;
+  customer_name?: string;
+  warehouse_id: number;
+  quotation_date: string;
+  valid_until?: string;
+  status: 'Draft' | 'Sent' | 'Accepted' | 'Rejected' | 'Expired';
+  total_amount: number;
+  discount_scope?: 'item' | 'invoice';
+  discount_type?: 'flat' | 'percentage';
+  discount_value?: number;
+  notes?: string;
+  terms?: string;
+  created_by?: number;
+  created_at?: string;
+  updated_at?: string;
+  source_id?: number;
+  source_type?: string;
+}
+
+export interface QuotationWithWarehouse extends Quotation {
+  warehouse_code?: string;
+  warehouse_name?: string;
+  created_by_username?: string;
+}
+
+// ============ Invoice Types (Extended) ============
+export interface InvoiceWithUsername extends Invoice {
+  created_by_username?: string;
+}
+
+// ============ Pricing Summary Types ============
+export interface PricingSummary {
+  customer_name: string;
+  transaction_count: number;
+  lowest_price: number;
+  highest_price: number;
+  avg_price: number;
+}
+
+export interface LastSale {
+  last_invoice_id?: string;
+  invoice_date?: string;
+  last_price?: number;
+}
+
+// ============ Integration Service Types ============
+export interface Setting {
+  key: string;
+  value: string;
+}
+
+export interface TaxRate {
+  rate: number;
+  state?: string;
+  zip?: string;
+  country?: string;
+  name?: string;
+}
+
+export interface TaxCalculation {
+  amount: number;
+  rate: number;
+  tax: number;
+  jurisdiction: string;
+}
+
+export interface TaxJarResponse {
+  error?: string;
+  tax?: TaxCalculation;
+  validation?: any;
+  categories?: Array<{ name: string }>;
+}
+
+export interface FixerResponse {
+  success?: boolean;
+  error?: { info: string };
+  base?: string;
+  date?: string;
+  rates?: Record<string, number>;
+}
+
+export interface WeatherResponse {
+  error?: { info: string };
+  main?: { temp: number; humidity: number };
+  weather?: Array<{ description: string }>;
+  name?: string;
+}
+
+export interface NotificationResponse {
+  success?: boolean;
+  message?: string;
+}
+
+export interface EmailResponse {
+  success?: boolean;
+  message?: string;
+  messageId?: string;
+}
+
+export interface NumverifyResponse {
+  success?: boolean;
+  valid?: boolean;
+  error?: { info: string };
+  number?: {
+    country_code: string;
+    country_name: string;
+    location: string;
+    carrier: string;
+    line_type: string;
+  };
+}
+
+// ============ Report Types ============
+export interface ReceivablesSummary {
+  total_invoices: number;
+  total_outstanding: number;
+  total_paid: number;
+  unpaid_count: number;
+  partial_count: number;
+  unused_overdue_count: number;
+  overdue_amount?: number;
+  total_current?: number;
+  total_1_30?: number;
+  total_31_60?: number;
+  total_61_90?: number;
+  total_over_90?: number;
+  statusBreakdown?: {
+    unpaid: { count: number; amount: number };
+    partiallyPaid: { count: number; amount: number };
+    overdue: { count: number; amount: number };
+  };
+}
+
+export interface SalesSummary {
+  total_invoices: number;
+  total_revenue: number;
+  unique_customers: number;
+  unique_items: number;
+  avg_invoice_value: number;
+}
+
+// ============ Activity Log Types ============
+export interface ActivityLogDbEntry {
+  id: number;
+  user_id: number | null;
+  username?: string;
+  action: string;
+  entity_type: string;
+  entity_id: number | null;
+  description: string;
+  metadata: string | null;
+  ip_address: string | null;
+  created_at: string;
+}
+
+export interface ActivityStat {
+  action?: string;
+  count?: number;
+  username?: string;
+  date?: string;
+}

@@ -20,6 +20,7 @@ import {
 
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -251,55 +252,28 @@ export default function ProductionSummaryReport() {
       )}
 
       {reportData?.summary && (
-        <div className="report-summary">
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <Factory size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalProductionOrders}</div>
-                <div className="summary-label">Total Production Orders</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <Package size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalOutput}</div>
-                <div className="summary-label">Total Output Quantity</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <CheckCircle size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalCompleted}</div>
-                <div className="summary-label">Completed Quantity</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <XCircle size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalScrapped}</div>
-                <div className="summary-label">Scrapped Quantity</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatsGrid>
+          <StatCard
+            icon={Factory}
+            label="Total Production Orders"
+            value={reportData.summary.totalProductionOrders}
+          />
+          <StatCard
+            icon={Package}
+            label="Total Output Quantity"
+            value={reportData.summary.totalOutput}
+          />
+          <StatCard
+            icon={CheckCircle}
+            label="Completed Quantity"
+            value={reportData.summary.totalCompleted}
+          />
+          <StatCard
+            icon={XCircle}
+            label="Scrapped Quantity"
+            value={reportData.summary.totalScrapped}
+          />
+        </StatsGrid>
       )}
 
       <div className="report-content">
@@ -310,7 +284,7 @@ export default function ProductionSummaryReport() {
         ) : reportData?.production && reportData.production.length > 0 ? (
           <>
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.production || []}
                 columnDefs={columnDefs}
                 defaultColDef={{

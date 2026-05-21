@@ -4,17 +4,10 @@ import { AuthUser, AuthRequest } from '../types';
 import logger from '../utils/logger';
 
 if (!process.env.JWT_SECRET) {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('FATAL: JWT_SECRET environment variable is not set. Server cannot start in production mode without a secure secret.');
-  }
-  if (process.env.NODE_ENV === 'test') {
-    // Allow test environment to use hardcoded test secret
-  } else {
-    throw new Error('FATAL: JWT_SECRET environment variable must be set. Generate one with: openssl rand -base64 64');
-  }
+  throw new Error('FATAL: JWT_SECRET environment variable must be set. Generate one with: openssl rand -base64 64');
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'test-secret-for-test-env-only';
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 export function authenticateToken(
   req: AuthRequest,

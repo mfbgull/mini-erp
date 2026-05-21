@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import logger from '../utils/logger';
 
@@ -19,14 +20,14 @@ export interface ResponseLogData extends RequestLogData {
 }
 
 function generateRequestId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return randomUUID();
 }
 
 export function requestLogger(req: Request, res: Response, next: NextFunction): void {
   const requestId = generateRequestId();
   const startTime = Date.now();
   
-  (req as any).requestId = requestId;
+  req.requestId = requestId;
   
   const requestLog: RequestLogData = {
     requestId,
@@ -35,8 +36,8 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     path: req.path,
     query: req.query as Record<string, unknown>,
     userAgent: req.get('user-agent'),
-    ip: req.ip || (req as any).connection?.remoteAddress,
-    userId: (req as any).user?.id
+    ip: req.ip || req.connection?.remoteAddress,
+    userId: req.user?.id
   };
   
   logger.info('Incoming request', requestLog);
@@ -71,7 +72,7 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
 }
 
 export function errorLogger(err: Error, req: Request, res: Response, next: NextFunction): void {
-  const requestId = (req as any).requestId || generateRequestId();
+  const requestId = req.requestId || generateRequestId();
   
   logger.error('Unhandled error', {
     requestId,
@@ -80,7 +81,7 @@ export function errorLogger(err: Error, req: Request, res: Response, next: NextF
     path: req.path,
     error: err.message,
     stack: err.stack,
-    userId: (req as any).user?.id
+    userId: req.user?.id
   });
   
   next(err);

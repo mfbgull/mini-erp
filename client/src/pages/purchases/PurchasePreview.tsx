@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { X, Eye, Edit2, Printer, FileText } from 'lucide-react';
 
 import { formatCurrency } from '../../utils/formatters';
+import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
 import './PurchasePreview.css';
 
 interface Purchase {
@@ -64,31 +65,20 @@ export default function PurchasePreview({
         {/* Content */}
         <div className="mobile-preview-content">
           {/* Key Stats */}
-          <div className="preview-stats-grid">
-            <div className="preview-stat-card">
-              <div className="stat-icon-wrapper purchase">
-                <FileText size={20} />
-              </div>
-              <div className="stat-content">
-                <p className="stat-label">Total Cost</p>
-                <p className="stat-value purchase-value">
-                  {formatCurrency(parseFloat(String(purchase.total_cost || 0)))}
-                </p>
-              </div>
-            </div>
-
-            <div className="preview-stat-card">
-              <div className="stat-icon-wrapper success">
-                <FileText size={20} />
-              </div>
-              <div className="stat-content">
-                <p className="stat-label">Quantity</p>
-                <p className="stat-value">
-                  {parseFloat(String(purchase.quantity || 0)).toFixed(3)} {purchase.unit_of_measure || ''}
-                </p>
-              </div>
-            </div>
-          </div>
+          <SummaryGrid columns={2}>
+            <SummaryCard
+              icon={FileText}
+              label="Total Cost"
+              value={formatCurrency(parseFloat(String(purchase.total_cost || 0)))}
+              variant="info"
+            />
+            <SummaryCard
+              icon={FileText}
+              label="Quantity"
+              value={`${parseFloat(String(purchase.quantity || 0)).toFixed(3)} ${purchase.unit_of_measure || ''}`}
+              variant="success"
+            />
+          </SummaryGrid>
 
           {/* Details Section */}
           <div className="preview-section">

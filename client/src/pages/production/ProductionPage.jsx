@@ -16,6 +16,7 @@ import Button from "../../components/common/Button";
 import { CompactProductionCardView } from "../../components/common/CompactProductionCard";
 import FormInput from "../../components/common/FormInput";
 import Modal from "../../components/common/Modal";
+import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import SearchableSelect from "../../components/common/SearchableSelect";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
@@ -64,6 +65,14 @@ export default function ProductionPage() {
         ?.toLowerCase()
         .includes(searchTerm.toLowerCase()),
   );
+
+  const now = new Date();
+  const productionsThisMonth = productions.filter((p) => {
+    const d = new Date(p.production_date);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const productionsThisWeek = productions.filter((p) => new Date(p.production_date) >= weekAgo).length;
 
   const deleteProductionMutation = useMutation({
     mutationFn: async (productionId) => {
@@ -219,62 +228,11 @@ export default function ProductionPage() {
         </div>
       ) : (
         <>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon stat-icon-gradient-purple">
-                <ClipboardList size={24} color="white" />
-              </div>
-              <div className="stat-content">
-                <div className="stat-label">Total Productions</div>
-                <div className="stat-value">{productions.length}</div>
-                <div className="stat-subtitle">All records</div>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon stat-icon-gradient-green">
-                <Factory size={24} color="white" />
-              </div>
-              <div className="stat-content">
-                <div className="stat-label">This Month</div>
-                <div className="stat-value">
-                  {
-                    productions.filter((p) => {
-                      const prodDate = new Date(p.production_date);
-                      const now = new Date();
-                      return (
-                        prodDate.getMonth() === now.getMonth() &&
-                        prodDate.getFullYear() === now.getFullYear()
-                      );
-                    }).length
-                  }
-                </div>
-                <div className="stat-subtitle">Productions</div>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon stat-icon-gradient-orange">
-                <Calendar size={24} color="white" />
-              </div>
-              <div className="stat-content">
-                <div className="stat-label">This Week</div>
-                <div className="stat-value">
-                  {
-                    productions.filter((p) => {
-                      const prodDate = new Date(p.production_date);
-                      const now = new Date();
-                      const weekAgo = new Date(
-                        now.getTime() - 7 * 24 * 60 * 60 * 1000,
-                      );
-                      return prodDate >= weekAgo;
-                    }).length
-                  }
-                </div>
-                <div className="stat-subtitle">Productions</div>
-              </div>
-            </div>
-          </div>
+          <StatsGrid>
+            <StatCard icon={ClipboardList} label="Total Productions" value={productions.length} subtitle="All records" />
+            <StatCard icon={Factory} label="This Month" value={productionsThisMonth} subtitle="Productions" />
+            <StatCard icon={Calendar} label="This Week" value={productionsThisWeek} subtitle="Productions" />
+          </StatsGrid>
 
           <div className="production-search-container">
             <div className="search-box">
@@ -313,7 +271,7 @@ export default function ProductionPage() {
           ) : (
             <>
               <div className="ag-theme-quartz ag-grid-container">
-                <AgGridReact
+                <AgGridReact theme="legacy"
                   rowData={filteredProductions}
                   columnDefs={columnDefs}
                   defaultColDef={{

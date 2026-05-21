@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini ERP - Database</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 2rem; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; color: #0f172a; }
+    .subtitle { color: #64748b; margin-bottom: 2rem; }
+    .section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f8fafc; font-weight: 600; }
+    tr:hover { background: #f8fafc; }
+    .nav { background: #0f172a; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    .nav a { color: #94a3b8; text-decoration: none; }
+    .nav a:hover { color: white; }
+    .nav .current { color: white; font-weight: 600; }
+    .breadcrumb { color: #64748b; font-size: 0.85rem; margin-bottom: 1rem; }
+    .breadcrumb a { color: #3b82f6; text-decoration: none; }
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+    .table-group { background: #f1f5f9; border-radius: 8px; padding: 1rem; border-left: 3px solid #10b981; }
+    .table-group h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .table-group ul { list-style: none; font-size: 0.8rem; color: #64748b; }
+    .table-group li { padding: 0.2rem 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+    .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; text-align: center; }
+    .stat-number { font-size: 2rem; font-weight: 700; color: #10b981; }
+    .stat-label { font-size: 0.8rem; color: #64748b; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 8px; font-size: 0.8rem; font-family: monospace; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="nav">
+      <span>🏢 Mini ERP</span>
+      <a href="architecture.html">Overview</a>
+      <a href="frontend.html">Frontend</a>
+      <a href="controllers.html">Controllers</a>
+      <a href="services.html">Services</a>
+      <a href="models.html">Models</a>
+      <a href="database.html" class="current">Database</a>
+      <a href="users.html">Users</a>
+      <a href="roles.html">Roles</a>
+    </nav>
+
+    <p class="breadcrumb"><a href="architecture.html">← Back to Architecture</a></p>
+    
+    <h1>🗄️ Database</h1>
+    <p class="subtitle">SQLite Database (22 Tables)</p>
+
+    <div class="section">
+      <div class="section-title">Database Stats</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">22</div>
+          <div class="stat-label">Tables</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">26</div>
+          <div class="stat-label">Migrations</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">14</div>
+          <div class="stat-label">Models</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Database File</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Tables by Module</div>
+      <div class="module-grid">
+        <div class="table-group" style="border-color: #3b82f6;">
+          <h3>📦 Inventory</h3>
+          <ul>
+            <li>• items (products)</li>
+            <li>• warehouses</li>
+            <li>• item_locations</li>
+            <li>• stock_movements</li>
+            <li>• stock_balances</li>
+          </ul>
+        </div>
+        <div class="table-group" style="border-color: #10b981;">
+          <h3>💰 Sales</h3>
+          <ul>
+            <li>• invoices</li>
+            <li>• invoice_items</li>
+            <li>• sales</li>
+            <li>• sales_items</li>
+            <li>• sales_orders</li>
+            <li>• quotations</li>
+          </ul>
+        </div>
+        <div class="table-group" style="border-color: #f59e0b;">
+          <h3>🏷️ Purchases</h3>
+          <ul>
+            <li>• purchases</li>
+            <li>• purchase_items</li>
+            <li>• purchase_orders</li>
+            <li>• purchase_order_items</li>
+          </ul>
+        </div>
+        <div class="table-group" style="border-color: #8b5cf6;">
+          <h3>👥 Customers</h3>
+          <ul>
+            <li>• customers</li>
+            <li>• customer_ledger</li>
+            <li>• customer_addresses</li>
+          </ul>
+        </div>
+        <div class="table-group" style="border-color: #ec4899;">
+          <h3>🔧 Suppliers</h3>
+          <ul>
+            <li>• suppliers</li>
+            <li>• supplier_ledger</li>
+          </ul>
+        </div>
+        <div class="table-group" style="border-color: #14b8a6;">
+          <h3>⚙️ Production</h3>
+          <ul>
+            <li>• productions</li>
+            <li>• boms</li>
+            <li>• bom_lines</li>
+          </ul>
+        </div>
+        <div class="table-group" style="border-color: #ef4444;">
+          <h3>📊 Finance</h3>
+          <ul>
+            <li>• payments</li>
+            <li>• payment_allocations</li>
+            <li>• expenses</li>
+            <li>• expense_categories</li>
+          </ul>
+        </div>
+        <div class="table-group" style="border-color: #64748b;">
+          <h3>🔐 System</h3>
+          <ul>
+            <li>• users</li>
+            <li>• roles</li>
+            <li>• settings</li>
+            <li>• activity_logs</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Key Tables Schema</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Table</th>
+            <th>Key Columns</th>
+            <th>Foreign Keys</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>items</td><td>item_code, item_name, category, current_stock, standard_cost</td><td>created_by → users</td></tr>
+          <tr><td>invoices</td><td>invoice_no, customer_id, total, tax, status</td><td>customer_id, created_by</td></tr>
+          <tr><td>sales</td><td>sale_no, customer_id, total_amount, sale_date</td><td>customer_id</td></tr>
+          <tr><td>purchases</td><td>purchase_no, supplier_id, total, status</td><td>supplier_id</td></tr>
+          <tr><td>stock_movements</td><td>movement_no, item_id, movement_type, quantity</td><td>item_id, warehouse_id</td></tr>
+          <tr><td>productions</td><td>production_no, status, quantity, start_date</td><td>warehouse_id</td></tr>
+          <tr><td>boms</td><td>item_id, version, is_active</td><td>item_id</td></tr>
+          <tr><td>payments</td><td>payment_no, amount, payment_type, payment_date</td><td>customer_id, invoice_id</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Migrations</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Migration</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>init.sql</td><td>Initial schema (22 tables)</td></tr>
+          <tr><td>2</td><td>add-sales-table.sql</td><td>Sales module</td></tr>
+          <tr><td>3</td><td>add-purchases-table.sql</td><td>Purchases module</td></tr>
+          <tr><td>4</td><td>add-production-tables.sql</td><td>Production module</td></tr>
+          <tr><td>5</td><td>add-bom-tables.sql</td><td>BOM module</td></tr>
+          <tr><td>6</td><td>add-expenses-table.sql</td><td>Expenses tracking</td></tr>
+          <tr><td>7</td><td>create-customer-ledger.sql</td><td>AR tracking</td></tr>
+          <tr><td>8</td><td>add-item-locations.sql</td><td>Multi-warehouse</td></tr>
+          <tr><td>9</td><td>add-roles-permissions.sql</td><td>Role-based access</td></tr>
+          <tr><td>10</td><td>add-missing-indexes.sql</td><td>Performance</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 2rem;">
+      <p>Mini ERP • Built with React + Express + SQLite | <a href="architecture.html" style="color: #3b82f6;">← Overview</a></p>
+    </footer>
+  </div>
+</body>
+</html>

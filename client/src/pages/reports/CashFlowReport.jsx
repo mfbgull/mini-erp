@@ -24,6 +24,7 @@ import {
 
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -217,28 +218,23 @@ export default function CashFlowReport() {
         </div>
       ) : reportData ? (
         <div className="report-content">
-          <div className="financial-summary">
-            <div className="summary-row">
-              <div className="summary-item inflow">
-                <div className="summary-label">Total Cash Inflow</div>
-                <div className="summary-value">{formatCurrency(reportData.totalInflow)}</div>
-              </div>
-            </div>
-
-            <div className="summary-row">
-              <div className="summary-item outflow">
-                <div className="summary-label">Total Cash Outflow</div>
-                <div className="summary-value negative">{formatCurrency(reportData.totalOutflow)}</div>
-              </div>
-            </div>
-
-            <div className="summary-row">
-              <div className="summary-item net">
-                <div className="summary-label">Net Cash Flow</div>
-                <div className="summary-value">{formatCurrency(reportData.netCashFlow)}</div>
-              </div>
-            </div>
-          </div>
+          <StatsGrid>
+            <StatCard
+              icon={DollarSign}
+              label="Total Cash Inflow"
+              value={formatCurrency(reportData.totalInflow)}
+            />
+            <StatCard
+              icon={TrendingDown}
+              label="Total Cash Outflow"
+              value={formatCurrency(reportData.totalOutflow)}
+            />
+            <StatCard
+              icon={TrendingUp}
+              label="Net Cash Flow"
+              value={formatCurrency(reportData.netCashFlow)}
+            />
+          </StatsGrid>
 
           <div className="chart-container">
             <Bar key="cashflow-chart" data={chartData} options={chartOptions} />

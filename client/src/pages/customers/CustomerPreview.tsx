@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { X, Eye, Edit2, CreditCard, FileText } from 'lucide-react';
 
 import { formatCurrency } from '../../utils/formatters';
+import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
 import './CustomerPreview.css';
 
 interface Customer {
@@ -69,36 +70,22 @@ export default function CustomerPreview({
         {/* Content */}
         <div className="mobile-preview-content">
           {/* Key Stats */}
-          <div className={`preview-stats-grid ${!hasCreditLimit ? 'single-col' : ''}`}>
-            <div className="preview-stat-card">
-              <div className="stat-icon-wrapper balance">
-                <FileText size={20} />
-              </div>
-              <div className="stat-content">
-                <p className="stat-label">Current Balance</p>
-                <p className={`stat-value ${customer.current_balance > 0 ? 'warning' : ''}`}>
-                  {formatCurrency(parseFloat(String(customer.current_balance || 0)))}
-                </p>
-              </div>
-            </div>
-
+          <SummaryGrid columns={hasCreditLimit ? 2 : 1}>
+            <SummaryCard
+              icon={FileText}
+              label="Current Balance"
+              value={formatCurrency(parseFloat(String(customer.current_balance || 0)))}
+              variant={customer.current_balance > 0 ? 'warning' : 'default'}
+            />
             {hasCreditLimit && (
-              <div className="preview-stat-card">
-                <div className="stat-icon-wrapper credit">
-                  <CreditCard size={20} />
-                </div>
-                <div className="stat-content">
-                  <p className="stat-label">Credit Limit</p>
-                  <p className="stat-value">
-                    {formatCurrency(parseFloat(String(customer.credit_limit || 0)))}
-                  </p>
-                  <p className="stat-subtitle">
-                    {creditUtilization.toFixed(1)}% utilized
-                  </p>
-                </div>
-              </div>
+              <SummaryCard
+                icon={CreditCard}
+                label="Credit Limit"
+                value={formatCurrency(parseFloat(String(customer.credit_limit || 0)))}
+                subtitle={`${creditUtilization.toFixed(1)}% utilized`}
+              />
             )}
-          </div>
+          </SummaryGrid>
 
           {/* Status */}
           <div className="preview-section">

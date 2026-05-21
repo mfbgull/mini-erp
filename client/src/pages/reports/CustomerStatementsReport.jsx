@@ -269,7 +269,7 @@ export default function CustomerStatementsReport() {
         ) : reportData?.statements && reportData.statements.length > 0 ? (
           <>
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.statements}
                 columnDefs={columnDefs}
                 defaultColDef={{

@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import { Request, Response } from 'express';
 import logger from '../utils/logger';
 
@@ -7,22 +7,19 @@ import logger from '../utils/logger';
  * Limits: 5 requests per 15 minutes per IP
  */
 export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts per window
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  skipSuccessfulRequests: true, // Don't count successful requests
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 999999 : 5,
+  standardHeaders: true,
+  legacyHeaders: false,
   handler: (req: Request, res: Response) => {
     logger.warn(`[Rate Limit] Login attempts exceeded for IP: ${req.ip}`);
     res.status(429).json({
       error: 'Too many login attempts. Please try again later.',
-      retryAfter: Math.ceil(15 * 60) // seconds
+      retryAfter: Math.ceil(15 * 60)
     });
   },
   keyGenerator: (req: Request) => {
-    // Use username for more targeted limiting (avoids IPv6 key issues)
-    const username = req.body?.username || 'unknown';
-    return username;
+    return ipKeyGenerator(req.ip || '');
   }
 });
 
@@ -48,13 +45,12 @@ export const passwordChangeLimiter = rateLimit({
  * Limits: 100 requests per minute per IP
  */
 export const apiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 100, // 100 requests per minute
+  windowMs: 60 * 1000,
+  max: process.env.NODE_ENV === 'test' ? 999999 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req: Request) => {
-    // Skip rate limiting for health checks
-    return req.path === '/health';
+    return req.path === '/health' || process.env.NODE_ENV === 'test';
   },
   handler: (req: Request, res: Response) => {
     logger.warn(`[Rate Limit] API requests exceeded for IP: ${req.ip}`);
@@ -64,6 +60,18 @@ export const apiLimiter = rateLimit({
     });
   }
 });
+
+/** Shut down rate limiter stores to release timers (used in test teardown) */
+export function shutdownRateLimiters() {
+  // MemoryStore exposes a shutdown() method that clears the interval
+  const stores = [apiLimiter, authLimiter, passwordChangeLimiter, sensitiveOperationLimiter];
+  for (const limiter of stores) {
+    const store = (limiter as any).store;
+    if (store && typeof store.shutdown === 'function') {
+      store.shutdown();
+    }
+  }
+}
 
 /**
  * Aggressive rate limiter for sensitive operations

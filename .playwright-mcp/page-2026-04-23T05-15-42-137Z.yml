@@ -1,0 +1,76 @@
+- generic [ref=e21]:
+  - button "Switch to light mode" [active] [ref=e122]:
+    - img [ref=e123]
+  - button "Open navigation menu" [ref=e25]:
+    - img [ref=e26]
+  - img "Mini ERP" [ref=e30]
+  - generic [ref=e32]:
+    - generic [ref=e33]:
+      - generic [ref=e35]:
+        - heading "Welcome back, admin" [level=1] [ref=e36]
+        - paragraph [ref=e37]: Thursday, April 23, 2026
+      - generic [ref=e38]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: Total Items
+          - generic [ref=e42]: "25"
+          - generic [ref=e43]: 1 warehouse stocks
+        - generic [ref=e45]:
+          - generic [ref=e46]: Stock Value
+          - generic [ref=e47]: Rs. 2613600.00
+          - generic [ref=e48]: Current inventory worth
+        - generic [ref=e50]:
+          - generic [ref=e51]: Sales Revenue
+          - generic [ref=e52]: Rs. 175660.00
+          - generic [ref=e53]: Total sales
+        - generic [ref=e55]:
+          - generic [ref=e56]: Production
+          - generic [ref=e57]: "0"
+          - generic [ref=e58]: Runs in last 30 days
+      - generic [ref=e59]:
+        - generic [ref=e60]:
+          - heading "Sales vs Purchases (Last 7 Days)" [level=3] [ref=e61]
+          - img [ref=e63]
+        - generic [ref=e64]:
+          - heading "Stock by Category" [level=3] [ref=e65]
+          - img [ref=e67]
+      - generic [ref=e68]:
+        - generic [ref=e69]:
+          - heading "Low Stock Alerts" [level=3] [ref=e70]:
+            - img [ref=e71]
+            - text: Low Stock Alerts
+          - paragraph [ref=e73]: All items are well stocked!
+        - generic [ref=e74]:
+          - heading "Quick Actions" [level=3] [ref=e75]
+          - generic [ref=e76]:
+            - link "New Item" [ref=e77] [cursor=pointer]:
+              - /url: /inventory/items
+              - img [ref=e78]
+              - generic [ref=e82]: New Item
+            - link "Record Sale" [ref=e83] [cursor=pointer]:
+              - /url: /sales
+              - img [ref=e84]
+              - generic [ref=e86]: Record Sale
+            - link "New Purchase" [ref=e87] [cursor=pointer]:
+              - /url: /purchases
+              - img [ref=e88]
+              - generic [ref=e92]: New Purchase
+            - link "Production" [ref=e93] [cursor=pointer]:
+              - /url: /production
+              - img [ref=e94]
+              - generic [ref=e96]: Production
+            - link "Stock Movement" [ref=e97] [cursor=pointer]:
+              - /url: /inventory/stock-movements
+              - img [ref=e98]
+              - generic [ref=e100]: Stock Movement
+            - link "BOM" [ref=e101] [cursor=pointer]:
+              - /url: /bom
+              - img [ref=e102]
+              - generic [ref=e105]: BOM
+            - link "Living Ecosystem" [ref=e106] [cursor=pointer]:
+              - /url: /ecosystem
+              - img [ref=e107]
+              - generic [ref=e111]: Living Ecosystem
+      - button "Open quick actions menu" [ref=e112] [cursor=pointer]:
+        - img [ref=e113]
+    - button "Open quick actions menu" [ref=e114] [cursor=pointer]:
+      - img [ref=e115]

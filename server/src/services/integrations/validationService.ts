@@ -5,6 +5,9 @@
 
 import axios from 'axios';
 import db from '../../config/database';
+import logger from '../../utils/logger';
+import { decryptIfNeeded } from '../../utils/encryption';
+import { Setting, NumverifyResponse } from '../../types';
 
 interface PhoneValidationResult {
   valid: boolean;
@@ -31,20 +34,20 @@ class ValidationService {
    */
   private loadSettings(): void {
     try {
-      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'validation_%'").all() as any[];
+      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'validation_%'").all() as Setting[];
 
-      settings.forEach((setting: any) => {
+      settings.forEach((setting) => {
         switch (setting.key) {
           case 'validation_enabled':
             this.enabled = setting.value === 'true';
             break;
           case 'validation_api_key':
-            this.apiKey = setting.value;
+            this.apiKey = decryptIfNeeded(setting.value);
             break;
         }
       });
     } catch (error) {
-      console.error('[ValidationService] Failed to load settings:', error);
+      logger.error('[ValidationService] Failed to load settings:', error);
     }
   }
 
@@ -90,21 +93,21 @@ class ValidationService {
         }
       });
 
-      if ((response.data as any).success === false) {
+      if ((response.data as NumverifyResponse).success === false) {
         return {
           success: false,
           valid: false,
-          message: (response.data as any).error?.info || 'Phone validation failed'
+          message: (response.data as NumverifyResponse).error?.info || 'Phone validation failed'
         };
       }
 
       return {
         success: true,
-        valid: (response.data as any).valid,
-        data: response.data as any
+        valid: (response.data as NumverifyResponse).valid,
+        data: response.data as PhoneValidationResult
       };
     } catch (error: any) {
-      console.error('[ValidationService] Failed to validate phone:', error);
+      logger.error('[ValidationService] Failed to validate phone:', error);
       return {
         success: false,
         valid: this.basicPhoneValidation(phoneNumber),

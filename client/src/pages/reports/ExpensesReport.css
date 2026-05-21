@@ -165,47 +165,6 @@
   margin-bottom: var(--space-lg);
 }
 
-.expenses-report .summary-card {
-  background: var(--card-bg);
-  border: 1px solid var(--neutral-200);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.expenses-report .summary-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
-
-.expenses-report .summary-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--primary), transparent 90%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
-.expenses-report .summary-text {
-  flex: 1;
-}
-
-.expenses-report .summary-value {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--neutral-900);
-}
-
-.expenses-report .summary-label {
-  font-size: 0.9rem;
-  color: var(--neutral-600);
-  margin-top: 2px;
-}
 
 /* Category Breakdown */
 .expenses-report .report-section {

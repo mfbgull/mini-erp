@@ -23,6 +23,7 @@ import {
 import PurchasePreview from "./PurchasePreview";
 import Button from "../../components/common/Button";
 import CompactPurchaseCardView from "../../components/common/CompactPurchaseCard";
+import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import FormInput from "../../components/common/FormInput";
 import Modal from "../../components/common/Modal";
 import { useSettings } from "../../context/SettingsContext";
@@ -221,124 +222,28 @@ export default function PurchasesPage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <div className={`stats-grid ${isMobile ? "stats-grid-mobile" : ""}`}>
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-purple">
-            <ShoppingCart size={isMobile ? 18 : 24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('purchases.totalPurchasesCard')}</div>
-            <div className="stat-value">{stats.totalPurchases}</div>
-            {!isMobile && <div className="stat-subtitle">{t('purchases.allTransactions')}</div>}
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-pink">
-            <DollarSign size={isMobile ? 18 : 24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('purchases.totalValueCard')}</div>
-            <div className="stat-value">{formatCurrency(stats.totalValue)}</div>
-            {!isMobile && <div className="stat-subtitle">{t('purchases.purchaseCost')}</div>}
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-blue">
-            <BarChart3 size={isMobile ? 18 : 24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('purchases.totalQuantityCard')}</div>
-            <div className="stat-value">
-              {parseFloat(stats.totalQuantity).toFixed(2)}
-            </div>
-            {!isMobile && <div className="stat-subtitle">{t('purchases.aggregateItems')}</div>}
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-green">
-            <Building2 size={isMobile ? 18 : 24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('purchases.suppliersCard')}</div>
-            <div className="stat-value">{stats.uniqueSuppliers}</div>
-            {!isMobile && <div className="stat-subtitle">{t('purchases.uniqueVendors')}</div>}
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-orange">
-            <Package size={isMobile ? 18 : 24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('purchases.itemsCard')}</div>
-            <div className="stat-value">{stats.uniqueItems}</div>
-            {!isMobile && (
-              <div className="stat-subtitle">{t('purchases.productsPurchased')}</div>
-            )}
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-indigo">
-            <TrendingUp size={isMobile ? 18 : 24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('purchases.averageValue')}</div>
-            <div className="stat-value">
-              {formatCurrency(stats.averagePurchaseValue)}
-            </div>
-            {!isMobile && <div className="stat-subtitle">{t('purchases.perPurchase')}</div>}
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div
-            className="stat-icon"
-            style={{
-              background: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-            }}
-          >
-            <Gem size={isMobile ? 18 : 24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('purchases.largestPurchase')}</div>
-            <div
-              className="stat-value"
-              style={isMobile ? undefined : { fontSize: "1.4rem" }}
-            >
-              {stats.largestPurchase.total_cost
-                ? formatCurrency(stats.largestPurchase.total_cost)
-                : t('purchases.noPurchasesYet')}
-            </div>
-            {!isMobile && (
-              <div className="stat-subtitle">
-                {stats.largestPurchase.total_cost
-                  ? `${formatCurrency(stats.largestPurchase.total_cost)} on ${format(new Date(stats.largestPurchase.purchase_date), "MMM dd")}`
-                  : t('purchases.noPurchasesYet')}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div
-          className="stat-card"
-          style={{
-            borderColor: stats.recentPurchases > 0 ? "#f5af19" : undefined,
-          }}
-        >
-          <div className="stat-icon stat-icon-gradient-red">
-            <CalendarDays size={isMobile ? 18 : 24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('purchases.recent30Days')}</div>
-            <div className="stat-value">{stats.recentPurchases}</div>
-            {!isMobile && <div className="stat-subtitle">{t('purchases.lastMonth')}</div>}
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={ShoppingCart} label={t('purchases.totalPurchasesCard')} value={stats.totalPurchases} subtitle={t('purchases.allTransactions')} />
+        <StatCard icon={DollarSign} label={t('purchases.totalValueCard')} value={formatCurrency(stats.totalValue)} subtitle={t('purchases.purchaseCost')} />
+        <StatCard icon={BarChart3} label={t('purchases.totalQuantityCard')} value={parseFloat(stats.totalQuantity).toFixed(2)} subtitle={t('purchases.aggregateItems')} />
+        <StatCard icon={Building2} label={t('purchases.suppliersCard')} value={stats.uniqueSuppliers} subtitle={t('purchases.uniqueVendors')} />
+        <StatCard icon={Package} label={t('purchases.itemsCard')} value={stats.uniqueItems} subtitle={t('purchases.productsPurchased')} />
+        <StatCard icon={TrendingUp} label={t('purchases.averageValue')} value={formatCurrency(stats.averagePurchaseValue)} subtitle={t('purchases.perPurchase')} />
+        <StatCard
+          icon={Gem}
+          label={t('purchases.largestPurchase')}
+          value={stats.largestPurchase.total_cost ? formatCurrency(stats.largestPurchase.total_cost) : t('purchases.noPurchasesYet')}
+          subtitle={stats.largestPurchase.total_cost ? `${formatCurrency(stats.largestPurchase.total_cost)} on ${format(new Date(stats.largestPurchase.purchase_date), "MMM dd")}` : t('purchases.noPurchasesYet')}
+          style={!isMobile ? { fontSize: "1.4rem" } : undefined}
+        />
+        <StatCard
+          icon={CalendarDays}
+          label={t('purchases.recent30Days')}
+          value={stats.recentPurchases}
+          subtitle={t('purchases.lastMonth')}
+          style={{ borderColor: stats.recentPurchases > 0 ? "#f5af19" : undefined }}
+        />
+      </StatsGrid>
 
       {/* Quick Actions */}
       <div
@@ -396,7 +301,7 @@ export default function PurchasesPage() {
         />
       ) : (
         <div className="ag-theme-quartz ag-grid-container">
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={purchases}
             columnDefs={columnDefs}
             defaultColDef={{

@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import errorHandlerMiddleware from './middleware/errorHandler';
 import { apiLimiter } from './middleware/rateLimiter';
+import { csrfProtection } from './middleware/csrf';
 import logger from './utils/logger';
 import { requestLogger, errorLogger } from './middleware/requestLogger';
 
@@ -89,6 +90,15 @@ app.use('/api/', apiLimiter);
 
 // Request logging middleware
 app.use(requestLogger);
+
+// CSRF protection - skip for auth routes (login/register need to set CSRF token)
+app.use('/api', (req, res, next) => {
+  if (req.path.startsWith('/auth/')) {
+    next();
+    return;
+  }
+  csrfProtection(req, res, next);
+});
 
 // Health check endpoint
 app.get('/health', (req: express.Request, res: express.Response) => {

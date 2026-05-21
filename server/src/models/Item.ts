@@ -200,6 +200,25 @@ class ItemModel {
     `).all() as { category: string }[];
   }
 
+  static getUnitsOfMeasure(db: Database.Database): string[] {
+    const usedUoms = db.prepare(`
+      SELECT DISTINCT unit_of_measure
+      FROM items
+      WHERE unit_of_measure IS NOT NULL
+      ORDER BY unit_of_measure
+    `).all() as { unit_of_measure: string }[];
+
+    const standardUoms = [
+      'Nos', 'Kg', 'Ltr', 'Box', 'Pack', 'Bottle',
+      'Meter', 'Roll', 'Set', 'Pcs', 'Dozen'
+    ];
+
+    return Array.from(new Set([
+      ...standardUoms,
+      ...usedUoms.map(u => u.unit_of_measure)
+    ]));
+  }
+
   static getLowStock(db: Database.Database): Item[] {
     return db.prepare(`
       SELECT *

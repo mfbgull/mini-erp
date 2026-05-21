@@ -66,6 +66,7 @@ export const createBOM = (req: AuthRequest, res: Response, next: NextFunction): 
 
     // Log BOM creation using activity logger
     logCRUD(ActionType.BOM_CREATE, 'BOM', bom.id, `Created BOM: ${bom.bom_no} for ${bom.finished_item_name}`, req.user!.id);
+    req.activityLogged = true;
 
     res.status(201).json(bom);
   } catch (error) {
@@ -88,6 +89,7 @@ export const updateBOM = (req: AuthRequest, res: Response, next: NextFunction): 
 
     // Log BOM update using activity logger
     logCRUD(ActionType.BOM_UPDATE, 'BOM', bom.id, `Updated BOM: ${bom.bom_no}`, req.user.id);
+    req.activityLogged = true;
 
     res.json(bom);
   } catch (error) {
@@ -112,6 +114,7 @@ export const deleteBOM = (req: AuthRequest, res: Response, next: NextFunction): 
 
     // Log BOM deletion using activity logger
     logCRUD(ActionType.BOM_DELETE, 'BOM', Number(id), `Deleted BOM: ${bom.bom_no}`, req.user!.id);
+    req.activityLogged = true;
 
     res.json({ message: 'BOM deleted successfully' });
   } catch (error) {

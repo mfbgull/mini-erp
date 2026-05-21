@@ -3,9 +3,12 @@ import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
 import { getRouteParam } from '../utils/queryUtils';
-import ledgerUtils from '../utils/ledgerUtils';
+import { sanitizeSortParams, PAYMENT_SORT_COLUMNS } from '../utils/sqlSanitizer';
 import logger from '../utils/logger';
-import { parseCurrency, subtractCurrency } from '../utils/currency';
+import { parseCurrency } from '../utils/currency';
+import PaymentModel from '../models/Payment';
+import CustomerModel from '../models/Customer';
+import InvoiceModel from '../models/Invoice';
 
 function getPayments(req: Request, res: Response): void {
   try {
@@ -18,578 +21,155 @@ function getPayments(req: Request, res: Response): void {
     const sortByParam = Array.isArray(req.query.sortBy) ? req.query.sortBy[0] : req.query.sortBy;
     const sortOrderParam = Array.isArray(req.query.sortOrder) ? req.query.sortOrder[0] : req.query.sortOrder;
 
-    const page = pageParam as string || '1';
-    const limit = limitParam as string || '10';
-    const search = searchParam as string || '';
-    const customerId = customerIdParam as string;
-    const fromDate = fromDateParam as string;
-    const toDate = toDateParam as string;
-    const sortBy = (sortByParam as string) || 'payment_date';
-    const sortOrder = (sortOrderParam as string) || 'DESC';
+    const filters = {
+      page: parseInt(pageParam as string) || 1,
+      limit: parseInt(limitParam as string) || 10,
+      search: searchParam as string,
+      customerId: customerIdParam as string,
+      fromDate: fromDateParam as string,
+      toDate: toDateParam as string,
+      sortBy: sortByParam as string,
+      sortOrder: sortOrderParam as string,
+    };
 
-    let query = `
-      SELECT 
-        p.id, p.payment_no, p.customer_id, c.customer_name, p.invoice_id, i.invoice_no,
-        p.payment_date, p.amount, p.payment_method, p.reference_no, p.notes, p.created_at,
-        GROUP_CONCAT(pa.invoice_id, ',') as allocated_invoices,
-        GROUP_CONCAT(pa.amount, ',') as allocation_amounts
-      FROM payments p
-      LEFT JOIN customers c ON p.customer_id = c.id
-      LEFT JOIN invoices i ON p.invoice_id = i.id
-      LEFT JOIN payment_allocations pa ON p.id = pa.payment_id
-      WHERE 1=1
-    `;
-
-    const params: any[] = [];
-
-    if (search) {
-      query += ` AND (p.payment_no LIKE ? OR c.customer_name LIKE ? OR p.reference_no LIKE ?)`;
-      const searchParam = `%${search}%`;
-      params.push(searchParam, searchParam, searchParam);
-    }
-
-    if (customerId) {
-      query += ' AND p.customer_id = ?';
-      params.push(parseInt(customerId as string, 10));
-    }
-
-    if (fromDate) {
-      query += ' AND p.payment_date >= ?';
-      params.push(fromDate);
-    }
-
-    if (toDate) {
-      query += ' AND p.payment_date <= ?';
-      params.push(toDate);
-    }
-
-    // Validate and whitelist sort parameters to prevent SQL injection
-    const ALLOWED_SORT_COLUMNS = ['payment_date', 'payment_no', 'amount', 'customer_name', 'id', 'created_at'];
-    const ALLOWED_SORT_ORDERS = ['ASC', 'DESC'];
-    const validatedSortBy = ALLOWED_SORT_COLUMNS.includes(sortBy) ? sortBy : 'payment_date';
-    const validatedSortOrder = ALLOWED_SORT_ORDERS.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC';
-
-    query += ` GROUP BY p.id ORDER BY ${validatedSortBy} ${validatedSortOrder} LIMIT ? OFFSET ?`;
-    params.push(parseInt(limit as string), (parseInt(page as string) - 1) * parseInt(limit as string));
-
-    const payments = db.prepare(query).all(...params);
-
-    let countQuery = `
-      SELECT COUNT(DISTINCT p.id) as total
-      FROM payments p
-      LEFT JOIN customers c ON p.customer_id = c.id
-      WHERE 1=1
-    `;
-
-    let countParams: any[] = [];
-    if (search) {
-      countQuery += ` AND (p.payment_no LIKE ? OR c.customer_name LIKE ? OR p.reference_no LIKE ?)`;
-      const searchParam = `%${search}%`;
-      countParams.push(searchParam, searchParam, searchParam);
-    }
-
-    if (customerId) {
-      countQuery += ' AND p.customer_id = ?';
-      countParams.push(parseInt(customerId as string, 10));
-    }
-
-    if (fromDate) {
-      countQuery += ' AND p.payment_date >= ?';
-      countParams.push(fromDate);
-    }
-
-    if (toDate) {
-      countQuery += ' AND p.payment_date <= ?';
-      countParams.push(toDate);
-    }
-
-    const total = db.prepare(countQuery).get(...countParams) as { total: number };
-
-    const pageNum = parseInt(page as string) || 1;
-    const limitNum = parseInt(limit as string) || 10;
+    const { payments, total, pageNum, limitNum } = PaymentModel.getAll(db, filters, [...PAYMENT_SORT_COLUMNS], 'payment_date', 'DESC');
 
     res.json({
-      success: true,
-      data: payments,
-      pagination: {
-        currentPage: pageNum,
-        totalPages: Math.ceil(total.total / limitNum),
-        totalItems: total.total,
-        hasNext: pageNum < Math.ceil(total.total / limitNum),
-        hasPrev: pageNum > 1
-      }
+      success: true, data: payments,
+      pagination: { currentPage: pageNum, totalPages: Math.ceil(total / limitNum), totalItems: total, hasNext: pageNum < Math.ceil(total / limitNum), hasPrev: pageNum > 1 }
     });
   } catch (error) {
     logger.error('Error fetching payments:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch payments'
-    });
+    res.status(500).json({ success: false, error: 'Failed to fetch payments' });
   }
 }
 
 function getPayment(req: Request, res: Response): void {
   try {
-    const { id } = req.params;
-
-    const query = `
-      SELECT 
-        p.id, p.payment_no, p.customer_id, c.customer_name, p.invoice_id, i.invoice_no,
-        p.payment_date, p.amount, p.payment_method, p.reference_no, p.notes, p.created_at,
-        GROUP_CONCAT(pa.invoice_id, ',') as allocated_invoices,
-        GROUP_CONCAT(pa.amount, ',') as allocation_amounts,
-        GROUP_CONCAT(pa.id, ',') as allocation_ids
-      FROM payments p
-      LEFT JOIN customers c ON p.customer_id = c.id
-      LEFT JOIN invoices i ON p.invoice_id = i.id
-      LEFT JOIN payment_allocations pa ON p.id = pa.payment_id
-      WHERE p.id = ?
-      GROUP BY p.id
-    `;
-
-    const payment = db.prepare(query).get(id) as any;
-
-    if (!payment) {
-      res.status(404).json({
-        success: false,
-        error: 'Payment not found'
-      });
-      return;
-    }
-
-    if (payment.allocated_invoices) {
-      const allocationQuery = `
-        SELECT pa.id, pa.payment_id, pa.invoice_id, i.invoice_no, pa.amount
-        FROM payment_allocations pa
-        LEFT JOIN invoices i ON pa.invoice_id = i.id
-        WHERE pa.payment_id = ?
-        ORDER BY pa.id
-      `;
-      payment.allocations = db.prepare(allocationQuery).all(id);
-    } else {
-      payment.allocations = [];
-    }
-
-    res.json({
-      success: true,
-      data: payment
-    });
+    const id = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
+    const payment = PaymentModel.getById(db, id);
+    if (!payment) { res.status(404).json({ success: false, error: 'Payment not found' }); return; }
+    res.json({ success: true, data: payment });
   } catch (error) {
     logger.error('Error fetching payment:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch payment'
-    });
+    res.status(500).json({ success: false, error: 'Failed to fetch payment' });
   }
 }
 
 function createPayment(req: AuthRequest, res: Response): void {
   try {
-    const {
-      customer_id,
-      payment_date,
-      amount,
-      payment_method,
-      reference_no,
-      notes,
-      invoice_allocations
-    } = req.body;
+    const { customer_id, payment_date, amount, payment_method, reference_no, notes, invoice_allocations } = req.body;
 
     if (!customer_id || !payment_date || !amount || amount <= 0) {
-      res.status(400).json({
-        success: false,
-        error: 'Customer ID, payment date, and amount are required'
-      });
+      res.status(400).json({ success: false, error: 'Customer ID, payment date, and amount are required' });
       return;
     }
 
     const parsedCustomerId = parseInt(customer_id, 10);
-
     if (!invoice_allocations || !Array.isArray(invoice_allocations) || invoice_allocations.length === 0) {
-      res.status(400).json({
-        success: false,
-        error: 'At least one invoice allocation is required'
-      });
+      res.status(400).json({ success: false, error: 'At least one invoice allocation is required' });
       return;
     }
 
-    const customer = db.prepare('SELECT id FROM customers WHERE id = ?').get(parsedCustomerId);
-    if (!customer) {
-      res.status(404).json({
-        success: false,
-        error: 'Customer not found'
-      });
+    if (!CustomerModel.getById(parsedCustomerId, db)) {
+      res.status(404).json({ success: false, error: 'Customer not found' });
       return;
-    }
-
-    const maxPaymentNo = db.prepare('SELECT MAX(payment_no) as max_no FROM payments WHERE payment_no LIKE \'PAY%\'').get() as { max_no: string } | undefined;
-    let newPaymentNo = 'PAY001';
-
-    if (maxPaymentNo && maxPaymentNo.max_no) {
-      const lastNumber = parseInt(maxPaymentNo.max_no.replace('PAY', ''));
-      newPaymentNo = `PAY${String(lastNumber + 1).padStart(3, '0')}`;
     }
 
     for (const alloc of invoice_allocations) {
       const parsedInvoiceId = parseInt(alloc.invoice_id, 10);
       if (isNaN(parsedInvoiceId)) {
-        res.status(400).json({
-          success: false,
-          error: `Invalid invoice ID: ${alloc.invoice_id}`
-        });
+        res.status(400).json({ success: false, error: `Invalid invoice ID: ${alloc.invoice_id}` });
         return;
       }
 
-      const invoice = db.prepare(`
-        SELECT id, customer_id, balance_amount, status
-        FROM invoices
-        WHERE id = ?
-      `).get(parsedInvoiceId) as any;
-
+      const invoice = InvoiceModel.getById(parsedInvoiceId, db);
       if (!invoice) {
-        res.status(404).json({
-          success: false,
-          error: `Invoice ${parsedInvoiceId} not found`
-        });
+        res.status(404).json({ success: false, error: `Invoice ${parsedInvoiceId} not found` });
         return;
       }
-
-      logger.debug('Payment validation - Invoice:', parsedInvoiceId, 'Invoice customer_id:', invoice.customer_id, typeof invoice.customer_id, 'Parsed customer_id:', parsedCustomerId, typeof parsedCustomerId);
 
       if (Number(invoice.customer_id) !== Number(parsedCustomerId)) {
-        res.status(400).json({
-          success: false,
-          error: `Invoice ${parsedInvoiceId} does not belong to customer ${parsedCustomerId}`
-        });
+        res.status(400).json({ success: false, error: `Invoice ${parsedInvoiceId} does not belong to customer ${parsedCustomerId}` });
         return;
       }
 
       if (parseCurrency(alloc.amount) <= 0) {
-        res.status(400).json({
-          success: false,
-          error: `Allocation amount for invoice ${alloc.invoice_id} must be greater than 0`
-        });
+        res.status(400).json({ success: false, error: `Allocation amount for invoice ${alloc.invoice_id} must be greater than 0` });
         return;
       }
     }
 
     const totalAllocated = invoice_allocations.reduce((sum: number, alloc: any) => sum + parseCurrency(alloc.amount), 0);
     if (Math.abs(totalAllocated - parseCurrency(amount)) > 0.01) {
-      res.status(400).json({
-        success: false,
-        error: `Payment amount (${amount}) does not match total allocated amount (${totalAllocated})`
-      });
+      res.status(400).json({ success: false, error: `Payment amount (${amount}) does not match total allocated amount (${totalAllocated})` });
       return;
     }
 
-    const transaction = db.transaction(() => {
-      const paymentStmt = db.prepare(`
-        INSERT INTO payments (
-          payment_no, customer_id, payment_date, amount, 
-          payment_method, reference_no, notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)
-      `);
-
-      const paymentResult = paymentStmt.run(
-        newPaymentNo,
-        parsedCustomerId,
-        payment_date,
-        amount,
-        payment_method || 'Cash',
-        reference_no || '',
-        notes || ''
-      );
-
-      const paymentId = paymentResult.lastInsertRowid as number;
-
-      const allocationStmt = db.prepare(`
-        INSERT INTO payment_allocations (
-          payment_id, invoice_id, amount
-        ) VALUES (?, ?, ?)
-      `);
-
-      for (const alloc of invoice_allocations) {
-        const invoiceId = parseInt(alloc.invoice_id, 10);
-        allocationStmt.run(paymentId, invoiceId, alloc.amount);
-
-        ledgerUtils.calculateInvoiceBalance(invoiceId);
-        ledgerUtils.updateInvoiceStatus(invoiceId);
-      }
-
-      const ledgerStmt = db.prepare(`
-        INSERT INTO customer_ledger (
-          customer_id, transaction_date, transaction_type, reference_no,
-          debit, credit, balance, description
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `);
-
-      const currentBalance = db.prepare('SELECT current_balance FROM customers WHERE id = ?').get(parsedCustomerId) as { current_balance: number };
-      const newBalance = subtractCurrency(parseCurrency(currentBalance.current_balance), parseCurrency(amount));
-
-      const invoiceNumbers = invoice_allocations.map((alloc: any) => {
-        const invoiceId = parseInt(alloc.invoice_id, 10);
-        const inv = db.prepare('SELECT invoice_no FROM invoices WHERE id = ?').get(invoiceId) as { invoice_no: string } | undefined;
-        logger.debug('Ledger description - Looking up invoice:', invoiceId, 'Found:', inv);
-        return inv && inv.invoice_no ? inv.invoice_no : `Invoice #${invoiceId}`;
-      });
-
-      ledgerStmt.run(
-        parsedCustomerId,
-        payment_date,
-        'PAYMENT',
-        newPaymentNo,
-        0,
-        amount,
-        newBalance,
-        `Payment against ${invoiceNumbers.join(', ')}`
-      );
-
-      ledgerUtils.updateCustomerBalance(parsedCustomerId);
-
-      return paymentId;
+    const paymentId = PaymentModel.create(db, {
+      customer_id: parsedCustomerId, payment_date, amount, payment_method, reference_no, notes, invoice_allocations,
+      userId: req.user!.id,
     });
 
-    const paymentId = transaction();
+    const customer = CustomerModel.getById(parsedCustomerId, db);
+    logCRUD(ActionType.PAYMENT_CREATE, 'Payment', paymentId, `Created payment - $${amount} from ${customer?.customer_name || 'Unknown'}`, req.user!.id, { customer_id: parsedCustomerId, amount, payment_method, invoice_allocations: invoice_allocations.length });
+    req.activityLogged = true;
 
-    // Get customer name for logging
-    const customerResult = db.prepare('SELECT customer_name FROM customers WHERE id = ?').get(parsedCustomerId) as { customer_name: string } | undefined;
-
-    // Log payment creation using activity logger
-    logCRUD(ActionType.PAYMENT_CREATE, 'Payment', paymentId as number, `Created payment: ${newPaymentNo} - $${amount} from ${customerResult?.customer_name || 'Unknown'}`, req.user!.id, {
-      payment_no: newPaymentNo,
-      customer_id: parsedCustomerId,
-      amount,
-      payment_method,
-      invoice_allocations: invoice_allocations.length
-    });
-
-    const createdPayment = db.prepare(`
-      SELECT 
-        p.id, p.payment_no, p.customer_id, c.customer_name, p.invoice_id, i.invoice_no,
-        p.payment_date, p.amount, p.payment_method, p.reference_no, p.notes, p.created_at,
-        GROUP_CONCAT(pa.invoice_id, ',') as allocated_invoices,
-        GROUP_CONCAT(pa.amount, ',') as allocation_amounts,
-        GROUP_CONCAT(pa.id, ',') as allocation_ids
-      FROM payments p
-      LEFT JOIN customers c ON p.customer_id = c.id
-      LEFT JOIN invoices i ON p.invoice_id = i.id
-      LEFT JOIN payment_allocations pa ON p.id = pa.payment_id
-      WHERE p.id = ?
-      GROUP BY p.id
-    `).get(paymentId.toString()) as any;
-
-    if (createdPayment && createdPayment.allocated_invoices) {
-      const allocationQuery = `
-        SELECT pa.id, pa.payment_id, pa.invoice_id, i.invoice_no, pa.amount
-        FROM payment_allocations pa
-        LEFT JOIN invoices i ON pa.invoice_id = i.id
-        WHERE pa.payment_id = ?
-        ORDER BY pa.id
-      `;
-      createdPayment.allocations = db.prepare(allocationQuery).all(paymentId.toString());
-    }
-
-    res.status(201).json({
-      success: true,
-      data: createdPayment
-    });
+    res.status(201).json({ success: true, data: PaymentModel.getById(db, paymentId) });
   } catch (error) {
     logger.error('Error creating payment:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to create payment'
-    });
+    res.status(500).json({ success: false, error: 'Failed to create payment' });
   }
 }
 
 function updatePayment(req: AuthRequest, res: Response): void {
   try {
-    const { id } = req.params;
-    const {
-      payment_date,
-      amount,
-      payment_method,
-      reference_no,
-      notes
-    } = req.body;
+    const id = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
+    const { payment_date, amount, payment_method, reference_no, notes } = req.body;
 
-    const existingPayment = db.prepare('SELECT * FROM payments WHERE id = ?').get(id) as any;
-    if (!existingPayment) {
-      res.status(404).json({
-        success: false,
-        error: 'Payment not found'
-      });
-      return;
-    }
+    const existing = PaymentModel.getById(db, id);
+    if (!existing) { res.status(404).json({ success: false, error: 'Payment not found' }); return; }
 
-    const stmt = db.prepare(`
-      UPDATE payments SET
-        payment_date = COALESCE(?, payment_date),
-        amount = COALESCE(?, amount),
-        payment_method = COALESCE(?, payment_method),
-        reference_no = COALESCE(?, reference_no),
-        notes = COALESCE(?, notes)
-      WHERE id = ?
-    `);
+    PaymentModel.update(db, id, { payment_date, amount, payment_method, reference_no, notes });
 
-    stmt.run(
-      payment_date, amount, payment_method, reference_no, notes, id
-    );
+    logCRUD(ActionType.PAYMENT_UPDATE, 'Payment', id, `Updated payment: ${existing.payment_no}`, req.user!.id, { payment_no: existing.payment_no, changes: Object.keys(req.body).filter(k => req.body[k] !== undefined) });
+    req.activityLogged = true;
 
-    ledgerUtils.updateCustomerBalance(existingPayment.customer_id);
-
-    const allocations = db.prepare('SELECT invoice_id FROM payment_allocations WHERE payment_id = ?').all(id) as { invoice_id: number }[];
-    for (const alloc of allocations) {
-      ledgerUtils.calculateInvoiceBalance(alloc.invoice_id);
-      ledgerUtils.updateInvoiceStatus(alloc.invoice_id);
-    }
-
-    // Log payment update using activity logger
-    logCRUD(ActionType.PAYMENT_UPDATE, 'Payment', parseInt(Array.isArray(id) ? id[0] : id, 10), `Updated payment: ${existingPayment.payment_no}`, req.user!.id, {
-      payment_no: existingPayment.payment_no,
-      changes: Object.keys(req.body).filter(k => req.body[k] !== undefined)
-    });
-
-    res.json({
-      success: true,
-      message: 'Payment updated successfully'
-    });
+    res.json({ success: true, message: 'Payment updated successfully' });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to update payment';
+    if (message === 'Payment not found') { res.status(404).json({ success: false, error: message }); return; }
     logger.error('Error updating payment:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to update payment'
-    });
+    res.status(500).json({ success: false, error: 'Failed to update payment' });
   }
 }
 
 function deletePayment(req: AuthRequest, res: Response): void {
   try {
-    const id = getRouteParam(req.params.id);
-    const parsedId = parseInt(id, 10);
+    const id = parseInt(getRouteParam(req.params.id), 10);
+    if (isNaN(id)) { res.status(400).json({ success: false, error: 'Invalid payment ID' }); return; }
 
-    logger.debug('Attempting to delete payment with ID:', id, 'Parsed as:', parsedId);
+    const existing = PaymentModel.getById(db, id);
+    if (!existing) { res.status(404).json({ success: false, error: 'Payment not found' }); return; }
 
-    if (isNaN(parsedId)) {
-      res.status(400).json({
-        success: false,
-        error: 'Invalid payment ID'
-      });
-      return;
-    }
+    PaymentModel.delete(db, id);
 
-    // Query to check if payment exists
-    const paymentCheck = db.prepare('SELECT id FROM payments WHERE id = ?').get(parsedId);
-    logger.debug('Payment check result:', paymentCheck);
+    logCRUD(ActionType.PAYMENT_DELETE, 'Payment', id, `Deleted payment: ${existing.payment_no} - $${existing.amount}`, req.user!.id, { payment_no: existing.payment_no, amount: existing.amount });
+    req.activityLogged = true;
 
-    if (!paymentCheck) {
-      logger.debug('Payment with ID', parsedId, 'does not exist in database');
-      res.status(404).json({
-        success: false,
-        error: 'Payment not found'
-      });
-      return;
-    }
-
-    // If payment exists, fetch full details
-    const existingPayment = db.prepare('SELECT * FROM payments WHERE id = ?').get(parsedId) as any;
-    logger.debug('Found payment details:', existingPayment);
-
-    if (!existingPayment) {
-      res.status(404).json({
-        success: false,
-        error: 'Payment not found'
-      });
-      return;
-    }
-
-    const transaction = db.transaction(() => {
-      logger.debug('Starting transaction to delete payment:', parsedId);
-
-      const allocations = db.prepare('SELECT * FROM payment_allocations WHERE payment_id = ?').all(parsedId) as Array<{ invoice_id: number }>;
-      logger.debug('Found allocations to delete:', allocations.length);
-
-      const deleteAllocationsResult = db.prepare('DELETE FROM payment_allocations WHERE payment_id = ?').run(parsedId);
-      logger.debug('Deleted allocations result:', deleteAllocationsResult);
-
-      const deletePaymentResult = db.prepare('DELETE FROM payments WHERE id = ?').run(parsedId);
-      logger.debug('Deleted payment result:', deletePaymentResult);
-
-      const deleteLedgerResult = db.prepare('DELETE FROM customer_ledger WHERE reference_no = ?').run(existingPayment.payment_no);
-      logger.debug('Deleted ledger entries result:', deleteLedgerResult);
-
-      for (const alloc of allocations) {
-        try {
-          ledgerUtils.calculateInvoiceBalance(alloc.invoice_id);
-          ledgerUtils.updateInvoiceStatus(alloc.invoice_id);
-        } catch (error) {
-          logger.error(`Error updating invoice ${alloc.invoice_id} after payment deletion:`, error);
-          // Continue processing other allocations even if one fails
-        }
-      }
-
-      try {
-        ledgerUtils.updateCustomerBalance(existingPayment.customer_id);
-      } catch (error) {
-        logger.error(`Error updating customer ${existingPayment.customer_id} balance after payment deletion:`, error);
-      }
-    });
-
-    try {
-      transaction();
-    } catch (transactionError) {
-      logger.error('Transaction failed during payment deletion:', transactionError);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to delete payment due to database error'
-      });
-      return;
-    }
-
-    // Log payment deletion using activity logger
-    try {
-      logCRUD(ActionType.PAYMENT_DELETE, 'Payment', parsedId, `Deleted payment: ${existingPayment.payment_no} - $${existingPayment.amount}`, req.user!.id, {
-        payment_no: existingPayment.payment_no,
-        amount: existingPayment.amount
-      });
-    } catch (logError) {
-      logger.error('Error logging payment deletion:', logError);
-      // Don't fail the operation if logging fails
-    }
-
-    res.json({
-      success: true,
-      message: 'Payment deleted successfully'
-    });
+    res.json({ success: true, message: 'Payment deleted successfully' });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to delete payment';
+    if (message === 'Payment not found') { res.status(404).json({ success: false, error: message }); return; }
     logger.error('Error deleting payment:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to delete payment'
-    });
+    res.status(500).json({ success: false, error: 'Failed to delete payment' });
   }
 }
 
 function allocatePaymentToInvoice(req: Request, res: Response): void {
-  try {
-    res.status(501).json({
-      success: false,
-      error: 'Manual allocation endpoint not implemented - use createPayment with allocations instead'
-    });
-  } catch (error) {
-    logger.error('Error allocating payment to invoice:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to allocate payment to invoice'
-    });
-  }
+  res.status(501).json({ success: false, error: 'Manual allocation endpoint not implemented - use createPayment with allocations instead' });
 }
 
 export default {
-  getPayments,
-  getPayment,
-  createPayment,
-  updatePayment,
-  deletePayment,
-  allocatePaymentToInvoice
+  getPayments, getPayment, createPayment, updatePayment, deletePayment, allocatePaymentToInvoice,
 };

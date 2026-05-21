@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import { getNextSequenceNumber } from '../utils/sequence';
 
 interface BOM {
   id: number;
@@ -55,20 +56,23 @@ class BOMModel {
   static generateBOMNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const prefix = `BOM-${year}-`;
+    const settingKey = `BOM_last_no_${year}`;
 
-    const lastBOM = db.prepare(`
-      SELECT bom_no FROM boms
-      WHERE bom_no LIKE ?
-      ORDER BY id DESC LIMIT 1
-    `).get(`${prefix}%`) as { bom_no: string } | undefined;
+    // Seed from existing max on first call
+    const existing = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
+    if (!existing) {
+      const lastBOM = db.prepare(`
+        SELECT bom_no FROM boms
+        WHERE bom_no LIKE ?
+        ORDER BY id DESC LIMIT 1
+      `).get(`${prefix}%`) as { bom_no: string } | undefined;
 
-    if (!lastBOM) {
-      return `${prefix}0001`;
+      const maxNo = lastBOM ? parseInt(lastBOM.bom_no.split('-')[2], 10) || 0 : 0;
+      db.prepare('INSERT INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)').run(settingKey, maxNo.toString());
     }
 
-    const lastNumber = parseInt(lastBOM.bom_no.split('-')[2]);
-    const nextNumber = (lastNumber + 1).toString().padStart(4, '0');
-    return `${prefix}${nextNumber}`;
+    const nextNo = getNextSequenceNumber(db, settingKey);
+    return `${prefix}${nextNo.toString().padStart(4, '0')}`;
   }
 
   static create(data: CreateBOMDTO, userId: number, db: Database.Database): BOMWithItems {

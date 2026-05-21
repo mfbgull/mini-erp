@@ -1,12 +1,13 @@
 import { Router, Request, Response } from 'express';
-import db from '../config/database';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
+import settingsController from '../controllers/settingsController';
 import emailService from '../services/integrations/emailService';
 import notificationService from '../services/integrations/notificationService';
 import weatherService from '../services/integrations/weatherService';
 import validationService from '../services/integrations/validationService';
 import currencyService from '../services/integrations/currencyService';
 import taxService from '../services/integrations/taxService';
+import logger from '../utils/logger';
 
 const router = Router();
 
@@ -17,72 +18,12 @@ router.use(requireAdmin);
 /**
  * Get all integration settings
  */
-router.get('/settings', (req: Request, res: Response): void => {
+router.get('/settings', (_req: Request, res: Response): void => {
   try {
-    const integrationSettings = {
-      email: {
-        enabled: false,
-        configured: false
-      },
-      notifications: {
-        enabled: false,
-        configured: false
-      },
-      weather: {
-        enabled: false,
-        configured: false
-      },
-      validation: {
-        enabled: false,
-        configured: false
-      },
-      currency: {
-        enabled: false,
-        configured: false
-      },
-      tax: {
-        enabled: false,
-        configured: false
-      }
-    };
-
-    const settings = db.prepare(`
-      SELECT key, value
-      FROM settings
-      WHERE key LIKE '%_enabled' OR key LIKE '%_api_key'
-    `).all() as any[];
-
-    settings.forEach((setting: any) => {
-      if (setting.key === 'sendgrid_enabled') {
-        integrationSettings.email.enabled = setting.value === 'true';
-      } else if (setting.key === 'sendgrid_api_key') {
-        integrationSettings.email.configured = !!setting.value;
-      } else if (setting.key === 'twilio_enabled') {
-        integrationSettings.notifications.enabled = setting.value === 'true';
-      } else if (setting.key === 'twilio_auth_token') {
-        integrationSettings.notifications.configured = !!setting.value;
-      } else if (setting.key === 'weather_enabled') {
-        integrationSettings.weather.enabled = setting.value === 'true';
-      } else if (setting.key === 'weather_api_key') {
-        integrationSettings.weather.configured = !!setting.value;
-      } else if (setting.key === 'validation_enabled') {
-        integrationSettings.validation.enabled = setting.value === 'true';
-      } else if (setting.key === 'validation_api_key') {
-        integrationSettings.validation.configured = !!setting.value;
-      } else if (setting.key === 'currency_enabled') {
-        integrationSettings.currency.enabled = setting.value === 'true';
-      } else if (setting.key === 'currency_api_key') {
-        integrationSettings.currency.configured = !!setting.value;
-      } else if (setting.key === 'tax_enabled') {
-        integrationSettings.tax.enabled = setting.value === 'true';
-      } else if (setting.key === 'tax_api_key') {
-        integrationSettings.tax.configured = !!setting.value;
-      }
-    });
-
+    const integrationSettings = settingsController.getIntegrationSettings();
     res.json(integrationSettings);
   } catch (error) {
-    console.error('Get integration settings error:', error);
+    logger.error('Get integration settings error:', error);
     res.status(500).json({ error: 'Failed to fetch integration settings' });
   }
 });
@@ -93,63 +34,26 @@ router.get('/settings', (req: Request, res: Response): void => {
 router.put('/settings/:service', (req: Request, res: Response): void => {
   try {
     const { service } = req.params;
-    const { enabled, apiKey, ...otherSettings } = req.body;
 
-    const serviceKeys: Record<string, { enabled: string; api_key: string; others: Record<string, string> }> = {
-      email: { enabled: 'sendgrid_enabled', api_key: 'sendgrid_api_key', others: { from_email: 'sendgrid_from_email', from_name: 'sendgrid_from_name' } },
-      notifications: { enabled: 'twilio_enabled', api_key: 'twilio_auth_token', others: { account_sid: 'twilio_account_sid', phone_number: 'twilio_phone_number' } },
-      weather: { enabled: 'weather_enabled', api_key: 'weather_api_key', others: { default_location: 'weather_default_location' } },
-      validation: { enabled: 'validation_enabled', api_key: 'validation_api_key', others: {} },
-      currency: { enabled: 'currency_enabled', api_key: 'currency_api_key', others: { base: 'currency_base', update_interval: 'currency_rates_update_interval' } },
-      tax: { enabled: 'tax_enabled', api_key: 'tax_api_key', others: { default_country: 'tax_default_country', zip_code: 'tax_zip_code' } }
-    };
-
-    const serviceKey = Array.isArray(service) ? service[0] : service;
-    const keys = serviceKeys[serviceKey];
-    if (!keys) {
-      res.status(400).json({ error: 'Invalid service name' });
-      return;
-    }
-
-    const transaction = db.transaction(() => {
-      // Update enabled status
-      db.prepare('UPDATE settings SET value = ? WHERE key = ?').run(
-        enabled ? 'true' : 'false',
-        keys.enabled
-      );
-
-      // Update API key
-      db.prepare('UPDATE settings SET value = ? WHERE key = ?').run(
-        apiKey || '',
-        keys.api_key
-      );
-
-      // Update other settings
-      Object.entries(keys.others).forEach(([dbKey, settingKey]) => {
-        const value = otherSettings[dbKey];
-        if (value !== undefined) {
-          db.prepare('UPDATE settings SET value = ? WHERE key = ?').run(
-            value,
-            settingKey
-          );
-        }
-      });
-    });
-
-    transaction();
+    const serviceKey = typeof service === 'string' ? service : service[0];
+    settingsController.updateIntegrationSettings(serviceKey, req.body);
 
     // Reload service settings
-    if (service === 'email') emailService.reloadSettings();
-    if (service === 'notifications') notificationService.reloadSettings();
-    if (service === 'weather') weatherService.reloadSettings();
-    if (service === 'validation') validationService.reloadSettings();
-    if (service === 'currency') currencyService.reloadSettings();
-    if (service === 'tax') taxService.reloadSettings();
+    if (serviceKey === 'email') emailService.reloadSettings();
+    if (serviceKey === 'notifications') notificationService.reloadSettings();
+    if (serviceKey === 'weather') weatherService.reloadSettings();
+    if (serviceKey === 'validation') validationService.reloadSettings();
+    if (serviceKey === 'currency') currencyService.reloadSettings();
+    if (serviceKey === 'tax') taxService.reloadSettings();
 
     res.json({ success: true, message: 'Settings updated successfully' });
   } catch (error) {
-    console.error('Update integration settings error:', error);
-    res.status(500).json({ error: 'Failed to update integration settings' });
+    logger.error('Update integration settings error:', error);
+    if (error instanceof Error && error.message === 'Invalid service name') {
+      res.status(400).json({ error: 'Invalid service name' });
+    } else {
+      res.status(500).json({ error: 'Failed to update integration settings' });
+    }
   }
 });
 
@@ -173,7 +77,7 @@ router.post('/test/email', async (req: Request, res: Response): Promise<void> =>
 
     res.json(result);
   } catch (error) {
-    console.error('Test email error:', error);
+    logger.error('Test email error:', error);
     res.status(500).json({ error: 'Failed to send test email' });
   }
 });
@@ -197,7 +101,7 @@ router.post('/test/notification', async (req: Request, res: Response): Promise<v
 
     res.json(result);
   } catch (error) {
-    console.error('Test notification error:', error);
+    logger.error('Test notification error:', error);
     res.status(500).json({ error: 'Failed to send test notification' });
   }
 });
@@ -217,7 +121,7 @@ router.get('/weather', async (req: Request, res: Response): Promise<void> => {
     const result = await weatherService.getWeather(location);
     res.json(result);
   } catch (error) {
-    console.error('Get weather error:', error);
+    logger.error('Get weather error:', error);
     res.status(500).json({ error: 'Failed to fetch weather data' });
   }
 });
@@ -237,7 +141,7 @@ router.get('/validate/phone', async (req: Request, res: Response): Promise<void>
     const result = await validationService.validatePhoneNumber(phone);
     res.json(result);
   } catch (error) {
-    console.error('Validate phone error:', error);
+    logger.error('Validate phone error:', error);
     res.status(500).json({ error: 'Failed to validate phone number' });
   }
 });
@@ -253,7 +157,7 @@ router.get('/currency/rates', async (req: Request, res: Response): Promise<void>
     const result = await currencyService.getExchangeRates(symbolsArray);
     res.json(result);
   } catch (error) {
-    console.error('Get exchange rates error:', error);
+    logger.error('Get exchange rates error:', error);
     res.status(500).json({ error: 'Failed to fetch exchange rates' });
   }
 });
@@ -273,7 +177,7 @@ router.post('/currency/convert', async (req: Request, res: Response): Promise<vo
     const result = await currencyService.convertCurrency(amount, from, to);
     res.json(result);
   } catch (error) {
-    console.error('Convert currency error:', error);
+    logger.error('Convert currency error:', error);
     res.status(500).json({ error: 'Failed to convert currency' });
   }
 });
@@ -301,7 +205,7 @@ router.post('/tax/calculate', async (req: Request, res: Response): Promise<void>
     );
     res.json(result);
   } catch (error) {
-    console.error('Calculate tax error:', error);
+    logger.error('Calculate tax error:', error);
     res.status(500).json({ error: 'Failed to calculate tax' });
   }
 });

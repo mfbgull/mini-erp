@@ -1,10 +1,12 @@
 import { useState } from 'react';
 
 import { format } from 'date-fns';
+import { FileText, Zap, User, Calendar } from 'lucide-react';
 
 import Button from '../components/common/Button';
 import DataTable from '../components/common/DataTable';
 import Modal from '../components/common/Modal';
+import StatCard, { StatsGrid } from '../components/common/StatCard';
 import { useActivityLogs, useEntityTypes, useActions, useUsers, useActivityStats } from '../context/ActivityLogContext';
 
 import './ActivityLog.css';
@@ -125,28 +127,12 @@ export default function ActivityLog() {
 
       {/* Stats Cards */}
       {stats && (
-        <div className="stats-cards">
-          <div className="stat-card">
-            <h3>Total Logs</h3>
-            <p className="stat-value">{stats.totalLogs}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Top Action</h3>
-            <p className="stat-value">{stats.actions[0]?.action || '-'}</p>
-            <p className="stat-sub">{stats.actions[0]?.count || 0} occurrences</p>
-          </div>
-          <div className="stat-card">
-            <h3>Most Active User</h3>
-            <p className="stat-value">{stats.users[0]?.username || '-'}</p>
-            <p className="stat-sub">{stats.users[0]?.count || 0} actions</p>
-          </div>
-          <div className="stat-card">
-            <h3>Actions Today</h3>
-            <p className="stat-value">
-              {stats.dailyActivity[0]?.count || 0}
-            </p>
-          </div>
-        </div>
+        <StatsGrid>
+          <StatCard icon={FileText} label="Total Logs" value={stats.totalLogs} />
+          <StatCard icon={Zap} label="Top Action" value={stats.actions[0]?.action || '-'} subtitle={`${stats.actions[0]?.count || 0} occurrences`} />
+          <StatCard icon={User} label="Most Active User" value={stats.users[0]?.username || '-'} subtitle={`${stats.users[0]?.count || 0} actions`} />
+          <StatCard icon={Calendar} label="Actions Today" value={stats.dailyActivity[0]?.count || 0} />
+        </StatsGrid>
       )}
 
       {/* Filters */}

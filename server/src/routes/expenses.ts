@@ -4,11 +4,11 @@ import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { sensitiveOperationLimiter } from '../middleware/rateLimiter';
 import expenseController from '../controllers/expenseController';
 
+router.use(authenticateToken);
+
 router.get('/categories', expenseController.getExpenseCategories);
 router.get('/status-options', expenseController.getExpenseStatusOptions);
 router.get('/payment-method-options', expenseController.getExpensePaymentMethodOptions);
-
-router.use(authenticateToken);
 
 router.post('/', sensitiveOperationLimiter, expenseController.createExpense);
 router.get('/', expenseController.getExpenses);

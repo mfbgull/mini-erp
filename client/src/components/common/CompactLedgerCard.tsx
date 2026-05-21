@@ -199,13 +199,18 @@ export default function CompactLedgerCardView({
     entry.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const ledgerWithBalance = filteredLedger.map((entry, index) => {
+  const totalDebit = ledger.reduce((sum, item) => sum + parseFloat(String(item.debit || 0)), 0);
+  const totalCredit = ledger.reduce((sum, item) => sum + parseFloat(String(item.credit || 0)), 0);
+  const currentBalance = totalDebit - totalCredit;
+
+  const ledgerWithBalance = filteredLedger.reduce((acc, entry) => {
     const entryDebit = parseFloat(String(entry.debit || 0));
     const entryCredit = parseFloat(String(entry.credit || 0));
-    const previousBalance = index > 0 ? (ledgerWithBalance[index - 1]?.calculatedBalance || 0) : 0;
+    const previousBalance = acc.length > 0 ? acc[acc.length - 1].calculatedBalance : 0;
     const calculatedBalance = previousBalance + entryDebit - entryCredit;
-    return { ...entry, calculatedBalance };
-  });
+    acc.push({ ...entry, calculatedBalance });
+    return acc;
+  }, [] as Array<typeof ledger[0] & { calculatedBalance: number }>);
 
   if (ledgerWithBalance.length === 0) {
     return (
@@ -240,6 +245,25 @@ export default function CompactLedgerCardView({
           onChange={(e) => setSearchTerm(e.target.value)}
           className="compact-mobile-search-input"
         />
+      </div>
+
+      <div className="ledger-totals">
+        <div className="totals-grid">
+          <div className="total-item">
+            <span className="total-label">Total Debit</span>
+            <span className="total-value debit">{formatCurrency(totalDebit)}</span>
+          </div>
+          <div className="total-item">
+            <span className="total-label">Total Credit</span>
+            <span className="total-value credit">{formatCurrency(totalCredit)}</span>
+          </div>
+          <div className="total-item">
+            <span className="total-label">Current Balance</span>
+            <span className={`total-value balance ${currentBalance > 0 ? 'positive' : 'zero'}`}>
+              {formatCurrency(currentBalance)}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="compact-mobile-cards-container">

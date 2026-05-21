@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { ArrowLeft, Edit2, Trash2, Package, FileText, AlertTriangle } from 'lucide-react';
 
 import Button from '../../components/common/Button';
+import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 
@@ -192,32 +193,14 @@ export default function SupplierDetailPage() {
         <div className="detail-card">
           <h3>Purchase Orders Summary</h3>
           {poSummary ? (
-            <div className="summary-grid">
-              <div className="summary-item">
-                <div className="summary-value">{poSummary.total_pos || 0}</div>
-                <div className="summary-label">Total Orders</div>
-              </div>
-              <div className="summary-item">
-                <div className="summary-value">{formatCurrency(poSummary.total_value || 0)}</div>
-                <div className="summary-label">Total Value</div>
-              </div>
-              <div className="summary-item">
-                <div className="summary-value">{poSummary.draft_pos || 0}</div>
-                <div className="summary-label">Draft</div>
-              </div>
-              <div className="summary-item">
-                <div className="summary-value">{poSummary.submitted_pos || 0}</div>
-                <div className="summary-label">Submitted</div>
-              </div>
-              <div className="summary-item">
-                <div className="summary-value">{poSummary.partially_received_pos || 0}</div>
-                <div className="summary-label">Partial</div>
-              </div>
-              <div className="summary-item">
-                <div className="summary-value">{poSummary.completed_pos || 0}</div>
-                <div className="summary-label">Completed</div>
-              </div>
-            </div>
+            <SummaryGrid columns={6}>
+              <SummaryCard icon={Package} label="Total Orders" value={poSummary.total_pos || 0} />
+              <SummaryCard icon={FileText} label="Total Value" value={formatCurrency(poSummary.total_value || 0)} variant="info" />
+              <SummaryCard icon={FileText} label="Draft" value={poSummary.draft_pos || 0} />
+              <SummaryCard icon={Package} label="Submitted" value={poSummary.submitted_pos || 0} variant="success" />
+              <SummaryCard icon={Package} label="Partial" value={poSummary.partially_received_pos || 0} variant="warning" />
+              <SummaryCard icon={Package} label="Completed" value={poSummary.completed_pos || 0} variant="success" />
+            </SummaryGrid>
           ) : (
             <div className="no-data">No purchase orders found</div>
           )}

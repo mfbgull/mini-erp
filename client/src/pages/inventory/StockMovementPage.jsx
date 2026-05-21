@@ -7,16 +7,22 @@ import { AgGridReact } from "ag-grid-react";
 import { format } from "date-fns";
 import {
   Package,
-  ArrowUp,
   ArrowDown,
-  ArrowRight,
-  ClipboardList,
+  ArrowUp,
+  BarChart3,
+  TrendingUp,
+  ShoppingCart,
+  DollarSign,
+  Factory,
+  ArrowLeftRight,
+  Settings,
 } from "lucide-react";
 
 import Button from "../../components/common/Button";
 import CompactStockMovementCardView from "../../components/common/CompactStockMovementCard";
 import FormInput from "../../components/common/FormInput";
 import Modal from "../../components/common/Modal";
+import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
@@ -205,103 +211,18 @@ export default function StockMovementPage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-purple">📋</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('stockMovements.totalMovements')}</div>
-            <div className="stat-value">{stats.totalMovements}</div>
-            <div className="stat-subtitle">{t('stockMovements.allTransactions')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-blue">📥</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('common.totalIn')}</div>
-            <div className="stat-value">{stats.totalIn}</div>
-            <div className="stat-subtitle">{t('stockMovements.stockAdditions')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-red">📤</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('common.totalOut')}</div>
-            <div className="stat-value">{stats.totalOut}</div>
-            <div className="stat-subtitle">{t('stockMovements.stockReductions')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-pink">📊</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('stockMovements.totalQuantity')}</div>
-            <div className="stat-value">
-              {parseFloat(stats.totalQuantity).toFixed(2)}
-            </div>
-            <div className="stat-subtitle">{t('stockMovements.aggregateMoved')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-orange">🔝</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('stockMovements.mostActiveType')}</div>
-            <div className="stat-value text-lg">{mostActiveType}</div>
-            <div className="stat-subtitle">
-              {stats.mostActiveType !== "None"
-                ? `${t('stockMovements.count')}: ${stats.movementsByType[stats.mostActiveType]}`
-                : t('stockMovements.noMovements')}
-            </div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-green">📁</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('common.purchases')}</div>
-            <div className="stat-value">{stats.movementsByType.PURCHASE}</div>
-            <div className="stat-subtitle">{t('stockMovements.stockIn')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-indigo">💰</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('common.sales')}</div>
-            <div className="stat-value">{stats.movementsByType.SALE}</div>
-            <div className="stat-subtitle">{t('stockMovements.stockOut')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-orange">🏭</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('common.production')}</div>
-            <div className="stat-value">{stats.movementsByType.PRODUCTION}</div>
-            <div className="stat-subtitle">{t('stockMovements.created')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-indigo">🔄</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('common.transfers')}</div>
-            <div className="stat-value">{stats.movementsByType.TRANSFER}</div>
-            <div className="stat-subtitle">{t('stockMovements.movedBetween')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-coral">⚙️</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('stockMovements.adjustments')}</div>
-            <div className="stat-value">{stats.movementsByType.ADJUSTMENT}</div>
-            <div className="stat-subtitle">{t('stockMovements.manualChanges')}</div>
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={Package} label={t('stockMovements.totalMovements')} value={stats.totalMovements} subtitle={t('stockMovements.allTransactions')} />
+        <StatCard icon={ArrowDown} label={t('common.totalIn')} value={stats.totalIn} subtitle={t('stockMovements.stockAdditions')} />
+        <StatCard icon={ArrowUp} label={t('common.totalOut')} value={stats.totalOut} subtitle={t('stockMovements.stockReductions')} />
+        <StatCard icon={BarChart3} label={t('stockMovements.totalQuantity')} value={parseFloat(stats.totalQuantity).toFixed(2)} subtitle={t('stockMovements.aggregateMoved')} />
+        <StatCard icon={TrendingUp} label={t('stockMovements.mostActiveType')} value={mostActiveType} subtitle={stats.mostActiveType !== "None" ? `${t('stockMovements.count')}: ${stats.movementsByType[stats.mostActiveType]}` : t('stockMovements.noMovements')} />
+        <StatCard icon={ShoppingCart} label={t('common.purchases')} value={stats.movementsByType.PURCHASE} subtitle={t('stockMovements.stockIn')} />
+        <StatCard icon={DollarSign} label={t('common.sales')} value={stats.movementsByType.SALE} subtitle={t('stockMovements.stockOut')} />
+        <StatCard icon={Factory} label={t('common.production')} value={stats.movementsByType.PRODUCTION} subtitle={t('stockMovements.created')} />
+        <StatCard icon={ArrowLeftRight} label={t('common.transfers')} value={stats.movementsByType.TRANSFER} subtitle={t('stockMovements.movedBetween')} />
+        <StatCard icon={Settings} label={t('stockMovements.adjustments')} value={stats.movementsByType.ADJUSTMENT} subtitle={t('stockMovements.manualChanges')} />
+      </StatsGrid>
 
       {/* Quick Actions */}
       <div className="quick-actions">
@@ -353,7 +274,7 @@ export default function StockMovementPage() {
       ) : (
         // Desktop ag-grid view
         <div className="ag-theme-quartz ag-grid-container">
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={movements}
             columnDefs={columnDefs}
             defaultColDef={{
@@ -508,9 +429,11 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
     if (!validate(formData)) return;
 
     // Validate line items
-    const validItems = lineItems.filter(
-      (item) => item.item_id && item.quantity > 0,
-    );
+    const validItems = lineItems.filter((item) => {
+      if (!item.item_id) return false;
+      if (movementType === 'ADJUSTMENT') return item.quantity !== 0;
+      return item.quantity > 0;
+    });
     if (validItems.length === 0) {
       toast.error("Please add at least one item with quantity");
       return;
@@ -746,6 +669,44 @@ function StockAdjustmentForm({ onClose, onSuccess }) {
           })}
         </div>
       </div>
+
+      {movementType === "ADJUSTMENT" && lineItems.some(li => li.item_id && li.quantity !== 0) && (
+        <div style={{ marginTop: "var(--space-lg)", padding: "var(--space-md)", background: "var(--bg-secondary, #f8f9fa)", borderRadius: "var(--radius-md, 8px)", border: "1px solid var(--border-color, #e2e8f0)" }}>
+          <h4 style={{ margin: "0 0 var(--space-sm, 8px)", fontSize: "0.9rem", color: "var(--text-secondary, #64748b)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Financial Impact Preview</h4>
+          {lineItems.map((li, idx) => {
+            if (!li.item_id || li.quantity === 0) return null;
+            const item = items.find(i => i.id === parseInt(li.item_id));
+            if (!item) return null;
+            const cost = parseFloat(item.standard_cost) || 0;
+            const value = Math.abs(li.quantity) * cost;
+            const isRemoval = li.quantity < 0;
+            const typeLabel = isRemoval ? "Inventory Shrinkage (Expense)" : "Inventory Correction (Income)";
+            const typeColor = isRemoval ? "#ef4444" : "#22c55e";
+            return (
+              <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "var(--space-xs, 4px) 0", borderBottom: "1px solid var(--border-color, #e2e8f0)", fontSize: "0.85rem" }}>
+                <div>
+                  <strong>{item.item_name}</strong>
+                  <span style={{ color: "var(--text-secondary, #64748b)", marginLeft: "8px" }}>
+                    {isRemoval ? "-" : "+"}{Math.abs(li.quantity)} {item.unit_of_measure || "units"}
+                    {" × "}{cost.toFixed(2)}
+                  </span>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  {cost === 0 ? (
+                    <span style={{ color: "#f59e0b", fontSize: "0.8rem" }}>⚠ No standard_cost set</span>
+                  ) : (
+                    <>
+                      <span style={{ fontWeight: 600, color: typeColor }}>{value.toFixed(2)}</span>
+                      <br />
+                      <span style={{ fontSize: "0.75rem", color: typeColor }}>{typeLabel}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <FormInput
         label="Remarks"

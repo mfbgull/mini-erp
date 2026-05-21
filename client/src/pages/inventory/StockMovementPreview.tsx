@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { format } from 'date-fns';
-import { X, Download, Upload, Factory, ArrowLeftRight, Settings, ClipboardList, Info } from 'lucide-react';
+import { X, Download, Upload, Factory, ArrowLeftRight, Settings, ClipboardList, Info, DollarSign } from 'lucide-react';
 import './StockMovementPreview.css';
 
 interface StockMovementPreviewProps {
@@ -16,6 +16,9 @@ interface StockMovementPreviewProps {
     quantity: number;
     unit_of_measure: string;
     remarks?: string;
+    financial_value?: number;
+    financial_posted?: boolean | number;
+    unit_cost?: number;
   };
   onClose: () => void;
 }
@@ -99,6 +102,26 @@ export default function StockMovementPreview({ movement, onClose }: StockMovemen
                 <span className="preview-detail-value remarks-value">{movement.remarks}</span>
               </div>
             )}
+
+            {movement.movement_type === 'ADJUSTMENT' && movement.financial_value !== undefined && Number(movement.financial_value) > 0 && (
+              <div className="preview-detail-item full-width financial-entry-section">
+                <span className="preview-detail-label">Financial Entry</span>
+                <div className="financial-entry-details">
+                  <div className="financial-row">
+                    <span className="financial-account">
+                      {movement.quantity < 0 ? 'Inventory Shrinkage (Expense)' : 'Inventory Correction (Income)'}
+                    </span>
+                    <span className="financial-amount" style={{ color: movement.quantity < 0 ? '#ef4444' : '#22c55e' }}>
+                      {Number(movement.financial_value).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="financial-status">
+                    <span className={`status-dot ${movement.financial_posted ? 'posted' : 'pending'}`} />
+                    {movement.financial_posted ? 'Posted' : 'Pending'}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Info Notice */}
@@ -106,6 +129,9 @@ export default function StockMovementPreview({ movement, onClose }: StockMovemen
             <span className="notice-icon"><Info size={16} /></span>
             <span className="notice-text">
               This {movement.movement_type.toLowerCase()} movement has been recorded and stock levels updated.
+              {movement.movement_type === 'ADJUSTMENT' && Number(movement.financial_value) > 0 && (
+                ` Financial impact: ${Number(movement.financial_value).toFixed(2)}`
+              )}
             </span>
           </div>
         </div>

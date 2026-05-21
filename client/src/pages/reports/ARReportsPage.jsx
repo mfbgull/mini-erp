@@ -20,6 +20,8 @@ import {
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import FormInput from '../../components/common/FormInput';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
+import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -451,54 +453,35 @@ function ARAgingReport({ data, loading, formatCurrency, asOfDate }) {
     }
   ];
 
-  // Summary cards
+  // Summary cards - backend returns camelCase keys for all fields
   const summary = data.summary || {};
 
   return (
     <div className="ar-aging-report">
-      <div className="report-summary">
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <DollarSign size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">{formatCurrency(summary.totalReceivables || 0)}</div>
-              <div className="summary-label">Total Receivables</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <TrendingDown size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">{formatCurrency(summary.total_1_30 || 0)}</div>
-              <div className="summary-label">Current & 1-30 Days</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="summary-card warning">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <AlertTriangle size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">{formatCurrency(summary.total_over_90 || 0)}</div>
-              <div className="summary-label">Over 90 Days</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard
+          icon={DollarSign}
+          label="Total Receivables"
+          value={formatCurrency(summary.totalReceivables || 0)}
+        />
+        <StatCard
+          icon={TrendingDown}
+          label="Current & 1-30 Days"
+          value={formatCurrency((summary.current_amount || 0) + (summary.total_1_30 || 0))}
+        />
+        <StatCard
+          icon={AlertTriangle}
+          label="Over 90 Days"
+          value={formatCurrency(summary.total_over_90 || 0)}
+          alert={true}
+        />
+      </StatsGrid>
 
       <div className="aging-grid-container">
         <h3>AR Aging as of {new Date(asOfDate).toLocaleDateString()}</h3>
         <>
           <div className="ag-theme-quartz desktop-view ag-grid-container-lg">
-            <AgGridReact
+            <AgGridReact theme="legacy"
               rowData={data.agingBuckets || []}
               columnDefs={columnDefs}
               defaultColDef={{
@@ -659,101 +642,50 @@ function ReceivablesSummary({ data, loading, formatCurrency }) {
 
   return (
     <div className="receivables-summary">
-      <div className="summary-grid">
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <DollarSign size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">{formatCurrency(data.totalValue || 0)}</div>
-              <div className="summary-label">Total Invoices</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <DollarSign size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">{formatCurrency(data.totalOutstanding || 0)}</div>
-              <div className="summary-label">Total Outstanding</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <DollarSign size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">{formatCurrency(data.totalPaid || 0)}</div>
-              <div className="summary-label">Total Paid</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <AlertTriangle size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">{data.overdue?.count || 0}</div>
-              <div className="summary-label">Overdue Invoices</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <SummaryGrid columns={4}>
+        <SummaryCard icon={DollarSign} label="Total Invoices" value={data.total_invoices} />
+        <SummaryCard icon={DollarSign} label="Total Outstanding" value={formatCurrency(data.total_outstanding || 0)} variant="warning" />
+        <SummaryCard icon={DollarSign} label="Total Paid" value={formatCurrency(data.total_paid || 0)} variant="success" />
+        <SummaryCard icon={AlertTriangle} label="Overdue Invoices" value={data.overdue_count || 0} variant="danger" />
+      </SummaryGrid>
 
       <div className="status-breakdown">
         <h3>Invoice Status Breakdown</h3>
         <div className="status-chart">
-          <div className="status-item">
-            <div className="status-label">Unpaid</div>
-            <div className="status-bar">
-              <div 
-                className="status-fill unpaid" 
-                style={{ 
-                  width: `${data.statusBreakdown?.unpaid?.count ? 
-                    (data.statusBreakdown.unpaid.count / 
-                    (data.totalInvoices || 1)) * 100 : 0}%` 
-                }}
-              ></div>
-            </div>
-            <div className="status-count">{data.statusBreakdown?.unpaid?.count || 0}</div>
-          </div>
-          <div className="status-item">
-            <div className="status-label">Partially Paid</div>
-            <div className="status-bar">
-              <div 
-                className="status-fill partiallyPaid" 
-                style={{ 
-                  width: `${data.statusBreakdown?.partiallyPaid?.count ? 
-                    (data.statusBreakdown.partiallyPaid.count / 
-                    (data.totalInvoices || 1)) * 100 : 0}%` 
-                }}
-              ></div>
-            </div>
-            <div className="status-count">{data.statusBreakdown?.partiallyPaid?.count || 0}</div>
-          </div>
-          <div className="status-item">
-            <div className="status-label">Overdue</div>
-            <div className="status-bar">
-              <div 
-                className="status-fill overdue" 
-                style={{ 
-                  width: `${data.statusBreakdown?.overdue?.count ? 
-                    (data.statusBreakdown.overdue.count / 
-                    (data.totalInvoices || 1)) * 100 : 0}%` 
-                }}
-              ></div>
-            </div>
-            <div className="status-count">{data.statusBreakdown?.overdue?.count || 0}</div>
-          </div>
+          {data.statusBreakdown && (
+            <>
+              <div className="status-item">
+                <div className="status-label">Unpaid</div>
+                <div className="status-bar">
+                  <div
+                    className="status-fill unpaid"
+                    style={{ width: `${data.statusBreakdown.unpaid.count ? (data.statusBreakdown.unpaid.count / (data.total_invoices || 1)) * 100 : 0}%` }}
+                  ></div>
+                </div>
+                <div className="status-count">{data.statusBreakdown.unpaid.count || 0}</div>
+              </div>
+              <div className="status-item">
+                <div className="status-label">Partially Paid</div>
+                <div className="status-bar">
+                  <div
+                    className="status-fill partiallyPaid"
+                    style={{ width: `${data.statusBreakdown.partiallyPaid.count ? (data.statusBreakdown.partiallyPaid.count / (data.total_invoices || 1)) * 100 : 0}%` }}
+                  ></div>
+                </div>
+                <div className="status-count">{data.statusBreakdown.partiallyPaid.count || 0}</div>
+              </div>
+              <div className="status-item">
+                <div className="status-label">Overdue</div>
+                <div className="status-bar">
+                  <div
+                    className="status-fill overdue"
+                    style={{ width: `${data.statusBreakdown.overdue.count ? (data.statusBreakdown.overdue.count / (data.total_invoices || 1)) * 100 : 0}%` }}
+                  ></div>
+                </div>
+                <div className="status-count">{data.statusBreakdown.overdue.count || 0}</div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -816,7 +748,7 @@ function TopDebtorsReport({ data, loading, formatCurrency }) {
     <div className="top-debtors-report">
       <>
         <div className="ag-theme-quartz desktop-view ag-grid-container-lg">
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={data}
             columnDefs={columnDefs}
             defaultColDef={{
@@ -888,17 +820,7 @@ function DSOReport({ data, loading, formatCurrency }) {
   return (
     <div className="dso-report">
       <div className="dso-metric">
-        <div className="metric-card">
-          <div className="metric-content">
-            <div className="metric-icon">
-              <Calendar size={32} />
-            </div>
-            <div className="metric-text">
-              <div className="metric-value">{data.dso}</div>
-              <div className="metric-label">Days Sales Outstanding</div>
-            </div>
-          </div>
-        </div>
+        <SummaryCard icon={Calendar} label="Days Sales Outstanding" value={data.dso} variant="info" />
 
         <div className="metric-details">
           <div className="detail-item">

@@ -61,7 +61,6 @@ html.dark .dashboard {
 
 /* Card styles */
 html.dark .card,
-html.dark .kpi-card,
 html.dark .chart-card,
 html.dark .stat-card,
 html.dark .panel,
@@ -1272,11 +1271,7 @@ html.dark .details-actions {
   border-color: var(--border-color) !important;
 }
 
-/* KPI Card Dark Mode */
-html.dark .kpi-card {
-  background: var(--card-bg) !important;
-  border-color: var(--border-color) !important;
-}
+
 
 html.dark .kpi-label {
   color: var(--text-secondary) !important;

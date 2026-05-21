@@ -229,78 +229,6 @@
   border-bottom: 2px solid #e2e8f0;
 }
 
-.financial-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.financial-stat-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.financial-stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.stat-icon.invoiced {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #2563eb;
-}
-
-.stat-icon.paid {
-  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-  color: #16a34a;
-}
-
-.stat-icon.outstanding {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #d97706;
-}
-
-.stat-icon.days {
-  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
-  color: #9333ea;
-}
-
-.stat-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #0f172a;
-  line-height: 1.2;
-}
-
-.stat-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #64748b;
-}
-
 /* Invoice Status Section */
 .overview-invoice-status {
   margin-bottom: 1.5rem;
@@ -621,10 +549,6 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .financial-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .invoice-status-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -635,10 +559,6 @@
 }
 
 @media (max-width: 640px) {
-  .financial-stats-grid {
-    grid-template-columns: 1fr;
-  }
-
   .invoice-status-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1318,23 +1238,6 @@
 
   .overview-tab {
     padding: 0;
-  }
-
-  .financial-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  .financial-stat-card {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s, box-shadow 0.2s;
   }
 
   .invoice-status-grid {

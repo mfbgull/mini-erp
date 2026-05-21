@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -333,31 +334,18 @@ export default function StockValuationReport() {
       )}
 
       {reportData?.summary && (
-        <div className="report-summary">
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <Package size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalItems}</div>
-                <div className="summary-label">Total Items</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <DollarSign size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{formatCurrency(reportData.summary.totalValue)}</div>
-                <div className="summary-label">Total Inventory Value</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatsGrid>
+          <StatCard
+            icon={Package}
+            label="Total Items"
+            value={reportData.summary.totalItems}
+          />
+          <StatCard
+            icon={DollarSign}
+            label="Total Inventory Value"
+            value={formatCurrency(reportData.summary.totalValue)}
+          />
+        </StatsGrid>
       )}
 
       <div className="report-content" ref={gridRef}>
@@ -369,7 +357,7 @@ export default function StockValuationReport() {
           <>
             {/* Desktop view - AG Grid */}
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.stockValuation}
                 columnDefs={columnDefs}
                 defaultColDef={{

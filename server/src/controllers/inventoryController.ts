@@ -65,6 +65,7 @@ function createItem(req: AuthRequest, res: Response): void {
       item_name,
       category: req.body.category
     });
+    req.activityLogged = true;
 
     const newItem = ItemModel.getById(itemId, db);
     res.status(201).json(newItem);
@@ -90,6 +91,7 @@ function updateItem(req: AuthRequest, res: Response): void {
     logCRUD(ActionType.ITEM_UPDATE, 'Item', itemId, `Updated item: ${req.body.item_name || existingItem.item_name}`, req.user!.id, {
       changes: Object.keys(req.body)
     });
+    req.activityLogged = true;
 
     const updatedItem = ItemModel.getById(itemId, db);
     res.json(updatedItem);
@@ -120,6 +122,7 @@ function deleteItem(req: AuthRequest, res: Response): void {
     logCRUD(ActionType.ITEM_DELETE, 'Item', itemId, `Deleted item: ${item.item_name}`, req.user!.id, {
       item_code: item.item_code
     });
+    req.activityLogged = true;
 
     res.json({ success: true, message: 'Item deleted successfully' });
   } catch (error) {
@@ -150,33 +153,8 @@ function getLowStock(req: Request, res: Response): void {
 
 function getUnitsOfMeasure(req: Request, res: Response): void {
   try {
-    const usedUoms = db.prepare(`
-      SELECT DISTINCT unit_of_measure
-      FROM items
-      WHERE unit_of_measure IS NOT NULL
-      ORDER BY unit_of_measure
-    `).all() as { unit_of_measure: string }[];
-
-    const standardUoms = [
-      'Nos',
-      'Kg',
-      'Ltr',
-      'Box',
-      'Pack',
-      'Bottle',
-      'Meter',
-      'Roll',
-      'Set',
-      'Pcs',
-      'Dozen'
-    ];
-
-    const allUoms = Array.from(new Set([
-      ...standardUoms,
-      ...usedUoms.map(u => u.unit_of_measure)
-    ]));
-
-    res.json(allUoms);
+    const uoms = ItemModel.getUnitsOfMeasure(db);
+    res.json(uoms);
   } catch (error) {
     logger.error('Get units of measure error:', error);
     res.status(500).json({ error: 'Failed to fetch units of measure' });
@@ -198,14 +176,14 @@ function getWarehouses(req: Request, res: Response): void {
 
 function getWarehouse(req: Request, res: Response): void {
   try {
-    const warehouse = WarehouseModel.getById(Number(req.params.id), db);
+    const warehouse = WarehouseModel.getById(db, Number(req.params.id));
 
     if (!warehouse) {
       res.status(404).json({ error: 'Warehouse not found' });
       return;
     }
 
-    const stockSummary = WarehouseModel.getStockSummary(warehouse.id, db);
+    const stockSummary = WarehouseModel.getStockSummary(db);
 
     res.json({
       ...warehouse,
@@ -226,13 +204,13 @@ function createWarehouse(req: AuthRequest, res: Response): void {
       return;
     }
 
-    const existing = WarehouseModel.getByCode(warehouse_code, db);
+    const existing = WarehouseModel.getByCode(db, warehouse_code);
     if (existing) {
       res.status(400).json({ error: 'Warehouse code already exists' });
       return;
     }
 
-    const warehouseId = WarehouseModel.create(req.body, db);
+    const warehouseId = WarehouseModel.create(db, { warehouse_code, warehouse_name, location: req.body.location });
 
     // Log warehouse creation using activity logger
     logCRUD(ActionType.WAREHOUSE_CREATE, 'Warehouse', warehouseId, `Created warehouse: ${warehouse_name}`, req.user!.id, {
@@ -240,8 +218,9 @@ function createWarehouse(req: AuthRequest, res: Response): void {
       warehouse_name,
       location: req.body.location
     });
+    req.activityLogged = true;
 
-    const newWarehouse = WarehouseModel.getById(warehouseId, db);
+    const newWarehouse = WarehouseModel.getById(db, warehouseId);
     res.status(201).json(newWarehouse);
   } catch (error) {
     logger.error('Create warehouse error:', error);
@@ -252,21 +231,26 @@ function createWarehouse(req: AuthRequest, res: Response): void {
 function updateWarehouse(req: AuthRequest, res: Response): void {
   try {
     const warehouseId = Number(req.params.id);
-    const existing = WarehouseModel.getById(warehouseId, db);
+    const existing = WarehouseModel.getById(db, warehouseId);
 
     if (!existing) {
       res.status(404).json({ error: 'Warehouse not found' });
       return;
     }
 
-    WarehouseModel.update(warehouseId, req.body, db);
+    WarehouseModel.update(db, warehouseId, {
+      warehouse_code: req.body.warehouse_code || existing.warehouse_code,
+      warehouse_name: req.body.warehouse_name || existing.warehouse_name,
+      location: req.body.location
+    });
 
     // Log warehouse update using activity logger
     logCRUD(ActionType.WAREHOUSE_UPDATE, 'Warehouse', warehouseId, `Updated warehouse: ${req.body.warehouse_name || existing.warehouse_name}`, req.user!.id, {
       changes: Object.keys(req.body)
     });
+    req.activityLogged = true;
 
-    const updated = WarehouseModel.getById(warehouseId, db);
+    const updated = WarehouseModel.getById(db, warehouseId);
     res.json(updated);
   } catch (error) {
     logger.error('Update warehouse error:', error);
@@ -295,20 +279,16 @@ function createStockMovement(req: AuthRequest, res: Response): void {
 
     // Negative Stock Validation for Outgoing Movements
     if (['OUT', 'TRANSFER', 'ADJUSTMENT_OUT'].includes(movement_type)) {
-      const currentStock = db.prepare(`
-        SELECT quantity FROM stock_balances 
-        WHERE item_id = ? AND warehouse_id = ?
-      `).get(item_id, warehouse_id) as { quantity: number } | undefined;
-
+      const currentStock = StockMovementModel.getBalance(item_id, warehouse_id, db) as { quantity: number } | undefined;
       const availableQty = currentStock?.quantity || 0;
-      
+
       if (availableQty < quantity) {
-        res.status(400).json({ 
-          error: 'Insufficient stock', 
-          details: { 
-            available: availableQty, 
-            requested: quantity 
-          } 
+        res.status(400).json({
+          error: 'Insufficient stock',
+          details: {
+            available: availableQty,
+            requested: quantity
+          }
         });
         return;
       }
@@ -317,7 +297,7 @@ function createStockMovement(req: AuthRequest, res: Response): void {
     const result = StockMovementModel.recordMovement(req.body, req.user!.id, db);
 
     const item = ItemModel.getById(item_id, db);
-    const warehouse = WarehouseModel.getById(warehouse_id, db);
+    const warehouse = WarehouseModel.getById(db, warehouse_id);
 
     // Log stock movement using activity logger
     logCRUD(ActionType.STOCK_MOVEMENT, 'StockMovement', result.id, `${movement_type}: ${quantity} ${item?.unit_of_measure || 'units'} of ${item?.item_name} at ${warehouse?.warehouse_name}`, req.user!.id, {
@@ -328,6 +308,7 @@ function createStockMovement(req: AuthRequest, res: Response): void {
       movement_type,
       quantity
     });
+    req.activityLogged = true;
 
     const movement = StockMovementModel.getById(result.id, db);
     res.status(201).json(movement);
@@ -363,20 +344,7 @@ function getItemLedger(req: Request, res: Response): void {
 
 function getStockBalances(req: Request, res: Response): void {
   try {
-    const balances = db.prepare(`
-      SELECT
-        sb.*,
-        i.item_code,
-        i.item_name,
-        i.unit_of_measure,
-        w.warehouse_code,
-        w.warehouse_name
-      FROM stock_balances sb
-      JOIN items i ON sb.item_id = i.id
-      JOIN warehouses w ON sb.warehouse_id = w.id
-      ORDER BY i.item_code, w.warehouse_code
-    `).all();
-
+    const balances = StockMovementModel.getStockBalances(db);
     res.json(balances);
   } catch (error) {
     logger.error('Get stock balances error:', error);

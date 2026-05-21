@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -322,55 +323,30 @@ export default function StockLevelReport() {
       )}
 
       {reportData?.summary && (
-        <div className="report-summary">
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <Package size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalItems}</div>
-                <div className="summary-label">Total Items</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <CheckCircle size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.inStock}</div>
-                <div className="summary-label">In Stock</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card warning">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <AlertTriangle size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.lowStock}</div>
-                <div className="summary-label">Low Stock</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card danger">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <XCircle size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.outOfStock}</div>
-                <div className="summary-label">Out of Stock</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatsGrid>
+          <StatCard
+            icon={Package}
+            label="Total Items"
+            value={reportData.summary.totalItems}
+          />
+          <StatCard
+            icon={CheckCircle}
+            label="In Stock"
+            value={reportData.summary.inStock}
+          />
+          <StatCard
+            icon={AlertTriangle}
+            label="Low Stock"
+            value={reportData.summary.lowStock}
+            alert={true}
+          />
+          <StatCard
+            icon={XCircle}
+            label="Out of Stock"
+            value={reportData.summary.outOfStock}
+            alert={true}
+          />
+        </StatsGrid>
       )}
 
       <div className="report-content">
@@ -382,7 +358,7 @@ export default function StockLevelReport() {
           <>
             {/* Desktop view - AG Grid */}
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.stockLevels}
                 columnDefs={columnDefs}
                 defaultColDef={{

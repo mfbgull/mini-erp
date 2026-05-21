@@ -245,7 +245,7 @@ export default function UsersPage() {
         />
       ) : (
         <div className="ag-theme-quartz users-grid">
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={users}
             columnDefs={columnDefs}
             defaultColDef={{

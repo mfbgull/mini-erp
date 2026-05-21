@@ -30,6 +30,7 @@ import {
 
 
 import Button from '../../components/common/Button';
+import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
 import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
 import CompactLedgerCardView from '../../components/common/CompactLedgerCard';
 import CompactPaymentCardView from '../../components/common/CompactPaymentCard';
@@ -521,44 +522,12 @@ function OverviewTab({ customer, invoices, ledger, payments }) {
           <DollarSign size={18} />
           Financial Summary
         </h3>
-        <div className="financial-stats-grid">
-          <div className="financial-stat-card">
-            <div className="stat-icon invoiced">
-              <FileText size={20} />
-            </div>
-            <div className="stat-content">
-              <span className="stat-value">${totalInvoiced.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              <span className="stat-label">Total Invoiced</span>
-            </div>
-          </div>
-          <div className="financial-stat-card">
-            <div className="stat-icon paid">
-              <CreditCard size={20} />
-            </div>
-            <div className="stat-content">
-              <span className="stat-value">${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              <span className="stat-label">Total Received</span>
-            </div>
-          </div>
-          <div className="financial-stat-card">
-            <div className="stat-icon outstanding">
-              <Clock size={20} />
-            </div>
-            <div className="stat-content">
-              <span className="stat-value">${totalOutstanding.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              <span className="stat-label">Outstanding Balance</span>
-            </div>
-          </div>
-          <div className="financial-stat-card">
-            <div className="stat-icon days">
-              <Calendar size={20} />
-            </div>
-            <div className="stat-content">
-              <span className="stat-value">{avgDaysToPay}</span>
-              <span className="stat-label">Avg. Days to Pay</span>
-            </div>
-          </div>
-        </div>
+        <SummaryGrid columns={4}>
+          <SummaryCard icon={FileText} label="Total Invoiced" value={`$${totalInvoiced.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} variant="info" />
+          <SummaryCard icon={CreditCard} label="Total Received" value={`$${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} variant="success" />
+          <SummaryCard icon={Clock} label="Outstanding Balance" value={`$${totalOutstanding.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} variant="warning" />
+          <SummaryCard icon={Calendar} label="Avg. Days to Pay" value={avgDaysToPay} />
+        </SummaryGrid>
       </div>
 
       {/* Invoice Status Overview */}
@@ -900,7 +869,7 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice }) {
         </div>
       ) : (
         <div className="ag-theme-quartz" style={{ height: 400, width: '100%' }}>
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={invoices}
             columnDefs={columnDefs}
             defaultColDef={{
@@ -1271,7 +1240,7 @@ function LedgerTab({ ledger, loading, customerName }) {
       ) : (
         <div ref={ledgerRef}>
           <div className="ag-theme-quartz" style={{ height: 350, width: '100%' }}>
-            <AgGridReact
+            <AgGridReact theme="legacy"
               ref={gridRef}
               rowData={ledger}
               columnDefs={columnDefs}
@@ -1390,7 +1359,7 @@ function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }) {
         </div>
       ) : (
         <div className="ag-theme-quartz" style={{ height: 400, width: '100%' }}>
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={payments}
             columnDefs={columnDefs}
             defaultColDef={{

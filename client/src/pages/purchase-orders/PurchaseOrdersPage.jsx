@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, FileText, Clock, CheckCircle, Package, Truck, DollarSign } from 'lucide-react';
 
 import { PurchaseOrderCard } from '../../components/common/PurchaseOrderCard';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
@@ -70,32 +71,14 @@ export default function PurchaseOrdersPage() {
         </div>
       ) : (
         <>
-          <div className="summary-cards">
-            <div className="summary-card">
-              <div className="summary-label">Total POs</div>
-              <div className="summary-value">{stats.total}</div>
-            </div>
-            <div className="summary-card">
-              <div className="summary-label">Draft</div>
-              <div className="summary-value">{stats.draft}</div>
-            </div>
-            <div className="summary-card">
-              <div className="summary-label">Submitted</div>
-              <div className="summary-value">{stats.submitted}</div>
-            </div>
-            <div className="summary-card">
-              <div className="summary-label">Partially Received</div>
-              <div className="summary-value">{stats.partial}</div>
-            </div>
-            <div className="summary-card">
-              <div className="summary-label">Completed</div>
-              <div className="summary-value">{stats.completed}</div>
-            </div>
-            <div className="summary-card">
-              <div className="summary-label">Total Value</div>
-              <div className="summary-value">{formatCurrency(stats.totalValue)}</div>
-            </div>
-          </div>
+          <StatsGrid>
+            <StatCard icon={FileText} label="Total POs" value={stats.total} />
+            <StatCard icon={FileText} label="Draft" value={stats.draft} />
+            <StatCard icon={Send} label="Submitted" value={stats.submitted} />
+            <StatCard icon={Package} label="Partially Received" value={stats.partial} />
+            <StatCard icon={CheckCircle} label="Completed" value={stats.completed} />
+            <StatCard icon={DollarSign} label="Total Value" value={formatCurrency(stats.totalValue)} />
+          </StatsGrid>
 
           <div className="filters-bar">
             <div className="search-box">

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini ERP - Frontend Architecture</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 2rem; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; color: #0f172a; }
+    .subtitle { color: #64748b; margin-bottom: 2rem; }
+    .section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .module { background: #f1f5f9; border-radius: 8px; padding: 1rem; border-left: 3px solid #3b82f6; }
+    .module h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .module ul { list-style: none; font-size: 0.8rem; color: #64748b; }
+    .module li { padding: 0.2rem 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+    .stat-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; text-align: center; }
+    .stat-number { font-size: 2rem; font-weight: 700; color: #3b82f6; }
+    .stat-label { font-size: 0.8rem; color: #64748b; }
+    .tech-stack { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .tech { background: #f1f5f9; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f8fafc; font-weight: 600; }
+    tr:hover { background: #f8fafc; }
+    .nav { background: #0f172a; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    .nav a { color: #94a3b8; text-decoration: none; }
+    .nav a:hover { color: white; }
+    .nav .current { color: white; font-weight: 600; }
+    .breadcrumb { color: #64748b; font-size: 0.85rem; margin-bottom: 1rem; }
+    .breadcrumb a { color: #3b82f6; text-decoration: none; }
+    .file-tree { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 8px; font-size: 0.8rem; font-family: monospace; overflow-x: auto; }
+    .file-tree .folder { color: #fbbf24; }
+    .file-tree .file { color: #86efac; }
+    .file-tree .tsx { color: #60a5fa; }
+    .file-tree .ts { color: #60a5fa; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="nav">
+      <span>🏢 Mini ERP</span>
+      <a href="architecture.html">Overview</a>
+      <a href="frontend.html" class="current">Frontend</a>
+      <a href="controllers.html">Controllers</a>
+      <a href="services.html">Services</a>
+      <a href="models.html">Models</a>
+      <a href="database.html">Database</a>
+      <a href="users.html">Users</a>
+      <a href="roles.html">Roles</a>
+    </nav>
+
+    <p class="breadcrumb"><a href="architecture.html">← Back to Architecture</a></p>
+    
+    <h1>🖥️ Frontend</h1>
+    <p class="subtitle">React + Vite Client Application</p>
+
+    <div class="section">
+      <div class="section-title">Technology Stack</div>
+      <div class="tech-stack">
+        <span class="tech">React 19</span>
+        <span class="tech">Vite 5</span>
+        <span class="tech">TypeScript</span>
+        <span class="tech">TanStack Query 5</span>
+        <span class="tech">AG-Grid 35</span>
+        <span class="tech">React Router 7</span>
+        <span class="tech">Recharts</span>
+        <span class="tech">Zod 4</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Project Statistics</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Pages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">14</div>
+          <div class="stat-label">Contexts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">90+</div>
+          <div class="stat-label">Components</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Utils</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Folder Structure</div>
+      <pre class="file-tree">client/src/
+├── main.tsx              <span class="tsx">Entry point</span>
+├── App.tsx               <span class="tsx">Main app with routing</span>
+├── types/
+│   └── index.ts          <span class="ts">Type definitions</span>
+├── schemas/
+│   └── index.ts          <span class="ts">Zod validation schemas</span>
+├── hooks/                <span class="folder">Custom React hooks</span>
+│   ├── useFormValidation.ts
+│   ├── useInvoiceNavigation.ts
+│   ├── useKeyboardShortcut.ts
+│   └── useMobileDetection.ts
+├── context/               <span class="folder">React contexts (state)</span>
+│   ├── AuthContext.tsx
+│   ├── InvoiceContext.tsx
+│   ├── SettingsContext.tsx
+│   ├── ThemeContext.tsx
+│   ├── SearchContext.tsx
+│   └── ...
+├── components/           <span class="folder">Reusable components</span>
+│   ├── common/          <span class="folder">Generic UI components</span>
+│   │   ├── Button.tsx
+│   │   ├── FormInput.tsx
+│   │   ├── Modal.tsx
+│   │   ├── DataTable.tsx
+│   │   ├── SearchModal.tsx
+│   │   └── Compact*.tsx  <span class="ts">Mobile cards</span>
+│   ├── layout/           <span class="folder">Layout components</span>
+│   │   ├── Sidebar.tsx
+│   │   ├── TopMenu.tsx
+│   │   └── FloatingActionButton.tsx
+│   ├── invoice/          <span class="folder">Invoice-specific</span>
+│   ├── customers/
+│   ├── production/
+│   ├── bom/
+│   ├── expenses/
+│   └── purchase-order/
+├── pages/                <span class="folder">Page components (lazy loaded)</span>
+│   ├── inventory/       <span class="folder">4 pages</span>
+│   ├── sales/          <span class="folder">5 pages</span>
+│   ├── purchases/       <span class="folder">3 pages</span>
+│   ├── customers/       <span class="folder">3 pages</span>
+│   ├── suppliers/       <span class="folder">3 pages</span>
+│   ├── invoice/        <span class="folder">6 pages</span>
+│   ├── reports/        <span class="folder">15 pages</span>
+│   └── ...
+└── utils/               <span class="folder">Utility functions</span>
+    ├── api.ts           <span class="ts">Axios client</span>
+    ├── salesApi.ts      <span class="ts">Sales API</span>
+    ├── invoiceApi.ts    <span class="ts">Invoice API</span>
+    ├── formatters.ts
+    └── exportUtils.ts</pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Pages by Module</div>
+      <div class="module-grid">
+        <div class="module" style="border-color: #3b82f6;">
+          <h3>📦 Inventory (4 pages)</h3>
+          <ul>
+            <li>• ItemsPage - Item list/CRUD</li>
+            <li>• ItemFormPage - Add/Edit item</li>
+            <li>• WarehousesPage - Warehouse management</li>
+            <li>• StockMovementPage - Stock movements</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #10b981;">
+          <h3>💰 Sales (5 pages)</h3>
+          <ul>
+            <li>• SalesPage - Sales list</li>
+            <li>• SalesInvoicePage - Invoice creation</li>
+            <li>• InvoiceViewPage - View invoice</li>
+            <li>• InvoiceReturn - Returns</li>
+            <li>• SalesPreview - Print preview</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #f59e0b;">
+          <h3>🏷️ Purchases (3 pages)</h3>
+          <ul>
+            <li>• PurchasesPage - Purchase list</li>
+            <li>• PurchaseOrdersPage - PO list</li>
+            <li>• PurchaseOrderFormPage - PO creation</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #8b5cf6;">
+          <h3>👥 Customers (3 pages)</h3>
+          <ul>
+            <li>• CustomersPage - Customer list</li>
+            <li>• CustomerDetailPage - View customer</li>
+            <li>• CustomerStatement - Statement</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #ec4899;">
+          <h3>🔧 Suppliers (3 pages)</h3>
+          <ul>
+            <li>• SuppliersPage - Supplier list</li>
+            <li>• SupplierFormPage - Add/Edit</li>
+            <li>• SupplierDetailPage - View</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #14b8a6;">
+          <h3>⚙️ Production (2 pages)</h3>
+          <ul>
+            <li>• BOMPage - Bill of Materials</li>
+            <li>• ProductionPage - Work orders</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #ef4444;">
+          <h3>📊 Reports (15 pages)</h3>
+          <ul>
+            <li>• ReportsDashboard - Main</li>
+            <li>• ARReportsPage</li>
+            <li>• SalesSummaryReport</li>
+            <li>• StockLevelReport</li>
+            <li>• ProfitLossReport</li>
+            <li>• And 10 more...</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #6366f1;">
+          <h3>⚡ POS (2 pages)</h3>
+          <ul>
+            <li>• POSPage - Point of Sale</li>
+            <li>• POSViewTransactions</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #f97316;">
+          <h3>📈 Forecasts (3 pages)</h3>
+          <ul>
+            <li>• ForecastDashboard</li>
+            <li>• DemandForecast</li>
+            <li>• ForecastTrends</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #64748b;">
+          <h3>💵 Expenses (2 pages)</h3>
+          <ul>
+            <li>• ExpensesPage</li>
+            <li>• ExpensesReport</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #0ea5e9;">
+          <h3>🔐 Auth & Settings (6 pages)</h3>
+          <ul>
+            <li>• LoginPage</li>
+            <li>• UsersPage</li>
+            <li>• UserFormPage</li>
+            <li>• RolesPage</li>
+            <li>• RoleFormPage</li>
+            <li>• SettingsPage</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #84cc16;">
+          <h3>📋 Utilities (4 pages)</h3>
+          <ul>
+            <li>• Dashboard</li>
+            <li>• ActivityLogPage</li>
+            <li>• IntegrationsPage</li>
+            <li>• Quotations/SalesOrders</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Key Components</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Type</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Sidebar</td><td>Layout</td><td>Navigation menu</td></tr>
+          <tr><td>TopMenu</td><td>Layout</td><td>Header with search</td></tr>
+          <tr><td>DataTable</td><td>Common</td><td>AG-Grid wrapper</td></tr>
+          <tr><td>SearchModal</td><td>Common</td><td>Global search (Ctrl+K)</td></tr>
+          <tr><td>Modal</td><td>Common</td><td>Modal dialog</td></tr>
+          <tr><td>Compact*Card</td><td>Common</td><td>Mobile card views</td></tr>
+          <tr><td>InvoiceWizard</td><td>Invoice</td><td>5-step wizard</td></tr>
+          <tr><td>PurchaseOrderWizard</td><td>Purchase</td><td>PO creation</td></tr>
+          <tr><td>BOMCard</td><td>Production</td><td>BOM display</td></tr>
+          <tr><td>InvoiceTemplate</td><td>Invoice</td><td>Print template</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">State Management</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Context</th>
+            <th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>AuthContext</td><td>user, isAuthenticated, login, logout</td></tr>
+          <tr><td>InvoiceContext</td><td>currentInvoice, steps, navigation</td></tr>
+          <tr><td>SettingsContext</td><td>appSettings, updateSettings</td></tr>
+          <tr><td>ThemeContext</td><td>theme, toggleTheme</td></tr>
+          <tr><td>SearchContext</td><td>searchQuery, results</td></tr>
+          <tr><td>KeyboardShortcutsContext</td><td>shortcuts, shortcuts list</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 2rem;">
+      <p>Mini ERP • Built with React + Express + SQLite | <a href="architecture.html" style="color: #3b82f6;">← Overview</a></p>
+    </footer>
+  </div>
+</body>
+</html>

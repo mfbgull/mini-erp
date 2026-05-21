@@ -1,0 +1,79 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - button "Switch to Top Menu" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - img "Mini ERP" [ref=e13]
+    - navigation [ref=e14]:
+      - link "Dashboard" [ref=e15] [cursor=pointer]:
+        - /url: /
+        - img [ref=e17]
+        - generic [ref=e22]: Dashboard
+      - button "Inventory" [ref=e23] [cursor=pointer]:
+        - generic [ref=e24]:
+          - img [ref=e26]
+          - generic [ref=e30]: Inventory
+          - img [ref=e31]
+      - button "Sales" [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]:
+          - img [ref=e36]
+          - generic [ref=e38]: Sales
+          - img [ref=e39]
+      - button "Reports" [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]:
+          - img [ref=e44]
+          - generic [ref=e46]: Reports
+          - img [ref=e47]
+      - button "Forecasts" [ref=e49] [cursor=pointer]:
+        - generic [ref=e50]:
+          - img [ref=e52]
+          - generic [ref=e55]: Forecasts
+          - img [ref=e56]
+      - button "Purchases" [ref=e58] [cursor=pointer]:
+        - generic [ref=e59]:
+          - img [ref=e61]
+          - generic [ref=e65]: Purchases
+          - img [ref=e66]
+      - link "BOM" [ref=e68] [cursor=pointer]:
+        - /url: /bom
+        - img [ref=e70]
+        - generic [ref=e73]: BOM
+      - link "Production" [ref=e74] [cursor=pointer]:
+        - /url: /production
+        - img [ref=e76]
+        - generic [ref=e78]: Production
+      - button "Expenses" [ref=e79] [cursor=pointer]:
+        - generic [ref=e80]:
+          - img [ref=e82]
+          - generic [ref=e85]: Expenses
+          - img [ref=e86]
+      - button "Administrator" [ref=e88] [cursor=pointer]:
+        - generic [ref=e89]:
+          - img [ref=e91]
+          - generic [ref=e93]: Administrator
+          - img [ref=e94]
+      - link "Activity Log" [ref=e96] [cursor=pointer]:
+        - /url: /activity-log
+        - img [ref=e98]
+        - generic [ref=e101]: Activity Log
+      - link "Integrations" [ref=e102] [cursor=pointer]:
+        - /url: /integrations
+        - img [ref=e104]
+        - generic [ref=e107]: Integrations
+      - link "Settings" [ref=e108] [cursor=pointer]:
+        - /url: /settings
+        - img [ref=e110]
+        - generic [ref=e113]: Settings
+    - generic [ref=e115]:
+      - generic [ref=e116]: F
+      - generic [ref=e117]:
+        - generic [ref=e118]: Fawad
+        - generic [ref=e119]: admin
+      - button "اردو میں تبدیل کریں" [ref=e121] [cursor=pointer]:
+        - img [ref=e122]
+      - button "Logout" [ref=e126] [cursor=pointer]:
+        - img [ref=e127]
+  - generic [ref=e131]:
+    - generic [ref=e134]: Loading...
+    - button "Open quick actions menu" [ref=e135] [cursor=pointer]:
+      - img [ref=e136]

@@ -3,28 +3,12 @@ import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
 import logger from '../utils/logger';
+import { initializeSequenceFromMax, getNextSequenceNumber } from '../utils/sequence';
+import SupplierModel from '../models/Supplier';
 
 function getSuppliers(req: Request, res: Response): void {
   try {
-    const query = `
-      SELECT 
-        id,
-        supplier_code,
-        supplier_name,
-        contact_person,
-        email,
-        phone,
-        address,
-        payment_terms,
-        is_active,
-        created_at,
-        updated_at
-      FROM suppliers
-      WHERE is_active = 1
-      ORDER BY supplier_name
-    `;
-
-    const suppliers = db.prepare(query).all();
+    const suppliers = SupplierModel.getAll(db);
 
     res.json({
       success: true,
@@ -59,35 +43,24 @@ function createSupplier(req: Request, res: Response): void {
       return;
     }
 
-    const query = `
-      INSERT INTO suppliers (
-        supplier_code,
-        supplier_name,
-        contact_person,
-        email,
-        phone,
-        address,
-        payment_terms
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const result = db.prepare(query).run(
+    const id = SupplierModel.create({
       supplier_code,
       supplier_name,
-      contact_person || null,
-      email || null,
-      phone || null,
-      address || null,
-      payment_terms || null
-    );
+      contact_person,
+      email,
+      phone,
+      address,
+      payment_terms
+    }, db);
 
     // Log supplier creation using activity logger
-    logCRUD(ActionType.SUPPLIER_CREATE, 'Supplier', result.lastInsertRowid as number, `Created supplier: ${supplier_name} (${supplier_code})`, (req as AuthRequest).user?.id);
+    logCRUD(ActionType.SUPPLIER_CREATE, 'Supplier', id, `Created supplier: ${supplier_name} (${supplier_code})`, (req as AuthRequest).user?.id);
+    req.activityLogged = true;
 
     res.status(201).json({
       success: true,
       data: {
-        id: result.lastInsertRowid,
+        id,
         supplier_code,
         supplier_name,
         contact_person,
@@ -116,6 +89,7 @@ function createSupplier(req: Request, res: Response): void {
 function updateSupplier(req: Request, res: Response): void {
   try {
     const { id } = req.params;
+    const supplierId = parseInt(Array.isArray(id) ? id[0] : id, 10);
     const {
       supplier_name,
       contact_person,
@@ -126,29 +100,15 @@ function updateSupplier(req: Request, res: Response): void {
       is_active
     } = req.body;
 
-    const query = `
-      UPDATE suppliers SET
-        supplier_name = ?,
-        contact_person = ?,
-        email = ?,
-        phone = ?,
-        address = ?,
-        payment_terms = ?,
-        is_active = ?,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `;
-
-    const result = db.prepare(query).run(
+    const result = SupplierModel.update(supplierId, {
       supplier_name,
-      contact_person || null,
-      email || null,
-      phone || null,
-      address || null,
-      payment_terms || null,
-      is_active !== undefined ? (is_active ? 1 : 0) : 1,
-      id
-    );
+      contact_person,
+      email,
+      phone,
+      address,
+      payment_terms,
+      is_active
+    }, db);
 
     if (result.changes === 0) {
       res.status(404).json({
@@ -159,13 +119,13 @@ function updateSupplier(req: Request, res: Response): void {
     }
 
     // Log supplier update using activity logger
-    const supplierId = Array.isArray(id) ? id[0] : id;
-    logCRUD(ActionType.SUPPLIER_UPDATE, 'Supplier', parseInt(supplierId, 10), `Updated supplier: ${supplier_name}`, (req as AuthRequest).user?.id);
+    logCRUD(ActionType.SUPPLIER_UPDATE, 'Supplier', supplierId, `Updated supplier: ${supplier_name}`, (req as AuthRequest).user?.id);
+    req.activityLogged = true;
 
     res.json({
       success: true,
       data: {
-        id: parseInt(supplierId, 10),
+        id: supplierId,
         supplier_name,
         contact_person,
         email,
@@ -187,12 +147,13 @@ function updateSupplier(req: Request, res: Response): void {
 function deleteSupplier(req: Request, res: Response): void {
   try {
     const { id } = req.params;
+    const deleteId = Array.isArray(id) ? id[0] : id;
+    const supplierId = parseInt(deleteId, 10);
 
     // Check if supplier has any purchase orders
-    const checkQuery = `SELECT COUNT(*) as count FROM purchase_orders WHERE supplier_id = ?`;
-    const checkResult = db.prepare(checkQuery).get(id) as { count: number };
+    const poCount = SupplierModel.countPurchaseOrders(supplierId, db);
 
-    if (checkResult.count > 0) {
+    if (poCount.count > 0) {
       res.status(400).json({
         success: false,
         error: 'Cannot delete supplier with existing purchase orders'
@@ -201,22 +162,13 @@ function deleteSupplier(req: Request, res: Response): void {
     }
 
     // Query supplier info BEFORE deletion so we can log it
-    const deleteId = Array.isArray(id) ? id[0] : id;
-    const existingSupplier = db.prepare('SELECT supplier_name, supplier_code FROM suppliers WHERE id = ?').get(deleteId) as { supplier_name?: string, supplier_code?: string } | undefined;
+    const existingSupplier = SupplierModel.getById(supplierId, db);
 
-    const query = `DELETE FROM suppliers WHERE id = ?`;
-    const result = db.prepare(query).run(id);
-
-    if (result.changes === 0) {
-      res.status(404).json({
-        success: false,
-        error: 'Supplier not found'
-      });
-      return;
-    }
+    SupplierModel.delete(supplierId, db);
 
     // Log supplier deletion using activity logger
-    logCRUD(ActionType.SUPPLIER_DELETE, 'Supplier', parseInt(deleteId, 10), `Deleted supplier: ${existingSupplier?.supplier_name || 'Unknown'} (${existingSupplier?.supplier_code || 'N/A'})`, (req as AuthRequest).user?.id);
+    logCRUD(ActionType.SUPPLIER_DELETE, 'Supplier', supplierId, `Deleted supplier: ${existingSupplier?.supplier_name || 'Unknown'} (${existingSupplier?.supplier_code || 'N/A'})`, (req as AuthRequest).user?.id);
+    req.activityLogged = true;
 
     res.json({
       success: true,
@@ -234,11 +186,8 @@ function deleteSupplier(req: Request, res: Response): void {
 function getSupplierById(req: Request, res: Response): void {
   try {
     const { id } = req.params;
-    const query = `
-      SELECT * FROM suppliers
-      WHERE id = ?
-    `;
-    const supplier = db.prepare(query).get(id);
+    const supplierId = parseInt(Array.isArray(id) ? id[0] : id, 10);
+    const supplier = SupplierModel.getById(supplierId, db);
     if (!supplier) {
       res.status(404).json({ success: false, error: 'Supplier not found' });
       return;
@@ -251,31 +200,14 @@ function getSupplierById(req: Request, res: Response): void {
 
 function getNextSupplierCode(req: Request, res: Response): void {
   try {
-    // Get the highest existing supplier code
-    const query = `SELECT MAX(CAST(SUBSTR(supplier_code, 5) AS INTEGER)) as maxCode FROM suppliers WHERE supplier_code LIKE 'SUP-%'`;
-    const result = db.prepare(query).get() as { maxCode: number | null };
-    
-    const nextNumber = (result.maxCode || 0) + 1;
+    initializeSequenceFromMax(db, 'SUP_last_no', 'suppliers', 'supplier_code', 'SUP-');
+    const nextNumber = getNextSequenceNumber(db, 'SUP_last_no');
     const code = `SUP-${String(nextNumber).padStart(3, '0')}`;
-    
     res.json({ success: true, data: { code } });
   } catch (error) {
     logger.error('Error generating supplier code:', error);
-    // Fallback: try simple approach
-    try {
-      const fallbackQuery = `SELECT supplier_code FROM suppliers ORDER BY id DESC LIMIT 1`;
-      const lastSupplier = db.prepare(fallbackQuery).get() as { supplier_code: string } | undefined;
-      
-      if (lastSupplier && lastSupplier.supplier_code.startsWith('SUP-')) {
-        const num = parseInt(lastSupplier.supplier_code.split('-')[1], 10) || 0;
-        const code = `SUP-${String(num + 1).padStart(3, '0')}`;
-        res.json({ success: true, data: { code } });
-      } else {
-        res.json({ success: true, data: { code: 'SUP-001' } });
-      }
-    } catch (fallbackError) {
-      res.json({ success: true, data: { code: 'SUP-001' } });
-    }
+    const code = 'SUP-001';
+    res.json({ success: true, data: { code } });
   }
 }
 

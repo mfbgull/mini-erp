@@ -6,6 +6,7 @@
 
 import db from '../config/database';
 import logger from '../utils/logger';
+import { ActivityLogDbEntry, ActivityStat } from '../types';
 
 // Activity types enumeration
 export enum ActionType {
@@ -89,6 +90,7 @@ export enum ActionType {
   BACKUP_CREATE = 'BACKUP_CREATE',
   DATA_IMPORT = 'DATA_IMPORT',
   DATA_EXPORT = 'DATA_EXPORT',
+  SYSTEM_CLEANUP = 'SYSTEM_CLEANUP',
 
   // POS
   POS_SALE = 'POS_SALE',
@@ -264,7 +266,7 @@ class ActivityLoggerService {
         LEFT JOIN users u ON al.user_id = u.id
         ORDER BY al.created_at DESC
         LIMIT ?
-      `).all(limit) as any[];
+      `).all(limit) as ActivityLogDbEntry[];
     } catch (error: any) {
       logger.error('[ActivityLogger] Failed to get recent logs:', { error: error.message });
       return [];
@@ -283,7 +285,7 @@ class ActivityLoggerService {
         WHERE al.user_id = ?
         ORDER BY al.created_at DESC
         LIMIT ?
-      `).all(userId, limit) as any[];
+      `).all(userId, limit) as ActivityLogDbEntry[];
     } catch (error: any) {
       logger.error('[ActivityLogger] Failed to get user logs:', { error: error.message });
       return [];
@@ -302,7 +304,7 @@ class ActivityLoggerService {
         WHERE al.entity_type = ? AND al.entity_id = ?
         ORDER BY al.created_at DESC
         LIMIT ?
-      `).all(entityType, entityId, limit) as any[];
+      `).all(entityType, entityId, limit) as ActivityLogDbEntry[];
     } catch (error: any) {
       logger.error('[ActivityLogger] Failed to get entity logs:', { error: error.message });
       return [];
@@ -328,7 +330,7 @@ class ActivityLoggerService {
         ${dateFilter}
         GROUP BY action
         ORDER BY count DESC
-      `).all(...params) as any[];
+      `).all(...params) as ActivityStat[];
 
       const users = db.prepare(`
         SELECT u.username, COUNT(*) as count
@@ -338,7 +340,7 @@ class ActivityLoggerService {
         GROUP BY al.user_id
         ORDER BY count DESC
         LIMIT 10
-      `).all(...params) as any[];
+      `).all(...params) as ActivityStat[];
 
       const dailyActivity = db.prepare(`
         SELECT DATE(created_at) as date, COUNT(*) as count
@@ -347,7 +349,7 @@ class ActivityLoggerService {
         GROUP BY DATE(created_at)
         ORDER BY date DESC
         LIMIT 30
-      `).all(...params) as any[];
+      `).all(...params) as ActivityStat[];
 
       return { actions, users, dailyActivity };
     } catch (error: any) {

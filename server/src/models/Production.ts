@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import { getNextSequenceNumber } from '../utils/sequence';
 
 interface Production {
   id: number;
@@ -144,7 +145,7 @@ class ProductionModel {
         const existingBalance = db.prepare(`
           SELECT * FROM stock_balances
           WHERE item_id = ? AND warehouse_id = ?
-        `).get(input.item_id, materialsWarehouseId) as any;
+        `).get(input.item_id, materialsWarehouseId) as Record<string, unknown> | undefined;
 
         if (existingBalance) {
           db.prepare(`
@@ -207,7 +208,7 @@ class ProductionModel {
       const outputExistingBalance = db.prepare(`
         SELECT * FROM stock_balances
         WHERE item_id = ? AND warehouse_id = ?
-      `).get(output_item_id, warehouse_id) as any;
+      `).get(output_item_id, warehouse_id) as Record<string, unknown> | undefined;
 
       if (outputExistingBalance) {
         db.prepare(`
@@ -253,19 +254,7 @@ class ProductionModel {
   static generateProductionNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `PROD_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `PROD-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 

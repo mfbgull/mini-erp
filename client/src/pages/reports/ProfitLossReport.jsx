@@ -23,6 +23,7 @@ import {
 
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -235,91 +236,46 @@ export default function ProfitLossReport() {
         </div>
       ) : reportData ? (
         <div className="report-content">
-          <div className="pl-summary-grid">
-            <div className="pl-summary-card">
-              <div className="summary-content">
-                <div className="summary-icon">
-                  <DollarSign size={24} />
-                </div>
-                <div className="summary-text">
-                  <div className="summary-value">{formatCurrency(reportData.totalRevenue)}</div>
-                  <div className="summary-label">Total Revenue</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pl-summary-card">
-              <div className="summary-content">
-                <div className="summary-icon">
-                  <TrendingDown size={24} />
-                </div>
-                <div className="summary-text">
-                  <div className="summary-value negative">{formatCurrency(reportData.totalCogs)}</div>
-                  <div className="summary-label">Cost of Goods Sold (COGS)</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pl-summary-card">
-              <div className="summary-content">
-                <div className="summary-icon">
-                  <TrendingUp size={24} />
-                </div>
-                <div className="summary-text">
-                  <div className="summary-value">{formatCurrency(reportData.grossProfit)}</div>
-                  <div className="summary-label">Gross Profit</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pl-summary-card">
-              <div className="summary-content">
-                <div className="summary-icon">
-                  <Calculator size={24} />
-                </div>
-                <div className="summary-text">
-                  <div className="summary-value negative">{formatCurrency(reportData.totalExpenses)}</div>
-                  <div className="summary-label">Total Expenses</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pl-summary-card">
-              <div className="summary-content">
-                <div className="summary-icon">
-                  <DollarSign size={24} />
-                </div>
-                <div className="summary-text">
-                  <div className="summary-value">{formatCurrency(reportData.netProfit)}</div>
-                  <div className="summary-label">Net Profit</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pl-summary-card">
-              <div className="summary-content">
-                <div className="summary-icon">
-                  <TrendingUp size={24} />
-                </div>
-                <div className="summary-text">
-                  <div className="summary-value">{reportData.grossProfitMargin}%</div>
-                  <div className="summary-label">Gross Profit Margin</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pl-summary-card">
-              <div className="summary-content">
-                <div className="summary-icon">
-                  <BarChart3 size={24} />
-                </div>
-                <div className="summary-text">
-                  <div className="summary-value">{reportData.netProfitMargin}%</div>
-                  <div className="summary-label">Net Profit Margin</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <StatsGrid>
+            <StatCard
+              icon={DollarSign}
+              label="Total Revenue"
+              value={formatCurrency(reportData.totalRevenue)}
+            />
+            <StatCard
+              icon={TrendingDown}
+              label="Cost of Goods Sold (COGS)"
+              value={formatCurrency(reportData.totalCogs)}
+              style={reportData.totalCogs > 0 ? { color: '#dc3545' } : undefined}
+            />
+            <StatCard
+              icon={TrendingUp}
+              label="Gross Profit"
+              value={formatCurrency(reportData.grossProfit)}
+            />
+            <StatCard
+              icon={Calculator}
+              label="Total Expenses"
+              value={formatCurrency(reportData.totalExpenses)}
+              style={reportData.totalExpenses > 0 ? { color: '#dc3545' } : undefined}
+            />
+            <StatCard
+              icon={DollarSign}
+              label="Net Profit"
+              value={formatCurrency(reportData.netProfit)}
+              style={reportData.netProfit < 0 ? { color: '#dc3545' } : undefined}
+            />
+            <StatCard
+              icon={TrendingUp}
+              label="Gross Profit Margin"
+              value={`${reportData.grossProfitMargin}%`}
+            />
+            <StatCard
+              icon={BarChart3}
+              label="Net Profit Margin"
+              value={`${reportData.netProfitMargin}%`}
+            />
+          </StatsGrid>
 
           <div className="chart-container">
             <Bar key="profit-loss-chart" data={chartData} options={chartOptions} />

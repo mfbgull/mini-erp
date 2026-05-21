@@ -1,5 +1,7 @@
 import Database from 'better-sqlite3';
 import StockMovementModel from './StockMovement';
+import { getNextSequenceNumber } from '../utils/sequence';
+import { StockBalance } from '../types';
 
 interface PurchaseOrder {
   id: number;
@@ -177,19 +179,7 @@ class PurchaseOrderModel {
   static generatePONo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `PO_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `PO-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
@@ -672,7 +662,7 @@ class PurchaseOrderModel {
         const existingBalance = db.prepare(`
           SELECT * FROM stock_balances
           WHERE item_id = ? AND warehouse_id = ?
-        `).get(poItem.item_id, warehouse_id) as any;
+         `).get(poItem.item_id, warehouse_id) as StockBalance | undefined;
 
         if (existingBalance) {
           db.prepare(`

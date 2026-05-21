@@ -1,0 +1,10 @@
+- generic [ref=e3]:
+  - button "Switch to light mode" [ref=e4]:
+    - img [ref=e5]
+  - button "Open navigation menu" [ref=e11]:
+    - img [ref=e12]
+  - img "Mini ERP" [ref=e16]
+  - generic [ref=e18]:
+    - generic [ref=e21]: Loading...
+    - button "Open quick actions menu" [ref=e22] [cursor=pointer]:
+      - img [ref=e23]

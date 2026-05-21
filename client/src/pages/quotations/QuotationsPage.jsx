@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { FileText, Plus, Eye, Edit2, Trash2, ArrowRight } from 'lucide-react';
+import { FileText, Send, CheckCircle, ArrowRight, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
@@ -203,27 +204,15 @@ export default function QuotationsPage() {
         </Button>
       </div>
 
-      <div className="summary-cards">
-        <div className="summary-card">
-          <span className="summary-label">{t('common.total')}</span>
-          <span className="summary-value">{quotationTotals.count}</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-label">{t('quotations.draft')}</span>
-          <span className="summary-value">{quotationTotals.draft}</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-label">{t('quotations.sent')}</span>
-          <span className="summary-value">{quotationTotals.sent}</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-label">{t('quotations.converted')}</span>
-          <span className="summary-value">{quotationTotals.converted}</span>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={FileText} label={t('common.total')} value={quotationTotals.count} />
+        <StatCard icon={FileText} label={t('quotations.draft')} value={quotationTotals.draft} />
+        <StatCard icon={Send} label={t('quotations.sent')} value={quotationTotals.sent} />
+        <StatCard icon={CheckCircle} label={t('quotations.converted')} value={quotationTotals.converted} />
+      </StatsGrid>
 
       <div className="grid-container ag-theme-alpine">
-        <AgGridReact
+        <AgGridReact theme="legacy"
           rowData={quotations}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}

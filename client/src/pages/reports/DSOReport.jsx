@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
+import SummaryCard from '../../components/common/SummaryCard';
 import DateRangePicker from '../../components/common/DateRangePicker';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
@@ -228,43 +229,11 @@ export default function DSOReport() {
         </div>
       ) : reportData ? (
         <div className="report-content">
-          <div className="dso-metrics">
-            <div className="metric-card primary">
-              <div className="metric-content">
-                <div className="metric-icon">
-                  <Calendar size={32} />
-                </div>
-                <div className="metric-text">
-                  <div className="metric-value">{reportData.dso}</div>
-                  <div className="metric-label">Days Sales Outstanding</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="metric-card secondary">
-              <div className="metric-content">
-                <div className="metric-icon">
-                  <TrendingUp size={32} />
-                </div>
-                <div className="metric-text">
-                  <div className="metric-value">{reportData.previousDso}</div>
-                  <div className="metric-label">Previous Period DSO</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="metric-card tertiary">
-              <div className="metric-content">
-                <div className="metric-icon">
-                  <TrendingDown size={32} />
-                </div>
-                <div className="metric-text">
-                  <div className="metric-value">{reportData.industryAverage || 30}</div>
-                  <div className="metric-label">Industry Average</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <SummaryGrid columns={3}>
+            <SummaryCard icon={Calendar} label="Days Sales Outstanding" value={reportData.dso} variant="info" />
+            <SummaryCard icon={TrendingUp} label="Previous Period DSO" value={reportData.previousDso} />
+            <SummaryCard icon={TrendingDown} label="Industry Average" value={reportData.industryAverage || 30} variant="warning" />
+          </SummaryGrid>
 
           <div className="dso-details">
             <div className="detail-card">

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini ERP - Controllers</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 2rem; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; color: #0f172a; }
+    .subtitle { color: #64748b; margin-bottom: 2rem; }
+    .section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .module { background: #f1f5f9; border-radius: 8px; padding: 1rem; border-left: 3px solid #3b82f6; }
+    .module h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .module ul { list-style: none; font-size: 0.8rem; color: #64748b; }
+    .module li { padding: 0.2rem 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f8fafc; font-weight: 600; }
+    tr:hover { background: #f8fafc; }
+    .nav { background: #0f172a; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    .nav a { color: #94a3b8; text-decoration: none; }
+    .nav a:hover { color: white; }
+    .nav .current { color: white; font-weight: 600; }
+    .breadcrumb { color: #64748b; font-size: 0.85rem; margin-bottom: 1rem; }
+    .breadcrumb a { color: #3b82f6; text-decoration: none; }
+    .file-tree { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 8px; font-size: 0.8rem; font-family: monospace; overflow-x: auto; }
+    .badge { display: inline-block; background: #3b82f6; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; margin-left: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="nav">
+      <span>🏢 Mini ERP</span>
+      <a href="architecture.html">Overview</a>
+      <a href="frontend.html">Frontend</a>
+      <a href="controllers.html" class="current">Controllers</a>
+      <a href="services.html">Services</a>
+      <a href="models.html">Models</a>
+      <a href="database.html">Database</a>
+      <a href="users.html">Users</a>
+      <a href="roles.html">Roles</a>
+    </nav>
+
+    <p class="breadcrumb"><a href="architecture.html">← Back to Architecture</a></p>
+    
+    <h1>🎮 Controllers</h1>
+    <p class="subtitle">Express API Endpoints (22 Controllers)</p>
+
+    <div class="section">
+      <div class="section-title">All Controllers (22)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Controller</th>
+            <th>File</th>
+            <th>Routes</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>InvoiceController</td><td>invoiceController.ts</td><td class="badge">/api/invoices</td><td>Invoice CRUD, create, pay, preview</td></tr>
+          <tr><td>2</td><td>SalesController</td><td>salesController.ts</td><td class="badge">/api/sales</td><td>Sales orders, returns, summary</td></tr>
+          <tr><td>3</td><td>PurchaseController</td><td>purchaseController.ts</td><td class="badge">/api/purchases</td><td>Purchase CRUD</td></tr>
+          <tr><td>4</td><td>CustomersController</td><td>customersController.ts</td><td class="badge">/api/customers</td><td>Customer CRUD, ledger, payments</td></tr>
+          <tr><td>5</td><td>SuppliersController</td><td>suppliersController.ts</td><td class="badge">/api/suppliers</td><td>Supplier CRUD, ledger</td></tr>
+          <tr><td>6</td><td>InventoryController</td><td>inventoryController.ts</td><td class="badge">/api/items</td><td>Items, stock, movements</td></tr>
+          <tr><td>7</td><td>ProductionController</td><td>productionController.ts</td><td class="badge">/api/production</td><td>Production orders</td></tr>
+          <tr><td>8</td><td>BOMController</td><td>bomController.ts</td><td class="badge">/api/bom</td><td>Bill of Materials</td></tr>
+          <tr><td>9</td><td>ReportsController</td><td>reportsController.ts</td><td class="badge">/api/reports</td><td>P&L, AR, stock, sales reports</td></tr>
+          <tr><td>10</td><td>ExpenseController</td><td>expenseController.ts</td><td class="badge">/api/expenses</td><td>Expense tracking</td></tr>
+          <tr><td>11</td><td>AuthController</td><td>authController.ts</td><td class="badge">/api/auth</td><td>Login, logout, change password</td></tr>
+          <tr><td>12</td><td>UserController</td><td>userController.ts</td><td class="badge">/api/users</td><td>User management</td></tr>
+          <tr><td>13</td><td>RolesController</td><td>rolesController.ts</td><td class="badge">/api/roles</td><td>Role & permissions</td></tr>
+          <tr><td>14</td><td>SettingsController</td><td>settingsController.ts</td><td class="badge">/api/settings</td><td>App settings</td></tr>
+          <tr><td>15</td><td>DashboardController</td><td>dashboardController.ts</td><td class="badge">/api/dashboard</td><td>Dashboard KPIs</td></tr>
+          <tr><td>16</td><td>PaymentsController</td><td>paymentsController.ts</td><td class="badge">/api/payments</td><td>Payment processing</td></tr>
+          <tr><td>17</td><td>PurchaseOrderController</td><td>purchaseOrderController.ts</td><td class="badge">/api/purchase-orders</td><td>PO management</td></tr>
+          <tr><td>18</td><td>ForecastsController</td><td>forecastsController.ts</td><td class="badge">/api/forecasts</td><td>Demand forecasting</td></tr>
+          <tr><td>19</td><td>POSController</td><td>posController.ts</td><td class="badge">/api/pos</td><td>POS operations</td></tr>
+          <tr><td>20</td><td>ActivityLogController</td><td>activityLogController.ts</td><td class="badge">/api/activity</td><td>Activity logging</td></tr>
+          <tr><td>21</td><td>MobileInvoiceController</td><td>mobileInvoiceController.ts</td><td class="badge">/api/mobile</td><td>Mobile invoice</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Controllers by Module</div>
+      <div class="module-grid">
+        <div class="module" style="border-color: #3b82f6;">
+          <h3>📦 Inventory</h3>
+          <ul>
+            <li>• InventoryController (items, stock)</li>
+            <li>• Items, stock movements</li>
+            <li>• Warehouses</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #10b981;">
+          <h3>💰 Sales</h3>
+          <ul>
+            <li>• SalesController</li>
+            <li>• InvoiceController</li>
+            <li>• PaymentsController</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #f59e0b;">
+          <h3>🏷️ Purchases</h3>
+          <ul>
+            <li>• PurchaseController</li>
+            <li>• PurchaseOrderController</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #8b5cf6;">
+          <h3>👥 Customers</h3>
+          <ul>
+            <li>• CustomersController</li>
+            <li>• Ledger, payments</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #ec4899;">
+          <h3>🔧 Suppliers</h3>
+          <ul>
+            <li>• SuppliersController</li>
+            <li>• Ledger</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #14b8a6;">
+          <h3>⚙️ Production</h3>
+          <ul>
+            <li>• ProductionController</li>
+            <li>• BOMController</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #ef4444;">
+          <h3>📊 Reports</h3>
+          <ul>
+            <li>• ReportsController</li>
+            <li>• DashboardController</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #6366f1;">
+          <h3>⚡ POS</h3>
+          <ul>
+            <li>• POSController</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #f97316;">
+          <h3>📈 Forecasts</h3>
+          <ul>
+            <li>• ForecastsController</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #64748b;">
+          <h3>💵 Expenses</h3>
+          <ul>
+            <li>• ExpenseController</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #0ea5e9;">
+          <h3>🔐 Auth</h3>
+          <ul>
+            <li>• AuthController</li>
+            <li>• UserController</li>
+            <li>• RolesController</li>
+          </ul>
+        </div>
+        <div class="module" style="border-color: #84cc16;">
+          <h3>📋 System</h3>
+          <ul>
+            <li>• SettingsController</li>
+            <li>• ActivityLogController</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Example Routes (InvoiceController)</div>
+      <pre class="file-tree" style="background: #f1f5f9; color: #1e293b; border: 1px solid #e2e8f0;">
+GET    /api/invoices              - List all invoices
+GET    /api/invoices/:id        - Get single invoice
+POST   /api/invoices           - Create invoice
+PUT    /api/invoices/:id        - Update invoice
+DELETE /api/invoices/:id        - Delete invoice
+POST   /api/invoices/:id/pay  - Mark as paid
+GET    /api/invoices/:id/preview - Get print preview
+GET    /api/invoices/pdf/:id   - Generate PDF</pre>
+    </div>
+
+    <footer style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 2rem;">
+      <p>Mini ERP • Built with React + Express + SQLite | <a href="architecture.html" style="color: #3b82f6;">← Overview</a></p>
+    </footer>
+  </div>
+</body>
+</html>

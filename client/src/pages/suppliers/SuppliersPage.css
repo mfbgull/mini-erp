@@ -330,32 +330,6 @@
   color: var(--primary);
 }
 
-/* Summary Grid */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-md);
-}
-
-.summary-item {
-  text-align: center;
-  padding: var(--space-md);
-  background: var(--neutral-50);
-  border-radius: var(--radius-md);
-}
-
-.summary-value {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--primary);
-  margin-bottom: var(--space-xs);
-}
-
-.summary-label {
-  font-size: 0.85rem;
-  color: var(--neutral-600);
-}
-
 .no-data {
   text-align: center;
   padding: var(--space-lg);
@@ -597,10 +571,6 @@
 
   .info-item.full-width {
     grid-column: span 1;
-  }
-
-  .summary-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 
   .header-actions {

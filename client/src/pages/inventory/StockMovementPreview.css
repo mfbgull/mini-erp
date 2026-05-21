@@ -299,3 +299,58 @@
     font-size: 13px;
   }
 }
+
+/* Financial Entry Section */
+.financial-entry-section {
+  margin-top: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--neutral-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.financial-entry-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.financial-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.financial-account {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.financial-amount {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.financial-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.posted {
+  background: #22c55e;
+}
+
+.status-dot.pending {
+  background: #f59e0b;
+}

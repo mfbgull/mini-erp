@@ -5,11 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { FileText, ShoppingCart, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
+import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
 
 import InvoicePreview from './InvoicePreview';
 import Button from '../../components/common/Button';
 import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
@@ -196,38 +197,12 @@ export default function SalesPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="summary-cards">
-        <div className="summary-card">
-          <div className="summary-icon invoices">
-            <FileText size={24} />
-          </div>
-          <div className="summary-content">
-            <div className="summary-value">{invoiceTotals.count}</div>
-            <div className="summary-label">{t('sales.allInvoices')}</div>
-          </div>
-        </div>
-        <div className="summary-card">
-          <div className="summary-icon revenue">
-            <ShoppingCart size={24} />
-          </div>
-          <div className="summary-content">
-            <div className="summary-value">{formatCurrency(invoiceTotals.total)}</div>
-            <div className="summary-label">{t('sales.totalSales')}</div>
-          </div>
-        </div>
-        <div className="summary-card success">
-          <div className="summary-content">
-            <div className="summary-value">{formatCurrency(invoiceTotals.paid)}</div>
-            <div className="summary-label">{t('sales.totalPaid')}</div>
-          </div>
-        </div>
-        <div className="summary-card warning">
-          <div className="summary-content">
-            <div className="summary-value">{formatCurrency(invoiceTotals.outstanding)}</div>
-            <div className="summary-label">{t('sales.totalDue')}</div>
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={FileText} label={t('sales.allInvoices')} value={invoiceTotals.count} />
+        <StatCard icon={ShoppingCart} label={t('sales.totalSales')} value={formatCurrency(invoiceTotals.total)} />
+        <StatCard icon={DollarSign} label={t('sales.totalPaid')} value={formatCurrency(invoiceTotals.paid)} />
+        <StatCard icon={AlertTriangle} label={t('sales.totalDue')} value={formatCurrency(invoiceTotals.outstanding)} />
+      </StatsGrid>
 
       {/* Invoices Grid */}
       <div className="sales-content">
@@ -244,7 +219,7 @@ export default function SalesPage() {
           />
         ) : (
           <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>
-            <AgGridReact
+            <AgGridReact theme="legacy"
               rowData={invoices}
               columnDefs={invoiceColumnDefs}
               defaultColDef={{

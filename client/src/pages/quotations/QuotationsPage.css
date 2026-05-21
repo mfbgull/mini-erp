@@ -21,36 +21,6 @@
   font-weight: 600;
 }
 
-.quotations-page .summary-cards {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.quotations-page .summary-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px 24px;
-  min-width: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.quotations-page .summary-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-}
-
-.quotations-page .summary-value {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
 .quotations-page .grid-container {
   width: 100%;
   height: calc(100vh - 250px);
@@ -140,15 +110,5 @@
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
-  }
-
-  .quotations-page .summary-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .quotations-page .summary-card {
-    min-width: auto;
-    padding: 12px;
   }
 }

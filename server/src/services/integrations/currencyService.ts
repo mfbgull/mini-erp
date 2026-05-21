@@ -5,6 +5,9 @@
 
 import axios from 'axios';
 import db from '../../config/database';
+import logger from '../../utils/logger';
+import { decryptIfNeeded } from '../../utils/encryption';
+import { Setting, FixerResponse } from '../../types';
 
 interface ExchangeRates {
   base: string;
@@ -30,15 +33,15 @@ class CurrencyService {
    */
   private loadSettings(): void {
     try {
-      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'currency_%'").all() as any[];
+      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'currency_%'").all() as Setting[];
 
-      settings.forEach((setting: any) => {
+      settings.forEach((setting) => {
         switch (setting.key) {
           case 'currency_enabled':
             this.enabled = setting.value === 'true';
             break;
           case 'currency_api_key':
-            this.apiKey = setting.value;
+            this.apiKey = decryptIfNeeded(setting.value);
             break;
           case 'currency_base':
             this.baseCurrency = setting.value || 'USD';
@@ -49,7 +52,7 @@ class CurrencyService {
         }
       });
     } catch (error) {
-      console.error('[CurrencyService] Failed to load settings:', error);
+      logger.error('[CurrencyService] Failed to load settings:', error);
     }
   }
 
@@ -82,7 +85,7 @@ class CurrencyService {
     // Check cache
     const now = Date.now();
     if (this.cachedRates && (now - this.lastUpdate) < this.updateInterval) {
-      console.log('[CurrencyService] Using cached exchange rates');
+      logger.info('[CurrencyService] Using cached exchange rates');
       return {
         success: true,
         data: this.cachedRates
@@ -101,27 +104,27 @@ class CurrencyService {
 
       const response = await axios.get(`${this.baseUrl}/latest`, { params });
 
-      if ((response.data as any).success === false) {
+      if ((response.data as FixerResponse).success === false) {
         return {
           success: false,
-          message: (response.data as any).error?.info || 'Failed to fetch exchange rates'
+          message: (response.data as FixerResponse).error?.info || 'Failed to fetch exchange rates'
         };
       }
 
       this.cachedRates = {
-        base: (response.data as any).base,
-        date: (response.data as any).date,
-        rates: (response.data as any).rates
+        base: (response.data as FixerResponse).base || '',
+        date: (response.data as FixerResponse).date || '',
+        rates: (response.data as FixerResponse).rates || {}
       };
       this.lastUpdate = now;
 
-      console.log(`[CurrencyService] Updated exchange rates for ${response.data.base}`);
+      logger.info(`[CurrencyService] Updated exchange rates for ${response.data.base}`);
       return {
         success: true,
         data: this.cachedRates
       };
     } catch (error: any) {
-      console.error('[CurrencyService] Failed to fetch exchange rates:', error);
+      logger.error('[CurrencyService] Failed to fetch exchange rates:', error);
       return {
         success: false,
         message: error.message || 'Failed to fetch exchange rates'
@@ -220,7 +223,7 @@ class CurrencyService {
   clearCache(): void {
     this.cachedRates = null;
     this.lastUpdate = 0;
-    console.log('[CurrencyService] Cache cleared');
+    logger.info('[CurrencyService] Cache cleared');
   }
 }
 

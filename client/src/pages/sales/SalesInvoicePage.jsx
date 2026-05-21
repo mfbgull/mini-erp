@@ -34,8 +34,8 @@ const createEmptyItemRow = (index) => ({
   discount: { type: 'flat', value: 0 }
 });
 
-// Helper: pad items array to minimum 10 rows
-const padItemsToMinimum = (items, min = 10) => {
+// Helper: pad items array to minimum 1 rows
+const padItemsToMinimum = (items, min = 1) => {
   if (items.length >= min) return items;
   const padded = [...items];
   const now = Date.now();
@@ -108,7 +108,7 @@ export default function SalesInvoicePage() {
     customer_address: '',
     discountScope: 'invoice',
     discount: { type: 'flat', value: 0 },
-    items: Array.from({ length: 10 }, (_, i) => createEmptyItemRow(i)),
+    items: Array.from({ length: 1 }, (_, i) => createEmptyItemRow(i)),
     notes: 'Thank you for your business. Payment is due within 14 days.',
     terms: 'Net 14 days. Late payments subject to 1.5% monthly interest.',
     created_by: null,
@@ -138,7 +138,6 @@ export default function SalesInvoicePage() {
   const lastFocusedCellRef = useRef(null);
   const tableContainerRef = useRef(null);
   const pendingFocusRef = useRef(null);
-  const paymentAmountInputRef = useRef(null);
   const [existingPayments, setExistingPayments] = useState([]);
   const [showNewPaymentForm, setShowNewPaymentForm] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
@@ -275,7 +274,7 @@ export default function SalesInvoicePage() {
     if (!invoiceId) {
       if (invoice.payment.record_payment) {
         const total = calculateTotal();
-        const paymentAmount = invoice.payment.payment_amount;
+        const paymentAmount = invoice.paymentMethods.reduce((sum, m) => sum + (parseFloat(m.amount) || 0), 0);
         if (paymentAmount >= total) {
           return 'Paid';
         } else if (paymentAmount > 0) {
@@ -459,7 +458,7 @@ export default function SalesInvoicePage() {
         const activeTag = document.activeElement?.tagName;
         if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
           e.preventDefault();
-          paymentAmountInputRef.current?.focus();
+          document.querySelector('.payment-method-amount')?.focus();
         }
       }
     };
@@ -1324,7 +1323,7 @@ export default function SalesInvoicePage() {
           handleSave();
           setEditingCell(`${newItemId}-${field}`);
           focusTargetCell(newItemId, field);
-        } else if (rowOffset > 0 && newItemIndex >= invoice.items.length) {
+      } else if (rowOffset > 0 && newItemIndex >= invoice.items.length) {
           // Add new row when going down past last row
           handleSave();
           const newItemId = addNewItem();
@@ -1399,7 +1398,7 @@ export default function SalesInvoicePage() {
         // Shift+Enter: Focus payment amount field
         if (e.shiftKey) {
           handleSave();
-          paymentAmountInputRef.current?.focus();
+          document.querySelector('.payment-method-amount')?.focus();
           return;
         }
         handleSave();
@@ -2034,21 +2033,6 @@ export default function SalesInvoicePage() {
                 <div className="payment-fields">
                   <div className="payment-row">
                     <FormInput
-                      inputRef={paymentAmountInputRef}
-                      label="Amount"
-                      name="payment_amount"
-                      type="number"
-                      step="0.01"
-                      value={invoice.payment.payment_amount}
-                      onChange={(e) => setInvoice({
-                        ...invoice,
-                        payment: { ...invoice.payment, payment_amount: parseFloat(e.target.value) || 0 }
-                      })}
-                    />
-                  </div>
-
-                  <div className="payment-row">
-                    <FormInput
                       label="Payment Date"
                       name="payment_date"
                       type="date"
@@ -2088,7 +2072,7 @@ export default function SalesInvoicePage() {
                           </div>
 
                           <div className="payment-method-field">
-                            <label>Amount</label>
+                            <label>Amount (Shif+Enter)</label>
                             <input
                               type="number"
                               step="0.01"

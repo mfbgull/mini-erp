@@ -17,6 +17,7 @@ import Button from '../../components/common/Button';
 import CompactSalesSummaryCardView from '../../components/common/CompactSalesSummaryCard';
 import DateRangePicker from '../../components/common/DateRangePicker';
 import SearchableSelect from '../../components/common/SearchableSelect';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
@@ -324,55 +325,28 @@ export default function SalesSummaryReport() {
       )}
 
       {reportData?.summary && (
-        <div className="report-summary">
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <FileText size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalInvoices}</div>
-                <div className="summary-label">Total Invoices</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <DollarSign size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{formatCurrency(reportData.summary.totalSales)}</div>
-                <div className="summary-label">Total Sales</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <Package size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalItemsSold}</div>
-                <div className="summary-label">Items Sold</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <TrendingUp size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{formatCurrency(reportData.summary.averageInvoiceValue)}</div>
-                <div className="summary-label">Avg. Invoice Value</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatsGrid>
+          <StatCard
+            icon={FileText}
+            label="Total Invoices"
+            value={reportData.summary.totalInvoices}
+          />
+          <StatCard
+            icon={DollarSign}
+            label="Total Sales"
+            value={formatCurrency(reportData.summary.totalSales)}
+          />
+          <StatCard
+            icon={Package}
+            label="Items Sold"
+            value={reportData.summary.totalItemsSold}
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Avg. Invoice Value"
+            value={formatCurrency(reportData.summary.averageInvoiceValue)}
+          />
+        </StatsGrid>
       )}
 
       <div className="report-content" ref={gridRef}>
@@ -385,7 +359,7 @@ export default function SalesSummaryReport() {
             <CompactSalesSummaryCardView sales={reportData.sales} />
           ) : (
             <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.sales || []}
                 columnDefs={columnDefs}
                 defaultColDef={{

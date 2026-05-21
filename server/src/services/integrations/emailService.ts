@@ -5,6 +5,9 @@
 
 import sgMail from '@sendgrid/mail';
 import db from '../../config/database';
+import logger from '../../utils/logger';
+import { decryptIfNeeded } from '../../utils/encryption';
+import { Setting, EmailResponse } from '../../types';
 
 interface EmailAttachment {
   filename: string;
@@ -35,15 +38,15 @@ class EmailService {
    */
   private loadSettings(): void {
     try {
-      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'sendgrid_%'").all() as any[];
+      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'sendgrid_%'").all() as Setting[];
 
-      settings.forEach((setting: any) => {
+      settings.forEach((setting) => {
         switch (setting.key) {
           case 'sendgrid_enabled':
             this.enabled = setting.value === 'true';
             break;
           case 'sendgrid_api_key':
-            this.apiKey = setting.value;
+            this.apiKey = decryptIfNeeded(setting.value);
             break;
           case 'sendgrid_from_email':
             this.fromEmail = setting.value;
@@ -58,7 +61,7 @@ class EmailService {
         sgMail.setApiKey(this.apiKey);
       }
     } catch (error) {
-      console.error('[EmailService] Failed to load settings:', error);
+      logger.error('[EmailService] Failed to load settings:', error);
     }
   }
 
@@ -107,10 +110,10 @@ class EmailService {
 
       await sgMail.send(message);
 
-      console.log(`[EmailService] Email sent to: ${options.to}`);
+      logger.info(`[EmailService] Email sent to: ${options.to}`);
       return { success: true, message: 'Email sent successfully' };
     } catch (error: any) {
-      console.error('[EmailService] Failed to send email:', error);
+      logger.error('[EmailService] Failed to send email:', error);
       return {
         success: false,
         message: error.response?.body?.errors?.[0]?.message || error.message || 'Failed to send email'

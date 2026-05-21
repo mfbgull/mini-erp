@@ -157,7 +157,7 @@ export default function WarehousesPage() {
         </div>
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={filteredWarehouses}
             columnDefs={columnDefs}
 defaultColDef={{

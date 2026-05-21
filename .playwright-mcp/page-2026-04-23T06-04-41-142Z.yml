@@ -1,0 +1,6 @@
+- generic [ref=e3]:
+  - img "Mini ERP" [ref=e7]
+  - generic [ref=e9]:
+    - generic [ref=e12]: Loading...
+    - button "Open quick actions menu" [ref=e13] [cursor=pointer]:
+      - img [ref=e14]

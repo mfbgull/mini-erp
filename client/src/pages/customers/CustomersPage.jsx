@@ -333,7 +333,7 @@ export default function CustomersPage() {
         />
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={customers}
             columnDefs={columnDefs}
             defaultColDef={{

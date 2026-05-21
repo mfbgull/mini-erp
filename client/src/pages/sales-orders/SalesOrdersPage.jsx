@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { ShoppingCart, Plus, Eye, Edit2, Trash2, ArrowRight } from 'lucide-react';
+import { ShoppingCart, FileText, Clock, CheckCircle, Send, Plus, Eye, Edit2, Trash2, ArrowRight } from 'lucide-react';
 
 import Button from '../../components/common/Button';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
@@ -202,27 +203,15 @@ export default function SalesOrdersPage() {
         </Button>
       </div>
 
-      <div className="summary-cards">
-        <div className="summary-card">
-          <span className="summary-label">{t('common.total')}</span>
-          <span className="summary-value">{orderTotals.count}</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-label">{t('salesOrders.draft')}</span>
-          <span className="summary-value">{orderTotals.draft}</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-label">{t('salesOrders.confirmed')}</span>
-          <span className="summary-value">{orderTotals.confirmed}</span>
-        </div>
-        <div className="summary-card">
-          <span className="summary-label">{t('salesOrders.invoiced')}</span>
-          <span className="summary-value">{orderTotals.invoiced}</span>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={ShoppingCart} label={t('common.total')} value={orderTotals.count} />
+        <StatCard icon={FileText} label={t('salesOrders.draft')} value={orderTotals.draft} />
+        <StatCard icon={CheckCircle} label={t('salesOrders.confirmed')} value={orderTotals.confirmed} />
+        <StatCard icon={Send} label={t('salesOrders.invoiced')} value={orderTotals.invoiced} />
+      </StatsGrid>
 
       <div className="grid-container ag-theme-alpine">
-        <AgGridReact
+        <AgGridReact theme="legacy"
           rowData={salesOrders}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}

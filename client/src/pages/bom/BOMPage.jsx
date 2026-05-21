@@ -19,6 +19,7 @@ import Button from "../../components/common/Button";
 import { CompactBOMCardView } from "../../components/common/CompactBOMCard";
 import FormInput from "../../components/common/FormInput";
 import Modal from "../../components/common/Modal";
+import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import SearchableSelect from "../../components/common/SearchableSelect";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
@@ -279,61 +280,12 @@ export default function BOMPage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-purple">
-            <ClipboardList size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Total BOMs</div>
-            <div className="stat-value">{stats.totalBOMs}</div>
-            <div className="stat-subtitle">All recipes</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-green">
-            <CheckCircle size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Active BOMs</div>
-            <div className="stat-value">{stats.activeBOMs}</div>
-            <div className="stat-subtitle">In use</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-orange">
-            <Factory size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Finished Goods</div>
-            <div className="stat-value">{stats.uniqueFinishedGoods}</div>
-            <div className="stat-subtitle">Unique products</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div
-            className="stat-icon"
-            style={{
-              background: "linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)",
-            }}
-          >
-            <AlertTriangle size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Inactive BOMs</div>
-            <div className="stat-value">
-              {
-                boms.filter((b) => b.is_active === 0 || b.is_active === false)
-                  .length
-              }
-            </div>
-            <div className="stat-subtitle">Not in use</div>
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={ClipboardList} label="Total BOMs" value={stats.totalBOMs} subtitle="All recipes" />
+        <StatCard icon={CheckCircle} label="Active BOMs" value={stats.activeBOMs} subtitle="In use" />
+        <StatCard icon={Factory} label="Finished Goods" value={stats.uniqueFinishedGoods} subtitle="Unique products" />
+        <StatCard icon={AlertTriangle} label="Inactive BOMs" value={boms.filter((b) => b.is_active === 0 || b.is_active === false).length} subtitle="Not in use" />
+      </StatsGrid>
 
       {/* Quick Actions */}
       <div className="quick-actions">
@@ -392,7 +344,7 @@ export default function BOMPage() {
         />
       ) : (
         <div className="ag-theme-quartz ag-grid-container">
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={boms}
             columnDefs={columnDefs}
             defaultColDef={{

@@ -1,0 +1,56 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "Mini ERP" [ref=e6] [cursor=pointer]:
+      - /url: /
+      - img "Mini ERP" [ref=e7]
+    - navigation [ref=e8]:
+      - link "Dashboard Alt+1" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e10]: Dashboard
+        - generic [ref=e11]: Alt+1
+      - button "Inventory" [ref=e12]:
+        - button "Inventory" [ref=e13] [cursor=pointer]:
+          - generic [ref=e14]: Inventory
+          - img [ref=e15]
+      - button "Sales" [ref=e17]:
+        - button "Sales" [ref=e18] [cursor=pointer]:
+          - generic [ref=e19]: Sales
+          - img [ref=e20]
+      - button "Reports" [ref=e22]:
+        - button "Reports" [ref=e23] [cursor=pointer]:
+          - generic [ref=e24]: Reports
+          - img [ref=e25]
+      - button "Forecasts" [ref=e27]:
+        - button "Forecasts" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: Forecasts
+          - img [ref=e30]
+      - button "Purchases" [ref=e32]:
+        - button "Purchases" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: Purchases
+          - img [ref=e35]
+      - link "BOM" [ref=e37] [cursor=pointer]:
+        - /url: /bom
+        - generic [ref=e38]: BOM
+      - link "Production" [ref=e39] [cursor=pointer]:
+        - /url: /production
+        - generic [ref=e40]: Production
+      - button "More" [ref=e41]:
+        - button "More" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: More
+          - img [ref=e44]
+    - generic [ref=e46]:
+      - button "Switch to Sidebar" [ref=e47] [cursor=pointer]:
+        - img [ref=e48]
+      - button "Switch to light mode" [ref=e50] [cursor=pointer]:
+        - img [ref=e51]
+      - button "اردو میں تبدیل کریں" [ref=e57] [cursor=pointer]:
+        - img [ref=e58]
+      - button "F Fawad" [ref=e62]:
+        - button "F Fawad" [ref=e63] [cursor=pointer]:
+          - generic [ref=e64]: F
+          - generic [ref=e65]: Fawad
+          - img [ref=e66]
+  - generic [ref=e69]:
+    - generic [ref=e72]: Loading...
+    - button "Open quick actions menu" [ref=e73] [cursor=pointer]:
+      - img [ref=e74]

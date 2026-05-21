@@ -38,6 +38,7 @@ function recordProduction(req: AuthRequest, res: Response): void {
 
     // Log production creation using activity logger
     logCRUD(ActionType.WO_CREATE, 'WorkOrder', production.id, `Created production: ${production.production_no} - ${production.output_item_name} (${production.output_quantity} units)`, req.user!.id);
+    req.activityLogged = true;
 
     res.status(201).json(production);
   } catch (error: any) {
@@ -106,6 +107,7 @@ function deleteProduction(req: AuthRequest, res: Response): void {
     // Log production deletion using activity logger
     if (production) {
       logCRUD(ActionType.WO_DELETE, 'WorkOrder', productionId, `Deleted production: ${production.production_no}`, req.user!.id);
+      req.activityLogged = true;
     }
 
     res.json({ success: true, message: 'Production deleted successfully' });

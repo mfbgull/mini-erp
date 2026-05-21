@@ -62,7 +62,15 @@ function createDefaultUser(): void {
   const existingUser = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
 
   if (!existingUser) {
-    const passwordHash = bcrypt.hashSync('admin123', 12);
+    const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+    if (!defaultPassword && process.env.NODE_ENV !== 'production') {
+      // For development only, provide a clear warning but allow fallback
+      logger.warn('WARNING: DEFAULT_ADMIN_PASSWORD not set, using development-only fallback. DO NOT USE IN PRODUCTION.');
+    }
+    if (!defaultPassword) {
+      throw new Error('FATAL: DEFAULT_ADMIN_PASSWORD environment variable must be set');
+    }
+    const passwordHash = bcrypt.hashSync(defaultPassword, 12);
 
     const stmt = db.prepare(`
       INSERT INTO users (username, email, password_hash, full_name, role, is_active)
@@ -71,7 +79,7 @@ function createDefaultUser(): void {
 
     stmt.run('admin', 'admin@minierp.local', passwordHash, 'Administrator', 'admin', 1);
 
-    logger.info('✅ Default admin user created (username: admin, password: admin123)');
+    logger.info('✅ Default admin user created');
   }
 }
 
@@ -639,6 +647,30 @@ function runMobileInvoiceMigration(): void {
   }
 }
 
+function runPerformanceIndexesMigration(): void {
+  try {
+    const indexCheck = db.prepare(`
+      SELECT COUNT(*) as count FROM sqlite_master
+      WHERE type='index' AND name='idx_items_category'
+    `).get() as { count: number };
+
+    if (indexCheck.count === 0) {
+      logger.info('Running performance indexes migration...');
+
+      const indexSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-performance-indexes.sql'),
+        'utf8'
+      );
+
+      db.exec(indexSQL);
+
+      logger.info('✅ Performance indexes migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Performance indexes migration error:', error.message);
+  }
+}
+
 function runMissingIndexesMigration(): void {
   try {
     const indexCheck = db.prepare(`
@@ -663,6 +695,30 @@ function runMissingIndexesMigration(): void {
   }
 }
 
+function runMissingFKIndexesMigration(): void {
+  try {
+    const indexCheck = db.prepare(`
+      SELECT COUNT(*) as count FROM sqlite_master
+      WHERE type='index' AND name='idx_invoices_so_id'
+    `).get() as { count: number };
+
+    if (indexCheck.count === 0) {
+      logger.info('Running missing FK indexes migration...');
+
+      const indexSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-missing-fk-indexes.sql'),
+        'utf8'
+      );
+
+      db.exec(indexSQL);
+
+      logger.info('✅ Missing FK indexes migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Missing FK indexes migration error:', error.message);
+  }
+}
+
 initializeDatabase();
 runExpensesMigration();
 runPurchasesMigration();
@@ -674,9 +730,24 @@ runActivityLogMigration();
 runRawMaterialsWarehouseMigration();
 runProductionInputsWarehouseMigration();
 runMobileInvoiceMigration();
+runPerformanceIndexesMigration();
 runMissingIndexesMigration();
+runMissingFKIndexesMigration();
 runProductionOverheadMigration();
 runRolesPermissionsMigration();
+runStockAdjustmentFinancialMigration();
+runMissingFKIndexesMigration();
+
+// Rollback support: run if --rollback flag is passed
+if (process.argv.includes('--rollback')) {
+  const targetMigration = process.argv.find(arg => arg.startsWith('--rollback='));
+  if (targetMigration) {
+    const migrationName = targetMigration.split('=')[1];
+    runRollback(migrationName);
+  } else {
+    runRollbackAll();
+  }
+}
 
 export default db;
 
@@ -866,4 +937,63 @@ function seedDefaultPermissions(): void {
   } catch (error: any) {
     logger.error('Seed default permissions error:', error.message);
   }
+}
+
+function runStockAdjustmentFinancialMigration(): void {
+  try {
+    const hasFinancialValue = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('stock_movements') WHERE name='financial_value'`
+    ).get() as { count: number };
+
+    if (hasFinancialValue.count === 0) {
+      logger.info('Running stock adjustment financial migration...');
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-stock-adjustment-financial.sql'),
+        'utf8'
+      );
+      db.exec(migrationSQL);
+      logger.info('✅ Stock adjustment financial migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Stock adjustment financial migration error:', error.message);
+  }
+}
+
+function runRollback(migrationName: string): void {
+  const rollbackFile = path.join(__dirname, '../migrations/rollbacks/rollback-' + migrationName + '.sql');
+  if (!fs.existsSync(rollbackFile)) {
+    logger.error(`Rollback file not found: ${rollbackFile}`);
+    process.exit(1);
+  }
+  logger.info(`Running rollback for migration: ${migrationName}`);
+  try {
+    const rollbackSQL = fs.readFileSync(rollbackFile, 'utf8');
+    db.exec(rollbackSQL);
+    logger.info(`✅ Rollback completed for: ${migrationName}`);
+  } catch (error: any) {
+    logger.error(`Rollback error for ${migrationName}:`, error.message);
+    process.exit(1);
+  }
+}
+
+function runRollbackAll(): void {
+  const rollbacksDir = path.join(__dirname, '../migrations/rollbacks');
+  if (!fs.existsSync(rollbacksDir)) {
+    logger.error('Rollbacks directory not found');
+    process.exit(1);
+  }
+  const files = fs.readdirSync(rollbacksDir).filter(f => f.endsWith('.sql')).sort().reverse();
+  logger.info(`Running ${files.length} rollbacks in reverse order...`);
+  for (const file of files) {
+    const migrationName = file.replace('rollback-', '').replace('.sql', '');
+    logger.info(`Rolling back: ${migrationName}`);
+    try {
+      const rollbackSQL = fs.readFileSync(path.join(rollbacksDir, file), 'utf8');
+      db.exec(rollbackSQL);
+      logger.info(`✅ Rolled back: ${migrationName}`);
+    } catch (error: any) {
+      logger.error(`Rollback error for ${migrationName}:`, error.message);
+    }
+  }
+  logger.info('✅ All rollbacks completed');
 }

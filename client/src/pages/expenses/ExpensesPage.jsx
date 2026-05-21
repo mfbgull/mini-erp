@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 import Button from "../../components/common/Button";
+import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import { useTranslation } from "../../hooks/useTranslation";
 import { CompactExpenseCardView } from "../../components/common/CompactExpenseCard";
 import DateRangePicker from "../../components/common/DateRangePicker";
@@ -543,63 +544,12 @@ export default function ExpensesPage() {
         </div>
       )}
 
-      <div className="expenses-summary">
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <DollarSign size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">
-                {formatCurrency(
-                  expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0),
-                )}
-              </div>
-              <div className="summary-label">Total Expenses</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <FileText size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">{expenses.length}</div>
-              <div className="summary-label">Total Records</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <CheckCircle size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">
-                {expenses.filter((exp) => exp.status === "Paid").length}
-              </div>
-              <div className="summary-label">Paid Expenses</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="summary-card">
-          <div className="summary-content">
-            <div className="summary-icon">
-              <AlertCircle size={24} />
-            </div>
-            <div className="summary-text">
-              <div className="summary-value">
-                {expenses.filter((exp) => exp.status !== "Paid").length}
-              </div>
-              <div className="summary-label">Pending Expenses</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={DollarSign} label="Total Expenses" value={formatCurrency(expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0))} />
+        <StatCard icon={FileText} label="Total Records" value={expenses.length} />
+        <StatCard icon={CheckCircle} label="Paid Expenses" value={expenses.filter((exp) => exp.status === "Paid").length} />
+        <StatCard icon={AlertCircle} label="Pending Expenses" value={expenses.filter((exp) => exp.status !== "Paid").length} />
+      </StatsGrid>
 
       <div className="expenses-content">
         {isLoading ? (
@@ -614,7 +564,7 @@ export default function ExpensesPage() {
           />
         ) : expenses.length > 0 ? (
           <div className="ag-theme-quartz ag-grid-container">
-            <AgGridReact
+            <AgGridReact theme="legacy"
               rowData={filteredExpenses}
               columnDefs={columnDefs}
               defaultColDef={{

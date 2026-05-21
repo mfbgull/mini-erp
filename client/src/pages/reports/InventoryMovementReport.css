@@ -81,48 +81,6 @@
   margin-bottom: 20px;
 }
 
-.inventory-movement-report .summary-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.inventory-movement-report .summary-content {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.inventory-movement-report .summary-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--primary-light);
-  color: var(--primary);
-}
-
-.inventory-movement-report .summary-text {
-  flex: 1;
-}
-
-.inventory-movement-report .summary-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--text-primary);
-}
-
-.inventory-movement-report .summary-label {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-top: 5px;
-}
 
 .inventory-movement-report .movement-in {
   color: var(--success);

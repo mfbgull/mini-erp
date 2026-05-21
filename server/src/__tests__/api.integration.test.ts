@@ -1,6 +1,26 @@
 import request from 'supertest';
 import app from '../app';
 
+const TEST_PASSWORD = process.env.TEST_ADMIN_PASSWORD;
+if (!TEST_PASSWORD) {
+  throw new Error(
+    'TEST_ADMIN_PASSWORD environment variable must be set for integration tests.'
+  );
+}
+
+// Helper: authenticate and return cookie jar
+async function getAuthCookie() {
+  const res = await request(app)
+    .post('/api/auth/login')
+    .send({ username: 'admin', password: TEST_PASSWORD });
+  const cookies = res.headers['set-cookie'];
+  if (!cookies) return '';
+  const tokenCookie = (Array.isArray(cookies) ? cookies : [cookies])
+    .find((c: string) => c.startsWith('token='));
+  if (!tokenCookie) return '';
+  return tokenCookie.split(';')[0];
+}
+
 describe('Health Endpoint', () => {
   it('GET /health returns status ok', async () => {
     const res = await request(app).get('/health');
@@ -31,7 +51,7 @@ describe('Auth Endpoints', () => {
   it('POST /api/auth/login - accepts valid credentials', async () => {
     const res = await request(app)
       .post('/api/auth/login')
-      .send({ username: 'admin', password: 'admin123' });
+      .send({ username: 'admin', password: TEST_PASSWORD });
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.user).toHaveProperty('username', 'admin');
@@ -45,6 +65,7 @@ describe('Auth Endpoints', () => {
         token = tokenCookie.split(';')[0].split('=')[1];
       }
     }
+    expect(token).toBeTruthy();
   });
 
   it('GET /api/auth/me - rejects unauthenticated requests', async () => {
@@ -53,7 +74,7 @@ describe('Auth Endpoints', () => {
   });
 
   it('GET /api/auth/me - returns current user with token', async () => {
-    if (!token) return; // skip if login didn't work
+    expect(token).toBeTruthy();
     const res = await request(app)
       .get('/api/auth/me')
       .set('Cookie', `token=${token}`);
@@ -63,8 +84,16 @@ describe('Auth Endpoints', () => {
 });
 
 describe('Customers Endpoints', () => {
+  let authCookie: string;
+
+  beforeAll(async () => {
+    authCookie = await getAuthCookie();
+  });
+
   it('GET /api/customers - returns paginated customers list', async () => {
-    const res = await request(app).get('/api/customers');
+    const res = await request(app)
+      .get('/api/customers')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body).toHaveProperty('data');
@@ -73,36 +102,50 @@ describe('Customers Endpoints', () => {
   });
 
   it('GET /api/customers - supports search parameter', async () => {
-    const res = await request(app).get('/api/customers?search=test');
+    const res = await request(app)
+      .get('/api/customers?search=test')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
   });
 
   it('GET /api/customers - supports sorting', async () => {
-    const res = await request(app).get('/api/customers?sortBy=customer_name&sortOrder=DESC');
+    const res = await request(app)
+      .get('/api/customers?sortBy=customer_name&sortOrder=DESC')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
   });
 
   it('GET /api/customers - rejects invalid sort column (SQL injection)', async () => {
-    const res = await request(app).get('/api/customers?sortBy=id;DROP%20TABLE%20customers;--');
-    // Should either use default sort or return validation error
+    const res = await request(app)
+      .get('/api/customers?sortBy=id;DROP%20TABLE%20customers;--')
+      .set('Cookie', authCookie);
     expect([200, 400]).toContain(res.status);
     if (res.status === 200) {
-      // Data should still be returned (with safe default sort)
       expect(res.body.success).toBe(true);
     }
   });
 
   it('GET /api/customers/:id - returns 404 for non-existent customer', async () => {
-    const res = await request(app).get('/api/customers/99999');
+    const res = await request(app)
+      .get('/api/customers/99999')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(404);
   });
 });
 
 describe('Payments Endpoints', () => {
+  let authCookie: string;
+
+  beforeAll(async () => {
+    authCookie = await getAuthCookie();
+  });
+
   it('GET /api/payments - returns paginated payments list', async () => {
-    const res = await request(app).get('/api/payments');
+    const res = await request(app)
+      .get('/api/payments')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body).toHaveProperty('data');
@@ -110,45 +153,67 @@ describe('Payments Endpoints', () => {
   });
 
   it('GET /api/payments - supports date range filtering', async () => {
-    const res = await request(app).get('/api/payments?fromDate=2025-01-01&toDate=2026-12-31');
+    const res = await request(app)
+      .get('/api/payments?fromDate=2025-01-01&toDate=2026-12-31')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
   });
 
   it('GET /api/payments/:id - returns 404 for non-existent payment', async () => {
-    const res = await request(app).get('/api/payments/99999');
+    const res = await request(app)
+      .get('/api/payments/99999')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(404);
   });
 });
 
 describe('Reports Endpoints', () => {
+  let authCookie: string;
+
+  beforeAll(async () => {
+    authCookie = await getAuthCookie();
+  });
+
   it('GET /api/reports/ar-aging - returns AR aging report', async () => {
-    const res = await request(app).get('/api/reports/ar-aging');
+    const res = await request(app)
+      .get('/api/reports/ar-aging')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
   });
 
   it('GET /api/reports/dso - returns DSO metric', async () => {
-    const res = await request(app).get('/api/reports/dso');
+    const res = await request(app)
+      .get('/api/reports/dso')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
   });
 
   it('GET /api/reports/dso - rejects invalid period', async () => {
-    const res = await request(app).get('/api/reports/dso?period=abc');
+    const res = await request(app)
+      .get('/api/reports/dso?period=abc')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(400);
   });
 
   it('GET /api/reports/sales-summary - returns sales summary', async () => {
-    const res = await request(app).get('/api/reports/sales-summary');
+    const res = await request(app)
+      .get('/api/reports/sales-summary')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
   });
 
   it('GET /api/reports/stock-level - returns stock level report', async () => {
-    const res = await request(app).get('/api/reports/stock-level');
+    const res = await request(app)
+      .get('/api/reports/stock-level')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
   });
 
   it('GET /api/reports/low-stock - returns low stock report', async () => {
-    const res = await request(app).get('/api/reports/low-stock');
+    const res = await request(app)
+      .get('/api/reports/low-stock')
+      .set('Cookie', authCookie);
     expect(res.status).toBe(200);
   });
 });
@@ -157,18 +222,19 @@ describe('Inventory Endpoints', () => {
   let token: string;
 
   beforeAll(async () => {
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ username: 'admin', password: 'admin123' });
-    const cookies = res.headers['set-cookie'];
-    if (cookies) {
-      const tokenCookie = (Array.isArray(cookies) ? cookies : [cookies])
-        .find((c: string) => c.startsWith('token='));
-      if (tokenCookie) {
-        token = tokenCookie.split(';')[0].split('=')[1];
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ username: 'admin', password: TEST_PASSWORD });
+      const cookies = res.headers['set-cookie'];
+      if (cookies) {
+        const tokenCookie = (Array.isArray(cookies) ? cookies : [cookies])
+          .find((c: string) => c.startsWith('token='));
+        if (tokenCookie) {
+          token = tokenCookie.split(';')[0].split('=')[1];
+        }
       }
-    }
-  });
+      expect(token).toBeTruthy();
+    });
 
   it('GET /api/inventory/items - rejects unauthenticated requests', async () => {
     const res = await request(app).get('/api/inventory/items');
@@ -198,27 +264,41 @@ describe('Inventory Endpoints', () => {
 });
 
 describe('Security Tests', () => {
+  let authCookie: string;
+
+  beforeAll(async () => {
+    authCookie = await getAuthCookie();
+  });
+
   it('SQL injection via sortBy parameter is blocked', async () => {
-    const res = await request(app).get('/api/customers?sortBy=id;DROP TABLE customers;--');
-    // Should not crash and should return valid response
+    const res = await request(app)
+      .get('/api/customers?sortBy=id;DROP TABLE customers;--')
+      .set('Cookie', authCookie);
     expect([200, 400]).toContain(res.status);
 
-    // Verify table still exists
-    const check = await request(app).get('/api/customers');
+    const check = await request(app)
+      .get('/api/customers')
+      .set('Cookie', authCookie);
     expect(check.status).toBe(200);
     expect(check.body.success).toBe(true);
   });
 
   it('SQL injection via sortOrder parameter is blocked', async () => {
-    const res = await request(app).get('/api/payments?sortOrder=DESC;DELETE FROM payments;--');
+    const res = await request(app)
+      .get('/api/payments?sortOrder=DESC;DELETE FROM payments;--')
+      .set('Cookie', authCookie);
     expect([200, 400]).toContain(res.status);
 
-    const check = await request(app).get('/api/payments');
+    const check = await request(app)
+      .get('/api/payments')
+      .set('Cookie', authCookie);
     expect(check.status).toBe(200);
   });
 
   it('SQL injection via period parameter is blocked', async () => {
-    const res = await request(app).get("/api/reports/dso?period=30';DELETE FROM invoices;--");
+    const res = await request(app)
+      .get("/api/reports/dso?period=30';DELETE FROM invoices;--")
+      .set('Cookie', authCookie);
     expect(res.status).toBe(400);
   });
 });

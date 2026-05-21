@@ -21,6 +21,7 @@ import {
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
 import SearchableSelect from '../../components/common/SearchableSelect';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -396,43 +397,23 @@ export default function ExpensesReport() {
       )}
 
       {reportData?.summary && (
-        <div className="report-summary">
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <DollarSign size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{formatCurrency(reportData.summary.totalAmount)}</div>
-                <div className="summary-label">Total Expenses</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <FileText size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalExpenses}</div>
-                <div className="summary-label">Total Records</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <CheckCircle size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{formatCurrency(reportData.summary.averageAmount)}</div>
-                <div className="summary-label">Average Expense</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatsGrid>
+          <StatCard
+            icon={DollarSign}
+            label="Total Expenses"
+            value={formatCurrency(reportData.summary.totalAmount)}
+          />
+          <StatCard
+            icon={FileText}
+            label="Total Records"
+            value={reportData.summary.totalExpenses}
+          />
+          <StatCard
+            icon={CheckCircle}
+            label="Average Expense"
+            value={formatCurrency(reportData.summary.averageAmount)}
+          />
+        </StatsGrid>
       )}
 
       {reportData?.categoryBreakdown && reportData.categoryBreakdown.length > 0 && (
@@ -459,7 +440,7 @@ export default function ExpensesReport() {
           <>
             {/* Desktop view - AG Grid */}
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.expenses}
                 columnDefs={columnDefs}
                 defaultColDef={{

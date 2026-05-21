@@ -188,23 +188,6 @@
   box-shadow: 0 0 0 3px var(--primary-100) !important;
 }
 
-/* Reset KPI Cards to Default */
-.theme-default .kpi-card {
-  background: white !important;
-  border-radius: var(--radius-md) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-  border: none !important;
-}
-
-.theme-default .kpi-card:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
-}
-
-.theme-default .kpi-icon {
-  border-radius: var(--radius-md) !important;
-}
-
 /* Reset Sidebar to Default */
 .theme-default .sidebar {
   background: var(--neutral-100) !important;
@@ -284,7 +267,6 @@
 /* Reset Transitions to Default */
 .theme-default .btn,
 .theme-default .card,
-.theme-default .kpi-card,
 .theme-default .quick-action-btn {
   transition: all 0.2s !important;
 }

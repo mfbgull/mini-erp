@@ -285,7 +285,7 @@ export default function LowStockReport() {
           <>
             {/* Desktop view - AG Grid */}
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData}
                 columnDefs={columnDefs}
                 defaultColDef={{

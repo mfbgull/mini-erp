@@ -1,27 +1,14 @@
 import { Link } from 'react-router-dom';
 
 import { useQuery } from '@tanstack/react-query';
-import { 
-  TrendingUp, Package, AlertTriangle, CheckCircle, 
-  ArrowRight, RefreshCw 
+import {
+  TrendingUp, Package, AlertTriangle, CheckCircle,
+  ArrowRight, RefreshCw, BarChart3
 } from 'lucide-react';
 
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import api from '../../utils/api';
 import './ForecastDashboard.css';
-
-function SummaryCard({ icon: Icon, label, value, variant }) {
-  return (
-    <div className={`forecast-summary-card ${variant || ''}`}>
-      <div className="forecast-summary-icon">
-        <Icon size={24} />
-      </div>
-      <div className="forecast-summary-content">
-        <span className="forecast-summary-label">{label}</span>
-        <span className="forecast-summary-value">{value}</span>
-      </div>
-    </div>
-  );
-}
 
 function AlertCard({ alert }) {
   const levelColors = {
@@ -81,30 +68,12 @@ export default function ForecastDashboard() {
         </button>
       </div>
       
-      <div className="forecast-summary-grid">
-        <SummaryCard 
-          icon={Package} 
-          label="Tracked Items" 
-          value={summary.totalItems} 
-        />
-        <SummaryCard 
-          icon={AlertTriangle} 
-          label="Need Restock" 
-          value={summary.itemsNeedingRestock}
-          variant={summary.itemsNeedingRestock > 0 ? 'warning' : ''}
-        />
-        <SummaryCard 
-          icon={TrendingUp} 
-          label="Avg Confidence" 
-          value={`${summary.avgConfidence}%`}
-        />
-        <SummaryCard 
-          icon={CheckCircle} 
-          label="Critical Alerts" 
-          value={summary.criticalAlerts}
-          variant={summary.criticalAlerts > 0 ? 'critical' : ''}
-        />
-      </div>
+      <StatsGrid>
+        <StatCard icon={Package} label="Tracked Items" value={summary.totalItems} />
+        <StatCard icon={AlertTriangle} label="Need Restock" value={summary.itemsNeedingRestock} alert={summary.itemsNeedingRestock > 0} />
+        <StatCard icon={BarChart3} label="Avg Confidence" value={`${summary.avgConfidence}%`} />
+        <StatCard icon={CheckCircle} label="Critical Alerts" value={summary.criticalAlerts} alert={summary.criticalAlerts > 0} />
+      </StatsGrid>
       
       <div className="forecast-section">
         <div className="section-header">

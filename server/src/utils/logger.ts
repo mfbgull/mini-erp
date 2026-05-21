@@ -11,6 +11,8 @@ const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
   return msg;
 });
 
+const isTest = process.env.NODE_ENV === 'test';
+
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   defaultMeta: {
@@ -22,30 +24,28 @@ const logger = winston.createLogger({
     errors({ stack: true }),
     json()
   ),
-  transports: [
-    new winston.transports.Console({
-      format: combine(
-        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        logFormat
-      )
-    }),
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'error.log'),
-      level: 'error',
-      maxsize: 5242880,
-      maxFiles: 5
-    }),
-    new winston.transports.File({
-      filename: path.join(process.cwd(), 'logs', 'combined.log'),
-      maxsize: 5242880,
-      maxFiles: 5
-    })
-  ],
+  transports: isTest
+    ? [new winston.transports.Console({ silent: true })]
+    : [
+        new winston.transports.Console({
+          format: combine(
+            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            logFormat
+          )
+        }),
+        new winston.transports.File({
+          filename: path.join(process.cwd(), 'logs', 'error.log'),
+          level: 'error',
+          maxsize: 5242880,
+          maxFiles: 5
+        }),
+        new winston.transports.File({
+          filename: path.join(process.cwd(), 'logs', 'combined.log'),
+          maxsize: 5242880,
+          maxFiles: 5
+        })
+      ],
   exitOnError: false
 });
-
-if (process.env.NODE_ENV === 'test') {
-  logger.silent = true;
-}
 
 export default logger;

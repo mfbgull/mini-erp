@@ -5,7 +5,7 @@
 
 import { Request, Response } from 'express';
 import activityLogModel from '../models/ActivityLog';
-import { logCRUD } from '../services/activityLogger';
+import { logCRUD, ActionType } from '../services/activityLogger';
 import { AuthRequest } from '../types';
 import { getQueryInteger, getRouteParam } from '../utils/queryUtils';
 import logger from '../utils/logger';
@@ -251,13 +251,12 @@ export function cleanupLogs(req: AuthRequest, res: Response): void {
 
     // Log this cleanup action
     const userId = req.user?.id;
-    logCRUD(
-      'DELETE' as any,
-      'ActivityLog',
-      undefined,
-      `Cleaned up ${deletedCount} activity log entries older than ${retentionDays} days`,
-      userId
-    );
+    logCRUD(ActionType.SYSTEM_CLEANUP,
+    'ActivityLog',
+    undefined,
+    `Cleaned up ${deletedCount} activity log entries older than ${retentionDays} days`,
+    userId);
+    req.activityLogged = true;
 
     res.json({
       success: true,
@@ -276,18 +275,8 @@ export function cleanupLogs(req: AuthRequest, res: Response): void {
  */
 export function getUsers(req: Request, res: Response): void {
   try {
-    const db = require('../config/database').default;
-    const users = db.prepare(`
-      SELECT id, username, full_name
-      FROM users
-      WHERE is_active = 1
-      ORDER BY username
-    `).all();
-
-    res.json({
-      success: true,
-      data: users
-    });
+    const users = activityLogModel.getUsers();
+    res.json({ success: true, data: users });
   } catch (error: any) {
     logger.error('[ActivityLogController] Get users error:', error.message);
     res.status(500).json({ error: 'Failed to fetch users' });

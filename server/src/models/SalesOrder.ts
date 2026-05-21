@@ -1,4 +1,6 @@
 import Database from 'better-sqlite3';
+import { getNextSequenceNumber } from '../utils/sequence';
+import { QuotationWithWarehouse, InvoiceWithUsername } from '../types';
 
 export interface SalesOrder {
   id: number;
@@ -665,7 +667,7 @@ class SalesOrderModel {
         LEFT JOIN warehouses w ON q.warehouse_id = w.id
         LEFT JOIN users u ON q.created_by = u.id
         WHERE q.id = ?
-      `).get(salesOrder.source_id) as any | undefined;
+       `).get(salesOrder.source_id) as QuotationWithWarehouse | undefined;
     }
 
     const invoice = db.prepare(`
@@ -674,7 +676,7 @@ class SalesOrderModel {
         u.username as created_by_username
       FROM invoices i
       WHERE i.so_id = ?
-    `).get(salesOrderId) as any | undefined;
+     `).get(salesOrderId) as InvoiceWithUsername | undefined;
 
     return {
       quotation,
@@ -689,19 +691,7 @@ class SalesOrderModel {
   private static generateSalesOrderNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `SO_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `SO-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
@@ -711,19 +701,7 @@ class SalesOrderModel {
   private static generateInvoiceNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `INV_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `INV-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
@@ -733,19 +711,7 @@ class SalesOrderModel {
   private static generateMovementNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `MOV_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `MOV-${year}-${nextNo.toString().padStart(5, '0')}`;
   }
 }

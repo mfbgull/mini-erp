@@ -358,6 +358,15 @@ class ActivityLogModel {
 
     return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   }
+
+  getUsers() {
+    return db.prepare(`
+      SELECT id, username, full_name
+      FROM users
+      WHERE is_active = 1
+      ORDER BY username
+    `).all();
+  }
 }
 
 // Export singleton instance

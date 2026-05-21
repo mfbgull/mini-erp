@@ -5,6 +5,9 @@
 
 import axios from 'axios';
 import db from '../../config/database';
+import logger from '../../utils/logger';
+import { decryptIfNeeded } from '../../utils/encryption';
+import { Setting, WeatherResponse } from '../../types';
 
 interface WeatherData {
   location: {
@@ -49,20 +52,20 @@ class WeatherService {
    */
   private loadSettings(): void {
     try {
-      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'weather_%'").all() as any[];
+      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'weather_%'").all() as Setting[];
 
-      settings.forEach((setting: any) => {
+      settings.forEach((setting) => {
         switch (setting.key) {
           case 'weather_enabled':
             this.enabled = setting.value === 'true';
             break;
           case 'weather_api_key':
-            this.apiKey = setting.value;
+            this.apiKey = decryptIfNeeded(setting.value);
             break;
         }
       });
     } catch (error) {
-      console.error('[WeatherService] Failed to load settings:', error);
+      logger.error('[WeatherService] Failed to load settings:', error);
     }
   }
 
@@ -99,10 +102,10 @@ class WeatherService {
         }
       });
 
-      if ((response.data as any).error) {
+      if ((response.data as WeatherResponse).error) {
         return {
           success: false,
-          message: (response.data as any).error?.info || 'Failed to fetch weather data'
+          message: (response.data as WeatherResponse).error?.info || 'Failed to fetch weather data'
         };
       }
 
@@ -110,13 +113,8 @@ class WeatherService {
         success: true,
         data: response.data as WeatherData
       };
-
-      return {
-        success: true,
-        data: response.data
-      };
     } catch (error: any) {
-      console.error('[WeatherService] Failed to fetch weather:', error);
+      logger.error('[WeatherService] Failed to fetch weather:', error);
       return {
         success: false,
         message: error.message || 'Failed to fetch weather data'
@@ -203,7 +201,7 @@ class WeatherService {
    */
   async getDefaultLocationWeather(): Promise<WeatherData | null> {
     try {
-      const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get('weather_default_location') as any;
+      const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get('weather_default_location') as Setting | undefined;
 
       if (!setting?.value) {
         return null;
@@ -212,7 +210,7 @@ class WeatherService {
       const result = await this.getWeather(setting.value);
       return result.success && result.data ? result.data : null;
     } catch (error) {
-      console.error('[WeatherService] Failed to get default location weather:', error);
+      logger.error('[WeatherService] Failed to get default location weather:', error);
       return null;
     }
   }

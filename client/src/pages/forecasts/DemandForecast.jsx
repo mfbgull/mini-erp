@@ -180,7 +180,7 @@ export default function DemandForecast() {
       </div>
       
       <div className="forecast-grid ag-theme-quartz">
-        <AgGridReact
+        <AgGridReact theme="legacy"
           rowData={forecasts}
           columnDefs={columns}
             defaultColDef={{

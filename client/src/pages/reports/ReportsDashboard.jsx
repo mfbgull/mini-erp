@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 
 import { useSettings } from '../../context/SettingsContext';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import api from '../../utils/api';
 import './ReportsDashboard.css';
 
@@ -236,74 +237,15 @@ export default function ReportsDashboard() {
         </div>
       </div>
 
-      {/* Summary Statistics Cards - ItemsPage Style */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-success">
-            <TrendingUpIcon size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Total Sales</div>
-            <div className="stat-value">{formatCurrency(stats.totalSales)}</div>
-            <div className="stat-subtitle">Revenue this period</div>
-          </div>
-        </div>
-
-        <div className="stat-card" style={{ borderColor: stats.pendingPayments > 0 ? '#f97316' : undefined }}>
-          <div className="stat-icon stat-icon-gradient-warning">
-            <DollarSign size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Outstanding</div>
-            <div className="stat-value">{formatCurrency(stats.pendingPayments)}</div>
-            <div className="stat-subtitle">Pending payments</div>
-          </div>
-        </div>
-
-        <div className="stat-card alert">
-          <div className="stat-icon stat-icon-gradient-danger">
-            <AlertTriangle size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Overdue</div>
-            <div className="stat-value">{formatCurrency(stats.overduePayments)}</div>
-            <div className="stat-subtitle">Past due amount</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-info">
-            <Package size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Total Items</div>
-            <div className="stat-value">{stats.totalItems}</div>
-            <div className="stat-subtitle">In inventory</div>
-          </div>
-        </div>
-
-        <div className="stat-card" style={{ borderColor: stats.lowStockItems > 0 ? '#f59e0b' : undefined }}>
-          <div className="stat-icon stat-icon-gradient-amber">
-            <Bell size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Low Stock</div>
-            <div className="stat-value">{stats.lowStockItems}</div>
-            <div className="stat-subtitle">Need reorder</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-violet">
-            <Gem size={24} color="white" />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">Inventory Value</div>
-            <div className="stat-value">{formatCurrency(stats.inventoryValue)}</div>
-            <div className="stat-subtitle">Total stock worth</div>
-          </div>
-        </div>
-      </div>
+      {/* Summary Statistics Cards */}
+      <StatsGrid>
+        <StatCard icon={TrendingUpIcon} label="Total Sales" value={formatCurrency(stats.totalSales)} subtitle="Revenue this period" />
+        <StatCard icon={DollarSign} label="Outstanding" value={formatCurrency(stats.pendingPayments)} subtitle="Pending payments" style={{ borderColor: stats.pendingPayments > 0 ? '#f97316' : undefined }} />
+        <StatCard icon={AlertTriangle} label="Overdue" value={formatCurrency(stats.overduePayments)} subtitle="Past due amount" alert />
+        <StatCard icon={Package} label="Total Items" value={stats.totalItems} subtitle="In inventory" />
+        <StatCard icon={Bell} label="Low Stock" value={stats.lowStockItems} subtitle="Need reorder" style={{ borderColor: stats.lowStockItems > 0 ? '#f59e0b' : undefined }} />
+        <StatCard icon={Gem} label="Inventory Value" value={formatCurrency(stats.inventoryValue)} subtitle="Total stock worth" />
+      </StatsGrid>
 
       {/* Quick Actions - ItemsPage Style */}
       <div className="quick-actions">

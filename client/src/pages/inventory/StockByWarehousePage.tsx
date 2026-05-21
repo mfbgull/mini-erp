@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
+import { Package, BarChart3, Building2, TrendingUp, FolderOpen, Activity } from "lucide-react";
 
 import ItemPreview from "./ItemPreview";
 import CompactStockByWarehouseCardView from "../../components/common/CompactStockByWarehouseCard";
 import SearchableSelect from "../../components/common/SearchableSelect";
+import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { useTranslation } from "../../hooks/useTranslation";
 import api from "../../utils/api";
@@ -225,70 +227,14 @@ export default function StockByWarehousePage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-purple">📦</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('stockByWarehouse.totalItems')}</div>
-            <div className="stat-value">{stats.totalItems}</div>
-            <div className="stat-subtitle">{t('stockByWarehouse.itemsWithStock')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-pink">📊</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('common.total')}</div>
-            <div className="stat-value">
-              {stats.totalStockValue.toFixed(2)}
-            </div>
-            <div className="stat-subtitle">{t('stockByWarehouse.aggregateQty')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-blue">🏭</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('nav.warehouses')}</div>
-            <div className="stat-value">{stats.totalWarehouses}</div>
-            <div className="stat-subtitle">{t('stockByWarehouse.activeLocations')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-orange">🔝</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('stockByWarehouse.largestStock')}</div>
-            <div className="stat-value text-lg">
-              {stats.warehouseWithMostStock.warehouse_name}
-            </div>
-            <div className="stat-subtitle">
-              {stats.warehouseWithMostStock.quantity.toFixed(2)}{" "}
-              {t('common.units')}
-            </div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-green">📁</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('stockByWarehouse.multiWarehouseItems')}</div>
-            <div className="stat-value">{stats.multiWarehouseItems}</div>
-            <div className="stat-subtitle">{t('stockByWarehouse.multipleLocations')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-gradient-indigo">📈</div>
-          <div className="stat-content">
-            <div className="stat-label">{t('stockByWarehouse.averageQty')}</div>
-            <div className="stat-value">
-              {stats.averageQuantity.toFixed(2)}
-            </div>
-            <div className="stat-subtitle">{t('stockByWarehouse.perStockLine')}</div>
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={Package} label={t('stockByWarehouse.totalItems')} value={stats.totalItems} subtitle={t('stockByWarehouse.itemsWithStock')} />
+        <StatCard icon={BarChart3} label={t('common.total')} value={stats.totalStockValue.toFixed(2)} subtitle={t('stockByWarehouse.aggregateQty')} />
+        <StatCard icon={Building2} label={t('nav.warehouses')} value={stats.totalWarehouses} subtitle={t('stockByWarehouse.activeLocations')} />
+        <StatCard icon={TrendingUp} label={t('stockByWarehouse.largestStock')} value={stats.warehouseWithMostStock.warehouse_name} subtitle={`${stats.warehouseWithMostStock.quantity.toFixed(2)} ${t('common.units')}`} />
+        <StatCard icon={FolderOpen} label={t('stockByWarehouse.multiWarehouseItems')} value={stats.multiWarehouseItems} subtitle={t('stockByWarehouse.multipleLocations')} />
+        <StatCard icon={Activity} label={t('stockByWarehouse.averageQty')} value={stats.averageQuantity.toFixed(2)} subtitle={t('stockByWarehouse.perStockLine')} />
+      </StatsGrid>
 
       {/* Quick Actions */}
       <div className="quick-actions">
@@ -396,7 +342,7 @@ export default function StockByWarehousePage() {
         </>
       ) : (
         <div className="ag-theme-quartz ag-grid-container">
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={stockBalances}
             columnDefs={columnDefs}
             defaultColDef={{

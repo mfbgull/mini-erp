@@ -5,14 +5,9 @@
 
 import axios from 'axios';
 import db from '../../config/database';
-
-interface TaxRate {
-  rate: number;
-  state: string;
-  zip: string;
-  country: string;
-  name: string;
-}
+import logger from '../../utils/logger';
+import { decryptIfNeeded } from '../../utils/encryption';
+import { Setting, TaxRate as TaxRateType } from '../../types';
 
 class TaxService {
   private apiKey: string | null = null;
@@ -30,15 +25,15 @@ class TaxService {
    */
   private loadSettings(): void {
     try {
-      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'tax_%'").all() as any[];
+      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'tax_%'").all() as Setting[];
 
-      settings.forEach((setting: any) => {
+      settings.forEach((setting) => {
         switch (setting.key) {
           case 'tax_enabled':
             this.enabled = setting.value === 'true';
             break;
           case 'tax_api_key':
-            this.apiKey = setting.value;
+            this.apiKey = decryptIfNeeded(setting.value);
             break;
           case 'tax_default_country':
             this.defaultCountry = setting.value || 'US';
@@ -49,7 +44,7 @@ class TaxService {
         }
       });
     } catch (error) {
-      console.error('[TaxService] Failed to load settings:', error);
+      logger.error('[TaxService] Failed to load settings:', error);
     }
   }
 
@@ -106,21 +101,21 @@ class TaxService {
         }
       );
 
-      if ((response.data as any).error) {
+      if (response.data.error) {
         return {
           success: false,
-          message: (response.data as any).error || 'Failed to calculate tax'
+          message: response.data.error || 'Failed to calculate tax'
         };
       }
 
-      const tax = (response.data as any).tax;
+      const tax = response.data.tax;
       return {
         success: true,
         taxAmount: parseFloat(tax.amount_to_collect),
         rate: parseFloat(tax.rate)
       };
     } catch (error: any) {
-      console.error('[TaxService] Failed to calculate tax:', error);
+      logger.error('[TaxService] Failed to calculate tax:', error);
       // Fall back to manual calculation
       return this.calculateManualTax(amount);
     }
@@ -132,7 +127,7 @@ class TaxService {
   private calculateManualTax(amount: number): { success: boolean; taxAmount: number; rate?: number; message?: string } {
     try {
       // Get default tax rate from database
-      const taxRate = db.prepare('SELECT rate FROM tax_rates WHERE is_default = 1 LIMIT 1').get() as any;
+      const taxRate = db.prepare('SELECT rate FROM tax_rates WHERE is_default = 1 LIMIT 1').get() as TaxRateType | undefined;
 
       if (!taxRate) {
         return {
@@ -151,7 +146,7 @@ class TaxService {
         message: 'Using manual tax rate (TaxJar not configured)'
       };
     } catch (error) {
-      console.error('[TaxService] Failed to calculate manual tax:', error);
+      logger.error('[TaxService] Failed to calculate manual tax:', error);
       return {
         success: false,
         taxAmount: 0,
@@ -182,7 +177,7 @@ class TaxService {
         }
       );
 
-      const validation = (response.data as any).validation;
+      const validation = response.data.validation;
 
       return {
         success: true,
@@ -190,7 +185,7 @@ class TaxService {
         message: validation?.valid ? 'Tax ID is valid' : 'Tax ID is invalid'
       };
     } catch (error: any) {
-      console.error('[TaxService] Failed to validate tax ID:', error);
+      logger.error('[TaxService] Failed to validate tax ID:', error);
       return {
         success: false,
         valid: false,
@@ -220,14 +215,14 @@ class TaxService {
         }
       );
 
-      const categories = (response.data as any).categories?.map((c: any) => c.name) || [];
+      const categories = response.data.categories?.map((c: { name: string }) => c.name) || [];
 
       return {
         success: true,
         categories
       };
     } catch (error: any) {
-      console.error('[TaxService] Failed to get tax categories:', error);
+      logger.error('[TaxService] Failed to get tax categories:', error);
       return {
         success: false,
         message: 'Failed to get tax categories'

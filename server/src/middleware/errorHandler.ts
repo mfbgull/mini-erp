@@ -12,13 +12,13 @@ function errorHandler(
   const message = err.message || 'Internal server error';
 
   logger.error('Unhandled error', {
-    requestId: (req as any).requestId,
+    requestId: req.requestId,
     method: req.method,
     url: req.originalUrl || req.url,
     statusCode: status,
     error: message,
     stack: err.stack,
-    userId: (req as any).user?.id,
+    userId: req.user?.id,
   });
 
   if (process.env.NODE_ENV === 'development') {

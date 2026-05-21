@@ -44,85 +44,6 @@
   background: var(--primary-600);
 }
 
-.purchase-orders-page .summary-cards {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.purchase-orders-page .summary-card {
-  background: var(--card-bg);
-  border: 1px solid var(--neutral-200);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: all 0.2s ease;
-}
-
-.purchase-orders-page .summary-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-}
-
-.purchase-orders-page .summary-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.purchase-orders-page .summary-icon.total {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-}
-
-.purchase-orders-page .summary-icon.draft {
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-  color: white;
-}
-
-.purchase-orders-page .summary-icon.submitted {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-}
-
-.purchase-orders-page .summary-icon.partial {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
-}
-
-.purchase-orders-page .summary-icon.completed {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.purchase-orders-page .summary-icon.value {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  color: white;
-}
-
-.purchase-orders-page .summary-content {
-  flex: 1;
-}
-
-.purchase-orders-page .summary-label {
-  font-size: 13px;
-  color: var(--neutral-500);
-  margin-bottom: 4px;
-}
-
-.purchase-orders-page .summary-value {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--neutral-900);
-}
-
 /* Loading spinner */
 .purchase-orders-page .loading {
   display: flex;
@@ -1174,44 +1095,6 @@ VQ|
   .purchase-orders-page .btn-primary {
     width: 100%;
     justify-content: center;
-  }
-
-  /* Summary Cards - 2 per row, last one expands if odd */
-  .purchase-orders-page .summary-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-sm);
-    margin-bottom: var(--space-md);
-  }
-
-  /* Make the last card full width if there's an odd number of cards */
-  .purchase-orders-page .summary-card:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-  }
-
-  .purchase-orders-page .summary-card {
-    padding: var(--space-sm);
-    align-items: center;
-    text-align: center;
-  }
-
-  .purchase-orders-page .summary-icon {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .purchase-orders-page .summary-icon svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .purchase-orders-page .summary-label {
-    font-size: 0.7rem;
-    white-space: nowrap;
-  }
-
-  .purchase-orders-page .summary-value {
-    font-size: 1rem;
   }
 
   .purchase-orders-page .filters-bar {

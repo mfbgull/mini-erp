@@ -266,7 +266,7 @@ export default function BOMUsageReport() {
         ) : reportData?.usage && reportData.usage.length > 0 ? (
           <>
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.usage || []}
                 columnDefs={columnDefs}
                 defaultColDef={{

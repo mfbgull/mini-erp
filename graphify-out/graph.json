@@ -1,0 +1,1219 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "Codebase Analysis",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_phase_1",
+      "community": 1,
+      "norm_label": "codebase analysis"
+    },
+    {
+      "label": "CLI Architecture Design",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_phase_2",
+      "community": 1,
+      "norm_label": "cli architecture design"
+    },
+    {
+      "label": "Implementation",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_phase_3",
+      "community": 1,
+      "norm_label": "implementation"
+    },
+    {
+      "label": "Test Planning",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_phase_4",
+      "community": 1,
+      "norm_label": "test planning"
+    },
+    {
+      "label": "Test Implementation",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_phase_5",
+      "community": 1,
+      "norm_label": "test implementation"
+    },
+    {
+      "label": "Test Documentation",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_phase_6",
+      "community": 1,
+      "norm_label": "test documentation"
+    },
+    {
+      "label": "PyPI Publishing",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_phase_7",
+      "community": 1,
+      "norm_label": "pypi publishing"
+    },
+    {
+      "label": "Backend Engine",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_backend_engine",
+      "community": 10,
+      "norm_label": "backend engine"
+    },
+    {
+      "label": "Data Model",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_data_model",
+      "community": 11,
+      "norm_label": "data model"
+    },
+    {
+      "label": "CLI Architecture",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_cli_architecture",
+      "community": 12,
+      "norm_label": "cli architecture"
+    },
+    {
+      "label": "Stateful REPL",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_stateful_repl",
+      "community": 13,
+      "norm_label": "stateful repl"
+    },
+    {
+      "label": "Subcommand CLI",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_subcommand_cli",
+      "community": 14,
+      "norm_label": "subcommand cli"
+    },
+    {
+      "label": "Rendering Pipeline",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_rendering_pipeline",
+      "community": 15,
+      "norm_label": "rendering pipeline"
+    },
+    {
+      "label": "Output Verification",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_output_verification",
+      "community": 16,
+      "norm_label": "output verification"
+    },
+    {
+      "label": "Real Software",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_real_software",
+      "community": 17,
+      "norm_label": "real software"
+    },
+    {
+      "label": "Rendering Gap",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_rendering_gap",
+      "community": 18,
+      "norm_label": "rendering gap"
+    },
+    {
+      "label": "Filter Translation",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_filter_translation",
+      "community": 19,
+      "norm_label": "filter translation"
+    },
+    {
+      "label": "Timecode Precision",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_timecode_precision",
+      "community": 20,
+      "norm_label": "timecode precision"
+    },
+    {
+      "label": "Namespace Package",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_namespace_package",
+      "community": 21,
+      "norm_label": "namespace package"
+    },
+    {
+      "label": "ReplSkin",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/HARNESS.md",
+      "source_location": null,
+      "id": "harness_repl_skin",
+      "community": 22,
+      "norm_label": "replskin"
+    },
+    {
+      "label": "Local Installation",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/PUBLISHING.md",
+      "source_location": null,
+      "id": "publishing_local_installation",
+      "community": 6,
+      "norm_label": "local installation"
+    },
+    {
+      "label": "GitHub Repository",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/PUBLISHING.md",
+      "source_location": null,
+      "id": "publishing_github_repo",
+      "community": 6,
+      "norm_label": "github repository"
+    },
+    {
+      "label": "Claude Plugin Directory",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/PUBLISHING.md",
+      "source_location": null,
+      "id": "publishing_plugin_directory",
+      "community": 7,
+      "norm_label": "claude plugin directory"
+    },
+    {
+      "label": "NPM Package",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/PUBLISHING.md",
+      "source_location": null,
+      "id": "publishing_npm_package",
+      "community": 7,
+      "norm_label": "npm package"
+    },
+    {
+      "label": "Semantic Versioning",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/PUBLISHING.md",
+      "source_location": null,
+      "id": "publishing_semantic_versioning",
+      "community": 8,
+      "norm_label": "semantic versioning"
+    },
+    {
+      "label": "Release Workflow",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/PUBLISHING.md",
+      "source_location": null,
+      "id": "publishing_release_workflow",
+      "community": 8,
+      "norm_label": "release workflow"
+    },
+    {
+      "label": "cli-anything Plugin",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_cli_anything_plugin",
+      "community": 0,
+      "norm_label": "cli-anything plugin"
+    },
+    {
+      "label": "Refine Command",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_command_refine",
+      "community": 0,
+      "norm_label": "refine command"
+    },
+    {
+      "label": "Test Command",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_command_test",
+      "community": 0,
+      "norm_label": "test command"
+    },
+    {
+      "label": "Validate Command",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_command_validate",
+      "community": 3,
+      "norm_label": "validate command"
+    },
+    {
+      "label": "List Command",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_command_list",
+      "community": 0,
+      "norm_label": "list command"
+    },
+    {
+      "label": "Methodology",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_methodology",
+      "community": 4,
+      "norm_label": "methodology"
+    },
+    {
+      "label": "Stateful Session",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_stateful_session",
+      "community": 4,
+      "norm_label": "stateful session"
+    },
+    {
+      "label": "Dual Output Modes",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_dual_output",
+      "community": 4,
+      "norm_label": "dual output modes"
+    },
+    {
+      "label": "REPL Mode",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_repl_mode",
+      "community": 4,
+      "norm_label": "repl mode"
+    },
+    {
+      "label": "Comprehensive Testing",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_test_suite",
+      "community": 4,
+      "norm_label": "comprehensive testing"
+    },
+    {
+      "label": "Success Stories",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/README.md",
+      "source_location": null,
+      "id": "readme_success_stories",
+      "community": 23,
+      "norm_label": "success stories"
+    },
+    {
+      "label": "Quick Start",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/QUICKSTART.md",
+      "source_location": null,
+      "id": "quickstart_quick_start",
+      "community": 24,
+      "norm_label": "quick start"
+    },
+    {
+      "label": "Installation Guide",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/QUICKSTART.md",
+      "source_location": null,
+      "id": "quickstart_installation_guide",
+      "community": 25,
+      "norm_label": "installation guide"
+    },
+    {
+      "label": "First CLI Harness",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/QUICKSTART.md",
+      "source_location": null,
+      "id": "quickstart_first_cli",
+      "community": 26,
+      "norm_label": "first cli harness"
+    },
+    {
+      "label": "Test Workflow",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/QUICKSTART.md",
+      "source_location": null,
+      "id": "quickstart_test_workflow",
+      "community": 27,
+      "norm_label": "test workflow"
+    },
+    {
+      "label": "Validate Quality",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/QUICKSTART.md",
+      "source_location": null,
+      "id": "quickstart_validate_quality",
+      "community": 28,
+      "norm_label": "validate quality"
+    },
+    {
+      "label": "Common Workflows",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/QUICKSTART.md",
+      "source_location": null,
+      "id": "quickstart_common_workflows",
+      "community": 29,
+      "norm_label": "common workflows"
+    },
+    {
+      "label": "Inventory Current Coverage",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/refine.md",
+      "source_location": null,
+      "id": "refine_inventory_coverage",
+      "community": 0,
+      "norm_label": "inventory current coverage"
+    },
+    {
+      "label": "Analyze Software Capabilities",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/refine.md",
+      "source_location": null,
+      "id": "refine_analyze_capabilities",
+      "community": 30,
+      "norm_label": "analyze software capabilities"
+    },
+    {
+      "label": "Gap Analysis",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/refine.md",
+      "source_location": null,
+      "id": "refine_gap_analysis",
+      "community": 0,
+      "norm_label": "gap analysis"
+    },
+    {
+      "label": "Implement New Commands",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/refine.md",
+      "source_location": null,
+      "id": "refine_implement_commands",
+      "community": 0,
+      "norm_label": "implement new commands"
+    },
+    {
+      "label": "Expand Tests",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/refine.md",
+      "source_location": null,
+      "id": "refine_expand_tests",
+      "community": 0,
+      "norm_label": "expand tests"
+    },
+    {
+      "label": "Update Documentation",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/refine.md",
+      "source_location": null,
+      "id": "refine_update_docs",
+      "community": 31,
+      "norm_label": "update documentation"
+    },
+    {
+      "label": "Test Command",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/test.md",
+      "source_location": null,
+      "id": "test_command",
+      "community": 32,
+      "norm_label": "test command"
+    },
+    {
+      "label": "Test Execution",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/test.md",
+      "source_location": null,
+      "id": "test_execution",
+      "community": 33,
+      "norm_label": "test execution"
+    },
+    {
+      "label": "Test Results Format",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/test.md",
+      "source_location": null,
+      "id": "test_results",
+      "community": 34,
+      "norm_label": "test results format"
+    },
+    {
+      "label": "Failure Handling",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/test.md",
+      "source_location": null,
+      "id": "test_failure_handling",
+      "community": 35,
+      "norm_label": "failure handling"
+    },
+    {
+      "label": "Directory Structure",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_directory_structure",
+      "community": 3,
+      "norm_label": "directory structure"
+    },
+    {
+      "label": "Required Files",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_required_files",
+      "community": 3,
+      "norm_label": "required files"
+    },
+    {
+      "label": "CLI Implementation Standards",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_cli_standards",
+      "community": 3,
+      "norm_label": "cli implementation standards"
+    },
+    {
+      "label": "Core Module Standards",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_core_standards",
+      "community": 36,
+      "norm_label": "core module standards"
+    },
+    {
+      "label": "Test Standards",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_test_standards",
+      "community": 3,
+      "norm_label": "test standards"
+    },
+    {
+      "label": "Documentation Standards",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_doc_standards",
+      "community": 37,
+      "norm_label": "documentation standards"
+    },
+    {
+      "label": "PyPI Packaging Standards",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_pypi_standards",
+      "community": 38,
+      "norm_label": "pypi packaging standards"
+    },
+    {
+      "label": "Code Quality",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_quality_checks",
+      "community": 39,
+      "norm_label": "code quality"
+    },
+    {
+      "label": "Validation Report",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/validate.md",
+      "source_location": null,
+      "id": "validate_validation_report",
+      "community": 3,
+      "norm_label": "validation report"
+    },
+    {
+      "label": "List Command",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/list.md",
+      "source_location": null,
+      "id": "list_command",
+      "community": 40,
+      "norm_label": "list command"
+    },
+    {
+      "label": "Installed CLIs",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/list.md",
+      "source_location": null,
+      "id": "list_installed_clis",
+      "community": 41,
+      "norm_label": "installed clis"
+    },
+    {
+      "label": "Generated CLIs",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/list.md",
+      "source_location": null,
+      "id": "list_generated_clis",
+      "community": 42,
+      "norm_label": "generated clis"
+    },
+    {
+      "label": "Search Depth",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/list.md",
+      "source_location": null,
+      "id": "list_search_depth",
+      "community": 43,
+      "norm_label": "search depth"
+    },
+    {
+      "label": "JSON Output Format",
+      "file_type": "document",
+      "source_file": "CLI-Anything/cli-anything-plugin/commands/list.md",
+      "source_location": null,
+      "id": "list_json_output",
+      "community": 44,
+      "norm_label": "json output format"
+    },
+    {
+      "label": "Environment Variables",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_environment_variables",
+      "community": 2,
+      "norm_label": "environment variables"
+    },
+    {
+      "label": "Application Settings",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_app_settings",
+      "community": 9,
+      "norm_label": "application settings"
+    },
+    {
+      "label": "Security Configuration",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_security_config",
+      "community": 2,
+      "norm_label": "security configuration"
+    },
+    {
+      "label": "JWT Authentication",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_jwt_auth",
+      "community": 2,
+      "norm_label": "jwt authentication"
+    },
+    {
+      "label": "Password Hashing",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_password_hashing",
+      "community": 2,
+      "norm_label": "password hashing"
+    },
+    {
+      "label": "Rate Limiting",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_rate_limiting",
+      "community": 2,
+      "norm_label": "rate limiting"
+    },
+    {
+      "label": "CORS Configuration",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_cors_config",
+      "community": 2,
+      "norm_label": "cors configuration"
+    },
+    {
+      "label": "Logging Configuration",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_logging_config",
+      "community": 45,
+      "norm_label": "logging configuration"
+    },
+    {
+      "label": "Integration Services",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_integration_services",
+      "community": 46,
+      "norm_label": "integration services"
+    },
+    {
+      "label": "Database Configuration",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_database_config",
+      "community": 9,
+      "norm_label": "database configuration"
+    },
+    {
+      "label": "Vite Configuration",
+      "file_type": "document",
+      "source_file": "docs/CONFIGURATION.md",
+      "source_location": null,
+      "id": "configuration_vite_config",
+      "community": 47,
+      "norm_label": "vite configuration"
+    },
+    {
+      "label": "Production Build",
+      "file_type": "document",
+      "source_file": "docs/DEPLOYMENT.md",
+      "source_location": null,
+      "id": "deployment_production_build",
+      "community": 5,
+      "norm_label": "production build"
+    },
+    {
+      "label": "Reverse Proxy",
+      "file_type": "document",
+      "source_file": "docs/DEPLOYMENT.md",
+      "source_location": null,
+      "id": "deployment_reverse_proxy",
+      "community": 5,
+      "norm_label": "reverse proxy"
+    },
+    {
+      "label": "Process Management",
+      "file_type": "document",
+      "source_file": "docs/DEPLOYMENT.md",
+      "source_location": null,
+      "id": "deployment_process_management",
+      "community": 5,
+      "norm_label": "process management"
+    },
+    {
+      "label": "Electron Packaging",
+      "file_type": "document",
+      "source_file": "docs/DEPLOYMENT.md",
+      "source_location": null,
+      "id": "deployment_electron_packaging",
+      "community": 5,
+      "norm_label": "electron packaging"
+    },
+    {
+      "label": "Security Checklist",
+      "file_type": "document",
+      "source_file": "docs/DEPLOYMENT.md",
+      "source_location": null,
+      "id": "deployment_security_checklist",
+      "community": 2,
+      "norm_label": "security checklist"
+    },
+    {
+      "label": "Database Backup",
+      "file_type": "document",
+      "source_file": "docs/DEPLOYMENT.md",
+      "source_location": null,
+      "id": "deployment_database_backup",
+      "community": 5,
+      "norm_label": "database backup"
+    },
+    {
+      "label": "Troubleshooting",
+      "file_type": "document",
+      "source_file": "docs/DEPLOYMENT.md",
+      "source_location": null,
+      "id": "deployment_troubleshooting",
+      "community": 48,
+      "norm_label": "troubleshooting"
+    }
+  ],
+  "links": [
+    {
+      "relation": "precedes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "harness_phase_1",
+      "_tgt": "harness_phase_2",
+      "source": "harness_phase_1",
+      "target": "harness_phase_2"
+    },
+    {
+      "relation": "precedes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "harness_phase_2",
+      "_tgt": "harness_phase_3",
+      "source": "harness_phase_2",
+      "target": "harness_phase_3"
+    },
+    {
+      "relation": "precedes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "harness_phase_3",
+      "_tgt": "harness_phase_4",
+      "source": "harness_phase_3",
+      "target": "harness_phase_4"
+    },
+    {
+      "relation": "precedes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "harness_phase_4",
+      "_tgt": "harness_phase_5",
+      "source": "harness_phase_4",
+      "target": "harness_phase_5"
+    },
+    {
+      "relation": "precedes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "harness_phase_5",
+      "_tgt": "harness_phase_6",
+      "source": "harness_phase_5",
+      "target": "harness_phase_6"
+    },
+    {
+      "relation": "precedes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "harness_phase_6",
+      "_tgt": "harness_phase_7",
+      "source": "harness_phase_6",
+      "target": "harness_phase_7"
+    },
+    {
+      "relation": "enables",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "publishing_local_installation",
+      "_tgt": "publishing_github_repo",
+      "source": "publishing_local_installation",
+      "target": "publishing_github_repo"
+    },
+    {
+      "relation": "alternative_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "publishing_npm_package",
+      "_tgt": "publishing_plugin_directory",
+      "source": "publishing_plugin_directory",
+      "target": "publishing_npm_package"
+    },
+    {
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "publishing_release_workflow",
+      "_tgt": "publishing_semantic_versioning",
+      "source": "publishing_semantic_versioning",
+      "target": "publishing_release_workflow"
+    },
+    {
+      "relation": "provides",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_cli_anything_plugin",
+      "_tgt": "readme_command_refine",
+      "source": "readme_cli_anything_plugin",
+      "target": "readme_command_refine"
+    },
+    {
+      "relation": "provides",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_cli_anything_plugin",
+      "_tgt": "readme_command_test",
+      "source": "readme_cli_anything_plugin",
+      "target": "readme_command_test"
+    },
+    {
+      "relation": "provides",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_cli_anything_plugin",
+      "_tgt": "readme_command_validate",
+      "source": "readme_cli_anything_plugin",
+      "target": "readme_command_validate"
+    },
+    {
+      "relation": "provides",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_cli_anything_plugin",
+      "_tgt": "readme_command_list",
+      "source": "readme_cli_anything_plugin",
+      "target": "readme_command_list"
+    },
+    {
+      "relation": "performs",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_refine",
+      "_tgt": "refine_inventory_coverage",
+      "source": "readme_command_refine",
+      "target": "refine_inventory_coverage"
+    },
+    {
+      "relation": "performs",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_refine",
+      "_tgt": "refine_gap_analysis",
+      "source": "readme_command_refine",
+      "target": "refine_gap_analysis"
+    },
+    {
+      "relation": "performs",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_refine",
+      "_tgt": "refine_implement_commands",
+      "source": "readme_command_refine",
+      "target": "refine_implement_commands"
+    },
+    {
+      "relation": "performs",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_refine",
+      "_tgt": "refine_expand_tests",
+      "source": "readme_command_refine",
+      "target": "refine_expand_tests"
+    },
+    {
+      "relation": "validates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_validate",
+      "_tgt": "validate_directory_structure",
+      "source": "readme_command_validate",
+      "target": "validate_directory_structure"
+    },
+    {
+      "relation": "validates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_validate",
+      "_tgt": "validate_required_files",
+      "source": "readme_command_validate",
+      "target": "validate_required_files"
+    },
+    {
+      "relation": "validates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_validate",
+      "_tgt": "validate_cli_standards",
+      "source": "readme_command_validate",
+      "target": "validate_cli_standards"
+    },
+    {
+      "relation": "validates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_validate",
+      "_tgt": "validate_test_standards",
+      "source": "readme_command_validate",
+      "target": "validate_test_standards"
+    },
+    {
+      "relation": "produces",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_command_validate",
+      "_tgt": "validate_validation_report",
+      "source": "readme_command_validate",
+      "target": "validate_validation_report"
+    },
+    {
+      "relation": "enables",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_methodology",
+      "_tgt": "readme_stateful_session",
+      "source": "readme_methodology",
+      "target": "readme_stateful_session"
+    },
+    {
+      "relation": "provides",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_methodology",
+      "_tgt": "readme_dual_output",
+      "source": "readme_methodology",
+      "target": "readme_dual_output"
+    },
+    {
+      "relation": "enables",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_methodology",
+      "_tgt": "readme_repl_mode",
+      "source": "readme_methodology",
+      "target": "readme_repl_mode"
+    },
+    {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "readme_methodology",
+      "_tgt": "readme_test_suite",
+      "source": "readme_methodology",
+      "target": "readme_test_suite"
+    },
+    {
+      "relation": "configures",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "configuration_environment_variables",
+      "_tgt": "configuration_security_config",
+      "source": "configuration_environment_variables",
+      "target": "configuration_security_config"
+    },
+    {
+      "relation": "configures",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "configuration_app_settings",
+      "_tgt": "configuration_database_config",
+      "source": "configuration_app_settings",
+      "target": "configuration_database_config"
+    },
+    {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "configuration_security_config",
+      "_tgt": "configuration_jwt_auth",
+      "source": "configuration_security_config",
+      "target": "configuration_jwt_auth"
+    },
+    {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "configuration_security_config",
+      "_tgt": "configuration_password_hashing",
+      "source": "configuration_security_config",
+      "target": "configuration_password_hashing"
+    },
+    {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "configuration_security_config",
+      "_tgt": "configuration_rate_limiting",
+      "source": "configuration_security_config",
+      "target": "configuration_rate_limiting"
+    },
+    {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "configuration_security_config",
+      "_tgt": "configuration_cors_config",
+      "source": "configuration_security_config",
+      "target": "configuration_cors_config"
+    },
+    {
+      "relation": "validates",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "deployment_security_checklist",
+      "_tgt": "configuration_security_config",
+      "source": "configuration_security_config",
+      "target": "deployment_security_checklist"
+    },
+    {
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "deployment_production_build",
+      "_tgt": "deployment_reverse_proxy",
+      "source": "deployment_production_build",
+      "target": "deployment_reverse_proxy"
+    },
+    {
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "deployment_production_build",
+      "_tgt": "deployment_process_management",
+      "source": "deployment_production_build",
+      "target": "deployment_process_management"
+    },
+    {
+      "relation": "uses",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "deployment_production_build",
+      "_tgt": "deployment_electron_packaging",
+      "source": "deployment_production_build",
+      "target": "deployment_electron_packaging"
+    },
+    {
+      "relation": "supports",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "",
+      "source_location": null,
+      "weight": 1.0,
+      "_src": "deployment_database_backup",
+      "_tgt": "deployment_production_build",
+      "source": "deployment_production_build",
+      "target": "deployment_database_backup"
+    }
+  ],
+  "hyperedges": []
+}

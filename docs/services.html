@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini ERP - Services</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; padding: 2rem; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; color: #0f172a; }
+    .subtitle { color: #64748b; margin-bottom: 2rem; }
+    .section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f8fafc; font-weight: 600; }
+    tr:hover { background: #f8fafc; }
+    .nav { background: #0f172a; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    .nav a { color: #94a3b8; text-decoration: none; }
+    .nav a:hover { color: white; }
+    .nav .current { color: white; font-weight: 600; }
+    .breadcrumb { color: #64748b; font-size: 0.85rem; margin-bottom: 1rem; }
+    .breadcrumb a { color: #3b82f6; text-decoration: none; }
+    .service-card { background: #f1f5f9; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; border-left: 3px solid #3b82f6; }
+    .service-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .service-card p { font-size: 0.8rem; color: #64748b; }
+    .badge { display: inline-block; background: #3b82f6; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; margin-left: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="nav">
+      <span>🏢 Mini ERP</span>
+      <a href="architecture.html">Overview</a>
+      <a href="frontend.html">Frontend</a>
+      <a href="controllers.html">Controllers</a>
+      <a href="services.html" class="current">Services</a>
+      <a href="models.html">Models</a>
+      <a href="database.html">Database</a>
+      <a href="users.html">Users</a>
+      <a href="roles.html">Roles</a>
+    </nav>
+
+    <p class="breadcrumb"><a href="architecture.html">← Back to Architecture</a></p>
+    
+    <h1>⚙️ Services</h1>
+    <p class="subtitle">Business Logic Layer (9 Services)</p>
+
+    <div class="section">
+      <div class="section-title">Core Services</div>
+      
+      <div class="service-card" style="border-color: #3b82f6;">
+        <h3>salesService.ts <span class="badge">Core</span></h3>
+        <p>Sales business logic - calculate totals, taxes, commissions, profit calculations</p>
+      </div>
+      
+      <div class="service-card" style="border-color: #10b981;">
+        <h3>activityLogger.ts <span class="badge">Core</span></h3>
+        <p>Activity logging service - log user actions, cleanup old logs</p>
+      </div>
+      
+      <div class="service-card" style="border-color: #f59e0b;">
+        <h3>forecastService.ts <span class="badge">Core</span></h3>
+        <p>Demand forecasting - calculate trends, predictions</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Integration Services</div>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>File</th>
+            <th>Purpose</th>
+            <th>Integration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>EmailService</td><td>emailService.ts</td><td>Send emails</td><td>SMTP</td></tr>
+          <tr><td>TaxService</td><td>taxService.ts</td><td>Tax calculations</td><td>External API</td></tr>
+          <tr><td>WeatherService</td><td>weatherService.ts</td><td>Weather data</td><td>Weather API</td></tr>
+          <tr><td>CurrencyService</td><td>currencyService.ts</td><td>Exchange rates</td><td>Exchange API</td></tr>
+          <tr><td>ValidationService</td><td>validationService.ts</td><td>Data validation</td><td>Custom</td></tr>
+          <tr><td>NotificationService</td><td>notificationService.ts</td><td>Push notifications</td><td>Custom</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Service Layer Pattern</div>
+      <pre style="background: #f1f5f9; padding: 1rem; border-radius: 8px; font-size: 0.85rem; font-family: monospace;">
+Controller (HTTP)
+    ↓
+Service (Business Logic)
+    ↓
+Model (Database)
+    ↓
+SQLite</pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Example: SalesService</div>
+      <pre style="background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 8px; font-size: 0.8rem; font-family: monospace;">
+class SalesService {
+  calculateTotal(items: LineItem[]): number
+  calculateTax(subtotal: number, rate: number): number
+  calculateCommission(total: number): number
+  calculateProfit(sales: Sale): number
+  applyDiscount(total: number, discount: number): number
+}</pre>
+    </div>
+
+    <footer style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 2rem;">
+      <p>Mini ERP • Built with React + Express + SQLite | <a href="architecture.html" style="color: #3b82f6;">← Overview</a></p>
+    </footer>
+  </div>
+</body>
+</html>

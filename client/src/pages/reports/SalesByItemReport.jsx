@@ -239,7 +239,7 @@ export default function SalesByItemReport() {
         ) : reportData && reportData.length > 0 ? (
           <>
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData}
                 columnDefs={columnDefs}
                 defaultColDef={{

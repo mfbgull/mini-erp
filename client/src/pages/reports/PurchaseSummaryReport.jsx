@@ -18,6 +18,7 @@ import {
 
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -350,55 +351,28 @@ export default function PurchaseSummaryReport() {
       )}
 
       {reportData?.summary && (
-        <div className="report-summary">
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <FileText size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalOrders}</div>
-                <div className="summary-label">Total Orders</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <DollarSign size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{formatCurrency(reportData.summary.totalCost)}</div>
-                <div className="summary-label">Total Purchase Cost</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <Package size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalItems}</div>
-                <div className="summary-label">Items Purchased</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <TrendingUp size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{formatCurrency(reportData.summary.averageOrderValue)}</div>
-                <div className="summary-label">Avg. Order Value</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatsGrid>
+          <StatCard
+            icon={FileText}
+            label="Total Orders"
+            value={reportData.summary.totalOrders}
+          />
+          <StatCard
+            icon={DollarSign}
+            label="Total Purchase Cost"
+            value={formatCurrency(reportData.summary.totalCost)}
+          />
+          <StatCard
+            icon={Package}
+            label="Items Purchased"
+            value={reportData.summary.totalItems}
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Avg. Order Value"
+            value={formatCurrency(reportData.summary.averageOrderValue)}
+          />
+        </StatsGrid>
       )}
 
       <div className="report-content" ref={gridRef}>
@@ -409,7 +383,7 @@ export default function PurchaseSummaryReport() {
         ) : reportData?.purchases && reportData.purchases.length > 0 ? (
           <>
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.purchases || []}
                 columnDefs={columnDefs}
                 defaultColDef={{

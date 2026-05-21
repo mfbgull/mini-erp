@@ -61,8 +61,8 @@ export const warehouseSchema = z.object({
 });
 
 export const stockMovementSchema = z.object({
-  from_warehouse_id: z.string().optional(),
-  to_warehouse_id: z.string().optional(),
+  from_warehouse_id: z.union([z.string(), z.number()]).optional(),
+  to_warehouse_id: z.union([z.string(), z.number()]).optional(),
   movement_date: z.string().min(1, 'Movement date is required'),
   remarks: z.string().optional(),
 });

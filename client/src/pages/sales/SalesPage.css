@@ -4,89 +4,6 @@
 
 /* Page header styles inherited from global.css */
 
-/* Summary Cards */
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.summary-card {
-  background: var(--card-bg);
-  border: 1px solid var(--neutral-200);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: all 0.2s ease;
-}
-
-.summary-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-}
-
-.summary-card.success {
-  border-color: var(--success);
-  background: linear-gradient(135deg, var(--card-bg) 0%, #f0fdf4 100%);
-}
-
-.summary-card.warning {
-  border-color: #f59e0b;
-  background: linear-gradient(135deg, var(--card-bg) 0%, #fffbeb 100%);
-}
-
-.summary-card.revenue-card {
-  border-color: var(--success);
-  background: linear-gradient(135deg, var(--card-bg) 0%, #f0fdf4 100%);
-}
-
-.summary-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.summary-icon.invoices {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-}
-
-.summary-icon.revenue {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.summary-content {
-  flex: 1;
-}
-
-.summary-label {
-  font-size: 13px;
-  color: var(--neutral-500);
-  margin-bottom: 4px;
-}
-
-.summary-value {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--neutral-900);
-}
-
-.summary-value.revenue {
-  color: var(--success);
-}
-
-.revenue {
-  color: var(--success);
-}
-
 .sale-form .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -294,12 +211,6 @@
 }
 
 /* Responsive */
-@media (max-width: 1200px) {
-  .summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
   .sales-page {
     padding: 16px;
@@ -312,10 +223,6 @@
 
   .header-actions {
     width: 100%;
-  }
-
-  .summary-cards {
-    grid-template-columns: 1fr;
   }
 
   .sales-tabs {

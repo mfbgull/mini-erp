@@ -47,9 +47,9 @@ export function activityLoggerMiddleware(req: Request, res: Response, next: Next
     }
 
     // Only log for API requests
-    if (req.path.startsWith('/api/')) {
+    if (req.path.startsWith('/api/') && !req.activityLogged) {
       // Get user ID from request (set by auth middleware)
-      const userId = (req as any).user?.id;
+      const userId = req.user?.id;
 
       // Get entity type and ID from request if available
       const entityType = getEntityType(req.path);
@@ -112,9 +112,9 @@ function getEntityType(path: string): string {
  * Extract entity ID from request if available
  */
 function getEntityId(req: Request): number | undefined {
-  // Check params
-  if ((req as any).params.id) {
-    const id = parseInt((req as any).params.id, 10);
+  const paramId = req.params.id;
+  if (paramId && typeof paramId === 'string') {
+    const id = parseInt(paramId, 10);
     if (!isNaN(id)) return id;
   }
 

@@ -21,6 +21,7 @@ import {
 
 import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
@@ -374,43 +375,23 @@ export default function InventoryMovementReport() {
       )}
 
       {reportData?.summary && (
-        <div className="report-summary">
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <PackagePlus size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalInbound}</div>
-                <div className="summary-label">Total Inbound</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <PackageMinus size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.totalOutbound}</div>
-                <div className="summary-label">Total Outbound</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="summary-card">
-            <div className="summary-content">
-              <div className="summary-icon">
-                <Package size={24} />
-              </div>
-              <div className="summary-text">
-                <div className="summary-value">{reportData.summary.netMovement}</div>
-                <div className="summary-label">Net Movement</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatsGrid>
+          <StatCard
+            icon={PackagePlus}
+            label="Total Inbound"
+            value={reportData.summary.totalInbound}
+          />
+          <StatCard
+            icon={PackageMinus}
+            label="Total Outbound"
+            value={reportData.summary.totalOutbound}
+          />
+          <StatCard
+            icon={Package}
+            label="Net Movement"
+            value={reportData.summary.netMovement}
+          />
+        </StatsGrid>
       )}
 
       <div className="report-content" ref={gridRef}>
@@ -421,7 +402,7 @@ export default function InventoryMovementReport() {
         ) : reportData?.movements && reportData.movements.length > 0 ? (
           <>
             <div className="ag-theme-quartz desktop-view ag-grid-container">
-              <AgGridReact
+              <AgGridReact theme="legacy"
                 rowData={reportData.movements}
                 columnDefs={columnDefs}
                 defaultColDef={{

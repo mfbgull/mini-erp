@@ -5,6 +5,9 @@
 
 import twilio from 'twilio';
 import db from '../../config/database';
+import logger from '../../utils/logger';
+import { decryptIfNeeded } from '../../utils/encryption';
+import { Setting, NotificationResponse } from '../../types';
 
 interface NotificationOptions {
   to: string;
@@ -27,18 +30,18 @@ class NotificationService {
    */
   private loadSettings(): void {
     try {
-      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'twilio_%'").all() as any[];
+      const settings = db.prepare("SELECT key, value FROM settings WHERE key LIKE 'twilio_%'").all() as Setting[];
 
-      settings.forEach((setting: any) => {
+      settings.forEach((setting) => {
         switch (setting.key) {
           case 'twilio_enabled':
             this.enabled = setting.value === 'true';
             break;
           case 'twilio_account_sid':
-            this.accountSid = setting.value;
+            this.accountSid = decryptIfNeeded(setting.value);
             break;
           case 'twilio_auth_token':
-            this.authToken = setting.value;
+            this.authToken = decryptIfNeeded(setting.value);
             break;
           case 'twilio_phone_number':
             this.phoneNumber = setting.value;
@@ -50,7 +53,7 @@ class NotificationService {
         this.client = twilio(this.accountSid, this.authToken);
       }
     } catch (error) {
-      console.error('[NotificationService] Failed to load settings:', error);
+      logger.error('[NotificationService] Failed to load settings:', error);
     }
   }
 
@@ -86,10 +89,10 @@ class NotificationService {
         to: options.to
       });
 
-      console.log(`[NotificationService] SMS sent to: ${options.to}, SID: ${message.sid}`);
+      logger.info(`[NotificationService] SMS sent to: ${options.to}, SID: ${message.sid}`);
       return { success: true, message: 'SMS sent successfully' };
     } catch (error: any) {
-      console.error('[NotificationService] Failed to send SMS:', error);
+      logger.error('[NotificationService] Failed to send SMS:', error);
       return {
         success: false,
         message: error.message || 'Failed to send SMS'

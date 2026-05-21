@@ -4,12 +4,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
-import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet } from 'lucide-react';
+import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet, Plus } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import CompactItemCardView from '../../components/common/CompactItemCard';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
+import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
@@ -383,97 +384,21 @@ export default function ItemsPage() {
             <h1>{t('inventory.items')}</h1>
           )}
         </div>
+        <Button variant="primary" onClick={handleNewItem}>
+          <Plus size={18} /> {t('inventory.newItem')}
+        </Button>
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">
-            <Package size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('dashboard.totalItems')}</div>
-            <div className="stat-value">{stats.totalItems}</div>
-            <div className="stat-subtitle">{warehouseId ? `${t('inventory.itemsIn')} ${selectedWarehouse?.warehouse_name || ''}` : t('inventory.activeItems')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">
-            <DollarSign size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('inventory.stockValue')}</div>
-            <div className="stat-value">{formatCurrency(stats.totalStockValue)}</div>
-            <div className="stat-subtitle">{t('inventory.currentInventoryWorth')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">
-            <BarChart3 size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('inventory.totalStock')}</div>
-            <div className="stat-value">{parseFloat(stats.totalStock).toFixed(2)}</div>
-            <div className="stat-subtitle">{t('inventory.aggregateQty')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card" style={{ borderColor: stats.lowStockAlerts > 0 ? '#f5576c' : undefined }}>
-          <div className="stat-icon">
-            <AlertTriangle size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('inventory.lowStock')}</div>
-            <div className="stat-value">{stats.lowStockAlerts}</div>
-            <div className="stat-subtitle">{t('inventory.belowReorder')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card" style={{ borderColor: stats.outOfStock > 0 ? '#dc3545' : undefined }}>
-          <div className="stat-icon">
-            <Ban size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('inventory.outOfStock')}</div>
-            <div className="stat-value">{stats.outOfStock}</div>
-            <div className="stat-subtitle">{t('inventory.zeroStock')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">
-            <FolderOpen size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('inventory.categories')}</div>
-            <div className="stat-value">{stats.categories}</div>
-            <div className="stat-subtitle">{t('inventory.uniqueCats')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">
-            <Wrench size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('inventory.rawMaterials')}</div>
-            <div className="stat-value">{stats.rawMaterials}</div>
-            <div className="stat-subtitle">{t('inventory.materialItems')}</div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon">
-            <Factory size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-label">{t('inventory.finishedGoods')}</div>
-            <div className="stat-value">{stats.finishedGoods}</div>
-            <div className="stat-subtitle">{t('inventory.manufacturedProducts')}</div>
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={Package} label={t('dashboard.totalItems')} value={stats.totalItems} subtitle={warehouseId ? `${t('inventory.itemsIn')} ${selectedWarehouse?.warehouse_name || ''}` : t('inventory.activeItems')} />
+        <StatCard icon={DollarSign} label={t('inventory.stockValue')} value={formatCurrency(stats.totalStockValue)} subtitle={t('inventory.currentInventoryWorth')} />
+        <StatCard icon={BarChart3} label={t('inventory.totalStock')} value={parseFloat(stats.totalStock).toFixed(2)} subtitle={t('inventory.aggregateQty')} />
+        <StatCard icon={AlertTriangle} label={t('inventory.lowStock')} value={stats.lowStockAlerts} subtitle={t('inventory.belowReorder')} style={{ borderColor: stats.lowStockAlerts > 0 ? '#f5576c' : undefined }} />
+        <StatCard icon={Ban} label={t('inventory.outOfStock')} value={stats.outOfStock} subtitle={t('inventory.zeroStock')} style={{ borderColor: stats.outOfStock > 0 ? '#dc3545' : undefined }} />
+        <StatCard icon={FolderOpen} label={t('inventory.categories')} value={stats.categories} subtitle={t('inventory.uniqueCats')} />
+        <StatCard icon={Wrench} label={t('inventory.rawMaterials')} value={stats.rawMaterials} subtitle={t('inventory.materialItems')} />
+        <StatCard icon={Factory} label={t('inventory.finishedGoods')} value={stats.finishedGoods} subtitle={t('inventory.manufacturedProducts')} />
+      </StatsGrid>
 
       <div className="quick-actions">
         <button className="quick-action-btn" onClick={handleExport} type="button">
@@ -560,15 +485,14 @@ export default function ItemsPage() {
         </>
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
+          <AgGridReact theme="legacy"
             rowData={filteredItems}
             columnDefs={columnDefs}
-defaultColDef={{
+            defaultColDef={{
               resizable: true,
               sortable: false,
               filter: false
             }}
-            theme="legacy"
             pagination={true}
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}

@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import { getNextSequenceNumber } from '../utils/sequence';
 
 interface Purchase {
   id: number;
@@ -98,7 +99,7 @@ class PurchaseModel {
       const existingBalance = db.prepare(`
         SELECT * FROM stock_balances
         WHERE item_id = ? AND warehouse_id = ?
-      `).get(item_id, warehouse_id) as any;
+      `).get(item_id, warehouse_id) as Record<string, unknown> | undefined;
 
       if (existingBalance) {
         db.prepare(`
@@ -144,38 +145,14 @@ class PurchaseModel {
   static generatePurchaseNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `PURCH_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `PURCH-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
   static generateMovementNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `STK_last_no_${year}`;
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
-
-    let nextNo = 1;
-    if (setting) {
-      nextNo = parseInt(setting.value) + 1;
-    }
-
-    db.prepare(`
-      INSERT OR REPLACE INTO settings (key, value, updated_at)
-      VALUES (?, ?, CURRENT_TIMESTAMP)
-    `).run(settingKey, nextNo.toString());
-
+    const nextNo = getNextSequenceNumber(db, settingKey);
     return `STK-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 

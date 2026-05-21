@@ -81,60 +81,6 @@
   margin-bottom: 30px;
 }
 
-.dso-report .metric-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.dso-report .metric-card.primary {
-  border-left: 4px solid var(--primary);
-}
-
-.dso-report .metric-card.secondary {
-  border-left: 4px solid var(--secondary);
-}
-
-.dso-report .metric-card.tertiary {
-  border-left: 4px solid var(--info);
-}
-
-.dso-report .metric-content {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.dso-report .metric-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--primary-light);
-  color: var(--primary);
-}
-
-.dso-report .metric-text {
-  flex: 1;
-}
-
-.dso-report .metric-value {
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--text-primary);
-}
-
-.dso-report .metric-label {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-top: 5px;
-}
 
 .dso-report .dso-details {
   display: grid;

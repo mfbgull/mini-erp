@@ -16,6 +16,7 @@ import {
 } from 'chart.js';
 import { Package, DollarSign, ShoppingCart, Factory, BarChart3, ClipboardList, AlertTriangle, Waves } from 'lucide-react';
 
+import StatCard, { StatsGrid } from '../components/common/StatCard';
 import FloatingActionButton from '../components/layout/FloatingActionButton';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
@@ -143,51 +144,12 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="kpi-grid">
-        <div className="kpi-card">
-          <div className="kpi-icon kpi-icon--primary">
-            <Package size={24} />
-          </div>
-          <div className="kpi-content">
-            <div className="kpi-label">{t('dashboard.totalItems')}</div>
-            <div className="kpi-value">{data?.totalItems ?? 0}</div>
-            <div className="kpi-subtitle">{data?.warehouseStockCount ?? 0} {t('dashboard.warehouseStocks')}</div>
-          </div>
-        </div>
-
-        <div className="kpi-card">
-          <div className="kpi-icon kpi-icon--success">
-            <DollarSign size={24} />
-          </div>
-          <div className="kpi-content">
-            <div className="kpi-label">{t('dashboard.stockValue')}</div>
-            <div className="kpi-value">{formatCurrency(data?.totalStockValue ?? 0)}</div>
-            <div className="kpi-subtitle">{t('dashboard.currentInventoryWorth')}</div>
-          </div>
-        </div>
-
-        <div className="kpi-card">
-          <div className="kpi-icon kpi-icon--indigo">
-            <ShoppingCart size={24} />
-          </div>
-          <div className="kpi-content">
-            <div className="kpi-label">{t('dashboard.salesRevenue')}</div>
-            <div className="kpi-value">{formatCurrency(data?.totalSalesRevenue ?? 0)}</div>
-            <div className="kpi-subtitle">{t('dashboard.totalSales')}</div>
-          </div>
-        </div>
-
-        <div className="kpi-card">
-          <div className="kpi-icon kpi-icon--warning">
-            <Factory size={24} />
-          </div>
-          <div className="kpi-content">
-            <div className="kpi-label">{t('nav.production')}</div>
-            <div className="kpi-value">{data?.recentProductions ?? 0}</div>
-            <div className="kpi-subtitle">{t('dashboard.runsLast30Days')}</div>
-          </div>
-        </div>
-      </div>
+      <StatsGrid>
+        <StatCard icon={Package} label={t('dashboard.totalItems')} value={data?.totalItems ?? 0} subtitle={`${data?.warehouseStockCount ?? 0} ${t('dashboard.warehouseStocks')}`} />
+        <StatCard icon={DollarSign} label={t('dashboard.stockValue')} value={formatCurrency(data?.totalStockValue ?? 0)} subtitle={t('dashboard.currentInventoryWorth')} />
+        <StatCard icon={ShoppingCart} label={t('dashboard.salesRevenue')} value={formatCurrency(data?.totalSalesRevenue ?? 0)} subtitle={t('dashboard.totalSales')} />
+        <StatCard icon={Factory} label={t('nav.production')} value={data?.recentProductions ?? 0} subtitle={t('dashboard.runsLast30Days')} />
+      </StatsGrid>
 
       {/* Charts Row */}
       <div className="charts-grid">

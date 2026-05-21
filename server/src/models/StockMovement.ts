@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import logger from '../utils/logger';
 
 interface StockMovement {
   id: number;
@@ -43,6 +44,18 @@ interface RecordMovementDTO {
   movement_date?: string;
 }
 
+interface RecordMovementDTO {
+  item_id: number;
+  warehouse_id: number;
+  quantity: number;
+  unit_cost?: number;
+  reference_doctype?: string;
+  reference_docno?: string;
+  remarks?: string;
+  movement_type: string;
+  movement_date?: string;
+}
+
 class StockMovementModel {
   static recordMovement(data: RecordMovementDTO, userId: number, db: Database.Database): { id: number; movement_no: string } {
     const transaction = db.transaction(() => {
@@ -73,7 +86,7 @@ class StockMovementModel {
       const existingBalance = db.prepare(`
         SELECT * FROM stock_balances
         WHERE item_id = ? AND warehouse_id = ?
-      `).get(data.item_id, data.warehouse_id) as any;
+      `).get(data.item_id, data.warehouse_id) as Record<string, unknown> | undefined;
 
       if (existingBalance) {
         db.prepare(`
@@ -99,8 +112,20 @@ class StockMovementModel {
         WHERE id = ?
       `).run(data.item_id, data.item_id);
 
+      // Post financial entry for ADJUSTMENT movements
+      const movementId = result.lastInsertRowid as number;
+      if (data.movement_type === 'ADJUSTMENT') {
+        this.postFinancialEntryForAdjustment({
+          id: movementId,
+          item_id: data.item_id,
+          quantity: data.quantity,
+          movement_date: data.movement_date || new Date().toISOString().split('T')[0],
+          created_by: userId
+        }, db);
+      }
+
       return {
-        id: result.lastInsertRowid as number,
+        id: movementId,
         movement_no: movementNo
       };
     });
@@ -245,6 +270,83 @@ class StockMovementModel {
       FROM stock_balances
       WHERE item_id = ? AND warehouse_id = ?
     `).get(itemId, warehouseId);
+  }
+
+  static postFinancialEntryForAdjustment(params: {
+    id: number;
+    item_id: number;
+    quantity: number;
+    movement_date: string;
+    created_by: number;
+  }, db: Database.Database): void {
+    const { id, item_id, quantity, movement_date, created_by } = params;
+
+    const item = db.prepare(`
+      SELECT standard_cost FROM items WHERE id = ?
+    `).get(item_id) as { standard_cost: number } | undefined;
+
+    if (!item) return;
+
+    const standardCost = item.standard_cost || 0;
+    const value = Math.abs(quantity) * standardCost;
+
+    if (value === 0) return;
+
+    const isRemoval = quantity < 0;
+
+    const accounts = isRemoval
+      ? { debit: 'inventory_shrinkage', credit: 'inventory_asset' }
+      : { debit: 'inventory_asset', credit: 'inventory_correction' };
+
+    const description = isRemoval
+      ? `Stock removal: ${Math.abs(quantity)} units @ ${standardCost}`
+      : `Stock addition: ${Math.abs(quantity)} units @ ${standardCost}`;
+
+    const jeResult = db.prepare(`
+      INSERT INTO journal_entries
+        (reference_type, reference_id, entry_date, description,
+         debit_account, credit_account, amount, created_by)
+      VALUES ('stock_adjustment', ?, ?, ?, ?, ?, ?, ?)
+    `).run(id, movement_date, description, accounts.debit, accounts.credit, value, created_by);
+
+    const journalEntryId = jeResult.lastInsertRowid as number;
+
+    db.prepare(`
+      UPDATE stock_movements
+      SET financial_value = ?, financial_posted = TRUE, journal_entry_id = ?
+      WHERE id = ?
+    `).run(value, journalEntryId, id);
+  }
+
+  static voidJournalEntry(journalEntryId: number, db: Database.Database): void {
+    db.prepare(`
+      UPDATE journal_entries SET voided = TRUE WHERE id = ?
+    `).run(journalEntryId);
+  }
+
+  static getStockBalances(db: Database.Database) {
+    return db.prepare(`
+      SELECT
+        sb.*,
+        i.item_code,
+        i.item_name,
+        i.unit_of_measure,
+        w.warehouse_code,
+        w.warehouse_name
+      FROM stock_balances sb
+      JOIN items i ON sb.item_id = i.id
+      JOIN warehouses w ON sb.warehouse_id = w.id
+      ORDER BY i.item_code, w.warehouse_code
+    `).all();
+  }
+
+  static getOriginalWarehouseForItem(db: Database.Database, itemId: number, invoiceNo: string): number | undefined {
+    const result = db.prepare(`
+      SELECT warehouse_id FROM stock_movements
+      WHERE item_id = ? AND reference_docno = ? AND movement_type = 'SALE'
+      LIMIT 1
+    `).get(itemId, invoiceNo) as { warehouse_id: number } | undefined;
+    return result ? result.warehouse_id : undefined;
   }
 }
 

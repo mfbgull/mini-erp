@@ -94,56 +94,6 @@
   margin-bottom: 20px;
 }
 
-.stock-valuation-report .summary-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.stock-valuation-report .summary-card.warning {
-  border-left: 4px solid var(--warning);
-}
-
-.stock-valuation-report .summary-card.danger {
-  border-left: 4px solid var(--error);
-}
-
-.stock-valuation-report .summary-content {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.stock-valuation-report .summary-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--primary-light);
-  color: var(--primary);
-}
-
-.stock-valuation-report .summary-text {
-  flex: 1;
-}
-
-.stock-valuation-report .summary-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--text-primary);
-}
-
-.stock-valuation-report .summary-label {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-top: 5px;
-}
 
 .stock-valuation-report .report-content {
   flex: 1;
@@ -284,30 +234,6 @@
     gap: var(--space-sm) !important;
   }
 
-  .stock-valuation-report .summary-card {
-    padding: 15px !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 8px !important;
-    text-align: center !important;
-  }
-
-  .stock-valuation-report .summary-content {
-    flex-direction: column !important;
-    align-items: center !important;
-    width: 100% !important;
-  }
-
-  .stock-valuation-report .summary-icon {
-    width: 40px !important;
-    height: 40px !important;
-    font-size: 1.2rem !important;
-    margin-bottom: var(--space-xs) !important;
-  }
-
-  .stock-valuation-report .summary-value {
-    font-size: 1.2rem !important;
-  }
 
   .stock-valuation-report .ag-theme-quartz {
     height: auto !important;
