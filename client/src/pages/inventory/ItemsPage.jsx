@@ -389,7 +389,7 @@ export default function ItemsPage() {
         </Button>
       </div>
 
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={Package} label={t('dashboard.totalItems')} value={stats.totalItems} subtitle={warehouseId ? `${t('inventory.itemsIn')} ${selectedWarehouse?.warehouse_name || ''}` : t('inventory.activeItems')} />
         <StatCard icon={DollarSign} label={t('inventory.stockValue')} value={formatCurrency(stats.totalStockValue)} subtitle={t('inventory.currentInventoryWorth')} />
         <StatCard icon={BarChart3} label={t('inventory.totalStock')} value={parseFloat(stats.totalStock).toFixed(2)} subtitle={t('inventory.aggregateQty')} />
@@ -400,52 +400,53 @@ export default function ItemsPage() {
         <StatCard icon={Factory} label={t('inventory.finishedGoods')} value={stats.finishedGoods} subtitle={t('inventory.manufacturedProducts')} />
       </StatsGrid>
 
-      <div className="quick-actions">
-        <button className="quick-action-btn" onClick={handleExport} type="button">
-          <Download className="action-icon" size={24} />
-          <span className="action-text">{t('inventory.exportCSV')}</span>
-        </button>
-        <button className="quick-action-btn" onClick={handleImport} type="button">
-          <Upload className="action-icon" size={24} />
-          <span className="action-text">{t('inventory.importItems')}</span>
-        </button>
-        <button
-          className="quick-action-btn"
-          onClick={() => navigate('/reports/low-stock')}
-          type="button"
-        >
-          <AlertTriangle className="action-icon" size={24} />
-          <span className="action-text">{t('inventory.lowStockReport')}</span>
-        </button>
-        <button
-          className="quick-action-btn"
-          onClick={() => navigate('/reports/stock-valuation')}
-          type="button"
-        >
-          <Wallet className="action-icon" size={24} />
-          <span className="action-text">{t('inventory.stockValuation')}</span>
-        </button>
-      </div>
-
-      <div className="search-section">
-        <div className="search-input-wrapper">
-          <Search className="search-icon" size={20} />
-          <input
-            type="text"
-            className="search-input-field"
-            placeholder={t('inventory.searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          {searchTerm && (
-            <button 
-              className="search-clear-btn"
-              onClick={() => setSearchTerm('')}
-              type="button"
-            >
-              <X size={16} />
-            </button>
-          )}
+      <div className="search-quick-row">
+        <div className="search-section">
+          <div className="search-input-wrapper">
+            <Search className="search-icon" size={20} />
+            <input
+              type="text"
+              className="search-input-field"
+              placeholder={t('inventory.searchPlaceholder')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button
+                className="search-clear-btn"
+                onClick={() => setSearchTerm('')}
+                type="button"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="quick-actions">
+          <button className="quick-action-btn" onClick={handleExport} type="button">
+            <Download className="action-icon" size={24} />
+            <span className="action-text">{t('inventory.exportCSV')}</span>
+          </button>
+          <button className="quick-action-btn" onClick={handleImport} type="button">
+            <Upload className="action-icon" size={24} />
+            <span className="action-text">{t('inventory.importItems')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate('/reports/low-stock')}
+            type="button"
+          >
+            <AlertTriangle className="action-icon" size={24} />
+            <span className="action-text">{t('inventory.lowStockReport')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate('/reports/stock-valuation')}
+            type="button"
+          >
+            <Wallet className="action-icon" size={24} />
+            <span className="action-text">{t('inventory.stockValuation')}</span>
+          </button>
         </div>
       </div>
 

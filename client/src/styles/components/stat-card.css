@@ -73,6 +73,42 @@
   line-height: 1.2;
 }
 
+/* Compact mode — 4-up cols, smaller cards */
+.stats-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-xs);
+}
+
+.stats-grid.compact .stat-card {
+  padding: 5px 8px;
+  gap: 5px;
+}
+
+.stats-grid.compact .stat-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.stats-grid.compact .stat-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.stats-grid.compact .stat-label {
+  font-size: 0.55rem;
+  line-height: 1.2;
+}
+
+.stats-grid.compact .stat-value {
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+.stats-grid.compact .stat-subtitle {
+  font-size: 0.5rem;
+  line-height: 1.2;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .stats-grid {

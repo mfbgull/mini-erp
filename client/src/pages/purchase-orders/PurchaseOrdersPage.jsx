@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search, FileText, Clock, CheckCircle, Package, Truck, DollarSign } from 'lucide-react';
+import { Plus, Search, FileText, Clock, CheckCircle, Package, Truck, DollarSign, Send } from 'lucide-react';
 
 import { PurchaseOrderCard } from '../../components/common/PurchaseOrderCard';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';

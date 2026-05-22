@@ -13,47 +13,52 @@
 }
 
 .quick-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--space-md);
-  margin-bottom: var(--space-xl);
+  display: flex;
+  gap: var(--space-xs);
+  flex-shrink: 0;
+  align-items: center;
 }
 
 .quick-action-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-lg);
+  justify-content: center;
+  gap: 2px;
+  min-width: 48px;
+  padding: 4px 8px;
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 14px;
   color: var(--neutral-700);
-  font-weight: 500;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
 }
 
 .quick-action-btn:hover {
   background: #f0fdff;
   border-color: #0891b2;
   color: #0e7490;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(8, 145, 178, 0.15);
+  box-shadow: 0 2px 6px rgba(8, 145, 178, 0.15);
+}
+
+.quick-action-btn:active {
+  transform: none;
 }
 
 .quick-action-btn svg {
   color: #0891b2;
-}
-
-.action-icon {
-  font-size: 1.5rem;
+  width: 16px;
+  height: 16px;
 }
 
 .action-text {
-  font-size: 0.9rem;
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .page-filters {
@@ -152,13 +157,15 @@
 }
 
 .search-section {
-  margin-bottom: var(--space-lg);
+  flex: 1;
+  min-width: 0;
+  max-width: 500px;
 }
 
 .search-input-wrapper {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 100%;
 }
 
 .search-icon {
@@ -203,6 +210,16 @@
 
 .search-clear-btn:hover {
   color: var(--neutral-700);
+}
+
+.search-quick-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  width: 100%;
+  flex-wrap: wrap;
 }
 
 .no-results {
@@ -275,8 +292,20 @@
   }
 
   .quick-actions {
-    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     gap: var(--space-sm);
+  }
+
+  .search-quick-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+  }
+
+  .search-quick-row .search-section {
+    max-width: 100%;
   }
 
   .form-row {
@@ -337,7 +366,7 @@
   .back-to-warehouses-btn {
     font-size: 13px;
   }
-  
+
   .warehouse-filter-info {
     font-size: 13px;
   }
