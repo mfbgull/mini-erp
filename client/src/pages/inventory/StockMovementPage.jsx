@@ -16,6 +16,12 @@ import {
   Factory,
   ArrowLeftRight,
   Settings,
+  Search,
+  X,
+  Download,
+  ClipboardList,
+  Wallet,
+  Building2,
 } from "lucide-react";
 
 import Button from "../../components/common/Button";
@@ -33,6 +39,7 @@ import "./StockMovementPage.css";
 
 export default function StockMovementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
   const { t } = useTranslation();
@@ -73,6 +80,16 @@ export default function StockMovementPage() {
         .length,
     },
   };
+
+  // Filter movements by search term
+  const filteredMovements = movements.filter((m) =>
+    m.movement_no
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase()) ||
+    m.item_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.item_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.movement_type?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const mostActiveType = useMemo(() => {
     if (movements.length === 0) return "None";
@@ -194,7 +211,11 @@ export default function StockMovementPage() {
         <span className="status-tag">{params.value}</span>
       ),
     },
-  ];
+   ];
+
+  const handleRowClick = (movement) => {
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="items-page">
@@ -211,7 +232,7 @@ export default function StockMovementPage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={Package} label={t('stockMovements.totalMovements')} value={stats.totalMovements} subtitle={t('stockMovements.allTransactions')} />
         <StatCard icon={ArrowDown} label={t('common.totalIn')} value={stats.totalIn} subtitle={t('stockMovements.stockAdditions')} />
         <StatCard icon={ArrowUp} label={t('common.totalOut')} value={stats.totalOut} subtitle={t('stockMovements.stockReductions')} />
@@ -224,33 +245,58 @@ export default function StockMovementPage() {
         <StatCard icon={Settings} label={t('stockMovements.adjustments')} value={stats.movementsByType.ADJUSTMENT} subtitle={t('stockMovements.manualChanges')} />
       </StatsGrid>
 
-      {/* Quick Actions */}
-      <div className="quick-actions">
-        <button className="quick-action-btn" onClick={handleExport}>
-          <span className="action-icon">📥</span>
-          <span className="action-text">{t('stockMovements.exportCsv')}</span>
-        </button>
-        <button
-          className="quick-action-btn"
-          onClick={() => navigate("/reports/inventory-movement")}
-        >
-          <span className="action-icon">📋</span>
-          <span className="action-text">{t('stockMovements.movementReport')}</span>
-        </button>
-        <button
-          className="quick-action-btn"
-          onClick={() => navigate("/reports/stock-valuation")}
-        >
-          <span className="action-icon">💰</span>
-          <span className="action-text">{t('stockMovements.stockValuation')}</span>
-        </button>
-        <button
-          className="quick-action-btn"
-          onClick={() => navigate("/inventory/stock-by-warehouse")}
-        >
-          <span className="action-icon">🏭</span>
-          <span className="action-text">{t('stockMovements.stockByWarehouse')}</span>
-        </button>
+      <div className="search-quick-row">
+        <div className="search-section">
+          <div className="search-input-wrapper">
+            <Search className="search-icon" size={20} />
+            <input
+              type="text"
+              className="search-input-field"
+              placeholder={t('stockMovements.searchPlaceholder') || "Search movements..."}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button
+                className="search-clear-btn"
+                onClick={() => setSearchTerm('')}
+                type="button"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="quick-actions">
+          <button className="quick-action-btn" onClick={handleExport} type="button">
+            <Download className="action-icon" size={24} />
+            <span className="action-text">{t('stockMovements.exportCsv')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/reports/inventory-movement")}
+            type="button"
+          >
+            <ClipboardList className="action-icon" size={24} />
+            <span className="action-text">{t('stockMovements.movementReport')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/reports/stock-valuation")}
+            type="button"
+          >
+            <Wallet className="action-icon" size={24} />
+            <span className="action-text">{t('stockMovements.stockValuation')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/inventory/stock-by-warehouse")}
+            type="button"
+          >
+            <Building2 className="action-icon" size={24} />
+            <span className="action-text">{t('stockMovements.stockByWarehouse')}</span>
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -259,7 +305,7 @@ export default function StockMovementPage() {
         </div>
       ) : isMobile ? (
         <>
-          <CompactStockMovementCardView movements={movements} />
+          <CompactStockMovementCardView movements={filteredMovements} />
 
           <div className="mobile-action-bar">
             <Button
@@ -273,19 +319,20 @@ export default function StockMovementPage() {
         </>
       ) : (
         // Desktop ag-grid view
-        <div className="ag-theme-quartz ag-grid-container">
+        <div className="ag-theme-quartz">
           <AgGridReact theme="legacy"
-            rowData={movements}
+            rowData={filteredMovements}
             columnDefs={columnDefs}
             defaultColDef={{
-              theme:"legacy",
               resizable: true,
               sortable: false,
-              filter: false,
+              filter: false
             }}
             pagination={true}
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}
+            onRowClicked={(params) => setIsModalOpen(true, params.data)}
+            rowSelection={{ mode: 'singleRow' }}
           />
         </div>
       )}
