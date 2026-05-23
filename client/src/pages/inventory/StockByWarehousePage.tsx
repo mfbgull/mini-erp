@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
-import { Package, BarChart3, Building2, TrendingUp, FolderOpen, Activity } from "lucide-react";
+import { Package, BarChart3, Building2, TrendingUp, FolderOpen, Activity, Search, X, Download, DollarSign, ArrowLeftRight } from "lucide-react";
 
 import ItemPreview from "./ItemPreview";
 import CompactStockByWarehouseCardView from "../../components/common/CompactStockByWarehouseCard";
@@ -26,6 +26,7 @@ export default function StockByWarehousePage() {
     "all" | "zero" | "nonzero"
   >("nonzero");
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch warehouses for searchable select
   const { data: warehouses = [] } = useQuery({
@@ -97,6 +98,15 @@ export default function StockByWarehousePage() {
 
     return result;
   }, [stockBalances, selectedWarehouseId, quantityFilter]);
+
+  // Filter by search term
+  const searchFilteredBalances = useMemo(() => {
+    if (!searchTerm) return filteredStockBalances;
+    return filteredStockBalances.filter((item) =>
+      item.item_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.item_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [filteredStockBalances, searchTerm]);
 
   // Calculate statistics
   const stats = {
@@ -215,6 +225,10 @@ export default function StockByWarehousePage() {
     },
   ];
 
+  const handleRowClick = (data) => {
+    setSelectedItemId(data.item_id);
+  };
+
   return (
     <div className="items-page">
       <div className="page-header">
@@ -227,7 +241,7 @@ export default function StockByWarehousePage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={Package} label={t('stockByWarehouse.totalItems')} value={stats.totalItems} subtitle={t('stockByWarehouse.itemsWithStock')} />
         <StatCard icon={BarChart3} label={t('common.total')} value={stats.totalStockValue.toFixed(2)} subtitle={t('stockByWarehouse.aggregateQty')} />
         <StatCard icon={Building2} label={t('nav.warehouses')} value={stats.totalWarehouses} subtitle={t('stockByWarehouse.activeLocations')} />
@@ -236,33 +250,58 @@ export default function StockByWarehousePage() {
         <StatCard icon={Activity} label={t('stockByWarehouse.averageQty')} value={stats.averageQuantity.toFixed(2)} subtitle={t('stockByWarehouse.perStockLine')} />
       </StatsGrid>
 
-      {/* Quick Actions */}
-      <div className="quick-actions">
-        <button className="quick-action-btn" onClick={handleExport}>
-          <span className="action-icon">📥</span>
-          <span className="action-text">{t('stockByWarehouse.exportCsv')}</span>
-        </button>
-        <button
-          className="quick-action-btn"
-          onClick={() => navigate("/inventory/stock-movements")}
-        >
-          <span className="action-icon">📋</span>
-          <span className="action-text">{t('nav.stockMovements')}</span>
-        </button>
-        <button
-          className="quick-action-btn"
-          onClick={() => navigate("/reports/stock-valuation")}
-        >
-          <span className="action-icon">💰</span>
-          <span className="action-text">{t('nav.stockValuation')}</span>
-        </button>
-        <button
-          className="quick-action-btn"
-          onClick={() => navigate("/reports/inventory-movement")}
-        >
-          <span className="action-icon">🔄</span>
-          <span className="action-text">{t('nav.inventoryMovement')}</span>
-        </button>
+      <div className="search-quick-row">
+        <div className="search-section">
+          <div className="search-input-wrapper">
+            <Search className="search-icon" size={20} />
+            <input
+              type="text"
+              className="search-input-field"
+              placeholder="Search items..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button
+                className="search-clear-btn"
+                onClick={() => setSearchTerm('')}
+                type="button"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="quick-actions">
+          <button className="quick-action-btn" onClick={handleExport} type="button">
+            <Download className="action-icon" size={24} />
+            <span className="action-text">{t('stockByWarehouse.exportCsv')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/inventory/stock-movements")}
+            type="button"
+          >
+            <Activity className="action-icon" size={24} />
+            <span className="action-text">{t('nav.stockMovements')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/reports/stock-valuation")}
+            type="button"
+          >
+            <DollarSign className="action-icon" size={24} />
+            <span className="action-text">{t('nav.stockValuation')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/reports/inventory-movement")}
+            type="button"
+          >
+            <ArrowLeftRight className="action-icon" size={24} />
+            <span className="action-text">{t('nav.inventoryMovement')}</span>
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -330,20 +369,21 @@ export default function StockByWarehousePage() {
           </div>
 
           <CompactStockByWarehouseCardView
-            stockData={filteredStockBalances}
+            stockData={searchFilteredBalances}
           />
 
           {filteredStockBalances.length > 0 && (
             <div className="mobile-pagination-info">
-              Showing {filteredStockBalances.length} of {stockBalances.length}{" "}
+              Showing {searchFilteredBalances.length} of {stockBalances.length}{" "}
               stock items
             </div>
           )}
         </>
       ) : (
-        <div className="ag-theme-quartz ag-grid-container">
-          <AgGridReact theme="legacy"
-            rowData={stockBalances}
+        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
+          <AgGridReact
+            theme="legacy"
+            rowData={searchFilteredBalances}
             columnDefs={columnDefs}
             defaultColDef={{
               resizable: true,
@@ -353,6 +393,8 @@ export default function StockByWarehousePage() {
             pagination={true}
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}
+            onRowClicked={(params) => handleRowClick(params.data)}
+            rowSelection={{ mode: 'singleRow' }}
           />
         </div>
       )}
