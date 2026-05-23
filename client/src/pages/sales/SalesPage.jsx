@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
+import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2, Search, X, Download, BarChart3, Wallet } from 'lucide-react';
 
 import InvoicePreview from './InvoicePreview';
 import Button from '../../components/common/Button';
@@ -17,6 +17,7 @@ import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import './SalesPage.css';
+import '../../styles/components/stat-card.css';
 
 export default function SalesPage() {
   const queryClient = useQueryClient();
@@ -25,6 +26,7 @@ export default function SalesPage() {
   const navigate = useNavigate();
   const { isMobile } = useMobileDetection();
   const [previewInvoice, setPreviewInvoice] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useKeyboardShortcut('Alt+N', () => {
     navigate('/sales/invoice');
@@ -54,6 +56,12 @@ export default function SalesPage() {
     paid: invoices.reduce((sum, inv) => sum + parseFloat(inv.paid_amount || 0), 0),
     outstanding: invoices.reduce((sum, inv) => sum + parseFloat(inv.balance_amount || 0), 0)
   };
+
+  // Filter invoices by search term
+  const filteredInvoices = invoices.filter((inv) =>
+    inv.invoice_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    inv.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Delete invoice mutation
   const deleteInvoiceMutation = useMutation({
@@ -197,12 +205,66 @@ export default function SalesPage() {
       </div>
 
       {/* Summary Cards */}
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={FileText} label={t('sales.allInvoices')} value={invoiceTotals.count} />
         <StatCard icon={ShoppingCart} label={t('sales.totalSales')} value={formatCurrency(invoiceTotals.total)} />
         <StatCard icon={DollarSign} label={t('sales.totalPaid')} value={formatCurrency(invoiceTotals.paid)} />
         <StatCard icon={AlertTriangle} label={t('sales.totalDue')} value={formatCurrency(invoiceTotals.outstanding)} />
       </StatsGrid>
+
+      <div className="search-quick-row">
+        <div className="search-section">
+          <div className="search-input-wrapper">
+            <Search className="search-icon" size={20} />
+            <input
+              type="text"
+              className="search-input-field"
+              placeholder={t('sales.searchPlaceholder') || "Search invoices..."}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button
+                className="search-clear-btn"
+                onClick={() => setSearchTerm('')}
+                type="button"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="quick-actions">
+          <button className="quick-action-btn" onClick={() => navigate("/pos")} type="button">
+            <Wallet className="action-icon" size={24} />
+            <span className="action-text">{t('sales.pos')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/reports/sales-summary")}
+            type="button"
+          >
+            <BarChart3 className="action-icon" size={24} />
+            <span className="action-text">{t('sales.salesReport')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/reports/stock-valuation")}
+            type="button"
+          >
+            <DollarSign className="action-icon" size={24} />
+            <span className="action-text">{t('sales.stockValuation')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => toast.success('Export coming soon')}
+            type="button"
+          >
+            <Download className="action-icon" size={24} />
+            <span className="action-text">{t('common.export')}</span>
+          </button>
+        </div>
+      </div>
 
       {/* Invoices Grid */}
       <div className="sales-content">
@@ -212,7 +274,7 @@ export default function SalesPage() {
           </div>
         ) : isMobile ? (
           <CompactInvoiceCardView
-            invoices={invoices}
+            invoices={filteredInvoices}
             onView={(invoice) => setPreviewInvoice(invoice)}
             onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}?mode=edit`)}
             onDelete={handleDeleteInvoice}
@@ -220,7 +282,7 @@ export default function SalesPage() {
         ) : (
           <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>
             <AgGridReact theme="legacy"
-              rowData={invoices}
+              rowData={filteredInvoices}
               columnDefs={invoiceColumnDefs}
               defaultColDef={{
               theme:"legacy",
