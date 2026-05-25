@@ -2,12 +2,8 @@
 -- Adds financial tracking columns to stock_movements and creates journal_entries table
 -- Enables P&L impact for inventory shrinkage (removal) and corrections (additions)
 
--- Add financial columns to stock_movements (safe ALTER TABLE with IF NOT EXISTS pattern)
-ALTER TABLE stock_movements ADD COLUMN financial_value DECIMAL(15,4) DEFAULT 0;
-ALTER TABLE stock_movements ADD COLUMN financial_posted BOOLEAN DEFAULT FALSE;
-ALTER TABLE stock_movements ADD COLUMN journal_entry_id INTEGER REFERENCES journal_entries(id);
-
 -- Journal entries table for double-entry-style posting
+-- MUST be created BEFORE adding FK reference in stock_movements
 CREATE TABLE IF NOT EXISTS journal_entries (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     reference_type  TEXT NOT NULL,
@@ -33,3 +29,8 @@ CREATE INDEX IF NOT EXISTS idx_journal_entries_date
 -- Index for account queries
 CREATE INDEX IF NOT EXISTS idx_journal_entries_accounts
     ON journal_entries(debit_account, credit_account, voided);
+
+-- Add financial columns to stock_movements (safe ALTER TABLE with IF NOT EXISTS pattern)
+ALTER TABLE stock_movements ADD COLUMN financial_value DECIMAL(15,4) DEFAULT 0;
+ALTER TABLE stock_movements ADD COLUMN financial_posted BOOLEAN DEFAULT FALSE;
+ALTER TABLE stock_movements ADD COLUMN journal_entry_id INTEGER REFERENCES journal_entries(id);

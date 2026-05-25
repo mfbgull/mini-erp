@@ -224,11 +224,13 @@ class SalesOrderModel {
     // Get items
     const items = db.prepare(`
       SELECT
-        id, so_id, item_id, item_code, item_name,
-        quantity, delivered_quantity, unit_price, amount
-      FROM sales_order_items
-      WHERE so_id = ?
-      ORDER BY id
+        soi.id, soi.so_id, soi.item_id,
+        i.item_code, i.item_name,
+        soi.quantity, soi.delivered_quantity, soi.unit_price, soi.amount
+      FROM sales_order_items soi
+      LEFT JOIN items i ON soi.item_id = i.id
+      WHERE soi.so_id = ?
+      ORDER BY soi.id
     `).all(id) as SalesOrderItem[];
 
     return {
@@ -305,11 +307,13 @@ class SalesOrderModel {
     return salesOrders.map(so => {
       const items = db.prepare(`
         SELECT
-          id, so_id, item_id, item_code, item_name,
-          quantity, delivered_quantity, unit_price, amount
-        FROM sales_order_items
-        WHERE so_id = ?
-        ORDER BY id
+          soi.id, soi.so_id, soi.item_id,
+          i.item_code, i.item_name,
+          soi.quantity, soi.delivered_quantity, soi.unit_price, soi.amount
+        FROM sales_order_items soi
+        LEFT JOIN items i ON soi.item_id = i.id
+        WHERE soi.so_id = ?
+        ORDER BY soi.id
       `).all(so.id) as SalesOrderItem[];
 
       return {

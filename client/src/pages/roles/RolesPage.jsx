@@ -151,7 +151,7 @@ export default function RolesPage() {
           </div>
         </>
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>
+        <div className="ag-theme-quartz grid-fill">
           <AgGridReact theme="legacy"
             rowData={roles}
             columnDefs={columnDefs}

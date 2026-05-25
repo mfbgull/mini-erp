@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { initializeSequenceFromMax, getNextSequenceNumber } from '../utils/sequence';
+import { getNextSequenceNumber } from '../utils/sequence';
 import ledgerUtils from '../utils/ledgerUtils';
 import { parseCurrency, subtractCurrency } from '../utils/currency';
 
@@ -33,10 +33,28 @@ interface CreatePaymentDTO {
 // Static class for Payment model operations
 export class PaymentModel {
   /**
-   * Generate payment number using sequence utility
+   * Generate payment number using sequence utility.
+   * Re-syncs from the actual max in the table on every call to prevent
+   * duplicate payment_no errors when data is manually inserted or restored.
    */
   static generatePaymentNo(db: Database.Database): string {
-    initializeSequenceFromMax(db, 'PAY_last_no', 'payments', 'payment_no', 'PAY');
+    const maxResult = db.prepare(
+      `SELECT MAX(payment_no) as max_val FROM payments WHERE payment_no LIKE 'PAY%'`
+    ).get() as { max_val: string | null } | undefined;
+    const maxVal = maxResult?.max_val ?? null;
+    let maxNo = 0;
+    if (maxVal) {
+      const numStr = maxVal.replace(/[^0-9]/g, '');
+      maxNo = parseInt(numStr, 10) || 0;
+    }
+
+    const currentSetting = db.prepare("SELECT value FROM settings WHERE key = 'PAY_last_no'").get() as { value: string } | undefined;
+    const currentSeq = currentSetting ? parseInt(currentSetting.value, 10) || 0 : 0;
+
+    if (maxNo > currentSeq) {
+      db.prepare("UPDATE settings SET value = ?, updated_at = CURRENT_TIMESTAMP WHERE key = 'PAY_last_no'").run(maxNo.toString());
+    }
+
     const nextNo = getNextSequenceNumber(db, 'PAY_last_no');
     return `PAY${String(nextNo).padStart(3, '0')}`;
   }

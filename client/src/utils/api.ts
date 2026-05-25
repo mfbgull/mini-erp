@@ -10,9 +10,16 @@ const api: AxiosInstance = axios.create({
   withCredentials: true // Send cookies with cross-origin requests
 });
 
-// Request interceptor - removed manual token handling (cookies are automatic)
+// Request interceptor - include CSRF token
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+    const cookies = document.cookie.split('; ');
+    const csrfToken = cookies.find(row => row.startsWith('csrf-token='))?.split('=')[1];
+    
+    if (csrfToken) {
+      config.headers['x-csrf-token'] = csrfToken;
+    }
+    
     return config;
   },
   (error: AxiosError): Promise<never> => {

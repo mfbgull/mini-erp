@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
   ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, 
-  TrendingUp, ChevronDown, LogOut, PanelLeft
+  TrendingUp, ChevronDown, LogOut, PanelLeft, CreditCard
 } from 'lucide-react';
 
 import './TopMenu.css';
@@ -64,8 +64,9 @@ const getNavItems = (): NavItem[] => [
     labelKey: 'nav.forecasts',
     icon: <TrendingUp size={18} strokeWidth={1.5} />,
     children: [
-      { path: '/forecasts', labelKey: 'nav.reportsDashboard' },
-      { path: '/forecasts/demand', labelKey: 'nav.demand' }
+      { path: '/forecasts', labelKey: 'nav.forecastsDashboard' },
+      { path: '/forecasts/demand', labelKey: 'nav.demand' },
+      { path: '/forecasts/trends', labelKey: 'nav.forecastTrends' }
     ]
   },
   {
@@ -88,6 +89,7 @@ const getNavItems = (): NavItem[] => [
       { path: '/roles', labelKey: 'nav.roles' }
     ]
   },
+  { path: '/payments', labelKey: 'nav.payments', icon: <CreditCard size={18} strokeWidth={1.5} /> },
   { path: '/activity-log', labelKey: 'nav.activityLog', icon: <FileText size={18} strokeWidth={1.5} /> },
   { path: '/integrations', labelKey: 'nav.integrations', icon: <Link2 size={18} strokeWidth={1.5} /> },
   { path: '/settings', labelKey: 'nav.settings', icon: <Settings size={18} strokeWidth={1.5} /> }

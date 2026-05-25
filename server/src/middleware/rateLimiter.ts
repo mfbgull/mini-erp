@@ -5,12 +5,14 @@ import logger from '../utils/logger';
 /**
  * Rate limiter for authentication endpoints
  * Limits: 5 requests per 15 minutes per IP
+ * Disabled in development to avoid blocking local testing
  */
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: process.env.NODE_ENV === 'test' ? 999999 : 5,
+  max: process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development' ? 999999 : 5,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'development',
   handler: (req: Request, res: Response) => {
     logger.warn(`[Rate Limit] Login attempts exceeded for IP: ${req.ip}`);
     res.status(429).json({
@@ -25,12 +27,14 @@ export const authLimiter = rateLimit({
 
 /**
  * Stricter rate limiter for password change operations
+ * Disabled in development to avoid blocking local testing
  */
 export const passwordChangeLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // 3 attempts per hour
+  max: process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development' ? 999999 : 3, // 3 attempts per hour
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'development',
   handler: (req: Request, res: Response) => {
     logger.warn(`[Rate Limit] Password change attempts exceeded for IP: ${req.ip}`);
     res.status(429).json({
@@ -50,7 +54,11 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req: Request) => {
-    return req.path === '/health' || process.env.NODE_ENV === 'test';
+    return (
+      req.path === '/health' ||
+      process.env.NODE_ENV === 'test' ||
+      process.env.NODE_ENV === 'development'
+    );
   },
   handler: (req: Request, res: Response) => {
     logger.warn(`[Rate Limit] API requests exceeded for IP: ${req.ip}`);
@@ -76,12 +84,14 @@ export function shutdownRateLimiters() {
 /**
  * Aggressive rate limiter for sensitive operations
  * (e.g., data exports, bulk operations)
+ * Disabled in development
  */
 export const sensitiveOperationLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 10, // 10 requests per minute
+  max: process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development' ? 999999 : 10, // 10 requests per minute
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => process.env.NODE_ENV === 'development',
   handler: (req: Request, res: Response) => {
     logger.warn(`[Rate Limit] Sensitive operation rate limit exceeded for IP: ${req.ip}`);
     res.status(429).json({

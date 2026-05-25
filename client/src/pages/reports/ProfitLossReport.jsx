@@ -127,23 +127,23 @@ export default function ProfitLossReport() {
         label: 'Amount',
         data: [
           reportData?.totalRevenue || 0,
-          -(reportData?.totalCogs || 0), // Negative for COGS
-          reportData?.grossProfit || 0,
           -(reportData?.totalExpenses || 0), // Negative for expenses
+          reportData?.grossProfit || 0,
+          reportData?.totalCogs || 0,
           reportData?.netProfit || 0
         ],
         backgroundColor: [
           'rgba(54, 162, 235, 0.8)', // Revenue - Blue
-          'rgba(255, 99, 132, 0.8)', // COGS - Red
-          'rgba(75, 192, 192, 0.8)', // Gross Profit - Teal
           'rgba(255, 159, 64, 0.8)', // Expenses - Orange
+          'rgba(75, 192, 192, 0.8)', // Gross Profit - Teal
+          'rgba(255, 99, 132, 0.8)', // COGS - Red
           'rgba(75, 192, 192, 0.8)'  // Net Profit - Teal
         ],
         borderColor: [
           'rgba(54, 162, 235, 1)',
-          'rgba(255, 99, 132, 1)',
-          'rgba(75, 192, 192, 1)',
           'rgba(255, 159, 64, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(255, 99, 132, 1)',
           'rgba(75, 192, 192, 1)'
         ],
         borderWidth: 1,
@@ -236,7 +236,7 @@ export default function ProfitLossReport() {
         </div>
       ) : reportData ? (
         <div className="report-content">
-          <StatsGrid>
+          <StatsGrid columns={4} className="compact">
             <StatCard
               icon={DollarSign}
               label="Total Revenue"

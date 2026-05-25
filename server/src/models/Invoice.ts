@@ -9,7 +9,7 @@ export interface Invoice {
   customer_id: number;
   customer_name?: string;
   so_id?: number; // Sales Order ID
-  source_type?: 'SALES_ORDER' | 'DIRECT' | null;
+  source_type?: 'SALES_ORDER' | 'DIRECT' | 'POS' | null;
   quotation_id?: number; // Direct link to quotation (if created via SO from quotation)
   invoice_date: string;
   due_date?: string;
@@ -50,7 +50,7 @@ export interface CreateInvoiceDTO {
   customer_id: number;
   customer_name?: string;
   so_id?: number;
-  source_type?: 'SALES_ORDER' | 'DIRECT' | null;
+  source_type?: 'SALES_ORDER' | 'DIRECT' | 'POS' | null;
   quotation_id?: number;
   invoice_date: string;
   due_date?: string;
@@ -471,9 +471,10 @@ class InvoiceModel {
       INSERT INTO invoices (
         invoice_no, customer_id, invoice_date, due_date, status,
         total_amount, paid_amount, balance_amount, notes,
-        discount_scope, discount_type, discount_value, terms, created_by
+        discount_scope, discount_type, discount_value, terms, created_by,
+        source_type
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       data.invoice_no || null,
       data.customer_id,
@@ -488,7 +489,8 @@ class InvoiceModel {
       data.discount_type || 'percentage',
       data.discount_value || 0,
       data.terms || null,
-      userId
+      userId,
+      data.source_type || null
     );
     return result.lastInsertRowid as number;
   }
@@ -552,12 +554,26 @@ class InvoiceModel {
    * Create a ledger entry
    */
   static createLedgerEntry(db: Database.Database, customerId: number, referenceNo: string, debit: number, credit: number, description: string): void {
+    // Calculate running balance from last entry for this customer
+    const lastBalanceResult = db.prepare(`
+      SELECT balance FROM customer_ledger
+      WHERE customer_id = ?
+      ORDER BY id DESC
+      LIMIT 1
+    `).get(customerId) as { balance: number } | undefined;
+
+    const lastBalance = parseCurrency(lastBalanceResult?.balance);
+    const safeDebit = parseCurrency(debit);
+    const safeCredit = parseCurrency(credit);
+    const newBalance = subtractCurrency(addCurrency(lastBalance, safeDebit), safeCredit);
+
     db.prepare(`
       INSERT INTO customer_ledger (
-        customer_id, reference_no, transaction_type, debit, credit, description, transaction_date
+        customer_id, transaction_date, transaction_type, reference_no,
+        debit, credit, balance, description
       )
-      VALUES (?, ?, ?, ?, ?, ?, DATE('now'))
-    `).run(customerId, referenceNo, 'INVOICE', debit, credit, description);
+      VALUES (?, DATE('now'), ?, ?, ?, ?, ?, ?)
+    `).run(customerId, referenceNo, 'INVOICE', debit, credit, newBalance, description);
   }
 
   /**

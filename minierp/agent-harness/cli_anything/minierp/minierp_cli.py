@@ -128,6 +128,7 @@ def repl(ctx: click.Context) -> None:
         "inventory items delete": "Delete an item",
         "inventory items movements": "Get item movement history",
         "inventory items valuation": "Get item valuation",
+        "inventory items categories": "List item categories",
         "inventory stock": "Show stock balances",
         "inventory stock-summary": "Show stock summary",
         "inventory low-stock": "Show low-stock items",
@@ -138,6 +139,9 @@ def repl(ctx: click.Context) -> None:
         "inventory adjust": "Adjust stock level",
         "inventory warehouses list": "List warehouses",
         "inventory warehouses create": "Create warehouse",
+        "inventory warehouses get": "Get warehouse details",
+        "inventory warehouses update": "Update a warehouse",
+        "inventory warehouses delete": "Delete a warehouse",
         "inventory warehouses stock": "Get warehouse stock",
         "inventory movements list": "List stock movements",
         "inventory movements create": "Record stock movement",
@@ -155,6 +159,7 @@ def repl(ctx: click.Context) -> None:
         "suppliers list": "List suppliers",
         "suppliers get": "Get supplier details",
         "suppliers create": "Create a supplier",
+        "suppliers update": "Update a supplier",
         "suppliers delete": "Delete supplier",
         
         # Sales
@@ -237,6 +242,16 @@ def repl(ctx: click.Context) -> None:
         "reports balance-sheet": "Balance sheet",
         "reports income-statement": "Income statement",
         "reports tax-summary": "Tax summary",
+        "reports cash-flow": "Cash flow report",
+        "reports stock-valuation": "Stock valuation report",
+        "reports inventory-movement": "Inventory movement report",
+        "reports production-summary": "Production summary",
+        "reports supplier-analysis": "Supplier analysis",
+        "reports sales-by-customer": "Sales by customer report",
+        "reports sales-by-item": "Sales by item report",
+        "reports customer-statements": "Customer statements",
+        "reports top-debtors": "Top debtors report",
+        "reports dso": "Days sales outstanding metric",
         "reports production-efficiency": "Production efficiency",
         "reports bom-usage": "BOM usage report",
         "reports batch-traceability": "Batch traceability",
@@ -731,6 +746,18 @@ def items_valuation(ctx: click.Context, item_id: int) -> None:
         _handle_error(e, ctx)
 
 
+@inventory_items.command("categories")
+@click.pass_context
+def items_categories(ctx: click.Context) -> None:
+    """List item categories."""
+    from cli_anything.minierp.core.inventory import list_categories
+
+    try:
+        _out(ctx, list_categories())
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
 @inventory_warehouses.command("stock")
 @click.argument("warehouse_id", type=int)
 @click.pass_context
@@ -740,6 +767,59 @@ def warehouses_stock(ctx: click.Context, warehouse_id: int) -> None:
 
     try:
         _out(ctx, get_warehouse_stock(warehouse_id))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@inventory_warehouses.command("get")
+@click.argument("warehouse_id", type=int)
+@click.pass_context
+def warehouses_get(ctx: click.Context, warehouse_id: int) -> None:
+    """Get warehouse details by ID."""
+    from cli_anything.minierp.core.inventory import get_warehouse
+
+    try:
+        _out(ctx, get_warehouse(warehouse_id))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@inventory_warehouses.command("update")
+@click.argument("warehouse_id", type=int)
+@click.option("--name", default=None, help="Warehouse name.")
+@click.option("--location", default=None, help="Physical location.")
+@click.pass_context
+def warehouses_update(
+    ctx: click.Context, warehouse_id: int, name: Optional[str], location: Optional[str]
+) -> None:
+    """Update a warehouse."""
+    from cli_anything.minierp.core.inventory import update_warehouse
+
+    fields = {
+        k: v
+        for k, v in {
+            "warehouse_name": name,
+            "location": location,
+        }.items()
+        if v is not None
+    }
+    try:
+        result = update_warehouse(warehouse_id, **fields)
+        _ok(ctx, f"Updated warehouse {warehouse_id}", result)
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@inventory_warehouses.command("delete")
+@click.argument("warehouse_id", type=int)
+@click.pass_context
+def warehouses_delete(ctx: click.Context, warehouse_id: int) -> None:
+    """Delete a warehouse."""
+    from cli_anything.minierp.core.inventory import delete_warehouse
+
+    try:
+        result = delete_warehouse(warehouse_id)
+        _ok(ctx, f"Deleted warehouse {warehouse_id}", result)
     except ERPError as e:
         _handle_error(e, ctx)
 
@@ -1014,6 +1094,44 @@ def suppliers_delete(ctx: click.Context, supplier_id: int) -> None:
         _handle_error(e, ctx)
 
 
+@suppliers.command("update")
+@click.argument("supplier_id", type=int)
+@click.option("--name", default=None, help="Supplier name.")
+@click.option("--email", default=None)
+@click.option("--phone", default=None)
+@click.option("--address", default=None)
+@click.option("--code", default=None, help="Supplier code.")
+@click.pass_context
+def suppliers_update(
+    ctx: click.Context,
+    supplier_id: int,
+    name: Optional[str],
+    email: Optional[str],
+    phone: Optional[str],
+    address: Optional[str],
+    code: Optional[str],
+) -> None:
+    """Update supplier details."""
+    from cli_anything.minierp.core.suppliers import update_supplier
+
+    fields = {
+        k: v
+        for k, v in {
+            "supplier_name": name,
+            "email": email,
+            "phone": phone,
+            "address": address,
+            "supplier_code": code,
+        }.items()
+        if v is not None
+    }
+    try:
+        result = update_supplier(supplier_id, **fields)
+        _ok(ctx, f"Updated supplier {supplier_id}", result)
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
 # ══════════════════════════════════════════════════════════════════════
 # INVOICES commands
 # ══════════════════════════════════════════════════════════════════════
@@ -1158,33 +1276,32 @@ def purchases_get(ctx: click.Context, purchase_id: int) -> None:
 
 
 @purchases.command("create")
-@click.option("--supplier-id", required=True, type=int)
+@click.option("--item-id", required=True, type=int)
+@click.option("--warehouse-id", required=True, type=int)
+@click.option("--qty", required=True, type=float)
+@click.option("--cost", required=True, type=float)
 @click.option("--date", "purchase_date", required=True)
-@click.option(
-    "--items",
-    "items_json",
-    required=True,
-    help='JSON array: [{"item_id":1,"quantity":5,"unit_price":8.0}]',
-)
+@click.option("--supplier", default="")
+@click.option("--invoice", default="")
 @click.option("--notes", default="")
 @click.pass_context
 def purchases_create(
     ctx: click.Context,
-    supplier_id: int,
+    item_id: int,
+    warehouse_id: int,
+    qty: float,
+    cost: float,
     purchase_date: str,
-    items_json: str,
+    supplier: str,
+    invoice: str,
     notes: str,
 ) -> None:
     """Record a new purchase."""
     from cli_anything.minierp.core.purchases import create_purchase
 
     try:
-        items = json.loads(items_json)
-        result = create_purchase(supplier_id, purchase_date, items, notes)
+        result = create_purchase(item_id, warehouse_id, qty, cost, purchase_date, supplier, invoice, notes)
         _ok(ctx, "Recorded purchase", result)
-    except json.JSONDecodeError as e:
-        _err(f"Invalid JSON for --items: {e}", ctx)
-        sys.exit(1)
     except ERPError as e:
         _handle_error(e, ctx)
 
@@ -1607,6 +1724,149 @@ def reports_batch_traceability(ctx: click.Context, item_id: int) -> None:
 
     try:
         _out(ctx, batch_traceability(item_id))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("cash-flow")
+@click.option("--start", default=None)
+@click.option("--end", default=None)
+@click.pass_context
+def reports_cash_flow(
+    ctx: click.Context, start: Optional[str], end: Optional[str]
+) -> None:
+    """Get cash flow report."""
+    from cli_anything.minierp.core.reports import cash_flow
+
+    try:
+        _out(ctx, cash_flow(start, end))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("stock-valuation")
+@click.pass_context
+def reports_stock_valuation(ctx: click.Context) -> None:
+    """Get stock valuation report."""
+    from cli_anything.minierp.core.reports import stock_valuation
+
+    try:
+        _out(ctx, stock_valuation())
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("inventory-movement")
+@click.option("--start", default=None)
+@click.option("--end", default=None)
+@click.pass_context
+def reports_inventory_movement(
+    ctx: click.Context, start: Optional[str], end: Optional[str]
+) -> None:
+    """Get inventory movement report."""
+    from cli_anything.minierp.core.reports import inventory_movement
+
+    try:
+        _out(ctx, inventory_movement(start, end))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("production-summary")
+@click.option("--start", default=None)
+@click.option("--end", default=None)
+@click.pass_context
+def reports_production_summary(
+    ctx: click.Context, start: Optional[str], end: Optional[str]
+) -> None:
+    """Get production summary report."""
+    from cli_anything.minierp.core.reports import production_summary
+
+    try:
+        _out(ctx, production_summary(start, end))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("supplier-analysis")
+@click.pass_context
+def reports_supplier_analysis(ctx: click.Context) -> None:
+    """Get supplier analysis report."""
+    from cli_anything.minierp.core.reports import supplier_analysis
+
+    try:
+        _out(ctx, supplier_analysis())
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("sales-by-customer")
+@click.option("--start", default=None)
+@click.option("--end", default=None)
+@click.pass_context
+def reports_sales_by_customer(
+    ctx: click.Context, start: Optional[str], end: Optional[str]
+) -> None:
+    """Get sales by customer report."""
+    from cli_anything.minierp.core.reports import sales_by_customer
+
+    try:
+        _out(ctx, sales_by_customer(start, end))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("sales-by-item")
+@click.option("--start", default=None)
+@click.option("--end", default=None)
+@click.pass_context
+def reports_sales_by_item(
+    ctx: click.Context, start: Optional[str], end: Optional[str]
+) -> None:
+    """Get sales by item report."""
+    from cli_anything.minierp.core.reports import sales_by_item
+
+    try:
+        _out(ctx, sales_by_item(start, end))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("customer-statements")
+@click.option("--customer-id", required=True, type=int, help="Customer ID.")
+@click.pass_context
+def reports_customer_statements(ctx: click.Context, customer_id: int) -> None:
+    """Get customer statements."""
+    from cli_anything.minierp.core.reports import customer_statements
+
+    try:
+        _out(ctx, customer_statements(customer_id))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("top-debtors")
+@click.option("--limit", default=10, type=int, help="Number of debtors.")
+@click.pass_context
+def reports_top_debtors(ctx: click.Context, limit: int) -> None:
+    """Get top debtors report."""
+    from cli_anything.minierp.core.reports import top_debtors
+
+    try:
+        _out(ctx, top_debtors(limit))
+    except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@reports.command("dso")
+@click.option("--period", default=30, type=int, help="Days period for DSO calculation.")
+@click.pass_context
+def reports_dso(ctx: click.Context, period: int) -> None:
+    """Get Days Sales Outstanding metric."""
+    from cli_anything.minierp.core.reports import dso
+
+    try:
+        _out(ctx, dso(period))
     except ERPError as e:
         _handle_error(e, ctx)
 

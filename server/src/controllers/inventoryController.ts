@@ -163,7 +163,7 @@ function getUnitsOfMeasure(req: Request, res: Response): void {
 
 function getWarehouses(req: Request, res: Response): void {
   try {
-    const warehouses = WarehouseModel.getAll(db);
+    const warehouses = WarehouseModel.getAllActive(db);
     res.json({
       success: true,
       data: warehouses
@@ -255,6 +255,30 @@ function updateWarehouse(req: AuthRequest, res: Response): void {
   } catch (error) {
     logger.error('Update warehouse error:', error);
     res.status(500).json({ error: 'Failed to update warehouse' });
+  }
+}
+
+function deleteWarehouse(req: AuthRequest, res: Response): void {
+  try {
+    const warehouseId = Number(req.params.id);
+    const existing = WarehouseModel.getById(db, warehouseId);
+
+    if (!existing) {
+      res.status(404).json({ error: 'Warehouse not found' });
+      return;
+    }
+
+    WarehouseModel.delete(db, warehouseId);
+
+    logCRUD(ActionType.WAREHOUSE_DELETE, 'Warehouse', warehouseId, `Deleted warehouse: ${existing.warehouse_name}`, req.user!.id, {
+      warehouse_code: existing.warehouse_code
+    });
+    req.activityLogged = true;
+
+    res.json({ success: true, message: 'Warehouse deleted successfully' });
+  } catch (error) {
+    logger.error('Delete warehouse error:', error);
+    res.status(500).json({ error: 'Failed to delete warehouse' });
   }
 }
 
@@ -365,6 +389,7 @@ export default {
   getWarehouse,
   createWarehouse,
   updateWarehouse,
+  deleteWarehouse,
   getStockMovements,
   createStockMovement,
   getStockSummary,

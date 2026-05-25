@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -20,6 +20,7 @@ export default function WarehousesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [gridReady, setGridReady] = useState(false);
   const { isMobile } = useMobileDetection();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -32,13 +33,38 @@ export default function WarehousesPage() {
     }
   });
 
-  const filteredWarehouses = warehouses.filter(warehouse =>
-    warehouse.warehouse_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    warehouse.warehouse_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    warehouse.location?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredWarehouses = useMemo(() =>
+    warehouses.filter(warehouse =>
+      warehouse.warehouse_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warehouse.warehouse_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warehouse.location?.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [warehouses, searchTerm]);
 
-  const columnDefs = [
+  const deleteMutation = useMutation({
+    mutationFn: async (warehouseId) => {
+      return api.delete(`/inventory/warehouses/${warehouseId}`);
+    },
+    onSuccess: () => {
+      toast.success('Warehouse deleted successfully!');
+      queryClient.removeQueries(['warehouses']);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to delete warehouse');
+    }
+  });
+
+  const handleDeleteWarehouse = (warehouse) => {
+    if (window.confirm(`Are you sure you want to delete warehouse: ${warehouse.warehouse_name}?`)) {
+      deleteMutation.mutate(warehouse.id);
+    }
+  };
+
+  const handleRowClick = (warehouse) => {
+    setEditingWarehouse(warehouse);
+    setIsModalOpen(true);
+  };
+
+  const columnDefs = useMemo(() => [
     {
       headerName: 'Code',
       field: 'warehouse_code',
@@ -58,13 +84,47 @@ export default function WarehousesPage() {
       field: 'location',
       filter: true,
       flex: 2
+    },
+    {
+      headerName: 'Actions',
+      field: 'actions',
+      flex: 1,
+      minWidth: 140,
+      cellRenderer: (params) => {
+        return (
+          <div className="table-actions">
+            <Button
+              variant="primary"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRowClick(params.data);
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="danger"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteWarehouse(params.data);
+              }}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </div>
+        );
+      }
     }
-  ];
+  ], [deleteMutation.isPending, handleRowClick, handleDeleteWarehouse]);
 
-  const handleRowClick = (warehouse) => {
-    setEditingWarehouse(warehouse);
-    setIsModalOpen(true);
-  };
+  // Defer Ag-Grid mount until after initial paint to avoid blocking interactivity
+  useEffect(() => {
+    const timer = setTimeout(() => setGridReady(true), 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleNew = () => {
     setEditingWarehouse(null);
@@ -74,25 +134,6 @@ export default function WarehousesPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingWarehouse(null);
-  };
-
-  const deleteMutation = useMutation({
-    mutationFn: async (warehouseId) => {
-      return api.delete(`/inventory/warehouses/${warehouseId}`);
-    },
-    onSuccess: () => {
-      toast.success('Warehouse deleted successfully!');
-      queryClient.invalidateQueries(['warehouses']);
-    },
-    onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to delete warehouse');
-    }
-  });
-
-  const handleDeleteWarehouse = (warehouse) => {
-    if (window.confirm(`Are you sure you want to delete warehouse: ${warehouse.warehouse_name}?`)) {
-      deleteMutation.mutate(warehouse.id);
-    }
   };
 
   return (
@@ -155,13 +196,12 @@ export default function WarehousesPage() {
             />
           ))}
         </div>
-      ) : (
-        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
+      ) : gridReady ? (
+        <div className="ag-theme-quartz warehouses-grid-wrapper">
           <AgGridReact theme="legacy"
             rowData={filteredWarehouses}
             columnDefs={columnDefs}
-defaultColDef={{
-              theme:"legacy",
+            defaultColDef={{
               resizable: true,
               sortable: false,
               filter: false
@@ -171,7 +211,21 @@ defaultColDef={{
             paginationPageSizeSelector={[10, 20, 50, 100]}
             onRowClicked={(params) => handleRowClick(params.data)}
             rowSelection={{ mode: 'singleRow' }}
+            suppressMaxRenderedRowRestriction={true}
           />
+        </div>
+      ) : (
+        <div className="ag-grid-placeholder">
+          <div className="ag-grid-skeleton">
+            <div className="skeleton-header"></div>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div className="skeleton-row" key={i}>
+                <div className="skeleton-cell"></div>
+                <div className="skeleton-cell"></div>
+                <div className="skeleton-cell"></div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

@@ -148,12 +148,11 @@ export default function ARReportsPage() {
         if (summaryData) {
           // For summary report, create a single row with all summary data
           const exportData = [
-            { metric: 'Total Invoices', value: summaryData.totalInvoices },
-            { metric: 'Total Value', value: summaryData.totalValue },
-            { metric: 'Total Paid', value: summaryData.totalPaid },
-            { metric: 'Total Outstanding', value: summaryData.totalOutstanding },
-            { metric: 'Overdue Count', value: summaryData.overdue?.count },
-            { metric: 'Overdue Amount', value: summaryData.overdue?.amount }
+            { metric: 'Total Invoices', value: summaryData.total_invoices },
+            { metric: 'Total Outstanding', value: summaryData.total_outstanding },
+            { metric: 'Total Paid', value: summaryData.total_paid },
+            { metric: 'Overdue Count', value: summaryData.overdue_count },
+            { metric: 'Overdue Amount', value: summaryData.overdue_amount }
           ];
 
           const exportColumns = [
@@ -163,7 +162,7 @@ export default function ARReportsPage() {
               field: 'value',
               valueFormatter: (params) => {
                 // Format as currency for monetary values
-                if (['Total Value', 'Total Paid', 'Total Outstanding', 'Overdue Amount'].includes(params.row?.metric)) {
+                if (['Total Outstanding', 'Total Paid', 'Overdue Amount'].includes(params.row?.metric)) {
                   return formatCurrency(params.value);
                 }
                 return params.value;

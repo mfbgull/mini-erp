@@ -62,10 +62,11 @@ function createDefaultUser(): void {
   const existingUser = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
 
   if (!existingUser) {
-    const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+    let defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD;
     if (!defaultPassword && process.env.NODE_ENV !== 'production') {
-      // For development only, provide a clear warning but allow fallback
-      logger.warn('WARNING: DEFAULT_ADMIN_PASSWORD not set, using development-only fallback. DO NOT USE IN PRODUCTION.');
+      // Development: no env var set, fall back to well-known dev credential
+      logger.warn('⚠ WARNING: DEFAULT_ADMIN_PASSWORD not set. Using default development fallback (admin123). DO NOT USE IN PRODUCTION.');
+      defaultPassword = 'admin123';
     }
     if (!defaultPassword) {
       throw new Error('FATAL: DEFAULT_ADMIN_PASSWORD environment variable must be set');
@@ -435,23 +436,8 @@ function runBOMMigration(): void {
 
 function runSalesMigration(): void {
   try {
-    const salesTableCheck = db.prepare(`
-      SELECT name FROM sqlite_master
-      WHERE type='table' AND name='sales'
-    `).get() as { name: string } | undefined;
-
-    if (!salesTableCheck) {
-      logger.info('Running sales migration...');
-
-      const salesSQL = fs.readFileSync(
-        path.join(__dirname, '../migrations/add-sales-table.sql'),
-        'utf8'
-      );
-
-      db.exec(salesSQL);
-
-      logger.info('✅ Sales migration completed!');
-    }
+    // Drop legacy sales table — POS and direct sales now use invoices+invoice_items
+    db.exec(`DROP TABLE IF EXISTS sales`);
 
     // Check and run sales cycle migration (quotations & sales orders)
     const salesCycleCheck = db.prepare(`
@@ -734,8 +720,10 @@ runPerformanceIndexesMigration();
 runMissingIndexesMigration();
 runMissingFKIndexesMigration();
 runProductionOverheadMigration();
+runProductionBOMIdMigration();
 runRolesPermissionsMigration();
 runStockAdjustmentFinancialMigration();
+runForecastsMigration();
 runMissingFKIndexesMigration();
 
 // Rollback support: run if --rollback flag is passed
@@ -750,6 +738,21 @@ if (process.argv.includes('--rollback')) {
 }
 
 export default db;
+
+function runProductionBOMIdMigration(): void {
+  try {
+    const hasBOMId = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('productions') WHERE name='bom_id'`
+    ).get() as { count: number };
+    if (!hasBOMId.count) {
+      logger.info('Running production bom_id migration...');
+      db.prepare(`ALTER TABLE productions ADD COLUMN bom_id INTEGER REFERENCES boms(id)`).run();
+      logger.info('✅ Production bom_id migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Production bom_id migration error:', error.message);
+  }
+}
 
 function runProductionOverheadMigration(): void {
   try {
@@ -941,21 +944,85 @@ function seedDefaultPermissions(): void {
 
 function runStockAdjustmentFinancialMigration(): void {
   try {
+    // Step 1: Ensure journal_entries table exists (must be created before FK reference)
+    const hasJournalTable = db.prepare(
+      `SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name='journal_entries'`
+    ).get() as { count: number };
+
+    if (hasJournalTable.count === 0) {
+      logger.info('Creating journal_entries table...');
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS journal_entries (
+          id              INTEGER PRIMARY KEY AUTOINCREMENT,
+          reference_type  TEXT NOT NULL,
+          reference_id    INTEGER NOT NULL,
+          entry_date      DATE NOT NULL,
+          description     TEXT,
+          debit_account   TEXT NOT NULL,
+          credit_account  TEXT NOT NULL,
+          amount          DECIMAL(15,4) NOT NULL,
+          created_by      INTEGER REFERENCES users(id),
+          voided          BOOLEAN DEFAULT FALSE,
+          created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE INDEX IF NOT EXISTS idx_journal_entries_reference ON journal_entries(reference_type, reference_id);
+        CREATE INDEX IF NOT EXISTS idx_journal_entries_date ON journal_entries(entry_date);
+        CREATE INDEX IF NOT EXISTS idx_journal_entries_accounts ON journal_entries(debit_account, credit_account, voided);
+      `);
+      logger.info('journal_entries table created');
+    }
+
+    // Step 2: Add stock_movements columns if missing
     const hasFinancialValue = db.prepare(
       `SELECT COUNT(*) as count FROM pragma_table_info('stock_movements') WHERE name='financial_value'`
     ).get() as { count: number };
 
     if (hasFinancialValue.count === 0) {
-      logger.info('Running stock adjustment financial migration...');
-      const migrationSQL = fs.readFileSync(
-        path.join(__dirname, '../migrations/add-stock-adjustment-financial.sql'),
-        'utf8'
-      );
-      db.exec(migrationSQL);
-      logger.info('✅ Stock adjustment financial migration completed!');
+      logger.info('Adding financial columns to stock_movements...');
+      db.exec(`
+        ALTER TABLE stock_movements ADD COLUMN financial_value DECIMAL(15,4) DEFAULT 0;
+        ALTER TABLE stock_movements ADD COLUMN financial_posted BOOLEAN DEFAULT FALSE;
+        ALTER TABLE stock_movements ADD COLUMN journal_entry_id INTEGER REFERENCES journal_entries(id);
+      `);
+      logger.info('Financial columns added to stock_movements');
+    } else {
+      // Recovery: Check for missing journal_entry_id column (partial migration fix)
+      const hasJournalEntryId = db.prepare(
+        `SELECT COUNT(*) as count FROM pragma_table_info('stock_movements') WHERE name='journal_entry_id'`
+      ).get() as { count: number };
+
+      if (hasJournalEntryId.count === 0) {
+        logger.info('Adding missing journal_entry_id column...');
+        db.exec('ALTER TABLE stock_movements ADD COLUMN journal_entry_id INTEGER REFERENCES journal_entries(id)');
+        logger.info('journal_entry_id column added');
+      }
     }
   } catch (error: any) {
     logger.error('Stock adjustment financial migration error:', error.message);
+  }
+}
+
+function runForecastsMigration(): void {
+  try {
+    const tableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='demand_forecasts'
+    `).get() as { name: string } | undefined;
+
+    if (!tableCheck) {
+      logger.info('Running demand forecasts migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-demand-forecasts.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      logger.info('✅ Demand forecasts migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Demand forecasts migration error:', error.message);
   }
 }
 

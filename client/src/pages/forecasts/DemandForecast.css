@@ -1,3 +1,89 @@
+.compact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.compact-forecast-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.compact-forecast-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.compact-forecast-card .card-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compact-forecast-card .card-item-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.compact-forecast-card .card-item-code {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.compact-forecast-card .trend-icon.growing { color: #16a34a; }
+.compact-forecast-card .trend-icon.declining { color: #dc2626; }
+.compact-forecast-card .trend-icon.stable { color: #6b7280; }
+
+.compact-forecast-card .card-body {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.compact-forecast-card .card-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.compact-forecast-card .card-stat-label {
+  font-size: 11px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.compact-forecast-card .card-stat-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.compact-forecast-card .card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compact-rec-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.compact-rec-badge.order_now { background: #fee2e2; color: #dc2626; }
+.compact-rec-badge.order_soon { background: #fef3c7; color: #d97706; }
+.compact-rec-badge.monitor { background: #dbeafe; color: #2563eb; }
+.compact-rec-badge.adequate { background: #dcfce7; color: #16a34a; }
+
+.compact-forecast-card .card-category {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
 .demand-forecast-page {
   padding: 20px;
 }

@@ -86,16 +86,10 @@ export const supplierSchema = z.object({
 
 // ── Purchases ─────────────────────────────────────────────────────
 export const purchaseSchema = z.object({
-  item_id: z.string().min(1, 'Item is required'),
-  warehouse_id: z.string().min(1, 'Warehouse is required'),
-  quantity: z.string().refine(
-    val => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
-    'Quantity must be greater than 0'
-  ),
-  unit_cost: z.string().refine(
-    val => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
-    'Unit cost must be greater than 0'
-  ),
+  item_id: z.coerce.number().positive('Item is required'),
+  warehouse_id: z.coerce.number().positive('Warehouse is required'),
+  quantity: z.coerce.number().positive('Quantity must be greater than 0'),
+  unit_cost: z.coerce.number().positive('Unit cost must be greater than 0'),
   supplier_name: z.string().optional(),
   purchase_date: z.string().min(1, 'Purchase date is required'),
   invoice_no: z.string().optional(),
@@ -121,7 +115,10 @@ export const purchaseOrderSchema = z.object({
 // ── BOM ───────────────────────────────────────────────────────────
 export const bomSchema = z.object({
   bom_name: z.string().min(1, 'BOM name is required'),
-  finished_item_id: z.string().min(1, 'Finished product is required'),
+  finished_item_id: z.union([z.string(), z.number()]).refine(
+    val => val !== '' && val !== null && val !== undefined && val !== 0,
+    'Finished product is required'
+  ),
   quantity: z.coerce.number().positive('Quantity must be greater than 0').default(1),
   description: z.string().optional(),
 });

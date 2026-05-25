@@ -208,6 +208,24 @@ def adjust_stock(
     )
 
 
+def delete_warehouse(wh_id: int) -> dict:
+    """Delete a warehouse."""
+    client = make_client()
+    return client.delete(f"/inventory/warehouses/{wh_id}")
+
+
+def get_item_ledger(item_id: int) -> list[dict]:
+    """Get stock ledger for an item."""
+    client = make_client()
+    return client.get(f"/inventory/stock-ledger/{item_id}")
+
+
+def get_units_of_measure() -> list[dict]:
+    """Get available units of measure."""
+    client = make_client()
+    return client.get("/inventory/items-uom")
+
+
 def get_slow_moving_items(threshold_days: int = 90) -> list[dict]:
     """Get items with no movement in specified days."""
     client = make_client()

@@ -1,5 +1,9 @@
 .sales-page {
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Page header styles inherited from global.css */
@@ -98,6 +102,20 @@
   border-radius: 12px;
   border: 1px solid var(--neutral-200);
   overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sales-content .grid-fill {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.sales-content .ag-theme-quartz {
+  --ag-row-height: 48px;
 }
 
 /* Invoice Link */
@@ -271,6 +289,53 @@
   flex: 1;
   min-width: 0;
   max-width: 500px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pos-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid #DEE2E6;
+  border-radius: var(--radius-md);
+  background: var(--card-bg, #fff);
+  color: var(--neutral-600);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  height: 44px;
+}
+
+.pos-filter-toggle:hover {
+  border-color: #0891b2;
+  color: #0e7490;
+  background: #f0fdff;
+}
+
+.pos-filter-toggle.active {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #047857;
+}
+
+.pos-filter-toggle.active:hover {
+  background: #d1fae5;
+  border-color: #059669;
+}
+
+.pos-filter-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pos-filter-toggle span {
+  line-height: 1;
 }
 
 .search-icon {
@@ -364,5 +429,9 @@
 
   .search-quick-row .search-section {
     max-width: 100%;
+  }
+
+  .pos-filter-toggle span {
+    display: none;
   }
 }

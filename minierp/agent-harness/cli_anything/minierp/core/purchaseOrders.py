@@ -134,6 +134,12 @@ def create_goods_receipt(
     )
 
 
+def get_summary_by_supplier(supplier_id: int) -> dict:
+    """Get purchase order summary for a supplier."""
+    client = make_client()
+    return client.get(f"/purchase-orders/summary/supplier/{supplier_id}")
+
+
 def get_supplier_balance(supplier_id: int) -> dict:
     """Get supplier account balance."""
     client = make_client()

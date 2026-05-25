@@ -22,24 +22,39 @@ def get_purchase(purchase_id: int) -> dict:
 
 
 def create_purchase(
-    supplier_id: int, purchase_date: str, items: list[dict], notes: str = ""
+    item_id: int, 
+    warehouse_id: int, 
+    quantity: float, 
+    unit_cost: float, 
+    purchase_date: str, 
+    supplier_name: str = "", 
+    invoice_no: str = "", 
+    notes: str = ""
 ) -> dict:
     """Record a purchase.
 
     Args:
-        supplier_id: Supplier ID
+        item_id: Item ID
+        warehouse_id: Warehouse ID
+        quantity: Quantity purchased
+        unit_cost: Unit cost
         purchase_date: Date string YYYY-MM-DD
-        items: List of {item_id, quantity, unit_price}
+        supplier_name: Supplier name
+        invoice_no: Invoice number
         notes: Optional notes
     """
     client = make_client()
     return client.post(
         "/purchases",
         body={
-            "supplier_id": supplier_id,
+            "item_id": item_id,
+            "warehouse_id": warehouse_id,
+            "quantity": quantity,
+            "unit_cost": unit_cost,
+            "supplier_name": supplier_name,
             "purchase_date": purchase_date,
-            "items": items,
-            "notes": notes,
+            "invoice_no": invoice_no,
+            "remarks": notes,
         },
     )
 
@@ -60,6 +75,12 @@ def get_purchase_summary(
             "end_date": end_date,
         },
     )
+
+
+def get_purchase_summary_by_item(item_id: int) -> dict:
+    """Get purchase summary for a specific item."""
+    client = make_client()
+    return client.get(f"/purchases/summary/item/{item_id}")
 
 
 def get_top_suppliers(limit: int = 10) -> list[dict]:

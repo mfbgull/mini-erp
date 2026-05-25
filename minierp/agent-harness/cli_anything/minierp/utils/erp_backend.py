@@ -148,7 +148,11 @@ class ERPClient:
         self.session = requests.Session()
 
     def _headers(self) -> dict:
-        return {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json"}
+        csrf_token = self.cookies.get("csrf-token")
+        if csrf_token:
+            headers["x-csrf-token"] = csrf_token
+        return headers
 
     def _url(self, path: str) -> str:
         return f"{self.base_url}/{path.lstrip('/')}"
@@ -266,6 +270,14 @@ def login_and_get_client(
     sess.base_url = base_url
     sess.username = user_data.get("username")
     sess._cookies = dict(client.session.cookies)
+    
+    # Make a dummy request to fetch the CSRF token cookie
+    try:
+        client.get("/settings")
+        sess._cookies = dict(client.session.cookies)
+    except Exception:
+        pass
+        
     sess.save()
 
     authenticated_client = ERPClient(base_url=base_url, cookies=sess._cookies)

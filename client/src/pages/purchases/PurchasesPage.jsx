@@ -349,6 +349,7 @@ export default function PurchasesPage() {
 
 function PurchaseForm({ onClose, onSuccess }) {
   const { formatCurrency } = useSettings();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     item_id: "",
     warehouse_id: "",
@@ -408,16 +409,16 @@ function PurchaseForm({ onClose, onSuccess }) {
 
     if (!validate(formData)) return;
 
-    // Convert to proper types
-    const data = {
-      ...formData,
-      item_id: parseInt(formData.item_id),
-      warehouse_id: parseInt(formData.warehouse_id),
-      quantity: parseFloat(formData.quantity),
-      unit_cost: parseFloat(formData.unit_cost),
-    };
-
-    mutation.mutate(data);
+    mutation.mutate({
+      item_id: Number(formData.item_id),
+      warehouse_id: Number(formData.warehouse_id),
+      quantity: Number(formData.quantity),
+      unit_cost: Number(formData.unit_cost),
+      supplier_name: formData.supplier_name,
+      purchase_date: formData.purchase_date,
+      invoice_no: formData.invoice_no || '',
+      remarks: formData.remarks || '',
+    });
   };
 
   const totalCost =

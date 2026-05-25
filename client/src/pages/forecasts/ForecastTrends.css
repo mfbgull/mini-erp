@@ -100,6 +100,59 @@
   color: #6b7280;
 }
 
+.empty-cell {
+  text-align: center;
+  color: #9ca3af;
+  padding: 24px !important;
+}
+
+.skeleton-pulse {
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-line.medium {
+  height: 14px;
+  width: 70%;
+  border-radius: 6px;
+  background: #e5e7eb;
+}
+
+.skeleton-chart {
+  width: 100%;
+  height: 260px;
+  border-radius: 8px;
+  background: #e5e7eb;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #dc2626;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-refresh {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
 @media (max-width: 768px) {
   .charts-grid {
     grid-template-columns: 1fr;

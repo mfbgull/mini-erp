@@ -382,41 +382,7 @@ function getSalesDashboard(req: Request, res: Response): void {
   }
 }
 
-// ============ Legacy Sale Controllers (kept for backward compatibility) ============
-
-function getSale(req: Request, res: Response): void {
-  try {
-    // Redirect to invoice endpoint for legacy support
-    res.redirect(301, `/api/invoices/${req.params.id}`);
-  } catch (error: any) {
-    logger.error('Get sale error:', error);
-    res.status(500).json({ error: 'Failed to get sale' });
-  }
-}
-
-function deleteSale(req: AuthRequest, res: Response): void {
-  try {
-    // Legacy endpoint - redirect to invoice deletion
-    res.status(410).json({ error: 'This endpoint is deprecated. Use invoice deletion instead.' });
-  } catch (error: any) {
-    logger.error('Delete sale error:', error);
-    res.status(500).json({ error: 'Failed to delete sale' });
-  }
-}
-
-function getSalesSummaryByItem(req: Request, res: Response): void {
-  try {
-    // This would need to be implemented based on invoice_items
-    // For now, return placeholder
-    res.json({
-      success: true,
-      message: 'Use invoice analytics for detailed sales summary'
-    });
-  } catch (error: any) {
-    logger.error('Get sales summary by item error:', error);
-    res.status(500).json({ error: 'Failed to get sales summary' });
-  }
-}
+// ============ Legacy (migrated to InvoiceModel) ============
 
 function getSalesSummaryByDateRange(req: Request, res: Response): void {
   try {
@@ -432,52 +398,6 @@ function getSalesSummaryByDateRange(req: Request, res: Response): void {
   } catch (error: any) {
     logger.error('Get sales summary by date range error:', error);
     res.status(500).json({ error: 'Failed to get sales summary' });
-  }
-}
-
-function getTopCustomers(req: Request, res: Response): void {
-  try {
-    const limit = req.query.limit ? parseInt(String(req.query.limit)) : 10;
-    // This would need a proper implementation
-    res.json({
-      success: true,
-      message: 'Use customer analytics for top customers',
-      limit
-    });
-  } catch (error: any) {
-    logger.error('Get top customers error:', error);
-    res.status(500).json({ error: 'Failed to get top customers' });
-  }
-}
-
-function getItemCustomerPriceHistory(req: Request, res: Response): void {
-  try {
-    const itemIdParam = Array.isArray(req.query.item_id) ? req.query.item_id[0] : req.query.item_id;
-    const customerIdParam = Array.isArray(req.query.customer_id) ? req.query.customer_id[0] : req.query.customer_id;
-
-    const item_id = itemIdParam ? Number(itemIdParam) : undefined;
-    const customer_id = customerIdParam ? Number(customerIdParam) : undefined;
-
-    if (!item_id || !customer_id) {
-      res.status(400).json({
-        success: false,
-        error: 'Item ID and Customer ID are required'
-      });
-      return;
-    }
-
-    // This would need a proper implementation querying invoice_items
-    res.json({
-      success: true,
-      data: null,
-      message: 'Price history available via invoice analytics'
-    });
-  } catch (error: any) {
-    logger.error('Error fetching price history:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch price history'
-    });
   }
 }
 
@@ -507,11 +427,6 @@ export default {
   // Dashboard
   getSalesDashboard,
   
-  // Legacy (kept for backward compatibility)
-  getSale,
-  deleteSale,
-  getSalesSummaryByItem,
-  getSalesSummaryByDateRange,
-  getTopCustomers,
-  getItemCustomerPriceHistory
+  // Legacy (migrated to InvoiceModel)
+  getSalesSummaryByDateRange
 };

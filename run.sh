@@ -5,6 +5,10 @@ echo "Starting Mini ERP System..."
 echo "===================================="
 echo ""
 
+echo "[0/2] Cleaning up ports 3010 and 3011..."
+fuser -k 3010/tcp 3011/tcp > /dev/null 2>&1 || true
+sleep 1
+
 echo "[1/2] Starting Backend Server..."
 cd server
 npm start &

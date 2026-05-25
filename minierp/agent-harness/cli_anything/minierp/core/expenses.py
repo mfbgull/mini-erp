@@ -75,6 +75,23 @@ def get_expense_summary(
     )
 
 
+def update_expense_category(category_id: int, name: str = "", description: str = "") -> dict:
+    """Update an expense category."""
+    client = make_client()
+    body: dict[str, Any] = {}
+    if name:
+        body["name"] = name
+    if description:
+        body["description"] = description
+    return client.put(f"/expenses/categories/{category_id}", body=body)
+
+
+def delete_expense_category(category_id: int) -> dict:
+    """Delete an expense category."""
+    client = make_client()
+    return client.delete(f"/expenses/categories/{category_id}")
+
+
 def get_expenses_by_date_range(start_date: str, end_date: str) -> list[dict]:
     client = make_client()
     return client.get(

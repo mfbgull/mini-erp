@@ -438,6 +438,9 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
       return res.status(404).json({ error: 'Invoice not found' });
     }
 
+    // Fallback to original invoice_no if not provided in request
+    const resolvedInvoiceNo = invoice_no || originalInvoice.invoice_no;
+
     const transaction = db.transaction(() => {
         // === Handle deleted payments ===
         if (deleted_payments && Array.isArray(deleted_payments) && deleted_payments.length > 0) {
@@ -484,7 +487,7 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
             InvoiceModel.createPaymentAllocation(db, newPaymentId, invoiceId, newPaymentAmount);
 
             // Ledger entry for payment (credit to reduce AR)
-            InvoiceModel.createLedgerEntry(db, parsedCustomerId, newPaymentNo, 0, newPaymentAmount, `Payment ${newPaymentNo} for Invoice ${invoice_no}`);
+            InvoiceModel.createLedgerEntry(db, parsedCustomerId, newPaymentNo, 0, newPaymentAmount, `Payment ${newPaymentNo} for Invoice ${resolvedInvoiceNo}`);
         }
 
         // === Recalculate paid/balance ===
@@ -506,7 +509,7 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
 
         // Update invoice record
         InvoiceModel.updateInvoice(db, invoiceId, {
-            invoice_no,
+            invoice_no: resolvedInvoiceNo,
             customer_id: parsedCustomerId,
             invoice_date,
             due_date,
@@ -558,8 +561,8 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
                     quantity: -item.quantity,
                     unit_cost: item.unit_price,
                     reference_doctype: 'INVOICE',
-                    reference_docno: invoice_no,
-                    remarks: `Sold via Invoice ${invoice_no} (updated)`,
+                    reference_docno: resolvedInvoiceNo,
+                    remarks: `Sold via Invoice ${resolvedInvoiceNo} (updated)`,
                     movement_date: invoice_date,
                 },
                 userId,
@@ -569,8 +572,8 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
 
         // Update ledger entry for the invoice if total changed
         // Delete old invoice ledger entry and recreate with new amount
-        InvoiceModel.deleteLedgerEntryByReference(db, invoice_no);
-        InvoiceModel.createLedgerEntry(db, parsedCustomerId, invoice_no, totalAmountNum, 0, `Invoice ${invoice_no} (updated)`);
+        InvoiceModel.deleteLedgerEntryByReference(db, resolvedInvoiceNo);
+        InvoiceModel.createLedgerEntry(db, parsedCustomerId, resolvedInvoiceNo, totalAmountNum, 0, `Invoice ${resolvedInvoiceNo} (updated)`);
 
         // --- FIX #6: Customer balance update inside transaction ---
         if (originalInvoice.customer_id !== parsedCustomerId) {
@@ -592,8 +595,10 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
 
     res.json(updatedInvoice);
   } catch (error: unknown) {
-    logger.error('Update invoice error:', { error });
-    res.status(500).json({ error: 'Failed to update invoice' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorName = error instanceof Error ? error.name : 'Unknown';
+    logger.error('Update invoice error:', { error: errorMessage, name: errorName, stack: error instanceof Error ? error.stack : undefined });
+    res.status(500).json({ error: 'Failed to update invoice', detail: errorMessage, code: errorName });
   }
 }
 

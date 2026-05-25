@@ -250,6 +250,7 @@ export interface MonthlySaleData {
   month: string;
   actual: number | null;
   predicted: number | null;
+  movingAvg?: number | null;
 }
 
 export interface TrendData {

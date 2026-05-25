@@ -27,6 +27,7 @@ export default function SalesPage() {
   const { isMobile } = useMobileDetection();
   const [previewInvoice, setPreviewInvoice] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showPOSSales, setShowPOSSales] = useState(false);
 
   useKeyboardShortcut('Alt+N', () => {
     navigate('/sales/invoice');
@@ -57,11 +58,16 @@ export default function SalesPage() {
     outstanding: invoices.reduce((sum, inv) => sum + parseFloat(inv.balance_amount || 0), 0)
   };
 
-  // Filter invoices by search term
-  const filteredInvoices = invoices.filter((inv) =>
-    inv.invoice_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inv.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter invoices by search term and optionally exclude POS
+  const filteredInvoices = invoices.filter((inv) => {
+    const matchesSearch =
+      inv.invoice_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inv.customer_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!matchesSearch) return false;
+    // Hide POS invoices by default — toggle to show them
+    if (!showPOSSales && inv.source_type === 'POS') return false;
+    return true;
+  });
 
   // Delete invoice mutation
   const deleteInvoiceMutation = useMutation({
@@ -210,9 +216,7 @@ export default function SalesPage() {
         <StatCard icon={ShoppingCart} label={t('sales.totalSales')} value={formatCurrency(invoiceTotals.total)} />
         <StatCard icon={DollarSign} label={t('sales.totalPaid')} value={formatCurrency(invoiceTotals.paid)} />
         <StatCard icon={AlertTriangle} label={t('sales.totalDue')} value={formatCurrency(invoiceTotals.outstanding)} />
-      </StatsGrid>
-
-      <div className="search-quick-row">
+      </StatsGrid>        <div className="search-quick-row">
         <div className="search-section">
           <div className="search-input-wrapper">
             <Search className="search-icon" size={20} />
@@ -233,6 +237,15 @@ export default function SalesPage() {
               </button>
             )}
           </div>
+          <button
+            className={`pos-filter-toggle ${showPOSSales ? 'active' : ''}`}
+            onClick={() => setShowPOSSales(!showPOSSales)}
+            type="button"
+            title={showPOSSales ? 'Hide POS sales' : 'Show POS sales'}
+          >
+            <ShoppingCart size={16} />
+            <span>{showPOSSales ? 'Hide POS' : 'POS'}</span>
+          </button>
         </div>
         <div className="quick-actions">
           <button className="quick-action-btn" onClick={() => navigate("/pos")} type="button">
@@ -280,7 +293,7 @@ export default function SalesPage() {
             onDelete={handleDeleteInvoice}
           />
         ) : (
-          <div className="ag-theme-quartz" style={{ height: 500, width: '100%' }}>
+          <div className="ag-theme-quartz grid-fill">
             <AgGridReact theme="legacy"
               rowData={filteredInvoices}
               columnDefs={invoiceColumnDefs}

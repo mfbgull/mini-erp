@@ -1,5 +1,4 @@
 import Database from 'better-sqlite3';
-import { SalesSummary } from '../types';
 
 interface ReceivablesSummaryRow {
   total_invoices: number;
@@ -114,16 +113,39 @@ function getReceivablesSummary(db: Database.Database, asOfDate: string = new Dat
 }
 
 function getSalesSummary(db: Database.Database, startDate: string, endDate: string) {
-  const summary = db.prepare(`
-    SELECT COUNT(DISTINCT i.id) as total_invoices, COALESCE(SUM(i.total_amount), 0) as total_revenue,
-      COUNT(DISTINCT i.customer_id) as unique_customers, COUNT(DISTINCT ii.item_id) as unique_items,
-      AVG(i.total_amount) as avg_invoice_value
-    FROM invoices i LEFT JOIN invoice_items ii ON i.id = ii.invoice_id WHERE i.invoice_date BETWEEN ? AND ?
-  `).get(startDate, endDate) as SalesSummary;
+  const detail = db.prepare(`
+    SELECT i.invoice_date, i.invoice_no, c.customer_name,
+           i.total_amount, i.paid_amount, i.balance_amount, i.status,
+           COALESCE(SUM(ii.quantity), 0) as total_items
+    FROM invoices i
+    JOIN customers c ON i.customer_id = c.id
+    LEFT JOIN invoice_items ii ON ii.invoice_id = i.id
+    WHERE i.invoice_date BETWEEN ? AND ?
+    GROUP BY i.id
+    ORDER BY i.invoice_date DESC
+  `).all(startDate, endDate);
 
-  const dailySales = db.prepare(`SELECT invoice_date, COUNT(*) as count, SUM(total_amount) as total FROM invoices WHERE invoice_date BETWEEN ? AND ? GROUP BY invoice_date ORDER BY invoice_date`).all(startDate, endDate);
+  const sales = detail.map((row: any) => ({
+    invoice_date: row.invoice_date,
+    invoice_no: row.invoice_no,
+    customer_name: row.customer_name,
+    total_sales: row.total_amount,
+    total_items: row.total_items,
+    paid_amount: row.paid_amount,
+    balance_amount: row.balance_amount,
+    status: row.status
+  }));
 
-  return { period: { startDate, endDate }, summary, dailySales };
+  const totalInvoices = sales.length;
+  const totalSales = sales.reduce((s, r) => s + (r.total_sales || 0), 0);
+  const totalItemsSold = sales.reduce((s, r) => s + (r.total_items || 0), 0);
+  const totalPaid = sales.reduce((s, r) => s + (r.paid_amount || 0), 0);
+  const totalBalance = sales.reduce((s, r) => s + (r.balance_amount || 0), 0);
+  const averageInvoiceValue = totalInvoices > 0 ? totalSales / totalInvoices : 0;
+
+  const summary = { totalInvoices, totalSales, totalItemsSold, averageInvoiceValue, totalPaid, totalBalance };
+
+  return { period: { startDate, endDate }, summary, sales };
 }
 
 // Moved from reportsController
@@ -229,7 +251,7 @@ function getProfitLossReport(startDate: string, endDate: string, db: Database.Da
   `).get(startDate, endDate) as { total: number };
 
   const cogs = db.prepare(`
-    SELECT COALESCE(SUM(sm.quantity * sm.unit_cost), 0) as total FROM stock_movements sm
+    SELECT COALESCE(ABS(SUM(sm.quantity * sm.unit_cost)), 0) as total FROM stock_movements sm
     WHERE sm.movement_type = 'SALE' AND sm.movement_date BETWEEN ? AND ?
   `).get(startDate, endDate) as { total: number };
 
@@ -238,13 +260,15 @@ function getProfitLossReport(startDate: string, endDate: string, db: Database.Da
   const totalExpenses = expenses.reduce((sum, e) => sum + e.total, 0);
   const grossProfit = revenue.total - cogs.total;
   const netProfit = grossProfit - totalExpenses;
+  const grossProfitMargin = revenue.total > 0 ? (grossProfit / revenue.total) * 100 : 0;
+  const netProfitMargin = revenue.total > 0 ? (netProfit / revenue.total) * 100 : 0;
 
-  return { startDate, endDate, revenue: revenue.total, cogs: cogs.total, grossProfit, expenses, totalExpenses, netProfit };
+  return { startDate, endDate, totalRevenue: revenue.total, totalCogs: cogs.total, grossProfit, expenses, totalExpenses, netProfit, grossProfitMargin, netProfitMargin };
 }
 
 function getBalanceSheet(asOfDate: string, db: Database.Database) {
   const assets = db.prepare(`
-    SELECT COALESCE(SUM(current_stock * standard_cost), 0) as inventory_value FROM items WHERE is_active = 1
+    SELECT COALESCE(SUM(ABS(current_stock) * standard_cost), 0) as inventory_value FROM items WHERE is_active = 1
   `).get() as { inventory_value: number };
 
   const ar = db.prepare(`
@@ -252,7 +276,7 @@ function getBalanceSheet(asOfDate: string, db: Database.Database) {
   `).get() as { total: number };
 
   const ap = db.prepare(`
-    SELECT COALESCE(SUM(total_cost), 0) as total FROM purchase_orders WHERE status IN ('Approved', 'Received')
+    SELECT COALESCE(SUM(total_amount), 0) as total FROM purchase_orders WHERE status = 'Completed'
   `).get() as { total: number };
 
   const cash = db.prepare(`
@@ -284,7 +308,7 @@ function getGeneralLedger(startDate: string, endDate: string, db: Database.Datab
 function getCashFlow(startDate: string, endDate: string, db: Database.Database) {
   const inflows = db.prepare(`SELECT COALESCE(SUM(credit), 0) as total FROM customer_ledger WHERE transaction_type = 'PAYMENT' AND transaction_date BETWEEN ? AND ?`).get(startDate, endDate) as { total: number };
   const outflows = db.prepare(`SELECT COALESCE(SUM(debit), 0) as total FROM customer_ledger WHERE transaction_type = 'EXPENSE' AND transaction_date BETWEEN ? AND ?`).get(startDate, endDate) as { total: number };
-  return { startDate, endDate, inflows: inflows.total, outflows: outflows.total, netCashFlow: inflows.total - outflows.total };
+  return { startDate, endDate, totalInflow: inflows.total, totalOutflow: outflows.total, netCashFlow: inflows.total - outflows.total };
 }
 
 function getTaxSummary(startDate: string, endDate: string, db: Database.Database) {
@@ -312,25 +336,70 @@ function getGrossProfit(startDate: string, endDate: string, db: Database.Databas
 }
 
 function getStockLevelReport(db: Database.Database) {
-  return db.prepare(`
+  const rows = db.prepare(`
     SELECT i.id, i.item_code, i.item_name, i.category, i.unit_of_measure,
            COALESCE(SUM(sb.quantity), 0) as total_stock, i.reorder_level, i.standard_cost
     FROM items i LEFT JOIN stock_balances sb ON i.id = sb.item_id WHERE i.is_active = 1
     GROUP BY i.id ORDER BY i.item_name
-  `).all();
+  `).all() as Array<{ id: number; item_code: string; item_name: string; category: string | null; unit_of_measure: string; total_stock: number; reorder_level: number; standard_cost: number }>;
+
+  const stockLevels = rows.map(row => {
+    const currentStock = Math.max(0, row.total_stock);
+    return {
+      id: row.id,
+      item_code: row.item_code,
+      item_name: row.item_name,
+      item_category: row.category || '',
+      unit_of_measure: row.unit_of_measure,
+      current_stock: currentStock,
+      minimum_stock: row.reorder_level || 0,
+      reorder_level: row.reorder_level || 0,
+      standard_selling_price: row.standard_cost || 0,
+      stock_status: currentStock === 0
+        ? 'Out of Stock'
+        : currentStock < (row.reorder_level || 0)
+          ? 'Low Stock'
+          : 'In Stock'
+    };
+  });
+
+  const totalItems = stockLevels.length;
+  const inStock = stockLevels.filter(s => s.stock_status === 'In Stock').length;
+  const lowStock = stockLevels.filter(s => s.stock_status === 'Low Stock').length;
+  const outOfStock = stockLevels.filter(s => s.stock_status === 'Out of Stock').length;
+
+  return { stockLevels, summary: { totalItems, inStock, lowStock, outOfStock } };
 }
 
 function getLowStockReport(db: Database.Database) {
-  return db.prepare(`
-    SELECT i.id, i.item_code, i.item_name, i.category,
+  const rows = db.prepare(`
+    SELECT i.id, i.item_code, i.item_name, i.category, i.unit_of_measure,
            COALESCE(SUM(sb.quantity), 0) as current_stock, i.reorder_level,
-           i.standard_cost
-    FROM items i LEFT JOIN stock_balances sb ON i.item_id = sb.item_id
-    WHERE i.is_active = 1 AND i.reorder_level > 0
+           i.standard_selling_price
+    FROM items i LEFT JOIN stock_balances sb ON i.id = sb.item_id
+    WHERE i.reorder_level > 0
     GROUP BY i.id
     HAVING COALESCE(SUM(sb.quantity), 0) <= i.reorder_level
     ORDER BY (COALESCE(SUM(sb.quantity), 0) * 1.0 / i.reorder_level) ASC
-  `).all();
+  `).all() as Array<{ id: number; item_code: string; item_name: string; category: string | null; unit_of_measure: string; current_stock: number; reorder_level: number; standard_selling_price: number }>;
+
+  return rows.map(row => ({
+    id: row.id,
+    item_code: row.item_code,
+    item_name: row.item_name,
+    item_category: row.category || '',
+    unit_of_measure: row.unit_of_measure,
+    current_stock: row.current_stock,
+    minimum_stock: row.reorder_level,
+    shortage: Math.max(row.reorder_level - row.current_stock, 0),
+    reorder_level: row.reorder_level,
+    standard_selling_price: row.standard_selling_price || 0,
+    stock_status: row.current_stock === 0
+      ? 'Out of Stock'
+      : row.current_stock < row.reorder_level
+        ? 'Low Stock'
+        : 'In Stock'
+  }));
 }
 
 function getPurchaseSummary(startDate: string, endDate: string, db: Database.Database) {
@@ -375,11 +444,31 @@ function getSupplierOutstanding(asOfDate: string, db: Database.Database) {
 }
 
 function getExpenseReport(startDate: string, endDate: string, category?: string, db?: Database.Database) {
-  let query = 'SELECT expense_category, COUNT(*) as count, SUM(amount) as total FROM expenses WHERE expense_date BETWEEN ? AND ?';
+  const conditions: string[] = ['expense_date BETWEEN ? AND ?'];
   const params: (string | number)[] = [startDate, endDate];
-  if (category) { query += ' AND expense_category = ?'; params.push(category); }
-  query += ' GROUP BY expense_category ORDER BY total DESC';
-  return db!.prepare(query).all(...params);
+  if (category) { conditions.push('expense_category = ?'); params.push(category); }
+
+  const whereClause = conditions.join(' AND ');
+
+  // Individual expense rows for the grid
+  const expenses = db!.prepare(
+    `SELECT id, expense_no, expense_category, description, amount, expense_date,
+            payment_method, reference_no, vendor_name, project, status
+      FROM expenses WHERE ${whereClause} ORDER BY expense_date DESC`
+  ).all(...params) as Array<{ id: number; expense_no: string; expense_category: string; description: string | null; amount: number; expense_date: string; payment_method: string | null; reference_no: string | null; vendor_name: string | null; project: string | null; status: string }>;
+
+  // Category breakdown
+  const categoryBreakdown = db!.prepare(
+    `SELECT expense_category, COUNT(*) as count, SUM(amount) as total_amount
+     FROM expenses WHERE ${whereClause} GROUP BY expense_category ORDER BY total_amount DESC`
+  ).all(...params);
+
+  // Summary from the same result set
+  const totalAmount = expenses.reduce((s: number, r: any) => s + (r.amount || 0), 0);
+  const totalExpenses = expenses.length;
+  const averageAmount = totalExpenses > 0 ? totalAmount / totalExpenses : 0;
+
+  return { summary: { totalAmount, totalExpenses, averageAmount }, expenses, categoryBreakdown };
 }
 
 export default {

@@ -35,11 +35,13 @@ const StatCard = memo(function StatCard({
 
 interface StatsGridProps {
   children: ReactNode;
+  columns?: 1 | 2 | 3 | 4;
   className?: string;
 }
 
-const StatsGrid = memo(function StatsGrid({ children, className = '' }: StatsGridProps) {
-  return <div className={`stats-grid ${className}`.trim()}>{children}</div>;
+const StatsGrid = memo(function StatsGrid({ children, columns, className = '' }: StatsGridProps) {
+  const style = columns ? { gridTemplateColumns: `repeat(${columns}, 1fr)` } : undefined;
+  return <div className={`stats-grid ${className}`.trim()} style={style}>{children}</div>;
 });
 
 export default StatCard;

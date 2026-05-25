@@ -20,6 +20,7 @@ router.get('/warehouses', inventoryController.getWarehouses);
 router.get('/warehouses/:id', inventoryController.getWarehouse);
 router.post('/warehouses', sensitiveOperationLimiter, inventoryController.createWarehouse);
 router.put('/warehouses/:id', sensitiveOperationLimiter, inventoryController.updateWarehouse);
+router.delete('/warehouses/:id', requireAdmin, sensitiveOperationLimiter, inventoryController.deleteWarehouse);
 
 router.get('/stock-movements', inventoryController.getStockMovements);
 router.post('/stock-movements', sensitiveOperationLimiter, inventoryController.createStockMovement);

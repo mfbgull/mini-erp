@@ -274,3 +274,21 @@ def batch_traceability(item_id: int) -> list[dict]:
     """Get batch traceability for an item."""
     client = make_client()
     return client.get(f"/reports/batch-traceability/{item_id}")
+
+
+def customer_statements(customer_id: int) -> list[dict]:
+    """Get customer statements."""
+    client = make_client()
+    return client.get("/reports/customer-statements", params={"customerId": customer_id})
+
+
+def top_debtors(limit: int = 10) -> list[dict]:
+    """Get top debtors."""
+    client = make_client()
+    return client.get("/reports/top-debtors", params={"limit": limit})
+
+
+def dso(period: int = 30) -> Any:
+    """Get Days Sales Outstanding metric."""
+    client = make_client()
+    return client.get("/reports/dso", params={"period": period})

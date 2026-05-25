@@ -522,16 +522,14 @@ class QuotationModel {
 
       // Create sales order items from quotation items
       const soItemStmt = db.prepare(`
-        INSERT INTO sales_order_items (so_id, item_id, item_code, item_name, quantity, unit_price, amount)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO sales_order_items (so_id, item_id, quantity, unit_price, amount)
+        VALUES (?, ?, ?, ?, ?)
       `);
 
       for (const item of quotation.items || []) {
         soItemStmt.run(
           salesOrderId,
           item.item_id,
-          item.item_code,
-          item.item_name,
           item.quantity,
           item.unit_price,
           item.amount

@@ -65,24 +65,9 @@ router.get('/quotations/:id/invoices', salesController.getInvoicesByQuotation);
 // GET /api/sales/dashboard - Get sales dashboard summary
 router.get('/dashboard', salesController.getSalesDashboard);
 
-// ============ Legacy Routes (kept for backward compatibility) ============
+// ============ Legacy Routes (migrated to InvoiceModel) ============
 
-// GET /api/sales/summary/item/:item_id - Sales summary by item
-router.get('/sales/summary/item/:item_id', salesController.getSalesSummaryByItem);
-
-// GET /api/sales/summary/daterange - Sales summary by date range
+// GET /api/sales/summary/daterange - Sales summary by date range (uses InvoiceModel)
 router.get('/sales/summary/daterange', salesController.getSalesSummaryByDateRange);
-
-// GET /api/sales/top-customers - Top customers by revenue
-router.get('/sales/top-customers', salesController.getTopCustomers);
-
-// GET /api/sales/item-customer-history - Item-customer price history
-router.get('/sales/item-customer-history', salesController.getItemCustomerPriceHistory);
-
-// GET /api/sales/:id - Get sale (legacy, redirects to invoice)
-router.get('/sales/:id', salesController.getSale);
-
-// DELETE /api/sales/:id - Delete sale (legacy, deprecated)
-router.delete('/sales/:id', requireAdmin, sensitiveOperationLimiter, salesController.deleteSale);
 
 export default router;
