@@ -102,6 +102,19 @@ export interface InvoiceFilters {
 
 class InvoiceModel {
   /**
+   * Consume a quantity of an item from the oldest available stock batches (FIFO).
+   * Delegates to the centralized implementation in StockMovementModel.
+   */
+  static consumeFromOldestBatches(
+    itemId: number,
+    warehouseId: number,
+    quantity: number,
+    db: Database.Database
+  ): Array<{ batchId: number | null; consumed: number; unitCost: number }> {
+    return StockMovementModel.consumeFromOldestBatches(itemId, warehouseId, quantity, db);
+  }
+
+  /**
    * Get invoice by ID with items and source links
    */
   static getById(id: number, db: Database.Database): Invoice | undefined {
@@ -417,7 +430,8 @@ class InvoiceModel {
 
   /**
    * Reverse stock movements for a list of invoice items that were previously sold.
-   * Used during invoice update and delete.
+   * Restores quantity_remaining on stock_batches and creates ADJUSTMENT movements
+   * to fix stock_balances. Used during invoice update and delete.
    */
   static reverseStockForItems(
     db: Database.Database,
@@ -427,22 +441,54 @@ class InvoiceModel {
     referenceDoctype: string
   ): void {
     for (const item of items) {
-      // Find the original warehouse from the SALE movement
-      const originalMovement = db.prepare(`
-        SELECT warehouse_id FROM stock_movements
+      // Find all SALE movements for this item + invoice (they have batch_id links)
+      const saleMovements = db.prepare(`
+        SELECT warehouse_id, quantity, unit_cost, batch_id
+        FROM stock_movements
         WHERE item_id = ? AND reference_docno = ? AND movement_type = 'SALE'
-        LIMIT 1
-      `).get(item.item_id, invoiceNo) as { warehouse_id: number } | undefined;
+        ORDER BY id
+      `).all(item.item_id, invoiceNo) as Array<{
+        warehouse_id: number;
+        quantity: number;
+        unit_cost: number;
+        batch_id: number | null;
+      }>;
 
-      let warehouseId: number;
-      if (originalMovement) {
-        warehouseId = originalMovement.warehouse_id;
-      } else {
-        const defaultWarehouse = db.prepare(
-          `SELECT id FROM warehouses WHERE warehouse_code = ? AND is_active = 1`
-        ).get('WH-001') as { id: number } | undefined;
-        warehouseId = defaultWarehouse ? defaultWarehouse.id : 1;
+      if (saleMovements.length === 0) {
+        logger.warn(`[BatchReversal] No SALE movements found for item ${item.item_id} on invoice ${invoiceNo}`);
+        continue;
       }
+
+      const warehouseId = saleMovements[0].warehouse_id;
+
+      // Calculate total sold vs returned to handle partial returns proportionally.
+      // For a full return, ratio = 1 (restore everything).
+      // For a partial return, ratio < 1 (restore proportionally per batch).
+      const totalSold = saleMovements.reduce((sum, m) => sum + Math.abs(m.quantity), 0);
+      const returnQty = Math.abs(item.quantity);
+      const ratio = Math.abs(totalSold) < 0.001 ? 1 : Math.min(returnQty / totalSold, 1);
+
+      // Restore quantity_remaining on each consumed batch (except legacy/fallback entries)
+      for (const movement of saleMovements) {
+        if (movement.batch_id !== null) {
+          const restoreQty = Math.abs(movement.quantity) * ratio;
+          db.prepare(`
+            UPDATE stock_batches
+            SET quantity_remaining = quantity_remaining + ?
+            WHERE id = ?
+          `).run(restoreQty, movement.batch_id);
+        }
+      }
+
+      // Calculate the total actual cost from the original SALE movements
+      let totalActualCost = 0;
+      let totalQty = 0;
+      for (const movement of saleMovements) {
+        const absQty = Math.abs(movement.quantity);
+        totalActualCost += absQty * movement.unit_cost;
+        totalQty += absQty;
+      }
+      const avgUnitCost = totalQty > 0 ? totalActualCost / totalQty : item.unit_price;
 
       // Add stock back (positive quantity to reverse the sale)
       StockMovementModel.recordMovement(
@@ -451,7 +497,7 @@ class InvoiceModel {
           warehouse_id: warehouseId,
           movement_type: 'ADJUSTMENT',
           quantity: item.quantity, // Positive to add back stock
-          unit_cost: item.unit_price,
+          unit_cost: avgUnitCost,
           reference_doctype: referenceDoctype,
           reference_docno: invoiceNo,
           remarks: `Stock reversed - Invoice ${invoiceNo} ${referenceDoctype === 'INVOICE_DELETE' ? 'deleted' : 'updated'}`,

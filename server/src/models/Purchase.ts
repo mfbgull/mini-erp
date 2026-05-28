@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { getNextSequenceNumber } from '../utils/sequence';
+import StockMovementModel from './StockMovement';
 
 interface Purchase {
   id: number;
@@ -13,6 +14,8 @@ interface Purchase {
   purchase_date: string;
   invoice_no?: string;
   remarks?: string;
+  batch_no?: string;
+  batch_id?: number;
   created_by: number;
   created_at?: string;
   item_code?: string;
@@ -44,11 +47,19 @@ interface CreatePurchaseDTO {
 }
 
 class PurchaseModel {
+  static generateBatchNo(db: Database.Database): string {
+    const year = new Date().getFullYear();
+    const settingKey = `BATCH_last_no_${year}`;
+    const nextNo = getNextSequenceNumber(db, settingKey);
+    return `BATCH-${year % 100}-PUR-${nextNo.toString().padStart(4, '0')}`;
+  }
+
   static recordPurchase(data: CreatePurchaseDTO, userId: number, db: Database.Database): Purchase {
     const { item_id, warehouse_id, quantity, unit_cost, supplier_name, purchase_date, invoice_no, remarks } = data;
 
     const transaction = db.transaction(() => {
       const purchaseNo = this.generatePurchaseNo(db);
+      const batchNo = this.generateBatchNo(db);
 
       const purchaseStmt = db.prepare(`
         INSERT INTO purchases (
@@ -75,13 +86,38 @@ class PurchaseModel {
 
       const purchaseId = result.lastInsertRowid as number;
 
+      // Create a stock_batch record for the purchased item
+      db.prepare(`
+        INSERT INTO stock_batches (
+          batch_no, item_id, warehouse_id, source_type,
+          source_id, quantity_original, quantity_remaining,
+          unit_cost, received_date
+        ) VALUES (?, ?, ?, 'PURCHASE', ?, ?, ?, ?, ?)
+      `).run(
+        batchNo,
+        item_id,
+        warehouse_id,
+        purchaseId,
+        quantity,
+        quantity,
+        unit_cost,
+        purchase_date
+      );
+
+      const batchRecord = db.prepare(`
+        SELECT id FROM stock_batches
+        WHERE source_type = 'PURCHASE' AND source_id = ?
+      `).get(purchaseId) as { id: number } | undefined;
+      const outputBatchId = batchRecord?.id;
+
+      // Record stock movement linked to the new batch
       const movementNo = this.generateMovementNo(db);
       db.prepare(`
         INSERT INTO stock_movements (
           movement_no, item_id, warehouse_id, movement_type,
           quantity, unit_cost, reference_doctype, reference_docno,
-          remarks, movement_date, created_by
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          remarks, movement_date, created_by, batch_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
         movementNo,
         item_id,
@@ -91,11 +127,18 @@ class PurchaseModel {
         unit_cost,
         'Purchase',
         purchaseNo,
-        `Purchase: ${purchaseNo}${supplier_name ? ' from ' + supplier_name : ''}`,
+        `Purchase: ${purchaseNo}${supplier_name ? ' from ' + supplier_name : ''} (batch ${outputBatchId})`,
         purchase_date,
-        userId
+        userId,
+        outputBatchId
       );
 
+      // Update purchase record with batch info
+      db.prepare(`
+        UPDATE purchases SET batch_no = ?, batch_id = ? WHERE id = ?
+      `).run(batchNo, outputBatchId, purchaseId);
+
+      // Update stock_balances
       const existingBalance = db.prepare(`
         SELECT * FROM stock_balances
         WHERE item_id = ? AND warehouse_id = ?
@@ -133,7 +176,7 @@ class PurchaseModel {
         'CREATE',
         'Purchase',
         purchaseId,
-        `Recorded purchase ${purchaseNo}: ${quantity} units`
+        `Recorded purchase ${purchaseNo}: ${quantity} units (Batch: ${batchNo}, Cost: ${unit_cost}/unit)`
       );
 
       return this.getById(purchaseId, db) as Purchase;
@@ -277,7 +320,41 @@ class PurchaseModel {
       throw new Error('Purchase not found');
     }
 
-    db.prepare('DELETE FROM purchases WHERE id = ?').run(id);
+    const transaction = db.transaction(() => {
+      // Find the stock_batch created by this purchase
+      const batch = db.prepare(`
+        SELECT id, batch_no, quantity_remaining, unit_cost
+        FROM stock_batches
+        WHERE source_type = 'PURCHASE' AND source_id = ?
+      `).get(id) as { id: number; batch_no: string; quantity_remaining: number; unit_cost: number } | undefined;
+
+      if (batch && batch.quantity_remaining > 0) {
+        // Create ADJUSTMENT movement to remove remaining stock
+        StockMovementModel.recordMovement(
+          {
+            item_id: purchase.item_id,
+            warehouse_id: purchase.warehouse_id,
+            movement_type: 'ADJUSTMENT',
+            quantity: -batch.quantity_remaining,
+            unit_cost: batch.unit_cost,
+            reference_doctype: 'PURCHASE_DELETE',
+            reference_docno: purchase.purchase_no,
+            remarks: `Stock reversed - Purchase ${purchase.purchase_no} deleted (batch ${batch.batch_no})`,
+            movement_date: new Date().toISOString().split('T')[0],
+          },
+          userId,
+          db
+        );
+
+        // Zero out the batch record (keep for FK integrity with stock_movements)
+        db.prepare('UPDATE stock_batches SET quantity_remaining = 0 WHERE id = ?').run(batch.id);
+      }
+
+      // Delete the purchase record
+      db.prepare('DELETE FROM purchases WHERE id = ?').run(id);
+    });
+
+    transaction();
 
     db.prepare(`
       INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)

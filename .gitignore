@@ -158,3 +158,5 @@ ERP-AI/
 # !README.md
 # !.gitignore
 .worktrees/
+
+testsprite_tests/tmp/config.json

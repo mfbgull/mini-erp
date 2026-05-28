@@ -1,0 +1,27 @@
+Item Code,Item Name,Category,UOM,Stock,Cost,Price,Reorder Level,Raw Material,Finished Good,Purchased,Manufactured
+AC-001,1.5 Ton Split AC,Electronics,piece,47,55000,70000,0,No,Yes,Yes,No
+TV-001,"32"" LED Smart TV",Electronics,piece,-2,25000,32000,0,No,Yes,Yes,No
+TV-002,"43"" LED Smart TV",Electronics,piece,0,40000,50000,0,No,Yes,Yes,No
+HER-004,Asgandh (Ashwagandha),Pansar,kg,100,1200,1500,0,No,Yes,Yes,No
+RM-009,Cardboard Box (Large),Raw Materials,piece,100,80,120,0,Yes,No,Yes,No
+RM-008,Cardboard Box (Small),Raw Materials,piece,100,30,45,0,Yes,No,Yes,No
+GRC-003,Cooking Oil (1L),Groceries,liter,-5,280,350,0,No,Yes,Yes,No
+RM-005,Cotton Cloth (1 meter),Raw Materials,meter,100,300,400,0,Yes,No,Yes,No
+MOB-002,Infinix Hot 30,Electronics,piece,100,15000,18500,0,No,Yes,Yes,No
+HER-003,Kalwanji (Black Seeds),Pansar,kg,0,800,1000,0,No,Yes,Yes,No
+MINIMAL-1779339271483,Minimal Item,,Nos,100,0,0,0,No,No,Yes,No
+RM-010,Plastic Bags (Pack of 100),Raw Materials,pack,100,200,300,0,Yes,No,Yes,No
+RM-002,Plywood (18mm sheet),Raw Materials,sheet,100,2500,3200,0,Yes,No,Yes,No
+FRG-001,Refrigerator 180L,Electronics,piece,100,35000,45000,0,No,Yes,Yes,No
+GRC-002,Rice (Basmati 1kg),Groceries,kg,100,180,220,0,No,Yes,Yes,No
+MOB-001,Samsung Galaxy A14,Electronics,piece,100,18000,22000,0,No,Yes,Yes,No
+HER-001,Saunf (Fennel Seeds),Pansar,kg,100,400,500,0,No,Yes,Yes,No
+RM-004,Steel Pipe (1 inch),Raw Materials,piece,100,350,450,0,Yes,No,Yes,No
+RM-003,Steel Sheet (1mm),Raw Materials,kg,100,200,250,0,Yes,No,Yes,No
+GRC-001,Sugar (1kg),Groceries,kg,100,120,150,0,No,Yes,Yes,No
+RM-006,Synthetic Fabric (1 meter),Raw Materials,meter,100,200,280,0,Yes,No,Yes,No
+GRC-004,Tea (Green Label 250g),Groceries,pack,100,150,190,0,No,Yes,Yes,No
+RM-007,Thread (Cone),Raw Materials,cone,100,80,120,0,Yes,No,Yes,No
+RM-001,Timber (Cedar 1 cubic foot),Raw Materials,cft,100,800,1000,0,Yes,No,Yes,No
+GRC-005,Wheat Flour (10kg),Groceries,bag,100,650,800,0,No,Yes,Yes,No
+HER-002,Zeera (Cumin Seeds),Pansar,kg,100,600,750,0,No,Yes,Yes,No

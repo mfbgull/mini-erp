@@ -40,20 +40,25 @@ function getARAgingReport(asOfDate: string, db: Database.Database) {
 
 // Moved from reportsController
 function getCustomerStatements(db: Database.Database, customerId: number) {
-  return db.prepare(`
+  const rows = db.prepare(`
     SELECT i.invoice_no, i.invoice_date, i.due_date, i.total_amount, i.paid_amount, i.balance_amount, i.status
     FROM invoices i WHERE i.customer_id = ? AND i.balance_amount > 0 ORDER BY i.invoice_date DESC
   `).all(customerId);
+  return { statements: rows };
 }
 
 // Moved from reportsController
 function getTopDebtors(db: Database.Database, limit: number = 10) {
-  return db.prepare(`
-    SELECT c.customer_name, c.customer_code, SUM(i.balance_amount) as total_outstanding, COUNT(i.id) as invoice_count
+  const rows = db.prepare(`
+    SELECT c.customer_name, c.customer_code, SUM(i.balance_amount) as total_outstanding,
+      SUM(i.balance_amount) as outstanding_balance,
+      SUM(i.total_amount) as total_invoiced,
+      COUNT(i.id) as invoice_count
     FROM invoices i JOIN customers c ON i.customer_id = c.id
     WHERE i.status IN ('Unpaid', 'Partially Paid', 'Overdue') AND i.balance_amount > 0
     GROUP BY i.customer_id ORDER BY total_outstanding DESC LIMIT ?
   `).all(limit);
+  return rows;
 }
 
 // Moved from reportsController
@@ -71,8 +76,11 @@ function getDSOMetric(db: Database.Database, period: number = 30) {
   const totalCreditSales = db.prepare(`SELECT SUM(total_amount) as total FROM invoices WHERE invoice_date BETWEEN ? AND ?`).get(startDateStr, endDateStr) as { total: number };
   const days = period;
   const dso = totalCreditSales.total > 0 ? (avgReceivables.avg_balance / totalCreditSales.total) * days : 0;
+  const totalSales = totalCreditSales.total;
+  const totalAR = avgReceivables.avg_balance;
+  const avgInvoiceValue = totalCreditSales.total > 0 ? totalCreditSales.total / (db.prepare(`SELECT COUNT(*) as count FROM invoices WHERE invoice_date BETWEEN ? AND ?`).get(startDateStr, endDateStr) as { count: number }).count : 0;
 
-  return { dso, avgReceivables: avgReceivables.avg_balance, totalCreditSales: totalCreditSales.total, period: { startDate: startDateStr, endDate: endDateStr } };
+  return { dso, avgReceivables: avgReceivables.avg_balance, totalCreditSales: totalCreditSales.total, totalSales, totalAR, avgInvoiceValue, period: { startDate: startDateStr, endDate: endDateStr } };
 }
 
 // Moved from reportsController
@@ -151,9 +159,16 @@ function getSalesSummary(db: Database.Database, startDate: string, endDate: stri
 // Moved from reportsController
 function getSalesByCustomer(db: Database.Database, startDate: string, endDate: string) {
   return db.prepare(`
-    SELECT c.customer_name, c.customer_code, COUNT(i.id) as invoice_count,
-      SUM(i.total_amount) as total_sales, AVG(i.total_amount) as avg_sale
-    FROM invoices i JOIN customers c ON i.customer_id = c.id WHERE i.invoice_date BETWEEN ? AND ?
+    SELECT c.customer_name, c.customer_code, c.email, c.phone,
+      COUNT(DISTINCT i.id) as total_invoices,
+      SUM(i.total_amount) as total_sales,
+      AVG(i.total_amount) as average_order_value,
+      COALESCE(SUM(ii.quantity), 0) as total_items,
+      MAX(i.invoice_date) as last_purchase_date
+    FROM invoices i
+    JOIN customers c ON i.customer_id = c.id
+    LEFT JOIN invoice_items ii ON ii.invoice_id = i.id
+    WHERE i.invoice_date BETWEEN ? AND ?
     GROUP BY i.customer_id ORDER BY total_sales DESC
   `).all(startDate, endDate);
 }
@@ -161,9 +176,12 @@ function getSalesByCustomer(db: Database.Database, startDate: string, endDate: s
 // Moved from reportsController
 function getSalesByItem(db: Database.Database, startDate: string, endDate: string) {
   return db.prepare(`
-    SELECT it.item_code, it.item_name, SUM(ii.quantity) as total_qty, SUM(ii.amount) as total_revenue, AVG(ii.unit_price) as avg_price
+    SELECT it.item_code, it.item_name, it.category as item_category,
+      SUM(ii.quantity) as total_quantity_sold,
+      SUM(ii.amount) as total_sales,
+      AVG(ii.unit_price) as avg_selling_price
     FROM invoice_items ii JOIN items it ON ii.item_id = it.id JOIN invoices i ON ii.invoice_id = i.id
-    WHERE i.invoice_date BETWEEN ? AND ? GROUP BY ii.item_id ORDER BY total_revenue DESC
+    WHERE i.invoice_date BETWEEN ? AND ? GROUP BY ii.item_id ORDER BY total_sales DESC
   `).all(startDate, endDate);
 }
 
@@ -178,7 +196,15 @@ function getStockValuationReport(db: Database.Database) {
 
   const totalValue = db.prepare(`SELECT COALESCE(SUM(current_stock * standard_cost), 0) as total FROM items WHERE is_active = 1`).get() as { total: number };
 
-  return { valuation, totalValue: totalValue.total };
+  const reportData = { valuation, totalValue: totalValue.total };
+
+  return {
+    stockValuation: reportData.valuation,
+    summary: {
+      totalValue: reportData.totalValue,
+      totalItems: reportData.valuation.length
+    }
+  };
 }
 
 // Moved from reportsController
@@ -195,18 +221,42 @@ function getInventoryMovementReport(db: Database.Database, startDate?: string, e
   if (itemId !== undefined && itemId !== null) { query += ' AND sm.item_id = ?'; params.push(itemId); }
   query += ' ORDER BY sm.movement_date DESC LIMIT 500';
 
-  return db.prepare(query).all(...params);
+  const rows = db.prepare(query).all(...params);
+
+  const totalInbound = rows.filter((r: any) => r.movement_type?.toLowerCase() === 'in').length;
+  const totalOutbound = rows.filter((r: any) => r.movement_type?.toLowerCase() === 'out').length;
+
+  return {
+    movements: rows,
+    summary: {
+      totalInbound,
+      totalOutbound,
+      netMovement: totalInbound - totalOutbound
+    }
+  };
 }
 
 // Moved from reportsController
 function getSupplierAnalysis(db: Database.Database, startDate: string, endDate: string) {
-  return db.prepare(`
-    SELECT s.supplier_name, COUNT(po.id) as total_orders, SUM(po.total_cost) as total_value,
-      AVG(po.total_cost) as avg_order_value,
-      COUNT(CASE WHEN po.status = 'Received' THEN 1 END) as completed_orders
-    FROM purchase_orders po JOIN suppliers s ON po.supplier_id = s.id WHERE po.order_date BETWEEN ? AND ?
-    GROUP BY po.supplier_id ORDER BY total_value DESC
+  const rows = db.prepare(`
+    SELECT s.supplier_name, s.supplier_code, s.email, s.phone,
+      COUNT(po.id) as total_orders, SUM(po.total_amount) as total_purchase_value,
+      AVG(po.total_amount) as average_order_value,
+      MAX(po.po_date) as last_purchase_date,
+      COUNT(poi.id) as total_items
+    FROM purchase_orders po 
+    JOIN suppliers s ON po.supplier_id = s.id 
+    LEFT JOIN purchase_order_items poi ON poi.po_id = po.id
+    WHERE po.po_date BETWEEN ? AND ?
+    GROUP BY po.supplier_id ORDER BY total_purchase_value DESC
   `).all(startDate, endDate);
+  return rows.map((r: any) => ({
+    ...r,
+    total_purchase_value: r.total_purchase_value || 0,
+    average_order_value: r.average_order_value || 0,
+    on_time_delivery_rate: 100,
+    total_items: r.total_items || 0
+  }));
 }
 
 // Moved from reportsController
@@ -293,9 +343,10 @@ function getIncomeStatement(startDate: string, endDate: string, db: Database.Dat
 }
 
 function getTrialBalance(asOfDate: string, db: Database.Database) {
+  // customer_ledger doesn't have an account_name column, so group by transaction_type as proxy accounts
   return db.prepare(`
-    SELECT account_name, SUM(debit) as total_debit, SUM(credit) as total_credit
-    FROM customer_ledger WHERE transaction_date <= ? GROUP BY account_name
+    SELECT transaction_type as account_name, SUM(debit) as total_debit, SUM(credit) as total_credit
+    FROM customer_ledger WHERE transaction_date <= ? GROUP BY transaction_type ORDER BY account_name
   `).all(asOfDate);
 }
 
@@ -403,20 +454,66 @@ function getLowStockReport(db: Database.Database) {
 }
 
 function getPurchaseSummary(startDate: string, endDate: string, db: Database.Database) {
-  return db.prepare(`
-    SELECT s.supplier_name, COUNT(po.id) as count, SUM(po.total_cost) as total
-    FROM purchase_orders po JOIN suppliers s ON po.supplier_id = s.id
-    WHERE po.order_date BETWEEN ? AND ? GROUP BY s.supplier_name ORDER BY total DESC
-  `).all(startDate, endDate);
+  const rows = db.prepare(`
+    SELECT po.id as po_id, po.po_no as purchase_order_number, po.po_date as purchase_date,
+      s.supplier_name, po.total_amount as total_cost, po.status,
+      (SELECT COUNT(*) FROM purchase_order_items WHERE po_id = po.id) as total_items,
+      (SELECT COALESCE(SUM(received_quantity * unit_price), 0) FROM purchase_order_items WHERE po_id = po.id) as received_amount,
+      (po.total_amount - (SELECT COALESCE(SUM(received_quantity * unit_price), 0) FROM purchase_order_items WHERE po_id = po.id)) as balance_amount
+    FROM purchase_orders po
+    JOIN suppliers s ON po.supplier_id = s.id
+    WHERE po.po_date BETWEEN ? AND ?
+    ORDER BY po.po_date DESC
+  `).all(startDate, endDate) as Array<{
+    po_id: number; purchase_order_number: string; purchase_date: string;
+    supplier_name: string; total_cost: number; status: string;
+    total_items: number; received_amount: number; balance_amount: number;
+  }>;
+
+  const totalOrders = rows.length;
+  const totalCost = rows.reduce((s, r) => s + (r.total_cost || 0), 0);
+  const totalPurchasedItems = rows.reduce((s, r) => s + (r.total_items || 0), 0);
+  const averageOrderValue = totalOrders > 0 ? totalCost / totalOrders : 0;
+
+  return {
+    purchases: rows,
+    summary: { totalOrders, totalCost, totalItems: totalPurchasedItems, averageOrderValue }
+  };
 }
 
 function getProductionEfficiency(startDate: string, endDate: string, db: Database.Database) {
-  return db.prepare(`
-    SELECT p.id, p.production_no, p.item_id, i.item_name, p.planned_quantity, p.actual_quantity,
-           p.start_date, p.end_date,
-           CASE WHEN p.planned_quantity > 0 THEN (p.actual_quantity * 100.0 / p.planned_quantity) ELSE 0 END as efficiency
-    FROM productions p JOIN items i ON p.item_id = i.id WHERE p.start_date BETWEEN ? AND ? ORDER BY p.start_date DESC
-  `).all(startDate, endDate);
+  const rows = db.prepare(`
+    SELECT p.id, p.production_no, p.output_item_id, i.item_name as output_item_name,
+      p.output_quantity, p.production_date, p.bom_id
+    FROM productions p JOIN items i ON p.output_item_id = i.id
+    WHERE p.production_date BETWEEN ? AND ? ORDER BY p.production_date DESC
+  `).all(startDate, endDate) as Array<{
+    id: number; production_no: string; output_item_id: number;
+    output_item_name: string; output_quantity: number; production_date: string; bom_id: number | null;
+  }>;
+
+  const production = rows.map(r => ({
+    production_date: r.production_date,
+    production_order_number: r.production_no,
+    output_item_name: r.output_item_name,
+    output_quantity: r.output_quantity || 0,
+    completed_quantity: r.output_quantity || 0,
+    scrapped_quantity: 0,
+    status: 'Completed',
+    item_name: r.output_item_name,
+    planned_quantity: r.output_quantity || 0,
+    work_order_number: r.production_no
+  }));
+
+  const totalProductionOrders = production.length;
+  const totalOutput = production.reduce((s, r) => s + (r.output_quantity || 0), 0);
+  const totalCompleted = totalOutput;
+  const totalScrapped = 0;
+
+  return {
+    production,
+    summary: { totalProductionOrders, totalOutput, totalCompleted, totalScrapped }
+  };
 }
 
 function getBOMUsage(bomId: number, db: Database.Database) {
@@ -424,6 +521,43 @@ function getBOMUsage(bomId: number, db: Database.Database) {
     SELECT bi.*, i.item_name, i.item_code, i.unit_of_measure
     FROM bom_items bi JOIN items i ON bi.item_id = i.id WHERE bi.bom_id = ? ORDER BY bi.item_id
   `).all(bomId);
+}
+
+function getBOMUsageReport(startDate: string, endDate: string, itemId: number | null, db: Database.Database) {
+  let query = `
+    SELECT b.id as bom_id, b.bom_name, i.item_name as parent_item_name,
+      (SELECT COUNT(*) FROM productions WHERE bom_id = b.id AND production_date BETWEEN ? AND ?) as usage_count,
+      (SELECT MAX(production_date) FROM productions WHERE bom_id = b.id AND production_date BETWEEN ? AND ?) as last_used_date,
+      (SELECT COUNT(*) FROM bom_items WHERE bom_id = b.id) as total_components,
+      CASE WHEN b.is_active THEN 'Active' ELSE 'Inactive' END as status
+    FROM boms b
+    JOIN items i ON b.finished_item_id = i.id
+    WHERE 1=1
+  `;
+  const params: (string | number)[] = [startDate, endDate, startDate, endDate];
+  if (itemId) {
+    query += ' AND b.finished_item_id = ?';
+    params.push(itemId);
+  }
+  query += ' ORDER BY usage_count DESC, b.bom_name';
+
+  const rows = db.prepare(query).all(...params) as Array<{
+    bom_id: number; bom_name: string; parent_item_name: string;
+    usage_count: number; last_used_date: string | null;
+    total_components: number; status: string;
+  }>;
+
+  return {
+    usage: rows.map(r => ({
+      bom_name: r.bom_name,
+      parent_item_name: r.parent_item_name,
+      usage_count: r.usage_count || 0,
+      last_used_date: r.last_used_date,
+      total_components: r.total_components || 0,
+      status: r.status,
+      bom_id: r.bom_id
+    }))
+  };
 }
 
 function getCustomerOutstanding(asOfDate: string, db: Database.Database) {
@@ -437,7 +571,7 @@ function getCustomerOutstanding(asOfDate: string, db: Database.Database) {
 
 function getSupplierOutstanding(asOfDate: string, db: Database.Database) {
   return db.prepare(`
-    SELECT s.supplier_name, s.supplier_code, SUM(po.total_cost) as outstanding
+    SELECT s.supplier_name, s.supplier_code, SUM(po.total_amount) as outstanding
     FROM purchase_orders po JOIN suppliers s ON po.supplier_id = s.id
     WHERE po.status IN ('Approved', 'Received') GROUP BY s.id ORDER BY outstanding DESC
   `).all();
@@ -478,6 +612,6 @@ export default {
   getAPSummary, getProfitLossReport, getBalanceSheet, getIncomeStatement,
   getTrialBalance, getGeneralLedger, getCashFlow, getTaxSummary, getDailySales, getMonthlySales,
   getGrossProfit, getStockLevelReport, getLowStockReport, getBatchTraceability,
-  getPurchaseSummary, getProductionEfficiency, getBOMUsage, getCustomerOutstanding,
+  getPurchaseSummary, getProductionEfficiency, getBOMUsage, getBOMUsageReport, getCustomerOutstanding,
   getSupplierOutstanding, getExpenseReport,
 };

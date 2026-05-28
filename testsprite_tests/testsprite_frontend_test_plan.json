@@ -1,0 +1,1095 @@
+[
+  {
+    "id": "TC001",
+    "title": "Create a shared wall between adjacent spaces",
+    "description": "This test verifies that a user can define a wall for two adjacent rooms and have it counted once in storage while contributing to both room calculations.",
+    "category": "Wall Entity Modeling",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the specification area"
+      },
+      {
+        "type": "action",
+        "description": "Add a wall between adjacent spaces"
+      },
+      {
+        "type": "action",
+        "description": "Define each wall face independently"
+      },
+      {
+        "type": "action",
+        "description": "Link the wall to both rooms"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the shared wall is counted once in storage"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify both adjacent rooms include the wall in their calculations"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Create a milestone payment plan",
+    "description": "This test verifies that a user can create a milestone-based payment plan tied to the construction total and see the schedule generated.",
+    "category": "Payment Plans",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the payments area"
+      },
+      {
+        "type": "action",
+        "description": "Create a milestone payment plan"
+      },
+      {
+        "type": "action",
+        "description": "Review the default phase breakdown"
+      },
+      {
+        "type": "action",
+        "description": "Save the payment plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the milestone schedule is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the payment plan is tied to the project total"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Create a new project",
+    "description": "This verifies that a user can create a project with valid details and see it available for later BOQ work.",
+    "category": "Project Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Projects area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new project"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the project details with valid values"
+      },
+      {
+        "type": "action",
+        "description": "Save the project"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new project is available in the project list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Export a report in the chosen format",
+    "description": "This verifies that a user can choose an export format, generate the output, and see the exported result ready for saving or sharing.",
+    "category": "Export",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the export area"
+      },
+      {
+        "type": "action",
+        "description": "Choose an export format"
+      },
+      {
+        "type": "action",
+        "description": "Generate the export"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the exported output is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a save or share option is available"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Save a new rate card",
+    "description": "This test verifies that a user can add a new rate card and see it available in the rate library for later calculations.",
+    "category": "Rate Library",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the rates area"
+      },
+      {
+        "type": "action",
+        "description": "Create a new rate card"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the rate details with valid values"
+      },
+      {
+        "type": "action",
+        "description": "Save the rate card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new rate card is visible in the rate library"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the saved rate is available for project calculations"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Review report KPI summary and phase breakdown",
+    "description": "This verifies that a user can open the reports area, review the KPI summary, and inspect the phase-wise breakdown and material totals for a project.",
+    "category": "Reports",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the reports area"
+      },
+      {
+        "type": "action",
+        "description": "Open the phase-wise breakdown view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify KPI summary cards are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify material quantity totals are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Create a BOQ line item",
+    "description": "This verifies that a user can add a new BOQ line item and see it included in the BOQ grid.",
+    "category": "BOQ Editor",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the BOQ area"
+      },
+      {
+        "type": "action",
+        "description": "Add a new BOQ line item"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the line item details with valid values"
+      },
+      {
+        "type": "action",
+        "description": "Save the line item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new line item appears in the BOQ grid"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Calculate room quantities from dimensions",
+    "description": "This verifies that a user can define a room with dimensions and see calculated material quantities update.",
+    "category": "Room-Based Specification Engine",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Specification area"
+      },
+      {
+        "type": "action",
+        "description": "Add a floor or room"
+      },
+      {
+        "type": "action",
+        "description": "Fill in valid room dimensions"
+      },
+      {
+        "type": "action",
+        "description": "Assign room type and finishes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify calculated material quantities are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Edit a wall face without breaking room linkage",
+    "description": "This test verifies that a user can update one face of an existing shared wall and keep the wall linked to both rooms with calculations remaining available.",
+    "category": "Wall Entity Modeling",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the specification area"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing shared wall"
+      },
+      {
+        "type": "action",
+        "description": "Edit one wall face"
+      },
+      {
+        "type": "action",
+        "description": "Save the wall changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated wall remains linked to both rooms"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify room calculations are still displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Save edited project details",
+    "description": "This verifies that a user can update an existing project and see the revised details persisted in the list or detail view.",
+    "category": "Project Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Projects area"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing project"
+      },
+      {
+        "type": "action",
+        "description": "Edit the project details"
+      },
+      {
+        "type": "action",
+        "description": "Save the project changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated project details are visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Update an existing rate card",
+    "description": "This test verifies that a user can edit a rate card and see the updated values reflected in the rate library.",
+    "category": "Rate Library",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the rates area"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing rate card"
+      },
+      {
+        "type": "action",
+        "description": "Update the rate values"
+      },
+      {
+        "type": "action",
+        "description": "Save the rate card changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated rate card is visible in the library"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the revised rate values are available for calculations"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Compare project phases in the report",
+    "description": "This verifies that a user can use the report to compare different project phases and see the expected phase analysis content.",
+    "category": "Reports",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the reports area"
+      },
+      {
+        "type": "action",
+        "description": "Open the phase-wise breakdown view"
+      },
+      {
+        "type": "action",
+        "description": "Switch to a different project phase comparison view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify phase comparison details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Recalculate milestone amounts after changing total cost",
+    "description": "This test verifies that updating the project total causes the milestone payment amounts to recalculate automatically.",
+    "category": "Payment Plans",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the payments area"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing milestone payment plan"
+      },
+      {
+        "type": "action",
+        "description": "Update the total cost"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the milestone amounts are recalculated"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated payment schedule is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Preview the print layout before saving export output",
+    "description": "This verifies that a user can switch to a print-oriented export path and review the layout before finishing.",
+    "category": "Export",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the export area"
+      },
+      {
+        "type": "action",
+        "description": "Select the print format"
+      },
+      {
+        "type": "action",
+        "description": "Generate the export"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the print layout is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC015",
+    "title": "Edit and reorder BOQ items",
+    "description": "This verifies that a user can modify BOQ entries and reorder them while keeping the BOQ totals visible.",
+    "category": "BOQ Editor",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the BOQ area"
+      },
+      {
+        "type": "action",
+        "description": "Edit an existing BOQ line item"
+      },
+      {
+        "type": "action",
+        "description": "Reorder a BOQ section or item"
+      },
+      {
+        "type": "action",
+        "description": "Save the BOQ changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated BOQ totals are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Review report content after navigating from dashboard",
+    "description": "This verifies that a user can move from the dashboard into reports and still access the report analysis content they need.",
+    "category": "Reports",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the reports shortcut from the dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Open the phase-wise breakdown view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify KPI summary cards are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify material quantity totals are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Update a room specification and recalculate quantities",
+    "description": "This verifies that editing an existing room specification updates the calculated quantities for the project.",
+    "category": "Room-Based Specification Engine",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Specification area"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing room specification"
+      },
+      {
+        "type": "action",
+        "description": "Edit the room dimensions or finishes"
+      },
+      {
+        "type": "action",
+        "description": "Save the room specification changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the calculated material quantities update"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Open the report area from dashboard quick actions",
+    "description": "This verifies that a user can reach the report area from dashboard quick actions and see the expected report workspace.",
+    "category": "Reports",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the reports quick action on the dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the reports workspace is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "View saved project in the BOQ workflow",
+    "description": "This verifies that a saved project can be opened and used as the starting point for BOQ work.",
+    "category": "Project Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the Projects area"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing project"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the BOQ workflow for the project"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the project is available for BOQ and specification work"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Switch export format before generating output",
+    "description": "This verifies that a user can change the export format and see the generated output reflect the selected option.",
+    "category": "Export",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the export area"
+      },
+      {
+        "type": "action",
+        "description": "Choose a different export format"
+      },
+      {
+        "type": "action",
+        "description": "Generate the export"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the generated output is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Prevent double counting for shared walls",
+    "description": "This test verifies that a wall shared by two rooms is recorded only once and does not inflate the calculated quantities.",
+    "category": "Wall Entity Modeling",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the specification area"
+      },
+      {
+        "type": "action",
+        "description": "Add a wall between two adjacent spaces"
+      },
+      {
+        "type": "action",
+        "description": "Link the same wall to the second room"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the wall is listed once in the storage summary"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the calculated quantities do not show duplicate wall contribution"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC022",
+    "title": "Reject an empty rate card",
+    "description": "This test verifies that the user cannot save a rate card without the required details and sees validation feedback.",
+    "category": "Rate Library",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the rates area"
+      },
+      {
+        "type": "action",
+        "description": "Create a new rate card"
+      },
+      {
+        "type": "action",
+        "description": "Leave the required rate fields empty"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to save the rate card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation messages are visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the rate card is not saved"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC023",
+    "title": "See an empty report state when no analysis is available",
+    "description": "This verifies that the reports area shows an empty state when no report analysis is available for the current context.",
+    "category": "Reports",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the reports area"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC024",
+    "title": "Handle an invalid total cost in a payment plan",
+    "description": "This test verifies that entering an invalid total cost prevents saving and shows validation feedback for the payment plan.",
+    "category": "Payment Plans",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the payments area"
+      },
+      {
+        "type": "action",
+        "description": "Create a milestone payment plan"
+      },
+      {
+        "type": "action",
+        "description": "Enter an invalid total cost"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to save the payment plan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the payment plan is not saved"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC025",
+    "title": "Handle an empty export workspace",
+    "description": "This verifies that the export area presents a usable empty state when no export has been generated yet.",
+    "category": "Export",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open the export area"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state message is displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]

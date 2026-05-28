@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import { getNextSequenceNumber } from '../utils/sequence';
+import StockMovementModel from './StockMovement';
 
 interface Production {
   id: number;
@@ -12,6 +13,11 @@ interface Production {
   bom_id?: number;
   remarks?: string;
   overhead_cost?: number;
+  batch_no?: string;
+  unit_cost?: number;
+  total_material_cost?: number;
+  total_batch_cost?: number;
+  batch_id?: number;
   created_by: number;
   created_at?: string;
   output_item_code?: string;
@@ -60,6 +66,26 @@ interface CreateProductionDTO {
 }
 
 class ProductionModel {
+  /**
+   * Consume a quantity of an item from the oldest available stock batches (FIFO).
+   * Delegates to the centralized implementation in StockMovementModel.
+   */
+  static consumeFromOldestBatches(
+    itemId: number,
+    warehouseId: number,
+    quantity: number,
+    db: Database.Database
+  ): Array<{ batchId: number | null; consumed: number; unitCost: number }> {
+    return StockMovementModel.consumeFromOldestBatches(itemId, warehouseId, quantity, db);
+  }
+
+  static generateBatchNo(db: Database.Database): string {
+    const year = new Date().getFullYear();
+    const settingKey = `BATCH_last_no_${year}`;
+    const nextNo = getNextSequenceNumber(db, settingKey);
+    return `BATCH-${year % 100}-PRD-${nextNo.toString().padStart(4, '0')}`;
+  }
+
   static recordProduction(data: CreateProductionDTO, userId: number, db: Database.Database): Production {
     const {
       output_item_id,
@@ -77,6 +103,7 @@ class ProductionModel {
 
     const transaction = db.transaction(() => {
       const productionNo = this.generateProductionNo(db);
+      const batchNo = this.generateBatchNo(db);
 
       const productionStmt = db.prepare(`
         INSERT INTO productions (
@@ -106,6 +133,8 @@ class ProductionModel {
         ) VALUES (?, ?, ?, ?)
       `);
 
+      let totalMaterialCost = 0;
+
       for (const input of input_items) {
         const stockBalance = db.prepare(`
           SELECT quantity FROM stock_balances
@@ -121,27 +150,37 @@ class ProductionModel {
 
         inputStmt.run(productionId, input.item_id, input.quantity, materialsWarehouseId);
 
-        const inputMovementNo = this.generateMovementNo(db);
-        db.prepare(`
-          INSERT INTO stock_movements (
-            movement_no, item_id, warehouse_id, movement_type,
-            quantity, unit_cost, reference_doctype, reference_docno,
-            remarks, movement_date, created_by
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(
-          inputMovementNo,
-          input.item_id,
-          materialsWarehouseId,
-          'PRODUCTION',
-          -input.quantity,
-          null,
-          'Production',
-          productionNo,
-          `Consumed for production: ${productionNo} (from warehouse)`,
-          production_date,
-          userId
-        );
+        // FIFO consumption from oldest batches
+        const consumption = this.consumeFromOldestBatches(input.item_id, materialsWarehouseId, input.quantity, db);
 
+        // Create one stock_movement per consumed batch for full traceability
+        for (const entry of consumption) {
+          const inputMovementNo = this.generateMovementNo(db);
+          db.prepare(`
+            INSERT INTO stock_movements (
+              movement_no, item_id, warehouse_id, movement_type,
+              quantity, unit_cost, reference_doctype, reference_docno,
+              remarks, movement_date, created_by, batch_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).run(
+            inputMovementNo,
+            input.item_id,
+            materialsWarehouseId,
+            'PRODUCTION',
+            -entry.consumed,
+            entry.unitCost,
+            'Production',
+            productionNo,
+            `Consumed for production: ${productionNo} ${entry.batchId ? `(batch ${entry.batchId})` : '(legacy stock)'}`,
+            production_date,
+            userId,
+            entry.batchId
+          );
+
+          totalMaterialCost += entry.consumed * entry.unitCost;
+        }
+
+        // Update stock_balances
         const existingBalance = db.prepare(`
           SELECT * FROM stock_balances
           WHERE item_id = ? AND warehouse_id = ?
@@ -172,25 +211,43 @@ class ProductionModel {
         `).run(input.item_id, input.item_id);
       }
 
-      // Calculate material cost from input items' standard_cost
-      let materialCost = 0;
-      for (const item of input_items) {
-        const row = db.prepare(`SELECT standard_cost FROM items WHERE id = ?`).get(item.item_id) as { standard_cost: number } | undefined;
-        materialCost += item.quantity * (row?.standard_cost ?? 0);
-      }
-      const totalCost = materialCost + (overhead_cost ?? 0);
-      const costPerUnit = output_quantity > 0 ? totalCost / output_quantity : 0;
+      // Calculate total batch cost from actual FIFO consumption
+      const totalOverhead = overhead_cost ?? 0;
+      const totalBatchCost = totalMaterialCost + totalOverhead;
+      const costPerUnit = output_quantity > 0 ? totalBatchCost / output_quantity : 0;
 
-      // Update finished good's standard_cost
-      db.prepare(`UPDATE items SET standard_cost = ? WHERE id = ?`).run(costPerUnit, output_item_id);
+      // Create a stock_batch record for the finished good
+      db.prepare(`
+        INSERT INTO stock_batches (
+          batch_no, item_id, warehouse_id, source_type,
+          source_id, quantity_original, quantity_remaining,
+          unit_cost, received_date
+        ) VALUES (?, ?, ?, 'PRODUCTION', ?, ?, ?, ?, ?)
+      `).run(
+        batchNo,
+        output_item_id,
+        warehouse_id,
+        productionId,
+        output_quantity,
+        output_quantity,
+        costPerUnit,
+        production_date
+      );
 
+      const batchRecord = db.prepare(`
+        SELECT id FROM stock_batches
+        WHERE source_type = 'PRODUCTION' AND source_id = ?
+      `).get(productionId) as { id: number } | undefined;
+      const outputBatchId = batchRecord?.id;
+
+      // Record output stock movement linked to the new batch
       const outputMovementNo = this.generateMovementNo(db);
       db.prepare(`
         INSERT INTO stock_movements (
           movement_no, item_id, warehouse_id, movement_type,
           quantity, unit_cost, reference_doctype, reference_docno,
-          remarks, movement_date, created_by
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          remarks, movement_date, created_by, batch_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
         outputMovementNo,
         output_item_id,
@@ -200,11 +257,24 @@ class ProductionModel {
         costPerUnit,
         'Production',
         productionNo,
-        `Produced to: ${productionNo} (to warehouse)`,
+        `Produced to: ${productionNo} (batch ${outputBatchId})`,
         production_date,
-        userId
+        userId,
+        outputBatchId
       );
 
+      // Update production record with batch costing info
+      db.prepare(`
+        UPDATE productions
+        SET batch_no = ?,
+            unit_cost = ?,
+            total_material_cost = ?,
+            total_batch_cost = ?,
+            batch_id = ?
+        WHERE id = ?
+      `).run(batchNo, costPerUnit, totalMaterialCost, totalBatchCost, outputBatchId, productionId);
+
+      // Update stock_balances for output item
       const outputExistingBalance = db.prepare(`
         SELECT * FROM stock_balances
         WHERE item_id = ? AND warehouse_id = ?
@@ -242,7 +312,7 @@ class ProductionModel {
         'CREATE',
         'Production',
         productionId,
-        `Recorded production ${productionNo}: ${output_quantity} units produced (Materials from: WH-${materialsWarehouseId}, Goods to: WH-${warehouse_id})`
+        `Recorded production ${productionNo}: ${output_quantity} units (Batch: ${batchNo}, Cost: ${costPerUnit.toFixed(4)}/unit)`
       );
 
       return this.getById(productionId, db) as Production;
@@ -393,9 +463,86 @@ class ProductionModel {
       throw new Error('Production not found');
     }
 
-    db.prepare('DELETE FROM production_inputs WHERE production_id = ?').run(id);
+    const transaction = db.transaction(() => {
+      // 1. Restore raw material batch quantities from PRODUCTION movements
+      const rawMovements = db.prepare(`
+        SELECT item_id, warehouse_id, quantity, batch_id, unit_cost
+        FROM stock_movements
+        WHERE reference_docno = ? AND movement_type = 'PRODUCTION' AND quantity < 0
+        ORDER BY id
+      `).all(production.production_no) as Array<{
+        item_id: number;
+        warehouse_id: number;
+        quantity: number;
+        batch_id: number | null;
+        unit_cost: number;
+      }>;
 
-    db.prepare('DELETE FROM productions WHERE id = ?').run(id);
+      for (const movement of rawMovements) {
+        const absQty = Math.abs(movement.quantity);
+
+        // Restore quantity_remaining on the consumed batch
+        if (movement.batch_id !== null) {
+          db.prepare(`
+            UPDATE stock_batches
+            SET quantity_remaining = quantity_remaining + ?
+            WHERE id = ?
+          `).run(absQty, movement.batch_id);
+        }
+
+        // Create ADJUSTMENT movement to add stock back
+        StockMovementModel.recordMovement(
+          {
+            item_id: movement.item_id,
+            warehouse_id: movement.warehouse_id,
+            movement_type: 'ADJUSTMENT',
+            quantity: absQty,
+            unit_cost: movement.unit_cost,
+            reference_doctype: 'PRODUCTION_DELETE',
+            reference_docno: production.production_no,
+            remarks: `Stock reversed - Production ${production.production_no} deleted (raw material)`,
+            movement_date: new Date().toISOString().split('T')[0],
+          },
+          userId,
+          db
+        );
+      }
+
+      // 2. Handle the output batch created by this production
+      const outputBatch = db.prepare(`
+        SELECT id, quantity_remaining, unit_cost
+        FROM stock_batches
+        WHERE source_type = 'PRODUCTION' AND source_id = ?
+      `).get(id) as { id: number; quantity_remaining: number; unit_cost: number } | undefined;
+
+      if (outputBatch && outputBatch.quantity_remaining > 0) {
+        // Create ADJUSTMENT movement to remove output stock
+        StockMovementModel.recordMovement(
+          {
+            item_id: production.output_item_id,
+            warehouse_id: production.warehouse_id,
+            movement_type: 'ADJUSTMENT',
+            quantity: -outputBatch.quantity_remaining,
+            unit_cost: outputBatch.unit_cost,
+            reference_doctype: 'PRODUCTION_DELETE',
+            reference_docno: production.production_no,
+            remarks: `Stock reversed - Production ${production.production_no} deleted (output)`,
+            movement_date: new Date().toISOString().split('T')[0],
+          },
+          userId,
+          db
+        );
+
+        // Zero out the output batch (keep for FK integrity with stock_movements)
+        db.prepare('UPDATE stock_batches SET quantity_remaining = 0 WHERE id = ?').run(outputBatch.id);
+      }
+
+      // 3. Delete production inputs and production record
+      db.prepare('DELETE FROM production_inputs WHERE production_id = ?').run(id);
+      db.prepare('DELETE FROM productions WHERE id = ?').run(id);
+    });
+
+    transaction();
 
     db.prepare(`
       INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)

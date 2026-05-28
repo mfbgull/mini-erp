@@ -725,6 +725,7 @@ runRolesPermissionsMigration();
 runStockAdjustmentFinancialMigration();
 runForecastsMigration();
 runMissingFKIndexesMigration();
+runBatchCostingMigration();
 
 // Rollback support: run if --rollback flag is passed
 if (process.argv.includes('--rollback')) {
@@ -999,6 +1000,68 @@ function runStockAdjustmentFinancialMigration(): void {
     }
   } catch (error: any) {
     logger.error('Stock adjustment financial migration error:', error.message);
+  }
+}
+
+function runBatchCostingMigration(): void {
+  try {
+    // Step 1: Create stock_batches table (if not exists)
+    const stockBatchesTableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='stock_batches'
+    `).get() as { name: string } | undefined;
+
+    if (!stockBatchesTableCheck) {
+      logger.info('Running batch costing migration...');
+
+      const batchSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-batch-costing.sql'),
+        'utf8'
+      );
+
+      db.exec(batchSQL);
+
+      logger.info('✅ stock_batches table created!');
+    }
+
+    // Step 2: Add batch_id column to stock_movements
+    const smBatchIdCheck = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('stock_movements') WHERE name='batch_id'`
+    ).get() as { count: number };
+    if (!smBatchIdCheck.count) {
+      logger.info('Adding batch_id to stock_movements...');
+      db.exec('ALTER TABLE stock_movements ADD COLUMN batch_id INTEGER REFERENCES stock_batches(id)');
+      logger.info('✅ batch_id added to stock_movements');
+    }
+
+    // Step 3: Add batch columns to productions
+    const prodBatchIdCheck = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('productions') WHERE name='batch_id'`
+    ).get() as { count: number };
+    if (!prodBatchIdCheck.count) {
+      logger.info('Adding batch columns to productions...');
+      db.exec('ALTER TABLE productions ADD COLUMN batch_id INTEGER REFERENCES stock_batches(id)');
+      db.exec('ALTER TABLE productions ADD COLUMN batch_no VARCHAR(50)');
+      db.exec('ALTER TABLE productions ADD COLUMN unit_cost DECIMAL(15,4) DEFAULT 0');
+      db.exec('ALTER TABLE productions ADD COLUMN total_material_cost DECIMAL(15,4) DEFAULT 0');
+      db.exec('ALTER TABLE productions ADD COLUMN total_batch_cost DECIMAL(15,4) DEFAULT 0');
+      logger.info('✅ Batch columns added to productions');
+    }
+
+    // Step 4: Add batch columns to purchases
+    const purchBatchIdCheck = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('purchases') WHERE name='batch_id'`
+    ).get() as { count: number };
+    if (!purchBatchIdCheck.count) {
+      logger.info('Adding batch columns to purchases...');
+      db.exec('ALTER TABLE purchases ADD COLUMN batch_id INTEGER REFERENCES stock_batches(id)');
+      db.exec('ALTER TABLE purchases ADD COLUMN batch_no VARCHAR(50)');
+      logger.info('✅ Batch columns added to purchases');
+    }
+
+    logger.info('✅ Batch costing migration completed!');
+  } catch (error: any) {
+    logger.error('Batch costing migration error:', error.message);
   }
 }
 

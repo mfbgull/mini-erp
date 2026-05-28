@@ -304,6 +304,20 @@ function deleteSalesOrder(req: AuthRequest, res: Response): void {
 }
 
 /**
+ * POST /api/sales-orders/:id/cancel
+ * Cancel a sales order — reverses linked invoice stock and cancels the invoice.
+ */
+function cancelSalesOrder(req: AuthRequest, res: Response): void {
+  try {
+    const result = SalesService.cancelSalesOrder(Number(req.params.id), req.user!.id);
+    res.json({ success: true, message: 'Sales order cancelled successfully', ...result });
+  } catch (error: any) {
+    logger.error('Cancel sales order error:', error);
+    res.status(500).json({ error: error.message || 'Failed to cancel sales order' });
+  }
+}
+
+/**
  * POST /api/sales-orders/:id/convert
  * Convert sales order to invoice
  */
@@ -417,6 +431,7 @@ export default {
   getSalesOrder,
   updateSalesOrder,
   deleteSalesOrder,
+  cancelSalesOrder,
   convertSalesOrderToInvoice,
   getSalesOrderCycleChain,
   

@@ -302,40 +302,53 @@ function createStockMovement(req: AuthRequest, res: Response): void {
     }
 
     // Negative Stock Validation for Outgoing Movements
-    if (['OUT', 'TRANSFER', 'ADJUSTMENT_OUT'].includes(movement_type)) {
+    if (['OUT', 'TRANSFER', 'ADJUSTMENT'].includes(movement_type) && quantity < 0) {
       const currentStock = StockMovementModel.getBalance(item_id, warehouse_id, db) as { quantity: number } | undefined;
       const availableQty = currentStock?.quantity || 0;
 
-      if (availableQty < quantity) {
+      if (availableQty < Math.abs(quantity)) {
         res.status(400).json({
           error: 'Insufficient stock',
           details: {
             available: availableQty,
-            requested: quantity
+            requested: Math.abs(quantity)
           }
         });
         return;
       }
     }
 
-    const result = StockMovementModel.recordMovement(req.body, req.user!.id, db);
+    // Use batch-aware consumption for outgoing transfers and negative adjustments
+    const useBatchConsumption = ['TRANSFER', 'ADJUSTMENT'].includes(movement_type) && quantity < 0;
+
+    let results: Array<{ id: number; movement_no: string }>;
+
+    if (useBatchConsumption) {
+      results = StockMovementModel.recordBatchMovement(req.body, req.user!.id, db);
+    } else {
+      const r = StockMovementModel.recordMovement(req.body, req.user!.id, db);
+      results = [r];
+    }
 
     const item = ItemModel.getById(item_id, db);
     const warehouse = WarehouseModel.getById(db, warehouse_id);
 
-    // Log stock movement using activity logger
-    logCRUD(ActionType.STOCK_MOVEMENT, 'StockMovement', result.id, `${movement_type}: ${quantity} ${item?.unit_of_measure || 'units'} of ${item?.item_name} at ${warehouse?.warehouse_name}`, req.user!.id, {
+    // Log stock movement using activity logger (log the first/primary movement)
+    const primaryResult = results[0];
+    logCRUD(ActionType.STOCK_MOVEMENT, 'StockMovement', primaryResult.id, `${movement_type}: ${quantity} ${item?.unit_of_measure || 'units'} of ${item?.item_name} at ${warehouse?.warehouse_name}${results.length > 1 ? ` (${results.length} batches)` : ''}`, req.user!.id, {
       item_id,
       item_code: item?.item_code,
       warehouse_id,
       warehouse_code: warehouse?.warehouse_code,
       movement_type,
-      quantity
+      quantity,
+      batch_count: results.length
     });
     req.activityLogged = true;
 
-    const movement = StockMovementModel.getById(result.id, db);
-    res.status(201).json(movement);
+    // Return the first movement for backward compatibility
+    const firstMovement = StockMovementModel.getById(primaryResult.id, db);
+    res.status(201).json(firstMovement);
   } catch (error) {
     logger.error('Create stock movement error:', error);
     res.status(500).json({ error: 'Failed to create stock movement' });

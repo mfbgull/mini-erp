@@ -327,4 +327,194 @@ describe('StockMovementModel', () => {
       expect(movement).toBeUndefined();
     });
   });
+
+  describe('consumeFromOldestBatches', () => {
+    let testItemId: number;
+    let testWhId: number;
+
+    beforeAll(() => {
+      // Create a test item
+      testItemId = ItemModel.create({
+        item_code: `BATCH-TEST-${Date.now()}`,
+        item_name: 'Batch Test Item',
+        category: 'Test',
+        unit_of_measure: 'Nos',
+        standard_cost: 10,
+        standard_selling_price: 25,
+      }, 1, db);
+
+      // Use an existing warehouse (id 1)
+      testWhId = 1;
+
+      // Ensure a clean stock_balance entry
+      db.prepare(`DELETE FROM stock_balances WHERE item_id = ? AND warehouse_id = ?`).run(testItemId, testWhId);
+      db.prepare(`DELETE FROM stock_batches WHERE item_id = ? AND warehouse_id = ?`).run(testItemId, testWhId);
+      db.prepare(`INSERT INTO stock_balances (item_id, warehouse_id, quantity) VALUES (?, ?, 0)`).run(testItemId, testWhId);
+    });
+
+    afterAll(() => {
+      // Clean up
+      db.prepare(`DELETE FROM stock_balances WHERE item_id = ?`).run(testItemId);
+      db.prepare(`DELETE FROM stock_batches WHERE item_id = ?`).run(testItemId);
+      ItemModel.delete(testItemId, db);
+    });
+
+    it('consumes from oldest batch first (FIFO)', () => {
+      const batch1Result = StockMovementModel.recordMovement({
+        item_id: testItemId,
+        warehouse_id: testWhId,
+        movement_type: 'PURCHASE',
+        quantity: 100,
+        unit_cost: 15,
+      }, 1, db);
+
+      // Manually create batch #1 with older date
+      db.prepare(`INSERT INTO stock_batches (item_id, warehouse_id, batch_no, source_type, source_id, quantity_original, quantity_remaining, unit_cost, received_date)
+        VALUES (?, ?, 'BATCH-TEST-1', 'PURCHASE', 0, 50, 50, 15, '2025-01-01')`).run(testItemId, testWhId);
+
+      // Manually create batch #2 with newer date (higher unit cost)
+      db.prepare(`INSERT INTO stock_batches (item_id, warehouse_id, batch_no, source_type, source_id, quantity_original, quantity_remaining, unit_cost, received_date)
+        VALUES (?, ?, 'BATCH-TEST-2', 'PURCHASE', 0, 50, 50, 20, '2025-06-01')`).run(testItemId, testWhId);
+
+      // Consume 60 units: should take 50 from batch1, 10 from batch2
+      const consumption = StockMovementModel.consumeFromOldestBatches(
+        testItemId, testWhId, 60, db
+      );
+
+      expect(consumption).toHaveLength(2);
+      expect(consumption[0].batchId).not.toBeNull();
+      expect(consumption[0].consumed).toBe(50);
+      expect(consumption[0].unitCost).toBe(15);
+
+      expect(consumption[1].batchId).not.toBeNull();
+      expect(consumption[1].consumed).toBe(10);
+      expect(consumption[1].unitCost).toBe(20);
+
+      // Verify batch remaining quantities
+      const batch1 = db.prepare(`SELECT quantity_remaining FROM stock_batches WHERE id = ?`).get(consumption[0].batchId) as { quantity_remaining: number };
+      expect(batch1.quantity_remaining).toBe(0);
+
+      const batch2 = db.prepare(`SELECT quantity_remaining FROM stock_batches WHERE id = ?`).get(consumption[1].batchId) as { quantity_remaining: number };
+      expect(batch2.quantity_remaining).toBe(40);
+    });
+
+    it('falls back to standard_cost when batch stock is insufficient', () => {
+      // Clean up old test data
+      db.prepare(`DELETE FROM stock_batches WHERE item_id = ?`).run(testItemId);
+      db.prepare(`UPDATE stock_balances SET quantity = 0 WHERE item_id = ?`).run(testItemId);
+
+      // Create just 1 batch with 10 units
+      db.prepare(`INSERT INTO stock_batches (item_id, warehouse_id, batch_no, source_type, source_id, quantity_original, quantity_remaining, unit_cost, received_date)
+        VALUES (?, ?, 'BATCH-TEST-3', 'PURCHASE', 0, 10, 10, 15, '2025-01-01')`).run(testItemId, testWhId);
+
+      // Consume 15 units (more than available in batches)
+      const consumption = StockMovementModel.consumeFromOldestBatches(
+        testItemId, testWhId, 15, db
+      );
+
+      expect(consumption).toHaveLength(2);
+      expect(consumption[0].batchId).not.toBeNull();
+      expect(consumption[0].consumed).toBe(10);
+
+      // Fallback entry should have null batchId and use standard_cost (10)
+      expect(consumption[1].batchId).toBeNull();
+      expect(consumption[1].consumed).toBeCloseTo(5, 2);
+      expect(consumption[1].unitCost).toBe(10); // standard_cost from item creation
+    });
+
+    it('handles zero quantity gracefully', () => {
+      const consumption = StockMovementModel.consumeFromOldestBatches(
+        testItemId, testWhId, 0, db
+      );
+      expect(consumption).toHaveLength(0);
+    });
+  });
+
+  describe('recordBatchMovement', () => {
+    let testItemId2: number;
+    let testWhId2: number;
+
+    beforeAll(() => {
+      testItemId2 = ItemModel.create({
+        item_code: `BATCH-MOVE-${Date.now()}`,
+        item_name: 'Batch Movement Test Item',
+        category: 'Test',
+        unit_of_measure: 'Nos',
+        standard_cost: 12,
+        standard_selling_price: 30,
+      }, 1, db);
+
+      testWhId2 = 1;
+
+      db.prepare(`DELETE FROM stock_balances WHERE item_id = ? AND warehouse_id = ?`).run(testItemId2, testWhId2);
+      db.prepare(`DELETE FROM stock_batches WHERE item_id = ? AND warehouse_id = ?`).run(testItemId2, testWhId2);
+      db.prepare(`INSERT INTO stock_balances (item_id, warehouse_id, quantity) VALUES (?, ?, 0)`).run(testItemId2, testWhId2);
+    });
+
+    afterAll(() => {
+      db.prepare(`DELETE FROM stock_balances WHERE item_id = ?`).run(testItemId2);
+      db.prepare(`DELETE FROM stock_batches WHERE item_id = ?`).run(testItemId2);
+      ItemModel.delete(testItemId2, db);
+    });
+
+    it('delegates to recordMovement for incoming movements', () => {
+      const results = StockMovementModel.recordBatchMovement({
+        item_id: testItemId2,
+        warehouse_id: testWhId2,
+        movement_type: 'PURCHASE',
+        quantity: 50,
+        unit_cost: 22,
+        remarks: 'Test incoming batch movement',
+      }, 1, db);
+
+      expect(results).toHaveLength(1);
+      expect(results[0].id).toBeGreaterThan(0);
+      expect(results[0].movement_no).toMatch(/^STK-/);
+      expect(results[0].quantity).toBe(50);
+
+      // Verify stock_balance updated
+      const balance = StockMovementModel.getBalance(testItemId2, testWhId2, db) as { quantity: number };
+      expect(balance.quantity).toBe(50);
+    });
+
+    it('consumes from batches for outgoing movements', () => {
+      // Manually create two batches
+      db.prepare(`INSERT INTO stock_batches (item_id, warehouse_id, batch_no, source_type, source_id, quantity_original, quantity_remaining, unit_cost, received_date)
+        VALUES (?, ?, 'BATCH-MOVE-1', 'PURCHASE', 0, 30, 30, 18, '2025-01-01')`).run(testItemId2, testWhId2);
+      db.prepare(`INSERT INTO stock_batches (item_id, warehouse_id, batch_no, source_type, source_id, quantity_original, quantity_remaining, unit_cost, received_date)
+        VALUES (?, ?, 'BATCH-MOVE-2', 'PURCHASE', 0, 20, 20, 25, '2025-06-01')`).run(testItemId2, testWhId2);
+
+      // Update stock_balance to reflect batches
+      db.prepare(`UPDATE stock_balances SET quantity = 100 WHERE item_id = ? AND warehouse_id = ?`).run(testItemId2, testWhId2);
+
+      // Record outgoing TRANSFER of 40 units
+      const results = StockMovementModel.recordBatchMovement({
+        item_id: testItemId2,
+        warehouse_id: testWhId2,
+        movement_type: 'TRANSFER',
+        quantity: -40,
+        remarks: 'Test outgoing batch movement',
+      }, 1, db);
+
+      // Should consume 30 from batch1, 10 from batch2 = 2 movements
+      expect(results.length).toBeGreaterThanOrEqual(2);
+
+      // First movement: 30 units from batch1 @ 18
+      expect(results[0].quantity).toBe(-30);
+      expect(results[0].unit_cost).toBe(18);
+      expect(results[0].batch_id).not.toBeNull();
+
+      // Second movement: 10 units from batch2 @ 25
+      expect(results[1].quantity).toBe(-10);
+      expect(results[1].unit_cost).toBe(25);
+      expect(results[1].batch_id).not.toBeNull();
+
+      // Verify batch remaining quantities
+      const batch1Check = db.prepare(`SELECT quantity_remaining FROM stock_batches WHERE id = ?`).get(results[0].batch_id) as { quantity_remaining: number };
+      expect(batch1Check.quantity_remaining).toBe(0);
+
+      const batch2Check = db.prepare(`SELECT quantity_remaining FROM stock_batches WHERE id = ?`).get(results[1].batch_id) as { quantity_remaining: number };
+      expect(batch2Check.quantity_remaining).toBe(10);
+    });
+  });
 });

@@ -455,6 +455,42 @@ export interface SalesSummary {
   avg_invoice_value: number;
 }
 
+// ============ Batch Costing Types ============
+export interface StockBatch {
+  id: number;
+  batch_no: string;
+  item_id: number;
+  warehouse_id: number;
+  source_type: 'PRODUCTION' | 'PURCHASE';
+  source_id: number;
+  quantity_original: number;
+  quantity_remaining: number;
+  unit_cost: number;
+  received_date: string;
+  created_at?: string;
+  // Joined fields
+  item_code?: string;
+  item_name?: string;
+  warehouse_code?: string;
+  warehouse_name?: string;
+  source_no?: string; // production_no or purchase_no
+}
+
+export interface BatchSummary {
+  batch_no: string;
+  item_id: number;
+  item_code: string;
+  item_name: string;
+  warehouse_name: string;
+  source_type: string;
+  source_no: string;
+  quantity_original: number;
+  quantity_remaining: number;
+  unit_cost: number;
+  total_value: number;
+  received_date: string;
+}
+
 // ============ Activity Log Types ============
 export interface ActivityLogDbEntry {
   id: number;

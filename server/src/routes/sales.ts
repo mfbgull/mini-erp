@@ -46,6 +46,9 @@ router.put('/sales-orders/:id', requireAdmin, salesController.updateSalesOrder);
 // DELETE /api/sales-orders/:id - Delete sales order
 router.delete('/sales-orders/:id', requireAdmin, sensitiveOperationLimiter, salesController.deleteSalesOrder);
 
+// POST /api/sales-orders/:id/cancel - Cancel sales order (reverses stock)
+router.post('/sales-orders/:id/cancel', requireAdmin, sensitiveOperationLimiter, salesController.cancelSalesOrder);
+
 // POST /api/sales-orders/:id/convert - Convert sales order to invoice
 router.post('/sales-orders/:id/convert', requireAdmin, salesController.convertSalesOrderToInvoice);
 

@@ -83,6 +83,7 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
+  height: 100%;
 }
 
 .sales-by-item-report .no-data {

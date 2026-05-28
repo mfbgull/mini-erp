@@ -211,6 +211,27 @@ export default function StockMovementPage() {
         <span className="status-tag">{params.value}</span>
       ),
     },
+    {
+      headerName: "Batch",
+      field: "batch_no",
+      sortable: true,
+      filter: true,
+      flex: 1,
+      cellRenderer: (params) => (
+        <span style={{ fontFamily: 'monospace', fontSize: '12px', color: params.value ? '#6366f1' : '#9ca3af' }}>
+          {params.value || '—'}
+        </span>
+      ),
+    },
+    {
+      headerName: "Cost",
+      field: "unit_cost",
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+      flex: 1,
+      valueFormatter: (params) => params.value != null ? params.value.toFixed(2) : '—',
+      cellStyle: { fontFamily: 'monospace' },
+    },
    ];
 
   const handleRowClick = (movement) => {

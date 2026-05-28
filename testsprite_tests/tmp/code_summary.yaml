@@ -1,0 +1,513 @@
+version: "2"
+type: fullstack
+tech_stack:
+  - language: JavaScript, TypeScript (React 18 + Node.js/Express 5)
+  - database: SQLite via better-sqlite3
+  - ui_grid: AG-Grid (Enterprise features)
+  - state: TanStack Query (React Query) + React Context
+  - validation: Zod schemas
+  - http: Axios
+  - auth: JWT (httpOnly cookie) + CSRF (double-submit cookie pattern)
+  - testing: Jest + Supertest (backend unit tests)
+
+# ==========================================
+# CRITICAL: Authentication & Security Details
+# ==========================================
+auth:
+  login_endpoint: POST /api/auth/login
+  login_payload: '{"username": "admin", "password": "admin123"}'
+  login_response_format: '{ "success": true, "data": { "user": { "id": 1, "username": "admin", "role": "admin", ... } } }'
+  jwt_token: Set as httpOnly cookie named "token" — extract from response cookies and use as "Authorization: Bearer <token>" header
+  csrf:
+    description: "Double-submit cookie pattern. GET requests set a 'csrf-token' cookie. Mutations (POST/PUT/DELETE/PATCH) must include 'x-csrf-token' header matching the cookie value."
+    cookie_name: csrf-token
+    header_name: x-csrf-token
+    how_to_obtain: "Make any GET request first (e.g. GET /api/inventory/items) to get the csrf-token cookie. Extract its value and set as the x-csrf-token header on all mutation requests."
+  admin_required_endpoints:
+    - POST /api/quotations
+    - PUT /api/quotations/:id
+    - DELETE /api/quotations/:id
+    - POST /api/quotations/:id/convert
+    - POST /api/sales-orders
+    - PUT /api/sales-orders/:id
+    - DELETE /api/sales-orders/:id
+    - POST /api/sales-orders/:id/cancel
+    - POST /api/sales-orders/:id/convert
+    - DELETE /api/inventory/items/:id
+    - DELETE /api/inventory/warehouses/:id
+    - DELETE /api/invoices/:id
+    - POST /api/invoices/:id/return
+    - DELETE /api/purchases/:id
+    - DELETE /api/productions/:id
+    - DELETE /api/payments/:id
+  credentials:
+    username: admin
+    password: admin123
+    role: admin
+
+# ==========================================
+# Frontend Routes
+# ==========================================
+routes:
+  - path: /login
+    file: client/src/pages/LoginPage.tsx
+    auth_required: false
+    description: ERP system login — username/password form
+  - path: /
+    file: client/src/pages/Dashboard.jsx
+    auth_required: true
+    description: ERP dashboard with KPI cards (total items, stock value, sales revenue, production runs), charts, low stock alerts
+  - path: /inventory/items
+    file: client/src/pages/inventory/ItemsPage.jsx
+    auth_required: true
+    description: Inventory items list with AG-Grid (search, sort, filter, CRUD)
+  - path: /inventory/warehouses
+    file: client/src/pages/inventory/WarehousesPage.jsx
+    auth_required: true
+    description: Warehouse management (list, create, edit)
+  - path: /inventory/stock-movements
+    file: client/src/pages/inventory/StockMovementPage.jsx
+    auth_required: true
+    description: Stock movement tracking (purchases, sales, transfers, adjustments)
+  - path: /inventory/stock-by-warehouse
+    file: client/src/pages/inventory/StockByWarehousePage.tsx
+    auth_required: true
+    description: Stock levels grouped by warehouse
+  - path: /purchases
+    file: client/src/pages/purchases/PurchasesPage.jsx
+    auth_required: true
+    description: Purchase records list
+  - path: /purchase-orders
+    file: client/src/pages/purchase-orders/PurchaseOrdersPage.jsx
+    auth_required: true
+    description: Purchase orders management
+  - path: /suppliers
+    file: client/src/pages/suppliers/SuppliersPage.jsx
+    auth_required: true
+    description: Supplier management (list, create, edit, view details)
+  - path: /customers
+    file: client/src/pages/customers/CustomersPage.jsx
+    auth_required: true
+    description: Customer management (list, create, edit, view ledger/statement)
+  - path: /quotations
+    file: client/src/pages/quotations/QuotationsPage.jsx
+    auth_required: true
+    description: Sales quotations list and management
+  - path: /sales-orders
+    file: client/src/pages/sales-orders/SalesOrdersPage.jsx
+    auth_required: true
+    description: Sales orders list and management
+  - path: /sales
+    file: client/src/pages/sales/SalesPage.jsx
+    auth_required: true
+    description: Sales invoices list, invoice creation wizard, invoice view
+  - path: /pos
+    file: client/src/pages/pos/POSPage.jsx
+    auth_required: true
+    description: Point of Sale interface for retail transactions
+  - path: /reports
+    file: client/src/pages/reports/ReportsDashboard.jsx
+    auth_required: true
+    description: Reports dashboard with financial, sales, inventory, and production reports
+  - path: /payments
+    file: client/src/pages/payments/PaymentsPage.tsx
+    auth_required: true
+    description: Payment tracking and allocation to invoices
+  - path: /production
+    file: client/src/pages/production/ProductionPage.jsx
+    auth_required: true
+    description: Production/manufacturing runs
+  - path: /bom
+    file: client/src/pages/bom/BOMPage.jsx
+    auth_required: true
+    description: Bill of Materials management
+  - path: /forecasts
+    file: client/src/pages/forecasts/ForecastDashboard.tsx
+    auth_required: true
+    description: Demand forecasting dashboard
+  - path: /settings
+    file: client/src/pages/SettingsPage.jsx
+    auth_required: true
+    description: System settings
+  - path: /users
+    file: client/src/pages/users/UsersPage.jsx
+    auth_required: true
+    description: User management (admin only)
+  - path: /roles
+    file: client/src/pages/roles/RolesPage.jsx
+    auth_required: true
+    description: Role and permissions management
+  - path: /expenses
+    file: client/src/pages/expenses/ExpensesPage.jsx
+    auth_required: true
+    description: Expense tracking
+
+# ==========================================
+# Features (ERP Domain — NOT construction)
+# ==========================================
+features:
+  - name: User Authentication & Access Control
+    domain: ERP_AUTH
+    description: JWT-based login/logout with role-based access control (admin/user roles). CSRF-protected mutations via double-submit cookie pattern.
+    files:
+      - client/src/pages/LoginPage.tsx
+      - client/src/context/AuthContext.tsx
+      - server/src/middleware/auth.ts
+      - server/src/controllers/authController.ts
+    entry_route: /login
+    user_interactions:
+      - Enter username ("admin") and password ("admin123")
+      - Click Sign In button
+      - See error on invalid credentials
+      - Redirected to dashboard on success
+    api_calls:
+      - method: POST
+        endpoint: /api/auth/login
+        request_body: '{"username": "admin", "password": "admin123"}'
+        response_format: '{ "success": true, "data": { "user": { "id": 1, "username": "admin", "role": "admin", "email": "admin@example.com" } } }'
+        jwt_token_location: httpOnly cookie named "token"
+        csrf_note: "Login endpoint is EXCLUDED from CSRF protection"
+    auth_required: false
+
+  - name: Dashboard & KPIs
+    domain: ERP_DASHBOARD
+    description: ERP dashboard showing summary KPIs — total items, total stock value, total sales revenue, production run count, low stock alerts, sales vs purchases chart
+    files:
+      - client/src/pages/Dashboard.jsx
+      - server/src/controllers/dashboardController.ts
+    entry_route: /
+    api_calls:
+      - method: GET
+        endpoint: /api/dashboard/summary
+        response_contains: summary data with KPI metrics
+    auth_required: true
+
+  - name: Inventory Items Management
+    domain: ERP_INVENTORY
+    description: CRUD operations for inventory items with item code, name, category, unit of measure, standard cost, selling price, and stock tracking
+    files:
+      - client/src/pages/inventory/ItemsPage.jsx
+      - server/src/controllers/inventoryController.ts
+    entry_route: /inventory/items
+    user_interactions:
+      - View items list with AG-Grid (search, sort, filter)
+      - Create new item (item_code, item_name, category, unit_of_measure, standard_cost, standard_selling_price)
+      - Edit existing item
+      - Delete item (admin only)
+      - View low stock items
+    api_calls:
+      - method: GET
+        endpoint: /api/inventory/items
+      - method: GET
+        endpoint: /api/inventory/items-low-stock
+      - method: POST
+        endpoint: /api/inventory/items
+        csrf_required: true
+      - method: PUT
+        endpoint: /api/inventory/items/:id
+        csrf_required: true
+      - method: DELETE
+        endpoint: /api/inventory/items/:id
+        admin_required: true
+        csrf_required: true
+    auth_required: true
+
+  - name: Warehouse Management
+    domain: ERP_INVENTORY
+    description: Create and manage warehouses/locations for stock storage
+    files:
+      - client/src/pages/inventory/WarehousesPage.jsx
+    entry_route: /inventory/warehouses
+    api_calls:
+      - method: GET
+        endpoint: /api/inventory/warehouses
+      - method: POST
+        endpoint: /api/inventory/warehouses
+        csrf_required: true
+      - method: PUT
+        endpoint: /api/inventory/warehouses/:id
+        csrf_required: true
+      - method: DELETE
+        endpoint: /api/inventory/warehouses/:id
+        admin_required: true
+        csrf_required: true
+    auth_required: true
+
+  - name: Stock Movements & Tracking
+    domain: ERP_INVENTORY
+    description: Record stock movements (PURCHASE, SALE, TRANSFER, ADJUSTMENT) with batch costing support. View stock balances by warehouse, item ledger.
+    files:
+      - client/src/pages/inventory/StockMovementPage.jsx
+      - client/src/pages/inventory/StockByWarehousePage.tsx
+      - server/src/controllers/inventoryController.ts
+    entry_route: /inventory/stock-movements
+    api_calls:
+      - method: GET
+        endpoint: /api/inventory/stock-movements
+      - method: POST
+        endpoint: /api/inventory/stock-movements
+        csrf_required: true
+      - method: GET
+        endpoint: /api/inventory/stock-summary
+      - method: GET
+        endpoint: /api/inventory/stock-ledger/:itemId
+      - method: GET
+        endpoint: /api/inventory/stock-balances
+    auth_required: true
+
+  - name: Customer Management
+    domain: ERP_CRM
+    description: Manage customers with contact details, credit limits, balances, ledger, and statements
+    files:
+      - client/src/pages/customers/CustomersPage.jsx
+      - client/src/pages/customers/CustomerDetailPage.jsx
+    entry_route: /customers
+    user_interactions:
+      - View customers list
+      - Create new customer (customer_name, email, phone, credit_limit)
+      - Edit customer
+      - Delete customer
+      - View customer ledger and statement
+    api_calls:
+      - method: GET
+        endpoint: /api/customers
+      - method: POST
+        endpoint: /api/customers
+        csrf_required: true
+      - method: GET
+        endpoint: /api/customers/:id/ledger
+      - method: GET
+        endpoint: /api/customers/:id/statement
+    auth_required: true
+
+  - name: Supplier Management
+    domain: ERP_PURCHASING
+    description: Manage suppliers with contact details
+    files:
+      - client/src/pages/suppliers/SuppliersPage.jsx
+      - client/src/pages/suppliers/SupplierDetailPage.jsx
+    entry_route: /suppliers
+    api_calls:
+      - method: GET
+        endpoint: /api/suppliers
+      - method: POST
+        endpoint: /api/suppliers
+        csrf_required: true
+      - method: PUT
+        endpoint: /api/suppliers/:id
+        csrf_required: true
+      - method: DELETE
+        endpoint: /api/suppliers/:id
+        csrf_required: true
+    auth_required: true
+
+  - name: Sales Cycle (Quotations → Sales Orders → Invoices)
+    domain: ERP_SALES
+    description: Complete sales cycle — create quotations, convert to sales orders, convert to invoices. Includes stock deduction on invoicing, payment allocation, invoice returns.
+    files:
+      - client/src/pages/quotations/QuotationsPage.jsx
+      - client/src/pages/sales-orders/SalesOrdersPage.jsx
+      - client/src/pages/sales/SalesPage.jsx
+      - client/src/pages/sales/SalesInvoicePage.jsx
+      - client/src/pages/sales/InvoiceViewPage.jsx
+      - server/src/controllers/salesController.ts
+      - server/src/controllers/invoiceController.ts
+    entry_route: /quotations
+    user_interactions:
+      - View quotations list
+      - Create quotation with customer and line items
+      - View sales orders list
+      - Create sales order
+      - Convert quotation to sales order
+      - View invoices list
+      - Create invoice via wizard (step 1: customer, step 2: items, step 3: add item, step 4: payment, step 5: review)
+      - Process invoice returns
+      - View invoice details and payments
+    api_calls:
+      - method: GET
+        endpoint: /api/quotations
+      - method: POST
+        endpoint: /api/quotations
+        admin_required: true
+        csrf_required: true
+      - method: GET
+        endpoint: /api/sales-orders
+      - method: POST
+        endpoint: /api/sales-orders
+        admin_required: true
+        csrf_required: true
+      - method: POST
+        endpoint: /api/quotations/:id/convert
+        admin_required: true
+        csrf_required: true
+      - method: POST
+        endpoint: /api/sales-orders/:id/convert
+        admin_required: true
+        csrf_required: true
+      - method: GET
+        endpoint: /api/invoices
+      - method: POST
+        endpoint: /api/invoices
+        csrf_required: true
+      - method: POST
+        endpoint: /api/invoices/:id/return
+        admin_required: true
+        csrf_required: true
+    auth_required: true
+
+  - name: Purchase Management
+    domain: ERP_PURCHASING
+    description: Record and track purchases from suppliers, view purchase summaries by item and date range
+    files:
+      - client/src/pages/purchases/PurchasesPage.jsx
+      - server/src/controllers/purchaseController.ts
+    entry_route: /purchases
+    api_calls:
+      - method: GET
+        endpoint: /api/purchases
+      - method: POST
+        endpoint: /api/purchases
+        csrf_required: true
+      - method: GET
+        endpoint: /api/purchases/:id
+      - method: GET
+        endpoint: /api/purchases/summary/daterange
+      - method: GET
+        endpoint: /api/purchases/top-suppliers
+    auth_required: true
+
+  - name: Purchase Orders
+    domain: ERP_PURCHASING
+    description: Create and manage purchase orders with line items
+    files:
+      - client/src/pages/purchase-orders/PurchaseOrdersPage.jsx
+      - server/src/controllers/purchaseOrderController.ts
+    entry_route: /purchase-orders
+    auth_required: true
+
+  - name: Payment Tracking & Invoice Allocation
+    domain: ERP_FINANCE
+    description: Record payments from customers, allocate payments to invoices, track receivables
+    files:
+      - client/src/pages/payments/PaymentsPage.tsx
+      - server/src/controllers/paymentsController.ts
+    entry_route: /payments
+    api_calls:
+      - method: GET
+        endpoint: /api/payments
+      - method: POST
+        endpoint: /api/payments
+        csrf_required: true
+      - method: POST
+        endpoint: /api/payments/:id/allocate
+        csrf_required: true
+    auth_required: true
+
+  - name: Point of Sale (POS)
+    domain: ERP_SALES
+    description: Quick retail POS interface — search items, add to cart, complete sale
+    files:
+      - client/src/pages/pos/POSPage.jsx
+      - server/src/controllers/posController.ts
+    entry_route: /pos
+    api_calls:
+      - method: POST
+        endpoint: /api/pos/sale
+        csrf_required: true
+      - method: GET
+        endpoint: /api/pos/transactions
+    auth_required: true
+
+  - name: Bill of Materials (BOM)
+    domain: ERP_MANUFACTURING
+    description: Define finished goods with component items and quantities for production planning
+    files:
+      - client/src/pages/bom/BOMPage.jsx
+      - server/src/controllers/bomController.ts
+    entry_route: /bom
+    api_calls:
+      - method: GET
+        endpoint: /api/bom
+      - method: POST
+        endpoint: /api/bom
+        csrf_required: true
+    auth_required: true
+
+  - name: Production/Manufacturing Runs
+    domain: ERP_MANUFACTURING
+    description: Record production runs that consume raw materials and produce finished goods with batch costing
+    files:
+      - client/src/pages/production/ProductionPage.jsx
+      - server/src/controllers/productionController.ts
+    entry_route: /production
+    api_calls:
+      - method: GET
+        endpoint: /api/productions
+      - method: POST
+        endpoint: /api/productions
+        csrf_required: true
+    auth_required: true
+
+  - name: Financial Reports & Analytics
+    domain: ERP_REPORTS
+    description: Comprehensive ERP reports — AR aging, sales summary, stock valuation, profit & loss, cash flow, balance sheet, income statement, trial balance, general ledger, tax summary, batch traceability
+    files:
+      - client/src/pages/reports/ReportsDashboard.jsx
+      - server/src/controllers/reportsController.ts
+    entry_route: /reports
+    api_calls:
+      - method: GET
+        endpoint: /api/reports/ar-aging
+      - method: GET
+        endpoint: /api/reports/sales-summary
+      - method: GET
+        endpoint: /api/reports/sales-by-item
+      - method: GET
+        endpoint: /api/reports/stock-valuation
+      - method: GET
+        endpoint: /api/reports/profit-loss
+      - method: GET
+        endpoint: /api/reports/cash-flow
+      - method: GET
+        endpoint: /api/reports/low-stock
+    auth_required: true
+
+  - name: Expense Tracking
+    domain: ERP_FINANCE
+    description: Track and categorize business expenses
+    files:
+      - client/src/pages/expenses/ExpensesPage.jsx
+      - server/src/controllers/expensesController.ts
+    entry_route: /expenses
+    auth_required: true
+
+  - name: User & Role Management
+    domain: ERP_ADMIN
+    description: Admin-only user management and role-based permissions
+    files:
+      - client/src/pages/users/UsersPage.jsx
+      - client/src/pages/roles/RolesPage.jsx
+    entry_route: /users
+    auth_required: true
+
+  - name: Demand Forecasting
+    domain: ERP_PLANNING
+    description: Demand forecasting with trends and dashboards for inventory planning
+    files:
+      - client/src/pages/forecasts/ForecastDashboard.tsx
+    entry_route: /forecasts
+    auth_required: true
+
+  - name: Activity Log
+    domain: ERP_AUDIT
+    description: System-wide activity and audit log
+    files:
+      - client/src/pages/ActivityLogPage.tsx
+    entry_route: /activity-log
+    auth_required: true
+
+known_limitations:
+  - CSRF protection requires x-csrf-token header matching csrf-token cookie for all POST/PUT/DELETE/PATCH
+  - Login endpoint is excluded from CSRF protection
+  - admin role required for DELETE operations and quotation/sales-order creation
+  - JWT token is set as httpOnly cookie, extract from response cookies for API testing

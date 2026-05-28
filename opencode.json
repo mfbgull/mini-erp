@@ -2,5 +2,14 @@
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
     ".opencode/plugins/graphify.js"
-  ]
+  ],
+  "mcp": {
+    "TestSprite": {
+      "type": "local",
+      "command": ["npx", "@testsprite/testsprite-mcp@latest"],
+      "env": {
+        "API_KEY": "sk-user-2J_y9Dp0AaegFTzWxwUnJgssq5iycgjWvet7AIkZHZofzNanF4gsBs1PjLS4O1Tx8qfknpcsRiVxDnT06JjV9ymeOqEGX3E1lToN9gfEdFf7aj96r2jVO_UscZBBLf3kDBM"
+      }
+    }
+  }
 }

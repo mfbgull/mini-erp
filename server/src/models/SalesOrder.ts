@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { getNextSequenceNumber } from '../utils/sequence';
 import { QuotationWithWarehouse, InvoiceWithUsername } from '../types';
+import InvoiceModel from './Invoice';
 
 export interface SalesOrder {
   id: number;
@@ -441,7 +442,7 @@ class SalesOrderModel {
   }
 
   /**
-   * Delete sales order
+   * Delete sales order (only allowed for Draft/Confirmed — stock may not have been deducted yet).
    */
   static delete(id: number, userId: number, db: Database.Database): boolean {
     const salesOrder = this.getById(id, db);
@@ -468,6 +469,83 @@ class SalesOrderModel {
     );
 
     return true;
+  }
+
+  /**
+   * Cancel a sales order, reversing any linked invoice stock.
+   * Works for Invoiced/Completed SOs — reverses stock and cancels the linked invoice.
+   */
+  static cancel(id: number, userId: number, db: Database.Database): { invoiceId?: number; invoiceNo?: string } {
+    const salesOrder = this.getById(id, db);
+    if (!salesOrder) {
+      throw new Error('Sales order not found');
+    }
+
+    if (salesOrder.status === 'Cancelled') {
+      throw new Error('Sales order is already cancelled');
+    }
+
+    let linkedInvoice: { id: number; invoice_no: string; status: string } | undefined;
+
+    const transaction = db.transaction(() => {
+      if (salesOrder.status === 'Invoiced' || salesOrder.status === 'Completed') {
+        // Find the linked invoice
+        linkedInvoice = db.prepare(
+          `SELECT id, invoice_no, status FROM invoices WHERE so_id = ?`
+        ).get(id) as { id: number; invoice_no: string; status: string } | undefined;
+
+        if (linkedInvoice && linkedInvoice.status !== 'Cancelled') {
+          // Get items for stock reversal
+          const invoiceItems = InvoiceModel.getInvoiceItemsForStockReverse(db, linkedInvoice.id);
+
+          // Reverse stock — restores batch quantity_remaining and creates ADJUSTMENT movement
+          InvoiceModel.reverseStockForItems(
+            db,
+            invoiceItems,
+            linkedInvoice.invoice_no,
+            userId,
+            'SO_CANCEL'
+          );
+
+          // Cancel the invoice
+          db.prepare(`
+            UPDATE invoices SET status = 'Cancelled', updated_at = CURRENT_TIMESTAMP WHERE id = ?
+          `).run(linkedInvoice.id);
+
+          // Log activity for invoice cancellation
+          db.prepare(`
+            INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+            VALUES (?, ?, ?, ?, ?)
+          `).run(
+            userId,
+            'CANCEL',
+            'Invoice',
+            linkedInvoice.id,
+            `Invoice ${linkedInvoice.invoice_no} cancelled due to Sales Order ${salesOrder.so_no} cancellation`
+          );
+        }
+      }
+
+      // Update SO status
+      db.prepare(`UPDATE sales_orders SET status = 'Cancelled', updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+        .run(id);
+
+      // Log activity
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'CANCEL',
+        'SalesOrder',
+        id,
+        `Cancelled sales order ${salesOrder.so_no}`
+      );
+
+      return { invoiceId: linkedInvoice?.id, invoiceNo: linkedInvoice?.invoice_no };
+    });
+
+    return transaction();
   }
 
   /**
@@ -562,38 +640,53 @@ class SalesOrderModel {
          );
       }
 
-      // Deduct inventory
+      // Deduct inventory using FIFO batch consumption
       const movementDate = invoiceDate;
       for (const item of salesOrder.items || []) {
-        // Create stock movement
-        const movementNo = this.generateMovementNo(db);
-        db.prepare(`
-          INSERT INTO stock_movements (
-            movement_no, item_id, warehouse_id, movement_type,
-            quantity, unit_cost, reference_doctype, reference_docno,
-            remarks, movement_date, created_by
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(
-          movementNo,
+        const effectiveWarehouseId = salesOrder.warehouse_id || 1;
+        // FIFO consumption from oldest batches
+        const consumption = InvoiceModel.consumeFromOldestBatches(
           item.item_id,
-          salesOrder.warehouse_id,
-          'SALE',
-          -item.quantity,
-          null,
-          'Invoice',
-          invoiceNo,
-          `Invoice ${invoiceNo} from SO ${salesOrder.so_no}`,
-          movementDate,
-          userId
+          effectiveWarehouseId,
+          item.quantity,
+          db
         );
 
-        // Update stock balance
+        // Create one stock movement per consumed batch for full traceability
+        let totalConsumed = 0;
+        for (const entry of consumption) {
+          const movementNo = this.generateMovementNo(db);
+          const batchLabel = entry.batchId ? `(batch ${entry.batchId})` : '(legacy stock)';
+          db.prepare(`
+            INSERT INTO stock_movements (
+              movement_no, item_id, warehouse_id, movement_type,
+              quantity, unit_cost, reference_doctype, reference_docno,
+              remarks, movement_date, created_by, batch_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).run(
+            movementNo,
+            item.item_id,
+            effectiveWarehouseId,
+            'SALE',
+            -entry.consumed,
+            entry.unitCost,
+            'Invoice',
+            invoiceNo,
+            `Invoice ${invoiceNo} from SO ${salesOrder.so_no} ${batchLabel}`,
+            movementDate,
+            userId,
+            entry.batchId
+          );
+          totalConsumed += entry.consumed;
+        }
+
+        // Update stock balance once per item (total consumed)
         db.prepare(`
           UPDATE stock_balances
           SET quantity = quantity + ?,
               last_updated = CURRENT_TIMESTAMP
           WHERE item_id = ? AND warehouse_id = ?
-        `).run(-item.quantity, item.item_id, salesOrder.warehouse_id);
+        `).run(-totalConsumed, item.item_id, effectiveWarehouseId);
 
         // Update item current_stock
         db.prepare(`

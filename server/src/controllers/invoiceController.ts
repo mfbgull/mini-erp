@@ -296,10 +296,8 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
       items: []
     }, userId);
 
-    // Insert invoice items and deduct stock
+    // Insert invoice items and deduct stock via FIFO batch consumption
     for (const item of items) {
-      const amount = multiplyCurrency(item.quantity, item.unit_price);
-
       const warehouseId = InvoiceModel.findWarehouseForItem(
         db,
         item.item_id,
@@ -316,22 +314,34 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
         discount_value: item.discount_value
       });
 
-      // Deduct stock (negative quantity for SALE)
-      StockMovementModel.recordMovement(
-        {
-          item_id: item.item_id,
-          warehouse_id: warehouseId,
-          movement_type: 'SALE',
-          quantity: -item.quantity,
-          unit_cost: item.unit_price,
-          reference_doctype: 'INVOICE',
-          reference_docno: invoice_no!,
-          remarks: `Sold via Invoice ${invoice_no}`,
-          movement_date: invoice_date,
-        },
-        userId,
+      // FIFO consumption from oldest batches
+      const consumption = InvoiceModel.consumeFromOldestBatches(
+        item.item_id,
+        warehouseId,
+        item.quantity,
         db
       );
+
+      // Create one stock movement per consumed batch with actual COGS
+      for (const entry of consumption) {
+        const batchLabel = entry.batchId ? `(batch ${entry.batchId})` : '(legacy stock)';
+        StockMovementModel.recordMovement(
+          {
+            item_id: item.item_id,
+            warehouse_id: warehouseId,
+            movement_type: 'SALE',
+            quantity: -entry.consumed,
+            unit_cost: entry.unitCost,
+            reference_doctype: 'INVOICE',
+            reference_docno: invoice_no!,
+            remarks: `Sold via Invoice ${invoice_no} ${batchLabel}`,
+            movement_date: invoice_date,
+            batch_id: entry.batchId ?? undefined,
+          },
+          userId,
+          db
+        );
+      }
     }
 
       // Create customer ledger entry (debit to increase AR)
@@ -552,22 +562,34 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
                 item.warehouse_id
             );
 
-            // Deduct stock for new items
-            StockMovementModel.recordMovement(
-                {
-                    item_id: item.item_id,
-                    warehouse_id: warehouseId,
-                    movement_type: 'SALE',
-                    quantity: -item.quantity,
-                    unit_cost: item.unit_price,
-                    reference_doctype: 'INVOICE',
-                    reference_docno: resolvedInvoiceNo,
-                    remarks: `Sold via Invoice ${resolvedInvoiceNo} (updated)`,
-                    movement_date: invoice_date,
-                },
-                userId,
+            // FIFO batch consumption for new/updated items
+            const consumption = InvoiceModel.consumeFromOldestBatches(
+                item.item_id,
+                warehouseId,
+                item.quantity,
                 db
             );
+
+            // Create one stock movement per consumed batch with actual COGS
+            for (const entry of consumption) {
+                const batchLabel = entry.batchId ? `(batch ${entry.batchId})` : '(legacy stock)';
+                StockMovementModel.recordMovement(
+                    {
+                        item_id: item.item_id,
+                        warehouse_id: warehouseId,
+                        movement_type: 'SALE',
+                        quantity: -entry.consumed,
+                        unit_cost: entry.unitCost,
+                        reference_doctype: 'INVOICE',
+                        reference_docno: resolvedInvoiceNo,
+                        remarks: `Sold via Invoice ${resolvedInvoiceNo} (updated) ${batchLabel}`,
+                        movement_date: invoice_date,
+                        batch_id: entry.batchId ?? undefined,
+                    },
+                    userId,
+                    db
+                );
+            }
         }
 
         // Update ledger entry for the invoice if total changed
@@ -625,8 +647,6 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
       // Clean up payment allocations and orphaned payments
       const allocations = PaymentModel.getAllocationsByInvoiceId(db, invoiceId);
 
-      InvoiceModel.deleteInvoiceItems(db, invoiceId);
-
       for (const alloc of allocations) {
         const otherAllocations = PaymentModel.getAllocationsByPaymentId(db, alloc.payment_id);
 
@@ -641,9 +661,11 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
         }
       }
 
-      // Reverse stock movements
-      const invoiceItems = InvoiceModel.getInvoiceItemsForStockReverse(db, invoiceId);
+      // Reverse stock movements (before deleting invoice items — reversal looks up SALE movements by invoice_no)
       InvoiceModel.reverseStockForItems(db, invoiceItems, invoice.invoice_no, userId, 'INVOICE_DELETE');
+
+      // Delete invoice items after stock reversal is complete
+      InvoiceModel.deleteInvoiceItems(db, invoiceId);
 
       // Delete related ledger entries
       InvoiceModel.deleteLedgerEntryByReference(db, invoice.invoice_no);
@@ -675,6 +697,101 @@ function getInvoicePayments(req: AuthRequest, res: Response): void {
   }
 }
 
+/**
+ * POST /api/invoices/:id/return
+ * Process a return for invoice items — reverses stock using FIFO batch restoration
+ * and creates ADJUSTMENT movements to add stock back into inventory.
+ */
+function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
+  try {
+    const { id } = req.params;
+    const invoiceId = parseInt(id as string, 10);
+    const userId = req.user!.id;
+
+    const { items: returnItems, reason } = req.body as {
+      items: Array<{ invoice_item_id: number; return_quantity: number }>;
+      reason?: string;
+    };
+
+    if (!returnItems || returnItems.length === 0) {
+      return res.status(400).json({ error: 'At least one return item is required' });
+    }
+
+    const invoice = InvoiceModel.getById(invoiceId, db);
+    if (!invoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    if (invoice.status === 'Cancelled') {
+      return res.status(400).json({ error: 'Cannot return a cancelled invoice' });
+    }
+
+    const transaction = db.transaction(() => {
+      const processedItems: Array<{ item_id: number; quantity: number; unit_price: number }> = [];
+
+      for (const returnItem of returnItems) {
+        // Find the invoice item to get item_id, unit_price
+        const invoiceItem = invoice.items?.find(
+          (ii: any) => ii.id === returnItem.invoice_item_id || ii.item_id === returnItem.invoice_item_id
+        );
+
+        if (!invoiceItem) {
+          throw new Error(`Invoice item ${returnItem.invoice_item_id} not found`);
+        }
+
+        if (returnItem.return_quantity <= 0) {
+          throw new Error('Return quantity must be positive');
+        }
+
+        if (returnItem.return_quantity > invoiceItem.quantity) {
+          throw new Error(
+            `Return quantity (${returnItem.return_quantity}) exceeds original quantity (${invoiceItem.quantity}) for item ${invoiceItem.item_name}`
+          );
+        }
+
+        processedItems.push({
+          item_id: invoiceItem.item_id,
+          quantity: returnItem.return_quantity,
+          unit_price: invoiceItem.unit_price,
+        });
+      }
+
+      // Reverse stock for the returned items using the same batch-aware logic
+      InvoiceModel.reverseStockForItems(
+        db,
+        processedItems,
+        invoice.invoice_no,
+        userId,
+        'RETURN'
+      );
+
+      // Log the return activity
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'RETURN',
+        'Invoice',
+        invoiceId,
+        `Return processed for ${processedItems.length} item(s) on Invoice ${invoice.invoice_no}${reason ? ': ' + reason : ''}`
+      );
+
+      return {
+        returnedItems: processedItems,
+        totalItems: processedItems.length,
+      };
+    });
+
+    const result = transaction();
+    res.json({ success: true, message: 'Return processed successfully', data: result });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Return invoice items error:', { error: errorMessage });
+    res.status(400).json({ error: errorMessage });
+  }
+}
+
 export {
   getInvoices,
   getInvoice,
@@ -682,6 +799,7 @@ export {
   updateInvoice,
   deleteInvoice,
   getInvoicePayments,
+  returnInvoiceItems,
 };
 
 export default {
@@ -691,4 +809,5 @@ export default {
   updateInvoice,
   deleteInvoice,
   getInvoicePayments,
+  returnInvoiceItems,
 };

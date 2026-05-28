@@ -42,18 +42,7 @@ interface RecordMovementDTO {
   remarks?: string;
   movement_type: string;
   movement_date?: string;
-}
-
-interface RecordMovementDTO {
-  item_id: number;
-  warehouse_id: number;
-  quantity: number;
-  unit_cost?: number;
-  reference_doctype?: string;
-  reference_docno?: string;
-  remarks?: string;
-  movement_type: string;
-  movement_date?: string;
+  batch_id?: number;
 }
 
 class StockMovementModel {
@@ -65,8 +54,8 @@ class StockMovementModel {
         INSERT INTO stock_movements (
           movement_no, item_id, warehouse_id, movement_type,
           quantity, unit_cost, reference_doctype, reference_docno,
-          remarks, movement_date, created_by
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          remarks, movement_date, created_by, batch_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       const result = movementStmt.run(
@@ -80,7 +69,8 @@ class StockMovementModel {
         data.reference_docno || null,
         data.remarks || null,
         data.movement_date || new Date().toISOString().split('T')[0],
-        userId
+        userId,
+        data.batch_id || null
       );
 
       const existingBalance = db.prepare(`
@@ -160,11 +150,13 @@ class StockMovementModel {
         i.unit_of_measure,
         w.warehouse_code,
         w.warehouse_name,
-        u.full_name as created_by_name
+        u.full_name as created_by_name,
+        sb.batch_no
       FROM stock_movements sm
       JOIN items i ON sm.item_id = i.id
       JOIN warehouses w ON sm.warehouse_id = w.id
       LEFT JOIN users u ON sm.created_by = u.id
+      LEFT JOIN stock_batches sb ON sm.batch_id = sb.id
       WHERE 1=1
     `;
     const params: any[] = [];
@@ -347,6 +339,114 @@ class StockMovementModel {
       LIMIT 1
     `).get(itemId, invoiceNo) as { warehouse_id: number } | undefined;
     return result ? result.warehouse_id : undefined;
+  }
+
+  /**
+   * Consume a quantity of an item from the oldest available stock batches (FIFO).
+   * Deducts quantity_remaining from each batch until the required quantity is met.
+   * Returns an array of { batchId, consumed, unitCost } for recording movements.
+   */
+  static consumeFromOldestBatches(
+    itemId: number,
+    warehouseId: number,
+    quantity: number,
+    db: Database.Database
+  ): Array<{ batchId: number | null; consumed: number; unitCost: number }> {
+    const batches = db.prepare(`
+      SELECT id, quantity_remaining, unit_cost
+      FROM stock_batches
+      WHERE item_id = ? AND warehouse_id = ? AND quantity_remaining > 0
+      ORDER BY received_date ASC, id ASC
+    `).all(itemId, warehouseId) as Array<{
+      id: number;
+      quantity_remaining: number;
+      unit_cost: number;
+    }>;
+
+    let remaining = quantity;
+    const consumption: Array<{ batchId: number | null; consumed: number; unitCost: number }> = [];
+
+    for (const batch of batches) {
+      if (remaining <= 0) break;
+      const consumeFromThis = Math.min(remaining, batch.quantity_remaining);
+
+      db.prepare(`
+        UPDATE stock_batches
+        SET quantity_remaining = quantity_remaining - ?
+        WHERE id = ?
+      `).run(consumeFromThis, batch.id);
+
+      consumption.push({ batchId: batch.id, consumed: consumeFromThis, unitCost: batch.unit_cost });
+      remaining -= consumeFromThis;
+    }
+
+    if (remaining > 0.001) {
+      // Fallback: use item's standard_cost for any remainder not covered by batches.
+      // This handles stock that existed before batch costing was enabled.
+      const item = db.prepare('SELECT standard_cost, item_name FROM items WHERE id = ?').get(itemId) as { standard_cost: number; item_name: string } | undefined;
+      const fallbackCost = item?.standard_cost ?? 0;
+      logger.warn(
+        `[BatchCosting] Insufficient batch-tracked stock for ${item?.item_name || 'item'} in warehouse. ` +
+        `Using standard_cost (${fallbackCost}) for remaining ${remaining.toFixed(3)} units.`
+      );
+      consumption.push({ batchId: null, consumed: remaining, unitCost: fallbackCost });
+      remaining = 0;
+    }
+
+    return consumption;
+  }
+
+  /**
+   * Record a batch-aware outgoing stock movement that consumes from oldest batches.
+   * Creates one stock_movement per batch consumed, with batch_id and unit_cost.
+   * For incoming movements (quantity >= 0), delegates to recordMovement.
+   */
+  static recordBatchMovement(
+    data: RecordMovementDTO,
+    userId: number,
+    db: Database.Database
+  ): Array<{ id: number; movement_no: string; quantity: number; unit_cost: number; batch_id: number | null }> {
+    const absQty = Math.abs(data.quantity);
+
+    if (data.quantity >= 0 || absQty === 0) {
+      // Incoming or zero: just record normally
+      const result = this.recordMovement(data, userId, db);
+      return [{ ...result, quantity: data.quantity, unit_cost: data.unit_cost || 0, batch_id: null }];
+    }
+
+    // Outgoing: consume from oldest batches using FIFO
+    const consumption = this.consumeFromOldestBatches(
+      data.item_id,
+      data.warehouse_id,
+      absQty,
+      db
+    );
+
+    const results: Array<{ id: number; movement_no: string; quantity: number; unit_cost: number; batch_id: number | null }> = [];
+
+    for (const entry of consumption) {
+      const result = this.recordMovement(
+        {
+          item_id: data.item_id,
+          warehouse_id: data.warehouse_id,
+          quantity: -entry.consumed,
+          unit_cost: entry.unitCost,
+          movement_type: data.movement_type,
+          reference_doctype: data.reference_doctype,
+          reference_docno: data.reference_docno,
+          remarks: data.remarks
+            ? `Batch: ${entry.batchId ?? 'Legacy'} - ${entry.consumed} @ ${entry.unitCost} | ${data.remarks}`
+            : `Batch: ${entry.batchId ?? 'Legacy'} - ${entry.consumed} @ ${entry.unitCost}`,
+          movement_date: data.movement_date,
+          batch_id: entry.batchId ?? undefined,
+        },
+        userId,
+        db
+      );
+      results.push({ ...result, quantity: -entry.consumed, unit_cost: entry.unitCost, batch_id: entry.batchId });
+    }
+
+    return results;
   }
 }
 

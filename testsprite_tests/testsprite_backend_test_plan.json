@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "test_create_project_with_valid_details",
+    "description": "Verify that POST /api/projects with valid project details returns 201 status and the created project data."
+  },
+  {
+    "id": "TC002",
+    "title": "test_get_project_list",
+    "description": "Verify that GET /api/projects returns 200 status with a list of projects."
+  },
+  {
+    "id": "TC003",
+    "title": "test_get_project_details_by_id",
+    "description": "Verify that GET /api/projects/:id with a valid project ID returns 200 status with full project details."
+  },
+  {
+    "id": "TC004",
+    "title": "test_create_project_with_missing_fields",
+    "description": "Verify that POST /api/projects with missing required fields returns 400 status with validation error response."
+  },
+  {
+    "id": "TC005",
+    "title": "test_get_nonexistent_project",
+    "description": "Verify that GET /api/projects/:id for a non-existent project returns 404 status with not found response."
+  },
+  {
+    "id": "TC006",
+    "title": "test_create_specification_with_valid_dimensions",
+    "description": "Verify that POST /api/specifications with valid room dimensions and floor data returns 201 status with calculated specification output."
+  },
+  {
+    "id": "TC007",
+    "title": "test_get_specification_by_id",
+    "description": "Verify that GET /api/specifications/:id returns 200 status with saved room specification and derived quantities."
+  },
+  {
+    "id": "TC008",
+    "title": "test_update_specification_with_valid_data",
+    "description": "Verify that PUT /api/specifications/:id with updated dimensions returns 200 status with recalculated results."
+  },
+  {
+    "id": "TC009",
+    "title": "test_create_specification_with_invalid_dimensions",
+    "description": "Verify that POST /api/specifications with invalid dimensions or malformed payload returns 400 status with validation errors."
+  },
+  {
+    "id": "TC010",
+    "title": "test_update_specification_with_unsupported_data",
+    "description": "Verify that PUT /api/specifications/:id with unsupported room data returns 422 status with calculation or business-rule error."
+  }
+]

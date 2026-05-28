@@ -219,6 +219,13 @@ class SalesService {
   }
 
   /**
+   * Cancel a sales order — reverses linked invoice stock if invoiced.
+   */
+  static cancelSalesOrder(id: number, userId: number) {
+    return SalesOrderModel.cancel(id, userId, db);
+  }
+
+  /**
    * Get all invoices with optional filters
    */
   static getInvoices(filters?: {
