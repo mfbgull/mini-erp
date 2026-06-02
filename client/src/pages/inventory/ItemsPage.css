@@ -5,6 +5,15 @@
   margin: 0 auto;
 }
 
+.items-page .ag-grid-wrapper {
+  width: 100%;
+  margin-top: var(--space-lg);
+}
+
+.items-page .ag-theme-quartz {
+  width: 100%;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;

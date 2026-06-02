@@ -69,3 +69,17 @@ def delete_invoice(invoice_id: int) -> dict:
 def get_invoice_payments(invoice_id: int) -> list[dict]:
     client = make_client()
     return client.get(f"/invoices/{invoice_id}/payments")
+
+
+def return_invoice_items(invoice_id: int, items: list[dict]) -> dict:
+    """Return items from an invoice.
+
+    Args:
+        invoice_id: Invoice ID
+        items: List of {item_id, quantity} to return
+    """
+    client = make_client()
+    return client.post(
+        f"/invoices/{invoice_id}/return",
+        body={"items": items},
+    )

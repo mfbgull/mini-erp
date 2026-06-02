@@ -86,6 +86,12 @@ def get_entity_activity(
     )
 
 
+def cleanup_logs(days_old: int = 90) -> dict:
+    """Clean up activity logs older than the specified days."""
+    client = make_client()
+    return client.post("/activity-logs/cleanup", body={"days_old": days_old})
+
+
 def export_logs(
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,

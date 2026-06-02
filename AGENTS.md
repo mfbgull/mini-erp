@@ -179,6 +179,23 @@ The CLI tool `cli-anything-minierp` provides agent-native control for Mini ERP. 
 
 **Always use `--json` flag** for machine-readable output.
 
+### Users (Admin Only)
+```bash
+cli-anything-minierp users list/get/create/update/delete
+cli-anything-minierp users reset-password USER_ID --password NEW
+cli-anything-minierp users toggle-status USER_ID --active true/false
+```
+
+### Roles (Admin Only)
+```bash
+cli-anything-minierp roles list/permissions/get-permissions/create/update/update-permissions/delete
+```
+
+### Forecasts
+```bash
+cli-anything-minierp forecasts dashboard/demand/trends/generate
+```
+
 ### Authentication
 ```bash
 cli-anything-minierp auth login -u admin -p admin123
@@ -193,6 +210,9 @@ cli-anything-minierp auth status
 cli-anything-minierp inventory items list/create/get/update/delete
 cli-anything-minierp inventory items movements ITEM_ID
 cli-anything-minierp inventory items valuation ITEM_ID
+cli-anything-minierp inventory items ledger ITEM_ID
+cli-anything-minierp inventory items uom
+cli-anything-minierp inventory items categories
 cli-anything-minierp inventory stock
 cli-anything-minierp inventory stock-summary
 cli-anything-minierp inventory low-stock
@@ -205,7 +225,8 @@ cli-anything-minierp inventory warehouses list/create/stock
 
 ### Sales
 ```bash
-cli-anything-minierp sales orders list/create/get/delete
+cli-anything-minierp sales orders list/create/get/delete/update/convert-to-invoice/cycle-chain
+cli-anything-minierp sales quotations list/get/create/update/delete/convert/cycle-chain/invoices
 cli-anything-minierp sales summary-by-date/item
 cli-anything-minierp sales top-customers
 cli-anything-minierp sales returns
@@ -222,20 +243,20 @@ cli-anything-minierp customers ledger BALANCE CUSTOMER_ID
 
 ### Invoices & Payments
 ```bash
-cli-anything-minierp invoices list/create/get/delete/payments
-cli-anything-minierp payments list/create/get/delete
+cli-anything-minierp invoices list/create/get/update/delete/payments/return
+cli-anything-minierp payments list/create/get/update/delete/allocate
 ```
 
 ### Purchases
 ```bash
-cli-anything-minierp purchases list/create/get/delete
+cli-anything-minierp purchases list/create/get/delete/summary-by-item/summary-by-date/top-suppliers
 cli-anything-minierp purchase-orders list/create/get/delete/pending
 ```
 
 ### Production & BOM
 ```bash
-cli-anything-minierp production list/create/get/delete
-cli-anything-minierp bom list/create/get/by-item/delete
+cli-anything-minierp production list/create/get/delete/summary-by-item
+cli-anything-minierp bom list/create/get/by-item/update/toggle-active/delete
 ```
 
 ### Expenses
@@ -274,9 +295,11 @@ cli-anything-minierp utils clear-cache/optimize-db/data-dictionary/audit-log
 ```bash
 cli-anything-minierp pos sale/transactions
 cli-anything-minierp suppliers list/create/get/delete
-cli-anything-minierp activity list/stats/recent
+cli-anything-minierp activity list/stats/recent/entity-types/actions/user-activity/entity-activity/export/cleanup
 cli-anything-minierp dashboard summary
-cli-anything-minierp settings list/get/update
+cli-anything-minierp users list/get/create/update/delete
+cli-anything-minierp roles list/permissions/create/delete
+cli-anything-minierp forecasts dashboard/demand/trends/generate
 cli-anything-minierp integrations settings/update/test-email/weather/exchange-rates
 ```
 

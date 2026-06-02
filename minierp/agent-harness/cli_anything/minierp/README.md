@@ -61,6 +61,39 @@ quit
 
 ## Command Reference
 
+### Users (Admin Only)
+
+```bash
+users list [--role TEXT] [--active true|false] [--search TEXT]
+users get USER_ID
+users create --username USER --email EMAIL --password PASS --full-name NAME --role-id ROLE_ID [--active true|false]
+users update USER_ID [--username USER] [--email EMAIL] [--full-name NAME] [--role-id ROLE_ID] [--active true|false]
+users delete USER_ID
+users reset-password USER_ID --password NEW_PASS
+users toggle-status USER_ID --active true|false
+```
+
+### Roles (Admin Only)
+
+```bash
+roles list
+roles permissions
+roles get-permissions ROLE_ID
+roles create --name NAME [--description DESC] [--permissions "1,2,3"]
+roles update ROLE_ID [--name NAME] [--description DESC] [--active true|false]
+roles update-permissions ROLE_ID --permissions "1,2,3"
+roles delete ROLE_ID
+```
+
+### Forecasts
+
+```bash
+forecasts dashboard
+forecasts demand [--category CAT] [--trend up|down|stable] [--recommendation TEXT]
+forecasts trends [--item-id ID]
+forecasts generate
+```
+
 ### Authentication
 
 ```bash
@@ -115,6 +148,8 @@ suppliers delete SUPPLIER_ID
 invoices list [--search TEXT] [--status STATUS] [--page N] [--limit N]
 invoices get INVOICE_ID
 invoices create --customer-id ID --date YYYY-MM-DD --due YYYY-MM-DD --items JSON [--notes TEXT]
+invoices update INVOICE_ID [--customer-id ID] [--date DATE] [--due DATE] [--notes TEXT] [--status STATUS]
+invoices return INVOICE_ID --items '[{"item_id":1,"quantity":1}]'
 invoices delete INVOICE_ID
 invoices payments INVOICE_ID
 ```
@@ -126,6 +161,97 @@ purchases list [--page N] [--limit N]
 purchases get PURCHASE_ID
 purchases create --supplier-id ID --date YYYY-MM-DD --items JSON [--notes TEXT]
 purchases delete PURCHASE_ID
+purchases summary-by-item ITEM_ID
+purchases summary-by-date --start YYYY-MM-DD --end YYYY-MM-DD
+purchases top-suppliers [--limit N]
+```
+
+### Payments
+
+```bash
+payments list [--page N] [--limit N]
+payments get PAYMENT_ID
+payments create --customer-id ID --amount N --method cash|bank|card|other --date YYYY-MM-DD [--reference REF] [--notes NOTES]
+payments update PAYMENT_ID [--amount N] [--method METHOD] [--reference REF] [--notes NOTES] [--date DATE]
+payments delete PAYMENT_ID
+payments allocate PAYMENT_ID --allocations '[{"invoice_id":1,"amount":100.00}]'
+```
+
+### Production
+
+```bash
+production list [--page N] [--limit N]
+production get PRODUCTION_ID
+production create --item-id ID --quantity N --date YYYY-MM-DD [--notes TEXT]
+production delete PRODUCTION_ID
+production summary-by-item ITEM_ID
+```
+
+### BOM (Bill of Materials)
+
+```bash
+bom list [--page N] [--limit N]
+bom get BOM_ID
+bom by-item ITEM_ID
+bom create --finished-item-id ID --qty N --components JSON [--description DESC]
+bom update BOM_ID [--description DESC] [--quantity N] [--notes TEXT] [--active true|false]
+bom toggle-active BOM_ID
+bom delete BOM_ID
+```
+
+### Inventory Items Extended
+
+```bash
+inventory items ledger ITEM_ID
+inventory items uom
+```
+
+### Activity
+
+```bash
+activity list [--entity-type TYPE] [--action ACTION] [--user-id ID] [--start DATE] [--end DATE] [--page N] [--limit N]
+activity stats [--start DATE] [--end DATE]
+activity recent [--limit N]
+activity entity-types
+activity actions
+activity user-activity USER_ID [--page N] [--limit N]
+activity entity-activity ENTITY_TYPE ENTITY_ID [--page N] [--limit N]
+activity export [--start DATE] [--end DATE] [--entity-type TYPE] [--action ACTION]
+activity cleanup [--days N]
+```
+
+### Settings
+
+```bash
+settings list
+settings get KEY
+settings update KEY VALUE
+settings bulk-update --settings '{"key1":"value1","key2":"value2"}'
+```
+
+### Sales Orders Extended
+
+```bash
+sales orders list [--search TEXT] [--status STATUS] [--page N] [--limit N]
+sales orders get ORDER_ID
+sales orders create --customer-id ID --date YYYY-MM-DD --items JSON [--notes TEXT]
+sales orders update ORDER_ID [--customer-id ID] [--order-date DATE] [--status STATUS] [--notes TEXT]
+sales orders delete ORDER_ID
+sales orders convert-to-invoice ORDER_ID
+sales orders cycle-chain ORDER_ID
+```
+
+### Sales Quotations
+
+```bash
+sales quotations list [--search TEXT] [--status STATUS] [--page N] [--limit N]
+sales quotations get QUOTATION_ID
+sales quotations create --customer-id ID --date YYYY-MM-DD --valid-until DATE --items JSON [--notes TEXT]
+sales quotations update QUOTATION_ID [--customer-id ID] [--date DATE] [--valid-until DATE] [--status STATUS] [--notes TEXT]
+sales quotations delete QUOTATION_ID
+sales quotations convert QUOTATION_ID
+sales quotations cycle-chain QUOTATION_ID
+sales quotations invoices QUOTATION_ID
 ```
 
 ### Expenses

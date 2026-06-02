@@ -73,7 +73,7 @@ def _handle_error(exc: Exception, ctx: Optional[click.Context] = None) -> None:
     envvar="MINIERP_URL",
     help="Mini ERP server URL (default: http://localhost:3010/api).",
 )
-@click.version_option("1.0.0", prog_name="cli-anything-minierp")
+@click.version_option("1.1.0", prog_name="cli-anything-minierp")
 @click.pass_context
 def cli(ctx: click.Context, output_json: bool, url: Optional[str]) -> None:
     """Mini ERP CLI — agent-native control for the Mini ERP system.
@@ -106,7 +106,7 @@ def cli(ctx: click.Context, output_json: bool, url: Optional[str]) -> None:
 @click.pass_context
 def repl(ctx: click.Context) -> None:
     """Enter interactive REPL mode."""
-    skin = ReplSkin("minierp", version="1.0.0")
+    skin = ReplSkin("minierp", version="1.1.0")
     skin.print_banner()
 
     sess = load_session()
@@ -120,6 +120,29 @@ def repl(ctx: click.Context) -> None:
         "auth status": "Show session status",
         "auth change-password": "Change password",
         
+        # Users
+        "users list": "List system users",
+        "users get": "Get user details",
+        "users create": "Create a user",
+        "users update": "Update a user",
+        "users delete": "Delete a user",
+        "users reset-password": "Reset a user's password",
+        "users toggle-status": "Toggle user active status",
+        
+        # Roles
+        "roles list": "List roles",
+        "roles permissions": "List all permissions",
+        "roles get-permissions": "Get role permissions",
+        "roles create": "Create a role",
+        "roles update": "Update a role",
+        "roles update-permissions": "Update role permissions",
+        "roles delete": "Delete a role",
+        
+        # Forecasts
+        "forecasts dashboard": "Forecast dashboard",
+        "forecasts demand": "Demand forecasts",
+        "forecasts trends": "Trend data",
+        
         # Inventory
         "inventory items list": "List inventory items",
         "inventory items get": "Get item details",
@@ -129,6 +152,8 @@ def repl(ctx: click.Context) -> None:
         "inventory items movements": "Get item movement history",
         "inventory items valuation": "Get item valuation",
         "inventory items categories": "List item categories",
+        "inventory items ledger": "Get item ledger",
+        "inventory items uom": "List units of measure",
         "inventory stock": "Show stock balances",
         "inventory stock-summary": "Show stock summary",
         "inventory low-stock": "Show low-stock items",
@@ -174,6 +199,17 @@ def repl(ctx: click.Context) -> None:
         "sales create-return": "Create sales return",
         "sales commission": "Sales commission report",
         "sales forecast": "Sales forecast",
+        "sales orders update": "Update a sales order",
+        "sales orders convert-to-invoice": "Convert a sales order to invoice",
+        "sales orders cycle-chain": "View order-to-invoice chain",
+        "sales quotations list": "List quotations",
+        "sales quotations get": "Get quotation details",
+        "sales quotations create": "Create a quotation",
+        "sales quotations update": "Update a quotation",
+        "sales quotations delete": "Delete a quotation",
+        "sales quotations convert": "Convert quotation to sales order",
+        "sales quotations cycle-chain": "View quotation-to-invoice chain",
+        "sales quotations invoices": "Get invoices by quotation",
         
         # Invoices
         "invoices list": "List invoices",
@@ -181,6 +217,8 @@ def repl(ctx: click.Context) -> None:
         "invoices create": "Create an invoice",
         "invoices delete": "Delete invoice",
         "invoices payments": "List invoice payments",
+        "invoices update": "Update an invoice",
+        "invoices return": "Return items on an invoice",
         
         # Purchases
         "purchases list": "List purchases",
@@ -192,6 +230,11 @@ def repl(ctx: click.Context) -> None:
         "purchase-orders create": "Create purchase order",
         "purchase-orders pending": "List pending POs",
         "purchase-orders delete": "Delete purchase order",
+        
+        # Purchases
+        "purchases summary-by-item": "Purchase summary by item",
+        "purchases summary-by-date": "Purchase summary by date range",
+        "purchases top-suppliers": "Top suppliers by purchases",
         
         # Expenses
         "expenses list": "List expenses",
@@ -205,6 +248,7 @@ def repl(ctx: click.Context) -> None:
         "production get": "Get production details",
         "production create": "Record production",
         "production delete": "Delete production",
+        "production summary-by-item": "Production summary by item",
         
         # BOM
         "bom list": "List BOMs",
@@ -212,12 +256,16 @@ def repl(ctx: click.Context) -> None:
         "bom by-item": "Get BOMs for item",
         "bom create": "Create BOM",
         "bom delete": "Delete BOM",
+        "bom update": "Update a BOM",
+        "bom toggle-active": "Toggle BOM active status",
         
         # Payments
         "payments list": "List payments",
         "payments get": "Get payment details",
         "payments create": "Create payment",
         "payments delete": "Delete payment",
+        "payments update": "Update a payment",
+        "payments allocate": "Allocate payment to invoices",
         
         # POS
         "pos sale": "Create POS sale",
@@ -260,6 +308,12 @@ def repl(ctx: click.Context) -> None:
         "activity list": "List activity logs",
         "activity stats": "Activity statistics",
         "activity recent": "Recent activity",
+        "activity entity-types": "List entity types",
+        "activity actions": "List action types",
+        "activity user-activity": "Get user activity",
+        "activity entity-activity": "Get entity activity",
+        "activity export": "Export activity logs",
+        "activity cleanup": "Clean up old logs",
         
         # Dashboard
         "dashboard summary": "Dashboard summary",
@@ -268,6 +322,7 @@ def repl(ctx: click.Context) -> None:
         "settings list": "List all settings",
         "settings get": "Get a setting",
         "settings update": "Update a setting",
+        "settings bulk-update": "Bulk update settings",
         
         # Integrations
         "integrations settings": "Get integration settings",
@@ -424,6 +479,229 @@ def auth_status(ctx: click.Context) -> None:
 
     result = session_status()
     _out(ctx, result)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# USERS commands
+# ══════════════════════════════════════════════════════════════════════
+
+
+@cli.group()
+def users() -> None:
+    """System user management (admin only)."""
+
+
+@users.command("list")
+@click.option("--role", help="Filter by role name")
+@click.option("--active", "is_active", help="Filter by active status (true/false)")
+@click.option("--search", help="Search query")
+@click.pass_context
+def users_list(ctx: click.Context, role: Optional[str], is_active: Optional[str], search: Optional[str]) -> None:
+    """List system users."""
+    try:
+        from cli_anything.minierp.core.users import list_users
+        data = list_users(role=role, is_active=is_active, search=search)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@users.command("get")
+@click.argument("user_id", type=int)
+@click.pass_context
+def users_get(ctx: click.Context, user_id: int) -> None:
+    """Get user details by ID."""
+    try:
+        from cli_anything.minierp.core.users import get_user
+        data = get_user(user_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@users.command("create")
+@click.option("--username", required=True, help="Username")
+@click.option("--email", required=True, help="Email address")
+@click.option("--password", required=True, help="Password")
+@click.option("--full-name", required=True, help="Full name")
+@click.option("--role-id", type=int, required=True, help="Role ID")
+@click.option("--active", "is_active", type=bool, default=True, help="Active status")
+@click.pass_context
+def users_create(ctx: click.Context, username: str, email: str, password: str, full_name: str, role_id: int, is_active: bool) -> None:
+    """Create a new user."""
+    try:
+        from cli_anything.minierp.core.users import create_user
+        data = create_user(username=username, email=email, password=password, full_name=full_name, role_id=role_id, is_active=is_active)
+        _ok(ctx, f"User '{username}' created", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@users.command("update")
+@click.argument("user_id", type=int)
+@click.option("--username", help="Username")
+@click.option("--email", help="Email address")
+@click.option("--full-name", help="Full name")
+@click.option("--role-id", type=int, help="Role ID")
+@click.option("--active", "is_active", type=bool, help="Active status")
+@click.pass_context
+def users_update(ctx: click.Context, user_id: int, username: Optional[str], email: Optional[str], full_name: Optional[str], role_id: Optional[int], is_active: Optional[bool]) -> None:
+    """Update a user."""
+    try:
+        from cli_anything.minierp.core.users import update_user
+        data = update_user(user_id=user_id, username=username, email=email, full_name=full_name, role_id=role_id, is_active=is_active)
+        _ok(ctx, f"User {user_id} updated", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@users.command("delete")
+@click.argument("user_id", type=int)
+@click.pass_context
+def users_delete(ctx: click.Context, user_id: int) -> None:
+    """Delete a user (soft delete)."""
+    try:
+        from cli_anything.minierp.core.users import delete_user
+        data = delete_user(user_id)
+        _ok(ctx, f"User {user_id} deleted", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@users.command("reset-password")
+@click.argument("user_id", type=int)
+@click.option("--password", required=True, help="New password")
+@click.pass_context
+def users_reset_password(ctx: click.Context, user_id: int, password: str) -> None:
+    """Reset a user's password."""
+    try:
+        from cli_anything.minierp.core.users import reset_password
+        data = reset_password(user_id, password)
+        _ok(ctx, f"Password reset for user {user_id}", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@users.command("toggle-status")
+@click.argument("user_id", type=int)
+@click.option("--active", "is_active", type=bool, required=True, help="True to activate, False to deactivate")
+@click.pass_context
+def users_toggle_status(ctx: click.Context, user_id: int, is_active: bool) -> None:
+    """Toggle user active/inactive status."""
+    try:
+        from cli_anything.minierp.core.users import toggle_user_status
+        data = toggle_user_status(user_id, is_active)
+        status_str = "activated" if is_active else "deactivated"
+        _ok(ctx, f"User {user_id} {status_str}", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# ROLES commands
+# ══════════════════════════════════════════════════════════════════════
+
+
+@cli.group()
+def roles() -> None:
+    """Role-based access control management."""
+
+
+@roles.command("list")
+@click.pass_context
+def roles_list(ctx: click.Context) -> None:
+    """List all roles."""
+    try:
+        from cli_anything.minierp.core.roles import list_roles
+        data = list_roles()
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@roles.command("permissions")
+@click.pass_context
+def roles_permissions(ctx: click.Context) -> None:
+    """List all permissions grouped by module."""
+    try:
+        from cli_anything.minierp.core.roles import get_permissions
+        data = get_permissions()
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@roles.command("get-permissions")
+@click.argument("role_id", type=int)
+@click.pass_context
+def roles_get_permissions(ctx: click.Context, role_id: int) -> None:
+    """Get permissions for a specific role."""
+    try:
+        from cli_anything.minierp.core.roles import get_role_permissions
+        data = get_role_permissions(role_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@roles.command("create")
+@click.option("--name", "role_name", required=True, help="Role name")
+@click.option("--description", default="", help="Role description")
+@click.option("--permissions", help="Comma-separated permission IDs")
+@click.pass_context
+def roles_create(ctx: click.Context, role_name: str, description: str, permissions: Optional[str]) -> None:
+    """Create a new role."""
+    try:
+        from cli_anything.minierp.core.roles import create_role
+        perms = [int(p.strip()) for p in permissions.split(",")] if permissions else None
+        data = create_role(role_name=role_name, description=description, permissions=perms)
+        _ok(ctx, f"Role '{role_name}' created", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@roles.command("update")
+@click.argument("role_id", type=int)
+@click.option("--name", "role_name", help="Role name")
+@click.option("--description", help="Role description")
+@click.option("--active", "is_active", type=bool, help="Active status")
+@click.pass_context
+def roles_update(ctx: click.Context, role_id: int, role_name: Optional[str], description: Optional[str], is_active: Optional[bool]) -> None:
+    """Update a role."""
+    try:
+        from cli_anything.minierp.core.roles import update_role
+        data = update_role(role_id=role_id, role_name=role_name, description=description, is_active=is_active)
+        _ok(ctx, f"Role {role_id} updated", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@roles.command("update-permissions")
+@click.argument("role_id", type=int)
+@click.option("--permissions", required=True, help="Comma-separated permission IDs")
+@click.pass_context
+def roles_update_permissions(ctx: click.Context, role_id: int, permissions: str) -> None:
+    """Update permissions for a role."""
+    try:
+        from cli_anything.minierp.core.roles import update_role_permissions
+        perms = [int(p.strip()) for p in permissions.split(",")]
+        data = update_role_permissions(role_id, perms)
+        _ok(ctx, f"Permissions updated for role {role_id}", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@roles.command("delete")
+@click.argument("role_id", type=int)
+@click.pass_context
+def roles_delete(ctx: click.Context, role_id: int) -> None:
+    """Delete a role."""
+    try:
+        from cli_anything.minierp.core.roles import delete_role
+        data = delete_role(role_id)
+        _ok(ctx, f"Role {role_id} deleted", data)
+    except Exception as e:
+        _handle_error(e, ctx)
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -755,6 +1033,31 @@ def items_categories(ctx: click.Context) -> None:
     try:
         _out(ctx, list_categories())
     except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@inventory_items.command("ledger")
+@click.argument("item_id", type=int)
+@click.pass_context
+def items_ledger(ctx: click.Context, item_id: int) -> None:
+    """Get item ledger entries (full transaction history)."""
+    try:
+        from cli_anything.minierp.core.inventory import get_item_ledger
+        data = get_item_ledger(item_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@inventory_items.command("uom")
+@click.pass_context
+def items_uom(ctx: click.Context) -> None:
+    """List all units of measure."""
+    try:
+        from cli_anything.minierp.core.inventory import get_units_of_measure
+        data = get_units_of_measure()
+        _out(ctx, data)
+    except Exception as e:
         _handle_error(e, ctx)
 
 
@@ -1225,6 +1528,41 @@ def invoices_delete(ctx: click.Context, invoice_id: int) -> None:
         _handle_error(e, ctx)
 
 
+@invoices.command("update")
+@click.argument("invoice_id", type=int)
+@click.option("--customer-id", type=int, help="Customer ID")
+@click.option("--date", "invoice_date", help="Invoice date (YYYY-MM-DD)")
+@click.option("--due", "due_date", help="Due date (YYYY-MM-DD)")
+@click.option("--notes", help="Invoice notes")
+@click.option("--status", help="Invoice status")
+@click.pass_context
+def invoices_update(ctx: click.Context, invoice_id: int, **kwargs) -> None:
+    """Update an invoice."""
+    try:
+        from cli_anything.minierp.core.invoices import update_invoice
+        fields = {k: v for k, v in kwargs.items() if v is not None}
+        data = update_invoice(invoice_id, **fields)
+        _ok(ctx, f"Invoice {invoice_id} updated", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@invoices.command("return")
+@click.argument("invoice_id", type=int)
+@click.option("--items", required=True, help="JSON array of {item_id, quantity}")
+@click.pass_context
+def invoices_return(ctx: click.Context, invoice_id: int, items: str) -> None:
+    """Return items on an invoice."""
+    try:
+        from cli_anything.minierp.core.invoices import return_invoice_items
+        import json as _json
+        items_list = _json.loads(items)
+        data = return_invoice_items(invoice_id, items_list)
+        _ok(ctx, f"Return processed for invoice {invoice_id}", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
 @invoices.command("payments")
 @click.argument("invoice_id", type=int)
 @click.pass_context
@@ -1317,6 +1655,46 @@ def purchases_delete(ctx: click.Context, purchase_id: int) -> None:
         result = delete_purchase(purchase_id)
         _ok(ctx, f"Deleted purchase {purchase_id}", result)
     except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@purchases.command("summary-by-item")
+@click.argument("item_id", type=int)
+@click.pass_context
+def purchases_summary_by_item(ctx: click.Context, item_id: int) -> None:
+    """Get purchase summary for a specific item."""
+    try:
+        from cli_anything.minierp.core.purchases import get_purchase_summary_by_item
+        data = get_purchase_summary_by_item(item_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@purchases.command("summary-by-date")
+@click.option("--start", "start_date", required=True, help="Start date (YYYY-MM-DD)")
+@click.option("--end", "end_date", required=True, help="End date (YYYY-MM-DD)")
+@click.pass_context
+def purchases_summary_by_date(ctx: click.Context, start_date: str, end_date: str) -> None:
+    """Get purchase summary for a date range."""
+    try:
+        from cli_anything.minierp.core.purchases import get_purchase_summary
+        data = get_purchase_summary(start_date=start_date, end_date=end_date)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@purchases.command("top-suppliers")
+@click.option("--limit", type=int, default=10, help="Number of top suppliers")
+@click.pass_context
+def purchases_top_suppliers(ctx: click.Context, limit: int) -> None:
+    """Get top suppliers by purchase volume."""
+    try:
+        from cli_anything.minierp.core.purchases import get_top_suppliers
+        data = get_top_suppliers(limit=limit)
+        _out(ctx, data)
+    except Exception as e:
         _handle_error(e, ctx)
 
 
@@ -2003,6 +2381,174 @@ def sales_orders_delete(ctx: click.Context, order_id: int) -> None:
         _handle_error(e, ctx)
 
 
+@sales_orders.command("update")
+@click.argument("order_id", type=int)
+@click.option("--customer-id", type=int, help="Customer ID")
+@click.option("--order-date", help="Order date (YYYY-MM-DD)")
+@click.option("--status", help="Order status")
+@click.option("--notes", help="Order notes")
+@click.pass_context
+def sales_orders_update(ctx: click.Context, order_id: int, **kwargs) -> None:
+    """Update a sales order."""
+    try:
+        from cli_anything.minierp.core.sales import update_sales_order
+        fields = {k: v for k, v in kwargs.items() if v is not None}
+        data = update_sales_order(order_id, **fields)
+        _ok(ctx, f"Sales order {order_id} updated", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@sales_orders.command("convert-to-invoice")
+@click.argument("order_id", type=int)
+@click.pass_context
+def sales_orders_convert_to_invoice(ctx: click.Context, order_id: int) -> None:
+    """Convert a sales order to an invoice."""
+    try:
+        from cli_anything.minierp.core.sales import convert_sales_order_to_invoice
+        data = convert_sales_order_to_invoice(order_id)
+        _ok(ctx, f"Sales order {order_id} converted to invoice", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@sales_orders.command("cycle-chain")
+@click.argument("order_id", type=int)
+@click.pass_context
+def sales_orders_cycle_chain(ctx: click.Context, order_id: int) -> None:
+    """View the full order-to-invoice chain for a sales order."""
+    try:
+        from cli_anything.minierp.core.sales import get_sales_order_cycle_chain
+        data = get_sales_order_cycle_chain(order_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@sales.group()
+def quotations() -> None:
+    """Sales quotation management."""
+
+
+@quotations.command("list")
+@click.option("--search", help="Search query")
+@click.option("--status", help="Filter by status")
+@click.option("--page", type=int, default=1, help="Page number")
+@click.option("--limit", type=int, default=50, help="Items per page")
+@click.pass_context
+def quotations_list(ctx: click.Context, search: Optional[str], status: Optional[str], page: int, limit: int) -> None:
+    """List quotations."""
+    try:
+        from cli_anything.minierp.core.sales import list_quotations
+        data = list_quotations(search=search, status=status, page=page, limit=limit)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@quotations.command("get")
+@click.argument("quotation_id", type=int)
+@click.pass_context
+def quotations_get(ctx: click.Context, quotation_id: int) -> None:
+    """Get quotation details."""
+    try:
+        from cli_anything.minierp.core.sales import get_quotation
+        data = get_quotation(quotation_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@quotations.command("create")
+@click.option("--customer-id", type=int, required=True, help="Customer ID")
+@click.option("--date", "quotation_date", required=True, help="Quotation date (YYYY-MM-DD)")
+@click.option("--valid-until", required=True, help="Valid until date (YYYY-MM-DD)")
+@click.option("--items", required=True, help="JSON array of {item_id, quantity, unit_price}")
+@click.option("--notes", default="", help="Quotation notes")
+@click.pass_context
+def quotations_create(ctx: click.Context, customer_id: int, quotation_date: str, valid_until: str, items: str, notes: str) -> None:
+    """Create a new quotation."""
+    try:
+        from cli_anything.minierp.core.sales import create_quotation
+        import json as _json
+        items_list = _json.loads(items)
+        data = create_quotation(customer_id=customer_id, quotation_date=quotation_date, valid_until=valid_until, items=items_list, notes=notes)
+        _ok(ctx, "Quotation created", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@quotations.command("update")
+@click.argument("quotation_id", type=int)
+@click.option("--customer-id", type=int, help="Customer ID")
+@click.option("--date", "quotation_date", help="Quotation date (YYYY-MM-DD)")
+@click.option("--valid-until", help="Valid until date (YYYY-MM-DD)")
+@click.option("--status", help="Quotation status")
+@click.option("--notes", help="Quotation notes")
+@click.pass_context
+def quotations_update(ctx: click.Context, quotation_id: int, **kwargs) -> None:
+    """Update a quotation."""
+    try:
+        from cli_anything.minierp.core.sales import update_quotation
+        fields = {k: v for k, v in kwargs.items() if v is not None}
+        data = update_quotation(quotation_id, **fields)
+        _ok(ctx, f"Quotation {quotation_id} updated", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@quotations.command("delete")
+@click.argument("quotation_id", type=int)
+@click.pass_context
+def quotations_delete(ctx: click.Context, quotation_id: int) -> None:
+    """Delete a quotation."""
+    try:
+        from cli_anything.minierp.core.sales import delete_quotation
+        data = delete_quotation(quotation_id)
+        _ok(ctx, f"Quotation {quotation_id} deleted", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@quotations.command("convert")
+@click.argument("quotation_id", type=int)
+@click.pass_context
+def quotations_convert(ctx: click.Context, quotation_id: int) -> None:
+    """Convert a quotation to a sales order."""
+    try:
+        from cli_anything.minierp.core.sales import convert_quotation_to_sales_order
+        data = convert_quotation_to_sales_order(quotation_id)
+        _ok(ctx, f"Quotation {quotation_id} converted to sales order", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@quotations.command("cycle-chain")
+@click.argument("quotation_id", type=int)
+@click.pass_context
+def quotations_cycle_chain(ctx: click.Context, quotation_id: int) -> None:
+    """View the quotation-to-invoice chain."""
+    try:
+        from cli_anything.minierp.core.sales import get_quotation_cycle_chain
+        data = get_quotation_cycle_chain(quotation_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@quotations.command("invoices")
+@click.argument("quotation_id", type=int)
+@click.pass_context
+def quotations_invoices(ctx: click.Context, quotation_id: int) -> None:
+    """Get invoices created from a quotation."""
+    try:
+        from cli_anything.minierp.core.sales import get_invoices_by_quotation
+        data = get_invoices_by_quotation(quotation_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
 @sales.command("returns")
 @click.option("--start", default=None)
 @click.option("--end", default=None)
@@ -2167,6 +2713,41 @@ def payments_delete(ctx: click.Context, payment_id: int) -> None:
         _handle_error(e, ctx)
 
 
+@payments.command("update")
+@click.argument("payment_id", type=int)
+@click.option("--amount", type=float, help="Payment amount")
+@click.option("--method", help="Payment method (cash/bank/card/other)")
+@click.option("--reference", help="Reference number")
+@click.option("--notes", help="Payment notes")
+@click.option("--date", "payment_date", help="Payment date (YYYY-MM-DD)")
+@click.pass_context
+def payments_update(ctx: click.Context, payment_id: int, **kwargs) -> None:
+    """Update a payment."""
+    try:
+        from cli_anything.minierp.core.payments import update_payment
+        fields = {k: v for k, v in kwargs.items() if v is not None}
+        data = update_payment(payment_id, **fields)
+        _ok(ctx, f"Payment {payment_id} updated", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@payments.command("allocate")
+@click.argument("payment_id", type=int)
+@click.option("--allocations", required=True, help="JSON array of {invoice_id, amount}")
+@click.pass_context
+def payments_allocate(ctx: click.Context, payment_id: int, allocations: str) -> None:
+    """Allocate a payment to invoices."""
+    try:
+        from cli_anything.minierp.core.payments import allocate_payment
+        import json as _json
+        alloc_list = _json.loads(allocations)
+        data = allocate_payment(payment_id, alloc_list)
+        _ok(ctx, f"Payment {payment_id} allocated", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
 # ══════════════════════════════════════════════════════════════════════
 # PRODUCTION commands
 # ══════════════════════════════════════════════════════════════════════
@@ -2238,6 +2819,19 @@ def production_delete(ctx: click.Context, production_id: int) -> None:
         result = delete_production(production_id)
         _ok(ctx, f"Deleted production {production_id}", result)
     except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@production.command("summary-by-item")
+@click.argument("item_id", type=int)
+@click.pass_context
+def production_summary_by_item(ctx: click.Context, item_id: int) -> None:
+    """Get production summary for a specific item."""
+    try:
+        from cli_anything.minierp.core.production import get_production_summary_by_item
+        data = get_production_summary_by_item(item_id)
+        _out(ctx, data)
+    except Exception as e:
         _handle_error(e, ctx)
 
 
@@ -2329,6 +2923,99 @@ def bom_delete(ctx: click.Context, bom_id: int) -> None:
         result = delete_bom(bom_id)
         _ok(ctx, f"Deleted BOM {bom_id}", result)
     except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@bom.command("update")
+@click.argument("bom_id", type=int)
+@click.option("--description", help="BOM description")
+@click.option("--quantity", type=float, help="Quantity produced")
+@click.option("--notes", help="Notes")
+@click.option("--active", "is_active", type=bool, help="Active status")
+@click.pass_context
+def bom_update(ctx: click.Context, bom_id: int, **kwargs) -> None:
+    """Update a BOM."""
+    try:
+        from cli_anything.minierp.core.bom import update_bom
+        fields = {k: v for k, v in kwargs.items() if v is not None}
+        data = update_bom(bom_id, **fields)
+        _ok(ctx, f"BOM {bom_id} updated", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@bom.command("toggle-active")
+@click.argument("bom_id", type=int)
+@click.pass_context
+def bom_toggle_active(ctx: click.Context, bom_id: int) -> None:
+    """Toggle BOM active/inactive status."""
+    try:
+        from cli_anything.minierp.core.bom import toggle_bom_active
+        data = toggle_bom_active(bom_id)
+        _ok(ctx, f"BOM {bom_id} toggled", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# FORECASTS commands
+# ══════════════════════════════════════════════════════════════════════
+
+
+@cli.group()
+def forecasts() -> None:
+    """Demand forecasting and trend analysis."""
+
+
+@forecasts.command("dashboard")
+@click.pass_context
+def forecasts_dashboard(ctx: click.Context) -> None:
+    """Get forecast dashboard data."""
+    try:
+        from cli_anything.minierp.core.forecasts import get_forecast_dashboard
+        data = get_forecast_dashboard()
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@forecasts.command("demand")
+@click.option("--category", help="Filter by category")
+@click.option("--trend", help="Filter by trend (up/down/stable)")
+@click.option("--recommendation", help="Filter by recommendation")
+@click.pass_context
+def forecasts_demand(ctx: click.Context, category: Optional[str], trend: Optional[str], recommendation: Optional[str]) -> None:
+    """Get demand forecasts with optional filters."""
+    try:
+        from cli_anything.minierp.core.forecasts import get_demand_forecasts
+        data = get_demand_forecasts(category=category, trend=trend, recommendation=recommendation)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@forecasts.command("trends")
+@click.option("--item-id", type=int, help="Filter by item ID")
+@click.pass_context
+def forecasts_trends(ctx: click.Context, item_id: Optional[int]) -> None:
+    """Get trend data, optionally for a specific item."""
+    try:
+        from cli_anything.minierp.core.forecasts import get_trend_data
+        data = get_trend_data(item_id=item_id)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@forecasts.command("generate")
+@click.pass_context
+def forecasts_generate(ctx: click.Context) -> None:
+    """Generate new forecasts for all items."""
+    try:
+        from cli_anything.minierp.core.forecasts import generate_forecasts
+        data = generate_forecasts()
+        _ok(ctx, "Forecasts generated", data)
+    except Exception as e:
         _handle_error(e, ctx)
 
 
@@ -2487,6 +3174,90 @@ def activity_recent(ctx: click.Context, limit: int) -> None:
         _handle_error(e, ctx)
 
 
+@activity.command("entity-types")
+@click.pass_context
+def activity_entity_types(ctx: click.Context) -> None:
+    """List available entity types for filtering."""
+    try:
+        from cli_anything.minierp.core.activityLog import get_entity_types
+        data = get_entity_types()
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@activity.command("actions")
+@click.pass_context
+def activity_actions(ctx: click.Context) -> None:
+    """List available action types for filtering."""
+    try:
+        from cli_anything.minierp.core.activityLog import get_actions
+        data = get_actions()
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@activity.command("user-activity")
+@click.argument("user_id", type=int)
+@click.option("--page", type=int, default=1, help="Page number")
+@click.option("--limit", type=int, default=50, help="Items per page")
+@click.pass_context
+def activity_user_activity(ctx: click.Context, user_id: int, page: int, limit: int) -> None:
+    """Get activity logs for a specific user."""
+    try:
+        from cli_anything.minierp.core.activityLog import get_user_activity
+        data = get_user_activity(user_id, page=page, limit=limit)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@activity.command("entity-activity")
+@click.argument("entity_type")
+@click.argument("entity_id", type=int)
+@click.option("--page", type=int, default=1, help="Page number")
+@click.option("--limit", type=int, default=50, help="Items per page")
+@click.pass_context
+def activity_entity_activity(ctx: click.Context, entity_type: str, entity_id: int, page: int, limit: int) -> None:
+    """Get activity logs for a specific entity."""
+    try:
+        from cli_anything.minierp.core.activityLog import get_entity_activity
+        data = get_entity_activity(entity_type, entity_id, page=page, limit=limit)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@activity.command("export")
+@click.option("--start", "start_date", help="Start date (YYYY-MM-DD)")
+@click.option("--end", "end_date", help="End date (YYYY-MM-DD)")
+@click.option("--entity-type", help="Filter by entity type")
+@click.option("--action", help="Filter by action")
+@click.pass_context
+def activity_export(ctx: click.Context, start_date: Optional[str], end_date: Optional[str], entity_type: Optional[str], action: Optional[str]) -> None:
+    """Export activity logs to CSV."""
+    try:
+        from cli_anything.minierp.core.activityLog import export_logs
+        data = export_logs(start_date=start_date, end_date=end_date, entity_type=entity_type, action=action)
+        _out(ctx, data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
+@activity.command("cleanup")
+@click.option("--days", "days_old", type=int, default=90, help="Delete logs older than this many days")
+@click.pass_context
+def activity_cleanup(ctx: click.Context, days_old: int) -> None:
+    """Clean up old activity logs."""
+    try:
+        from cli_anything.minierp.core.activityLog import cleanup_logs
+        data = cleanup_logs(days_old=days_old)
+        _ok(ctx, f"Cleaned up logs older than {days_old} days", data)
+    except Exception as e:
+        _handle_error(e, ctx)
+
+
 # ══════════════════════════════════════════════════════════════════════
 # DASHBOARD commands
 # ══════════════════════════════════════════════════════════════════════
@@ -2556,6 +3327,21 @@ def settings_update(ctx: click.Context, key: str, value: str) -> None:
         result = update_setting(key, value)
         _ok(ctx, f"Updated {key}", result)
     except ERPError as e:
+        _handle_error(e, ctx)
+
+
+@settings.command("bulk-update")
+@click.option("--settings", "settings_json", required=True, help="JSON object of key-value settings")
+@click.pass_context
+def settings_bulk_update(ctx: click.Context, settings_json: str) -> None:
+    """Bulk update multiple settings at once."""
+    try:
+        from cli_anything.minierp.core.settings import update_settings
+        import json as _json
+        settings_dict = _json.loads(settings_json)
+        data = update_settings(settings_dict)
+        _ok(ctx, "Settings updated", data)
+    except Exception as e:
         _handle_error(e, ctx)
 
 

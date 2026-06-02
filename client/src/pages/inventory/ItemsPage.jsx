@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -22,6 +22,8 @@ import './ItemsPage.css';
 
 export default function ItemsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const gridWrapperRef = useRef(null);
+  const [gridHeight, setGridHeight] = useState(600);
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -87,6 +89,24 @@ export default function ItemsPage() {
     
     return matchesSearch && matchesWarehouse;
   });
+
+  // Dynamically resize grid to fill available vertical space
+  const updateGridHeight = useCallback(() => {
+    if (gridWrapperRef.current) {
+      const rect = gridWrapperRef.current.getBoundingClientRect();
+      const available = window.innerHeight - rect.top - 16;
+      setGridHeight(Math.max(200, available));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      // Small delay to ensure DOM is laid out
+      requestAnimationFrame(() => updateGridHeight());
+    }
+    window.addEventListener('resize', updateGridHeight);
+    return () => window.removeEventListener('resize', updateGridHeight);
+  }, [updateGridHeight, isLoading]);
 
   // Calculate statistics (filtered by warehouse if applicable)
   const filteredForStats = warehouseId 
@@ -485,7 +505,8 @@ export default function ItemsPage() {
           </div>
         </>
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
+        <div className="ag-grid-wrapper" ref={gridWrapperRef}>
+          <div className="ag-theme-quartz" style={{ height: gridHeight }}>
           <AgGridReact theme="legacy"
             rowData={filteredItems}
             columnDefs={columnDefs}
@@ -500,6 +521,7 @@ export default function ItemsPage() {
             onRowClicked={(params) => handleRowClick(params.data)}
             rowSelection={{ mode: 'singleRow' }}
           />
+          </div>
         </div>
       )}
 
