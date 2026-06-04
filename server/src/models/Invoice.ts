@@ -160,10 +160,12 @@ class InvoiceModel {
     let query = `
       SELECT
         i.*,
+        COALESCE(c.customer_name, i.customer_name) as customer_name,
         so.so_no,
         q.quotation_no,
         u.username as created_by_username
       FROM invoices i
+      LEFT JOIN customers c ON i.customer_id = c.id
       LEFT JOIN sales_orders so ON i.so_id = so.id
       LEFT JOIN quotations q ON i.quotation_id = q.id
       LEFT JOIN users u ON i.created_by = u.id
@@ -827,10 +829,12 @@ class InvoiceModel {
     let query = `
       SELECT
         i.*,
+        COALESCE(c.customer_name, i.customer_name) as customer_name,
         so.so_no,
         q.quotation_no,
         u.username as created_by_username
       FROM invoices i
+      LEFT JOIN customers c ON i.customer_id = c.id
       LEFT JOIN sales_orders so ON i.so_id = so.id
       LEFT JOIN quotations q ON i.quotation_id = q.id
       LEFT JOIN users u ON i.created_by = u.id

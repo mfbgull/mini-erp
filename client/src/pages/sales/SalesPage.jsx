@@ -107,7 +107,7 @@ export default function SalesPage() {
       )
     },
     {
-      headerName: t('sales.date'),
+      headerName: t('fields.date'),
       field: 'invoice_date',
       sortable: true,
       filter: 'agDateColumnFilter',
@@ -169,7 +169,7 @@ export default function SalesPage() {
       )
     },
     {
-      headerName: t('sales.actions'),
+      headerName: t('common.actions'),
       field: 'actions',
       width: 120,
       sortable: false,
@@ -298,7 +298,6 @@ export default function SalesPage() {
               rowData={filteredInvoices}
               columnDefs={invoiceColumnDefs}
               defaultColDef={{
-              theme:"legacy",
                 resizable: true,
                 sortable: true,
                 filter: true
