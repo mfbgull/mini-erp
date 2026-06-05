@@ -23,7 +23,7 @@ cd server && npm start
 cd client && npm run dev
 ```
 
-**Login:** `admin` / `admin123`
+**Login:** `admin` / `admin123` _(development default — change in production)_
 
 ## Features
 
@@ -43,7 +43,7 @@ cd client && npm run dev
 cli-anything-minierp --json inventory items list
 
 # Common commands
-cli-anything-minierp auth login -u admin -p admin123
+cli-anything-minierp auth login -u admin -p admin123  # dev default — change in production
 cli-anything-minierp inventory low-stock
 cli-anything-minierp reports profit-loss --start 2026-01-01 --end 2026-01-31
 cli-anything-minierp utils backup --name "backup"

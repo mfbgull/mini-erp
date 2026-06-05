@@ -1,5 +1,9 @@
 .quotations-page {
-  padding: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .quotations-page .page-header {
@@ -21,9 +25,25 @@
   font-weight: 600;
 }
 
-.quotations-page .grid-container {
-  width: 100%;
-  height: calc(100vh - 250px);
+.quotations-page .quotations-content {
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--neutral-200);
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.quotations-page .quotations-content .grid-fill {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.quotations-page .quotations-content .ag-theme-quartz {
+  --ag-row-height: 48px;
 }
 
 .quotations-page .link-text {

@@ -398,7 +398,7 @@ selected-row: #065F46;
 
 ---
 
-## Agent Prompt Guide
+## Design Token Reference (for developers, not AI behavioral instructions)
 
 ### Quick Color Reference
 
@@ -413,7 +413,9 @@ Light: Background #FAFBFC, Surface #FFFFFF
 Dark: Background #0A0F0D, Surface #111916
 ```
 
-### Example Prompts
+### Example Design Briefs
+
+These are sample prompts a developer might give to an AI when generating UI components:
 
 **"Create a data table with sorting and filtering using Mini ERP's emerald design tokens."**
 

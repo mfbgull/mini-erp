@@ -49,7 +49,7 @@ python3 -m cli_anything.minierp.minierp_cli --json customers list
 # Enter REPL mode
 python3 -m cli_anything.minierp.minierp_cli
 
-# Login within REPL
+# Login within REPL (default dev credentials — change in production)
 auth login -u admin -p admin123
 
 # List items

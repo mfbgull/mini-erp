@@ -11,6 +11,8 @@ Login and receive JWT token as httpOnly cookie.
 
 **Rate Limited:** 5 requests per 15 minutes per username.
 
+> **Security note:** The credentials below are development defaults. Change in production.
+
 ```json
 // Request
 { "username": "admin", "password": "admin123" }

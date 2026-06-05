@@ -2,9 +2,11 @@
 
 ## TL;DR ✅ FIXED
 
+> **Relationship to previous plan:** The initial fix in `fix-express-v5-wildcard.md` replaced `'*'` with `/{*path}` which fixed the startup crash but **broke all API routing**. This file documents the follow-up diagnosis and correct fix.
+
 The backend server was starting successfully but requests to `/health` and API endpoints were hanging. The issue was that Express v5's `/{*path}` catch-all route matches ALL routes regardless of registration order.
 
-**Fix Applied**: Replaced `app.get('/{*path}', ...)` with `app.use()` middleware that explicitly skips API routes and health endpoint.
+**Fix Applied**: Replaced `app.get('/{*path}', ...)` with `app.use()` middleware that explicitly skips API routes and health endpoint. This supersedes the `/{*path}` approach from the earlier plan.
 
 **File Modified**: `/home/fawad/ai/minierp/server/src/app.ts` (lines 115 and 137)
 
@@ -35,10 +37,10 @@ After fixing the Express v5 wildcard route from `'*'` to `/{*path}`, the server 
 7. Error handler
 
 ### Hypotheses
-1. The `/{*path}` pattern is matching all routes including those defined before it
-2. There's a middleware blocking requests
-3. The server is not actually listening even though it says it is
-4. There's an infinite loop or blocking operation in a route handler
+1. ✅ **CONFIRMED:** The `/{*path}` pattern is matching all routes including those defined before it (this was the root cause)
+2. ❌ There's a middleware blocking requests
+3. ❌ The server is not actually listening even though it says it is
+4. ❌ There's an infinite loop or blocking operation in a route handler
 
 ---
 

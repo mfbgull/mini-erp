@@ -5,13 +5,13 @@
 Version: 3.1\
 Modes: ASSISTANT MODE (Collaborative) | AUTONOMOUS MODE (Self-Executing + Self-Auditing)
 
-Default: ASSISTANT MODE if not specified.
+Default: ASSISTANT MODE if the user has not explicitly specified a mode (e.g., by saying "Operate in AUTONOMOUS MODE"). The agent should assume ASSISTANT MODE until told otherwise.
 
 ---
 
 # 1. PURPOSE
 
-This document defines operational rules for AI agents working in the Mini ERP codebase.
+This document defines operational rules for AI agents (including but not limited to Claude Code, Sisyphus, Opencode, and any LLM-based coding agent) working in the Mini ERP codebase. The agent reading this document should apply the rules that match its current operating mode (see §12).
 
 **Modes:**
 1. ASSISTANT MODE → advisory + guided execution
@@ -143,13 +143,15 @@ Before major refactor:
 
 # 10. FAILURE CONDITIONS
 
-Task automatically fails if:
+The following conditions indicate the task is incomplete and must be remediated before declaring done:
 - TypeScript errors remain
 - Mobile view broken
 - API contract inconsistent
 - Schema changed without migration
 - Security rule violated
 - Architecture boundary broken
+
+The agent should flag these to the user and continue refining — not self-terminate.
 
 ---
 
@@ -167,7 +169,7 @@ Task complete only when:
 
 # 12. MODE SWITCH INSTRUCTION
 
-"Operate in ASSISTANT MODE" or "Operate in AUTONOMOUS MODE" to activate explicitly.
+The user can switch modes by saying "Operate in ASSISTANT MODE" or "Operate in AUTONOMOUS MODE". The agent should not self-activate AUTONOMOUS MODE unless the user has explicitly requested it. If in doubt, stay in ASSISTANT MODE.
 
 ---
 
@@ -198,12 +200,14 @@ cli-anything-minierp forecasts dashboard/demand/trends/generate
 
 ### Authentication
 ```bash
-cli-anything-minierp auth login -u admin -p admin123
+cli-anything-minierp auth login -u USERNAME -p PASSWORD
 cli-anything-minierp auth logout
 cli-anything-minierp auth me
 cli-anything-minierp auth change-password --current OLD --new NEW
 cli-anything-minierp auth status
 ```
+
+> **Security note:** Replace USERNAME/PASSWORD with actual credentials. Do not hardcode secrets. The default development credentials are `admin`/`admin123` — these must be changed in production.
 
 ### Inventory
 ```bash
@@ -309,7 +313,7 @@ cli-anything-minierp integrations settings/update/test-email/weather/exchange-ra
 
 | Task | Command |
 |------|---------|
-| Login | `cli-anything-minierp auth login -u admin -p admin123` |
+| Login | `cli-anything-minierp auth login -u USERNAME -p PASSWORD` (development default: `admin`/`admin123` — change in production) |
 | List items | `cli-anything-minierp inventory items list` |
 | Stock valuation | `cli-anything-minierp inventory valuation` |
 | Low stock | `cli-anything-minierp inventory low-stock` |

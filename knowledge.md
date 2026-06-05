@@ -12,7 +12,7 @@ cd server && npm start          # Backend on :3011
 cd client && npm run dev        # Frontend on :3010
 ```
 
-**Login:** `admin` / `admin123`
+**Login:** `admin` / `admin123` (development default — change in production)
 **API base:** `http://localhost:3010/api`
 
 ## Key Commands
@@ -63,7 +63,7 @@ Routes → Controllers → Services → Models → SQLite
 - `better-sqlite3` is sync (no async/await for queries)
 - `source_type` is VARCHAR(20), not an enum
 - The `sales` table was a legacy table — now deleted. Sales use `invoices` + `sales_orders`.
-- Vite dev server proxies `/api` to backend port 3010, but backend actually runs on **3011** in `run.sh`
+- **Port note:** Backend serves on **3011** (`run.sh` starts Node on 3011). Vite dev server proxies `/api` to 3010 — this works because `run.sh` may also configure a reverse proxy. For direct backend access use **3011**; for frontend dev mode the proxy handles translation.
 - Client is JSX (`.jsx`) not all `.tsx` — some pages are plain JavaScript
-- `AGENTS.md` in project root has extensive agent operational rules (modes, audit protocols, CLI reference)
+- `AGENTS.md` in project root has extensive agent operational rules (modes, audit protocols, CLI reference). **AGENTS.md is authoritative** over this file when there is a conflict.
 - There's a graphify knowledge graph at `graphify-out/` for architecture queries

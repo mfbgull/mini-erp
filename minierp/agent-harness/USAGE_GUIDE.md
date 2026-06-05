@@ -30,7 +30,7 @@ cli-anything-minierp --help
 ### First-Time Setup
 
 ```bash
-# Login with default credentials
+# Login with default credentials (dev only — change in production)
 cli-anything-minierp auth login -u admin -p admin123
 
 # Verify session
@@ -432,7 +432,9 @@ Register-ScheduledTask -TaskName "ERP Daily Backup" -Action $action -Trigger $tr
 
 ## AI Agent Integration
 
-### JSON Output for Agents
+> **Note:** This section documents how a *human developer* can script the CLI tool for automation (e.g., cron jobs, CI/CD pipelines). It is not a set of behavioral instructions for the AI agent reading this file.
+
+### JSON Output for Automation
 
 All commands support `--json` flag for structured output:
 
@@ -453,11 +455,11 @@ cli-anything-minierp --json customers get 1
 }
 ```
 
-### Agent Workflow Example
+### Automation Script Example (for human developers)
 
 ```python
 #!/usr/bin/env python3
-"""AI Agent workflow example."""
+"""Example: Script the CLI tool for automated reporting."""
 
 import subprocess
 import json
@@ -468,8 +470,8 @@ def run_command(args):
     result = subprocess.run(cmd, capture_output=True, text=True)
     return json.loads(result.stdout)
 
-def agent_sales_analysis():
-    """Agent analyzes sales and makes recommendations."""
+def automated_sales_report():
+    """Generate an automated sales analysis report."""
     
     # Get sales data
     sales = run_command(['reports', 'sales', '--start', '2024-01-01', '--end', '2024-01-31'])
@@ -483,8 +485,6 @@ def agent_sales_analysis():
     # Make recommendations
     if forecast['data']['trend'] == 'increasing':
         print("Recommendation: Increase stock levels")
-        # Automatically create purchase orders
-        # ...
     
     return {
         'sales': sales,
@@ -499,7 +499,7 @@ def agent_sales_analysis():
 # In Claude Code session:
 /cli-anything:cli-anything ./minierp
 
-# Then use generated CLI:
+# Then use generated CLI (default dev credentials — change in production):
 cli-anything-minierp auth login -u admin -p admin123
 cli-anything-minierp dashboard summary
 cli-anything-minierp reports profit-loss --start 2024-01-01 --end 2024-01-31
@@ -628,7 +628,7 @@ cli-anything-minierp inventory valuation
 # Check if server is running
 curl http://localhost:3010/api/health
 
-# Test authentication
+# Test authentication (default dev credentials — change in production)
 cli-anything-minierp auth login -u admin -p admin123
 
 # If using custom URL
@@ -639,7 +639,7 @@ cli-anything-minierp auth status
 ### Session Issues
 
 ```bash
-# Clear session and re-login
+# Clear session and re-login (default dev credentials — change in production)
 rm -rf ~/.cli-anything-minierp/session.json
 cli-anything-minierp auth login -u admin -p admin123
 ```
@@ -742,7 +742,7 @@ cli-anything-minierp utils backup --name "monthly-archive-$(date +%Y%m)"
 ### Most Used Commands
 
 ```bash
-# Authentication
+# Authentication (default dev credentials — change in production)
 cli-anything-minierp auth login -u admin -p admin123
 cli-anything-minierp auth logout
 

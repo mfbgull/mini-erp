@@ -11,7 +11,8 @@
 }
 
 .page-header {
-  max-width: 1200px;
+  max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
   background: transparent;
   border: none;
@@ -22,7 +23,8 @@
 
 /* Main content container */
 .customer-detail-page {
-  max-width: 1200px;
+  max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
   padding: var(--space-md);
 }
@@ -174,10 +176,11 @@
   border-bottom: 1px solid var(--neutral-200);
   margin-bottom: var(--space-lg);
   overflow-x: auto;
+  gap: var(--space-xs);
 }
 
 .tab {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-md) var(--space-xl);
   border: none;
   background: none;
   border-bottom: 2px solid transparent;

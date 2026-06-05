@@ -1,12 +1,14 @@
 # Fix Express v5 Wildcard Route Error
 
-## TL;DR ✅ COMPLETED
+> **⚠️ SUPERSEDED:** The `/{*path}` fix described below resolved the startup crash but **introduced a new bug** — Express v5's `/{*path}` catch-all matches ALL routes regardless of registration order, causing all API requests to hang. See `diagnose-data-loading-issue.md` for the corrected fix using `app.use()` middleware instead.
+
+## TL;DR ✅ (Initially completed, then superseded)
 
 The server was crashing because Express v5 no longer supports the `*` wildcard route pattern that was valid in Express v4. 
 
-**Fix Applied**: Changed both occurrences in `app.ts` from `app.get('*', ...)` to `app.get('/{*path}', ...)`.
+**Initial Fix Applied (superseded)**: Changed both occurrences in `app.ts` from `app.get('*', ...)` to `app.get('/{*path}', ...)`.
 
-**Status**: ✅ Server now starts successfully without PathError
+**Final Correct Fix**: See `diagnose-data-loading-issue.md` — uses `app.use()` middleware with explicit API route skipping.
 
 **Error**: `PathError: Missing parameter name at index 1: *`
 **File**: `/home/fawad/ai/minierp/server/src/app.ts`
@@ -86,9 +88,11 @@ cd /home/fawad/ai/minierp/server
 grep -n "app.get('\\*'" src/app.ts
 # Should return no results
 
-grep -n "app.get('(.*)'" src/app.ts  
-# Should show 2 matches on lines 115 and 137
+grep -n "app.get('/{*path}'" src/app.ts  
+# Should show 2 matches (the initial fix — later superseded by app.use() middleware)
 ```
+
+> **Note:** The original verification command searched for `(.*)` which is **not valid Express v5 syntax** — this has been corrected above. The actual working Express v5 syntax is `/{*path}` (named splat parameter).
 
 ### Task 2: Rebuild Server ✅
 

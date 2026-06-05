@@ -176,11 +176,6 @@ export default function QuotationsPage() {
     }
   ];
 
-  const defaultColDef = {
-    resizable: true,
-    theme: "legacy"
-  };
-
   const mobileColumns = [
     { key: 'quotation_no', label: t('quotations.quotation') },
     { key: 'customer_name', label: t('quotations.customer') },
@@ -211,16 +206,25 @@ export default function QuotationsPage() {
         <StatCard icon={CheckCircle} label={t('quotations.converted')} value={quotationTotals.converted} />
       </StatsGrid>
 
-      <div className="grid-container ag-theme-alpine">
-        <AgGridReact theme="legacy"
-          rowData={quotations}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          pagination={true}
-          paginationPageSize={20}
-          animateRows={true}
-          loading={isLoading}
-        />
+      <div className="quotations-content">
+        <div className="ag-theme-quartz grid-fill">
+          <AgGridReact theme="legacy"
+            rowData={quotations}
+            columnDefs={columnDefs}
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true
+            }}
+            pagination={true}
+            paginationPageSize={15}
+            paginationPageSizeSelector={[10, 15, 25, 50]}
+            rowSelection={{ mode: 'singleRow' }}
+            animateRows={true}
+            loading={isLoading}
+            onRowDoubleClicked={(params) => navigate(`/quotations/${params.data.id}`)}
+          />
+        </div>
       </div>
     </div>
   );

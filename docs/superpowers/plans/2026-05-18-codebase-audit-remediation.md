@@ -1,6 +1,8 @@
 # Codebase Audit Remediation Plan
 
-> **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED: Use subagent-driven development (if subagents available) or execute the plan step-by-step. Steps use checkbox (`- [ ]`) syntax for tracking.
+>
+> *(Note: `superpowers:` prefixes referenced in earlier versions are internal Sisyphus skill names. If you are not in the Sisyphus ecosystem, ignore the prefix — just use subagents or sequential execution as available.)*
 
 **Goal:** Fix all 71 audit issues across the MiniERP codebase — from critical SQL injection to `as any` cleanup — organized by risk, with effort estimates, dependencies, and test-first verification.
 

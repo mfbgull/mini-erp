@@ -175,11 +175,6 @@ export default function SalesOrdersPage() {
     }
   ];
 
-  const defaultColDef = {
-    resizable: true,
-    theme: "legacy"
-  };
-
   const mobileColumns = [
     { key: 'so_no', label: t('salesOrders.soNo') },
     { key: 'customer_name', label: t('salesOrders.customer') },
@@ -210,16 +205,25 @@ export default function SalesOrdersPage() {
         <StatCard icon={Send} label={t('salesOrders.invoiced')} value={orderTotals.invoiced} />
       </StatsGrid>
 
-      <div className="grid-container ag-theme-alpine">
-        <AgGridReact theme="legacy"
-          rowData={salesOrders}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          pagination={true}
-          paginationPageSize={20}
-          animateRows={true}
-          loading={isLoading}
-        />
+      <div className="sales-orders-content">
+        <div className="ag-theme-quartz grid-fill">
+          <AgGridReact theme="legacy"
+            rowData={salesOrders}
+            columnDefs={columnDefs}
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true
+            }}
+            pagination={true}
+            paginationPageSize={15}
+            paginationPageSizeSelector={[10, 15, 25, 50]}
+            rowSelection={{ mode: 'singleRow' }}
+            animateRows={true}
+            loading={isLoading}
+            onRowDoubleClicked={(params) => navigate(`/sales-orders/${params.data.id}`)}
+          />
+        </div>
       </div>
     </div>
   );

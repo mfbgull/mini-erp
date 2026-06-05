@@ -154,4 +154,4 @@ GET /api/customers?sortBy=customer_name&sortOrder=ASC
 ---
 
 **Last Updated**: 2026-02-15  
-**Audited By**: Sisyphus (AI Agent) with sqlite-database-expert & rest-api-design-patterns skills
+**Audited By**: Sisyphus (AI Agent) — this audit referenced sqlite-database-expert and rest-api-design-patterns skill files (domain-specific knowledge guides, not installed packages).

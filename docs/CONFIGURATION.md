@@ -80,7 +80,7 @@ Document numbers are tracked in the `settings` table using atomic `INSERT ... ON
 |---|---|
 | Algorithm | bcrypt |
 | Rounds | 12 (OWASP minimum) |
-| Default Admin | `admin` / `admin123` |
+| Default Admin | `admin` / `admin123` _(development only — change in production)_ |
 
 ### Rate Limiting
 

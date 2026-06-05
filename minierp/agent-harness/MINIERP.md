@@ -75,7 +75,7 @@ The CLI communicates with Mini ERP through its REST API:
 ### Authentication
 | GUI Action | CLI Command |
 |-----------|-------------|
-| Login | `cli-anything-minierp auth login -u admin -p admin123` |
+| Login | `cli-anything-minierp auth login -u USERNAME -p PASSWORD` (dev default: `admin`/`admin123` — change in production) |
 | Logout | `cli-anything-minierp auth logout` |
 | Check session | `cli-anything-minierp auth status` |
 | Change password | `cli-anything-minierp auth change-password --current old --new new` |
@@ -155,6 +155,8 @@ The CLI maintains session state in `~/.cli-anything-minierp/session.json`:
 ```json
 {
   "base_url": "http://localhost:3010/api",
+  // Port note: Backend serves on 3011 in run.sh. Vite proxies /api from 3010→3011.
+  // Direct backend access uses 3011; frontend dev mode uses 3010 (via proxy).
   "token": "eyJhbGciOiJIUzI1NiIs...",
   "username": "admin",
   "context": null
@@ -164,8 +166,9 @@ The CLI maintains session state in `~/.cli-anything-minierp/session.json`:
 ### Session Commands
 
 ```bash
-# Login saves token
+# Login saves token (replace with actual credentials)
 cli-anything-minierp auth login -u admin -p admin123
+# ⚠️ Default credentials above are for development only — change in production
 
 # Status shows current session
 cli-anything-minierp auth status
@@ -205,10 +208,13 @@ The CLI requires a running Mini ERP server:
 cd /path/to/minierp/server
 npm start
 
-# Server runs at http://localhost:3010/api
+# Server runs at http://localhost:3011 (direct backend port)
+# CLI connects via proxy at http://localhost:3010/api (Vite dev server proxies to 3011)
 ```
 
-### Default Credentials
+### Default Credentials (Development Only)
+
+> **Security note:** These are development defaults. In production, change credentials immediately via `users reset-password` or environment variables.
 
 - Username: `admin`
 - Password: `admin123`
