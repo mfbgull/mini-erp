@@ -74,7 +74,7 @@ export default function DSOReport() {
     // Prepare data for export
     const exportData = [
       { metric: 'Days Sales Outstanding', value: reportData.dso },
-      { metric: 'Period (days)', value: reportData.period },
+      { metric: 'Period', value: reportData.period ? `${reportData.period.startDate} to ${reportData.period.endDate}` : '' },
       { metric: 'Total Sales', value: reportData.totalSales },
       { metric: 'Total AR', value: reportData.totalAR },
       { metric: 'Avg. Invoice Value', value: reportData.avgInvoiceValue }
@@ -93,7 +93,7 @@ export default function DSOReport() {
           // Format as currency for monetary values, regular number for DSO and period
           if (['Total Sales', 'Total AR', 'Avg. Invoice Value'].includes(params.row?.metric)) {
             return formatCurrency(params.value);
-          } else if (params.row?.metric === 'Days Sales Outstanding' || params.row?.metric === 'Period (days)') {
+          } else if (params.row?.metric === 'Days Sales Outstanding' || params.row?.metric === 'Period') {
             return params.value;
           }
           return params.value;
@@ -239,8 +239,8 @@ export default function DSOReport() {
             <div className="detail-card">
               <h4>Financial Data</h4>
               <div className="detail-item">
-                <span className="detail-label">Period (days):</span>
-                <span className="detail-value">{reportData.period}</span>
+                <span className="detail-label">Period:</span>
+                <span className="detail-value">{reportData.period?.startDate} to {reportData.period?.endDate}</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Total Sales:</span>
@@ -262,7 +262,7 @@ export default function DSOReport() {
                 <p>DSO = (Total Accounts Receivable ÷ Total Credit Sales) × Number of Days</p>
                 <p className="dso-calculation">
                   {reportData.calculation || 
-                    `DSO = (${formatCurrency(reportData.totalAR || 0)} ÷ ${formatCurrency(reportData.totalSales || 0)}) × ${reportData.period} = ${reportData.dso} days`}
+                    `DSO = (${formatCurrency(reportData.totalAR || 0)} ÷ ${formatCurrency(reportData.totalSales || 0)}) × ${reportData.period?.startDate || '...'} to ${reportData.period?.endDate || '...'} = ${reportData.dso} days`}
                 </p>
               </div>
               <div className="dso-analysis">
