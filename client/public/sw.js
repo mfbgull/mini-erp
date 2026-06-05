@@ -1,5 +1,6 @@
 // Mini ERP Service Worker
-const CACHE_NAME = 'minierp-cache-v1';
+// Note: Bump CACHE_NAME to force replacement of old cached service workers
+const CACHE_NAME = 'minierp-cache-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -35,20 +36,31 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache or network
+// Fetch event - network-first with selective caching
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
+  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
+  const url = new URL(event.request.url);
+
+  // Never cache JS files — prevents stale bundle conflicts with HMR
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.mjs')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   // Skip API requests
-  if (event.request.url.includes('/api/')) return;
+  if (url.pathname.startsWith('/api/')) return;
+
+  // Skip Vite HMR WebSocket and hot-update files
+  if (url.pathname.includes('hot-update')) return;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
       // Return cached version or fetch from network
       return cached || fetch(event.request).then((response) => {
-        // Cache new requests that are successful
-        if (response.status === 200) {
+        // Only cache successful responses for static assets
+        if (response.status === 200 && !url.pathname.endsWith('.js') && !url.pathname.endsWith('.mjs')) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseClone);

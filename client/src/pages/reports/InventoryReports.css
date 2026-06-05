@@ -3,6 +3,7 @@
 .low-stock-report,
 .stock-valuation-report,
 .inventory-movement-report {
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--space-md);

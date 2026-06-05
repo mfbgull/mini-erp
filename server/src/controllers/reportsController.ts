@@ -15,9 +15,17 @@ function getARAgingReport(req: Request, res: Response): void {
 
 function getCustomerStatements(req: Request, res: Response): void {
   try {
-    const { customerId } = req.query;
-    if (!customerId) { res.status(400).json({ success: false, error: 'customerId is required' }); return; }
-    const statements = ReportsModel.getCustomerStatements(db, parseInt(customerId as string, 10));
+    const customerId = String(req.query.customerId || '');
+    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
+      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
+    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
+      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const statements = ReportsModel.getCustomerStatements(
+      db,
+      parseInt(customerId, 10) || 0,
+      startDate || undefined,
+      endDate || undefined
+    );
     res.json({ success: true, data: statements });
   } catch (error) {
     logger.error('Error fetching customer statements:', error);

@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
-import SummaryCard from '../../components/common/SummaryCard';
+import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
 import DateRangePicker from '../../components/common/DateRangePicker';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';

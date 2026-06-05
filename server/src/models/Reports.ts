@@ -39,11 +39,53 @@ function getARAgingReport(asOfDate: string, db: Database.Database) {
 }
 
 // Moved from reportsController
-function getCustomerStatements(db: Database.Database, customerId: number) {
-  const rows = db.prepare(`
-    SELECT i.invoice_no, i.invoice_date, i.due_date, i.total_amount, i.paid_amount, i.balance_amount, i.status
-    FROM invoices i WHERE i.customer_id = ? AND i.balance_amount > 0 ORDER BY i.invoice_date DESC
-  `).all(customerId);
+function getCustomerStatements(db: Database.Database, customerId: number, startDate?: string, endDate?: string) {
+  let query: string;
+  let params: any[];
+
+  if (customerId) {
+    query = `
+      SELECT c.id as customer_id, c.customer_name, c.customer_code,
+        COALESCE(c.opening_balance, 0) as opening_balance,
+        COALESCE(SUM(i.total_amount), 0) as total_debits,
+        COALESCE(SUM(i.paid_amount), 0) as total_credits,
+        COALESCE(SUM(i.balance_amount), 0) as closing_balance,
+        COUNT(i.id) as invoice_count,
+        COALESCE(SUM(i.total_amount), 0) as total_amount,
+        COALESCE(SUM(i.paid_amount), 0) as paid_amount,
+        COALESCE(SUM(i.balance_amount), 0) as balance,
+        MAX(i.invoice_date) as last_invoice_date
+      FROM customers c
+      LEFT JOIN invoices i ON i.customer_id = c.id
+      WHERE c.id = ?
+    `;
+    params = [customerId];
+  } else {
+    query = `
+      SELECT c.id as customer_id, c.customer_name, c.customer_code,
+        COALESCE(c.opening_balance, 0) as opening_balance,
+        COALESCE(SUM(i.total_amount), 0) as total_debits,
+        COALESCE(SUM(i.paid_amount), 0) as total_credits,
+        COALESCE(SUM(i.balance_amount), 0) as closing_balance,
+        COUNT(i.id) as invoice_count,
+        COALESCE(SUM(i.total_amount), 0) as total_amount,
+        COALESCE(SUM(i.paid_amount), 0) as paid_amount,
+        COALESCE(SUM(i.balance_amount), 0) as balance,
+        MAX(i.invoice_date) as last_invoice_date
+      FROM customers c
+      LEFT JOIN invoices i ON i.customer_id = c.id
+    `;
+    params = [];
+  }
+
+  if (startDate && endDate) {
+    query += customerId ? ` AND i.invoice_date BETWEEN ? AND ?` : ` AND (i.invoice_date BETWEEN ? AND ? OR i.id IS NULL)`;
+    params.push(startDate, endDate);
+  }
+
+  query += ` GROUP BY c.id ORDER BY c.customer_name`;
+
+  const rows = db.prepare(query).all(...params);
   return { statements: rows };
 }
 

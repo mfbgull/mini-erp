@@ -28,7 +28,7 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function CustomerStatementsReport() {
   const [dateRange, setDateRange] = useState({
-    fromDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
+    fromDate: new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split('T')[0],
     toDate: new Date().toISOString().split('T')[0]
   });
   const [customerId, setCustomerId] = useState('');

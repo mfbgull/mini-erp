@@ -39,9 +39,24 @@ if (savedLocale && typeof document !== 'undefined') {
 }
 
 // Register service worker for PWA support (production only)
-// Disabled in development to avoid cache conflicts with HMR
+// In development, clean up any stale service worker from previous sessions
+// to prevent cache conflicts with HMR
 if (import.meta.env.PROD) {
   registerServiceWorker();
+} else if ('serviceWorker' in navigator) {
+  // Unregister any stale service worker left from production build
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for (let registration of registrations) {
+      registration.unregister();
+      console.log('Unregistered stale service worker');
+    }
+  });
+  // Also clear any cached responses
+  caches.keys().then(function(names) {
+    for (let name of names) {
+      caches.delete(name);
+    }
+  });
 }
 
 const rootElement = document.getElementById('root')

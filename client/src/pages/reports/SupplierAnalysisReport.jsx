@@ -32,7 +32,7 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function SupplierAnalysisReport() {
   const [dateRange, setDateRange] = useState({
-    fromDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
+    fromDate: new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split('T')[0],
     toDate: new Date().toISOString().split('T')[0]
   });
   const [showFilters, setShowFilters] = useState(false);
@@ -329,7 +329,7 @@ export default function SupplierAnalysisReport() {
                 >
                   <div className="supplier-analysis-card-content">
                     <h3 className="supplier-analysis-name">{supplier.supplier_name}</h3>
-                    <span className="supplier-analysis-amount">{formatCurrency(supplier.total_purchases || 0)}</span>
+                    <span className="supplier-analysis-amount">{formatCurrency(supplier.total_purchase_value || 0)}</span>
                   </div>
                 </div>
               ))}
@@ -382,7 +382,7 @@ export default function SupplierAnalysisReport() {
                       <DollarSign size={14} />
                       Total Purchases
                     </span>
-                    <span className="supplier-detail-value">{formatCurrency(selectedSupplier.total_purchases || 0)}</span>
+                    <span className="supplier-detail-value">{formatCurrency(selectedSupplier.total_purchase_value || 0)}</span>
                   </div>
 
                   <div className="supplier-detail-item">
@@ -390,7 +390,7 @@ export default function SupplierAnalysisReport() {
                       <TrendingUpIcon size={14} />
                       Average Order Value
                     </span>
-                    <span className="supplier-detail-value">{formatCurrency(selectedSupplier.avg_order_value || 0)}</span>
+                    <span className="supplier-detail-value">{formatCurrency(selectedSupplier.average_order_value || 0)}</span>
                   </div>
 
                   <div className="supplier-detail-item">

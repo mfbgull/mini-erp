@@ -1,4 +1,5 @@
 .ar-reports-page {
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--space-md);
@@ -2559,6 +2560,7 @@
 .low-stock-report,
 .stock-valuation-report,
 .inventory-movement-report {
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--space-md);
@@ -4505,6 +4507,7 @@
 .sales-summary-report,
 .sales-by-customer-report,
 .sales-by-item-report {
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--space-md);

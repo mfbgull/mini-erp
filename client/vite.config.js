@@ -6,6 +6,12 @@ export default defineConfig({
   server: {
     host: true,        // listen on 0.0.0.0 (external access)
     port: 3010,
+    // Force HMR to use localhost so Firefox can connect via WebSocket
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      port: 3010
+    },
     // SECURITY: Restrict allowed hosts in production via env var
     // In dev, allow localhost. In production, should be set explicitly.
     allowedHosts: process.env.VITE_ALLOWED_HOSTS
