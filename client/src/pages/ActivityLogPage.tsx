@@ -8,6 +8,7 @@ import DataTable from '../components/common/DataTable';
 import Modal from '../components/common/Modal';
 import StatCard, { StatsGrid } from '../components/common/StatCard';
 import { useActivityLogs, useEntityTypes, useActions, useUsers, useActivityStats } from '../context/ActivityLogContext';
+import type { Activity } from '../types';
 
 import './ActivityLog.css';
 

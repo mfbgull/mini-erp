@@ -22,10 +22,21 @@ except ImportError:
 
 # ── Constants ─────────────────────────────────────────────────────────
 
-DEFAULT_BASE_URL = os.environ.get("MINIERP_URL", "http://localhost:3010/api")
 SESSION_DIR = Path.home() / ".cli-anything-minierp"
 SESSION_FILE = SESSION_DIR / "session.json"
 UNDO_MAX = 50
+
+_DEFAULT_BASE_URL = "http://localhost:3011/api"
+
+
+def get_default_base_url() -> str:
+    """Return the default base URL, respecting the MINIERP_URL env var.
+
+    Unlike a module-level constant this is resolved at call time, so
+    code that sets os.environ["MINIERP_URL"] at runtime (e.g. the --url
+    CLI flag) actually takes effect.
+    """
+    return os.environ.get("MINIERP_URL", _DEFAULT_BASE_URL).rstrip("/")
 
 
 # ── Session state ─────────────────────────────────────────────────────
@@ -35,7 +46,7 @@ class ERPSession:
     """Persistent session: cookie-based auth + server URL + undo/redo stack."""
 
     def __init__(self):
-        self.base_url: str = DEFAULT_BASE_URL
+        self.base_url: str = get_default_base_url()
         self.username: Optional[str] = None
         self.context: Optional[str] = None
         self._undo_stack: list[dict] = []
@@ -53,7 +64,7 @@ class ERPSession:
         }
 
     def from_dict(self, data: dict) -> None:
-        self.base_url = data.get("base_url", DEFAULT_BASE_URL)
+        self.base_url = data.get("base_url", get_default_base_url())
         self.username = data.get("username")
         self.context = data.get("context")
         self._cookies = data.get("cookies", {})
@@ -128,7 +139,13 @@ def get_session() -> ERPSession:
 
 
 def load_session() -> ERPSession:
+    """Load session from disk.  Env var MINIERP_URL overrides the file value."""
     _session.load()
+    # --url on the CLI maps to MINIERP_URL via Click's envvar mechanism.
+    # Override whatever the session file had so the flag always wins.
+    env_url = os.environ.get("MINIERP_URL")
+    if env_url:
+        _session.base_url = env_url
     return _session
 
 
@@ -143,7 +160,7 @@ class ERPClient:
             raise RuntimeError(
                 "The 'requests' library is required. Install with: pip install requests"
             )
-        self.base_url = (base_url or DEFAULT_BASE_URL).rstrip("/")
+        self.base_url = (base_url or get_default_base_url()).rstrip("/")
         self.cookies = cookies or {}
         self.session = requests.Session()
 
@@ -256,9 +273,10 @@ def make_client(require_auth: bool = True) -> ERPClient:
 
 
 def login_and_get_client(
-    username: str, password: str, base_url: str = DEFAULT_BASE_URL
+    username: str, password: str
 ) -> tuple[dict, ERPClient]:
     """Login and return user data and authenticated client."""
+    base_url = get_default_base_url()
     client = ERPClient(base_url=base_url)
     data = client.post("/auth/login", body={"username": username, "password": password})
 

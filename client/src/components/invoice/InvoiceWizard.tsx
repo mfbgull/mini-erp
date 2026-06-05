@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 
 import { X, User, Package, DollarSign, Check, ChevronRight, ChevronLeft } from 'lucide-react';
 
-import type { Invoice, Customer, InvoiceItem, Item } from '../../types';
+import type { Invoice, Customer, Item } from '../../types';
 import api from '../../utils/api';
 import { handleError } from '../../utils/errors';
 import Button from '../common/Button';
@@ -31,7 +31,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
   const [customers, setCustomers] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
+  const [invoiceItems, setInvoiceItems] = useState<LocalInvoiceItem[]>([]);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [taxPercent, setTaxPercent] = useState(10);
   const [createdInvoice, setCreatedInvoice] = useState<any>(null);
@@ -130,7 +130,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
               <div className="item-info">
                 <span className="item-name">{item.item_name}</span>
                 <span className="item-code">{item.item_code}</span>
-                <span className="item-price">${parseFloat(item.standard_price || 0).toFixed(2)}</span>
+                <span className="item-price">${(item.standard_price || 0).toFixed(2)}</span>
               </div>
               <div className="item-quantity">
                 <input
@@ -143,7 +143,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
                     if (qty === 0) {
                       setInvoiceItems(invoiceItems.filter(ii => ii.item_id !== item.id));
                     } else {
-                      const total = qty * parseFloat(item.standard_price || 0);
+                      const total = qty * (item.standard_price || 0);
                       if (existingItem) {
                         setInvoiceItems(invoiceItems.map(ii =>
                           ii.item_id === item.id ? { ...ii, quantity: qty, total } : ii
@@ -154,7 +154,7 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
                           item_name: item.item_name,
                           item_code: item.item_code,
                           quantity: qty,
-                          unit_price: parseFloat(item.standard_price || 0),
+                          unit_price: item.standard_price || 0,
                           total
                         }]);
                       }

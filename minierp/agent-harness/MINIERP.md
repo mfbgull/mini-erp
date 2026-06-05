@@ -154,7 +154,7 @@ The CLI maintains session state in `~/.cli-anything-minierp/session.json`:
 
 ```json
 {
-  "base_url": "http://localhost:3010/api",
+  "base_url": "http://localhost:3011/api",
   // Port note: Backend serves on 3011 in run.sh. Vite proxies /api from 3010→3011.
   // Direct backend access uses 3011; frontend dev mode uses 3010 (via proxy).
   "token": "eyJhbGciOiJIUzI1NiIs...",

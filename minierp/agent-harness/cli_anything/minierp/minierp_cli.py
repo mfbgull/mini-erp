@@ -71,7 +71,7 @@ def _handle_error(exc: Exception, ctx: Optional[click.Context] = None) -> None:
     "--url",
     default=None,
     envvar="MINIERP_URL",
-    help="Mini ERP server URL (default: http://localhost:3010/api).",
+    help="Mini ERP server URL (default: http://localhost:3011/api).",
 )
 @click.version_option("1.1.0", prog_name="cli-anything-minierp")
 @click.pass_context
@@ -90,10 +90,12 @@ def cli(ctx: click.Context, output_json: bool, url: Optional[str]) -> None:
     ctx.ensure_object(dict)
     ctx.obj["json"] = output_json
 
-    # Override base URL if provided
+    # Override base URL if provided — also push into env so
+    # load_session() / make_client() pick it up.
     if url:
         sess = get_session()
         sess.base_url = url
+        os.environ["MINIERP_URL"] = url
 
     if ctx.invoked_subcommand is None:
         ctx.invoke(repl)
@@ -424,10 +426,10 @@ def auth_login(
 ) -> None:
     """Log in and save session token."""
     from cli_anything.minierp.core.session import login
-    from cli_anything.minierp.utils.erp_backend import DEFAULT_BASE_URL
+    from cli_anything.minierp.utils.erp_backend import get_default_base_url
 
     try:
-        result = login(username, password, base_url=url or DEFAULT_BASE_URL)
+        result = login(username, password, base_url=url or get_default_base_url())
         _ok(ctx, f"Logged in as {result['username']}", result)
     except ERPError as e:
         _handle_error(e, ctx)

@@ -109,7 +109,7 @@ export const exportToPDF = (
       .map(col => {
         let value = row[col.field];
         if (col.field.includes('date') && value) {
-          value = new Date(value).toLocaleDateString();
+          value = new Date(value as string | number | Date).toLocaleDateString();
         }
         else if (col.valueFormatter && typeof col.valueFormatter === 'function') {
           value = col.valueFormatter({ value });
@@ -122,10 +122,10 @@ export const exportToPDF = (
   columns
     .filter(col => col.headerName && col.field !== 'actions')
     .forEach((col, index) => {
-      const style: Record<string, string> = {};
+      const style: Record<string, string | number> = {};
 
       if (col.width) {
-        style.cellWidth = col.width;
+        style.cellWidth = col.width as string | number;
       }
 
       if (col.field === 'amount' || col.field.includes('amount') || col.field.includes('total') ||
@@ -163,8 +163,8 @@ export const exportToPDF = (
     theme: 'grid',
     showHead: 'everyPage',
     margin: { top: margin, left: margin, right: margin, bottom: 15 },
-    didDrawPage: (data: { cursor: { y: number } }) => {
-      const pageCount = (doc.internal as { getNumberOfPages: () => number }).getNumberOfPages();
+    didDrawPage: (data: { cursor: { y: number }; pageNumber: number }) => {
+      const pageCount = (doc.internal as any).getNumberOfPages?.() || 1;
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
       doc.text(
@@ -196,7 +196,7 @@ export const exportToExcel = (
       .map(col => {
         let value = row[col.field];
         if (col.field.includes('date') && value) {
-          value = new Date(value).toLocaleDateString();
+          value = new Date(value as string | number | Date).toLocaleDateString();
         }
         else if (col.valueFormatter && typeof col.valueFormatter === 'function') {
           value = col.valueFormatter({ value });

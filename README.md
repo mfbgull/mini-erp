@@ -16,7 +16,7 @@ A complete, production-ready ERP solution for small to medium businesses.
 # Install dependencies
 cd server && npm install && cd ../client && npm install
 
-# Start backend (port 3010)
+# Start backend (port 3011)
 cd server && npm start
 
 # Start frontend (port 5173)
@@ -62,7 +62,7 @@ mini-erp/
 
 ## API Base
 
-`http://localhost:3010/api`
+`http://localhost:3011/api`
 
 ## Security
 

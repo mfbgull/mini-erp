@@ -189,7 +189,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
       onClose();
     },
     onError: (error: unknown) => {
-      const errorMsg = (error as { response?: { data?: { error?: string } } })?.response?.data?.error?.data?.error || 'Failed to record payment';
+      const errorMsg = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to record payment';
       toast.error(errorMsg);
     }
   });

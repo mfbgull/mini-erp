@@ -7,8 +7,7 @@ import './CompactUserCard.css';
 function CompactUserCard({ user, onEdit, onDelete, onToggleStatus, onResetPassword }) {
   const [showMenu, setShowMenu] = useState(false);
 
-  const handleCardClick = (e) => {
-    if (e.target.closest('.menu-container')) return;
+  const handleCardClick = () => {
     // Could expand to show more details
   };
 

@@ -11,7 +11,6 @@ import { useSettings } from '../../context/SettingsContext';
 import { mobileInvoiceApi } from '../../utils/invoiceApi';
 
 
-import '../../styles/pages/invoice.css';
 
 export default function InvoiceStep5Review() {
   const navigate = useNavigate();
@@ -91,7 +90,7 @@ export default function InvoiceStep5Review() {
       }
     } catch (error: unknown) {
       console.error('Error creating invoice:', error);
-      toast.error(error.response?.data?.error || 'Failed to create invoice');
+      toast.error((error as any).response?.data?.error || 'Failed to create invoice');
     }
   };
 
@@ -134,7 +133,7 @@ export default function InvoiceStep5Review() {
           <div
             className={`miw-added-items-list ${isItemsExpanded ? 'miw-items-list-expanded-short' : 'miw-items-list-collapsed'}`}
           >
-            {items.map((item: InvoiceItem, index: number) => (
+            {items.map((item, index) => (
               <div 
                 key={item.id} 
                 className="miw-added-item"

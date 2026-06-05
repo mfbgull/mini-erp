@@ -77,7 +77,6 @@ h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: 
 
 .main-content.topmenu-active {
   margin-left: 0;
-  background-color: #0A0F0D !important;
 }
 
 .main-content.sidebar-active {

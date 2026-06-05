@@ -113,5 +113,11 @@ def get_data_dictionary() -> dict:
 
 def run_health_check() -> dict:
     """Run system health check."""
-    client = make_client()
-    return client.get("/utils/health-check")
+    import requests as _requests
+    from cli_anything.minierp.utils.erp_backend import get_default_base_url
+    base = get_default_base_url()
+    # Strip /api suffix if present since /health is at root
+    server_root = base.replace("/api", "").rstrip("/")
+    resp = _requests.get(f"{server_root}/health", timeout=10)
+    resp.raise_for_status()
+    return resp.json()

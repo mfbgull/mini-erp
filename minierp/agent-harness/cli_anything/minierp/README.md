@@ -297,10 +297,10 @@ Output:
 
 ## Environment Variables
 
-- `MINIERP_URL` - Server URL (default: `http://localhost:3010/api`)
+- `MINIERP_URL` - Server URL (default: `http://localhost:3011/api`)
 
 ```bash
-export MINIERP_URL=http://192.168.1.100:3010/api
+export MINIERP_URL=http://192.168.1.100:3011/api
 cli-anything-minierp auth login -u admin -p admin123
 ```
 
@@ -350,7 +350,7 @@ The CLI stores session data in `~/.cli-anything-minierp/session.json`:
 
 ```json
 {
-  "base_url": "http://localhost:3010/api",
+  "base_url": "http://localhost:3011/api",
   "token": "eyJhbGciOiJIUzI1NiIs...",
   "username": "admin"
 }

@@ -73,7 +73,7 @@ function DataTable<T = Record<string, unknown>>({ columns, data, onRowClick, cla
           ) : (
             sortedData.map((row, index) => (
               <tr
-                key={(row as Record<string, unknown>).id || index}
+                key={String((row as Record<string, unknown>).id ?? index)}
                 onClick={() => onRowClick && onRowClick(row)}
                 className={onRowClick ? 'clickable' : ''}
               >

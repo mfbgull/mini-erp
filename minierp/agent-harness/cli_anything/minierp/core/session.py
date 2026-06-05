@@ -5,20 +5,20 @@ This module bridges the CLI commands with the ERPSession object.
 
 from typing import Optional
 from cli_anything.minierp.utils.erp_backend import (
-    ERPClient,
-    ERPSession,
-    make_client,
-    get_session,
     load_session,
+    make_client,
     login_and_get_client,
+    get_default_base_url,
     AuthenticationError,
-    DEFAULT_BASE_URL,
+    ServerNotRunningError,
 )
 
 
-def login(username: str, password: str, base_url: str = DEFAULT_BASE_URL) -> dict:
+def login(username: str, password: str, base_url: Optional[str] = None) -> dict:
     """Authenticate and persist session."""
-    user_data, client = login_and_get_client(username, password, base_url)
+    if not base_url:
+        base_url = get_default_base_url()
+    user_data, client = login_and_get_client(username, password)
     return {"username": username, "base_url": base_url}
 
 

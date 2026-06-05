@@ -103,7 +103,7 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
       onSuccess();
     },
     onError: (error: Error) => {
-      toast.error(error.response?.data?.error || 'Failed to save item');
+      toast.error((error as any).response?.data?.error || 'Failed to save item');
     }
   });
 

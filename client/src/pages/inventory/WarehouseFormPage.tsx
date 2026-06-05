@@ -52,7 +52,7 @@ export default function WarehouseForm({ warehouse, onClose, onSuccess }: Warehou
       onSuccess();
     },
     onError: (error: Error) => {
-      toast.error(error.response?.data?.error || 'Failed to save warehouse');
+      toast.error((error as any).response?.data?.error || 'Failed to save warehouse');
     }
   });
 

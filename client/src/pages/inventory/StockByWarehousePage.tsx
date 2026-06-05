@@ -13,6 +13,7 @@ import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { useTranslation } from "../../hooks/useTranslation";
 import api from "../../utils/api";
+import type { Warehouse } from "../../types";
 import "./StockByWarehousePage.css";
 
 export default function StockByWarehousePage() {
@@ -314,7 +315,7 @@ export default function StockByWarehousePage() {
             <SearchableSelect
               name="warehouse"
               value={selectedWarehouseId}
-              onChange={(e) => setSelectedWarehouseId(e.target.value)}
+              onChange={(e) => setSelectedWarehouseId(e.target.value as string | number)}
               options={warehouseOptions}
               placeholder={t('stockByWarehouse.allWarehouses')}
             />

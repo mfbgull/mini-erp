@@ -1,6 +1,7 @@
 import api from './api';
+import type { InvoiceItem, Invoice } from '../types';
 
-// ============================================
+// Mock local API for mobile invoice flow
 // Types
 // ============================================
 

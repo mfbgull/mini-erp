@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, CreditCard } from 'lucide-react';
 
 import StickyFooter from './components/StickyFooter';
 import { useInvoice } from '../../context/InvoiceContext';
+
 import '../../styles/pages/invoice.css';
 
 export default function InvoiceStep4Payment() {
@@ -119,7 +120,7 @@ export default function InvoiceStep4Payment() {
           <div
             className={`miw-added-items-list ${isItemsExpanded ? 'miw-items-list-expanded-short' : 'miw-items-list-collapsed'}`}
           >
-            {items.map((item: InvoiceItem, index: number) => (
+            {items.map((item, index) => (
               <div 
                 key={item.id} 
                 className="miw-added-item"
@@ -167,7 +168,7 @@ export default function InvoiceStep4Payment() {
                 value={payment.method}
                 onChange={(e) => handlePaymentChange('method', e.target.value)}
               >
-                {paymentMethods.map((method: PaymentMethod) => (
+                {paymentMethods.map((method) => (
                   <option key={method.id} value={method.name}>
                     {method.name}
                   </option>

@@ -13,7 +13,7 @@ function CompactRoleCard({ role, onEdit, onDelete, onEditPermissions }) {
 
   return (
     <Card variant="compact" hoverable className="compact-role-card">
-      <Card.Row justify="space-between" align="flex-start" className="card-content-clickable">
+      <Card.Row justify="space-between" align="start" className="card-content-clickable">
         <div className="role-info-section">
           <div className="role-header">
             <div className="role-avatar">

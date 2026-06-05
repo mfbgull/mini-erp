@@ -1,4 +1,9 @@
+/**
+ * AG-Grid integration utilities.
+ * Imports and registers AG-Grid modules and CSS.
+ */
 import { GridApi } from 'ag-grid-community';
+import './registerAgGrid';
 
 export function isAGGridEditing(api: GridApi | null): boolean {
   if (!api) return false;

@@ -321,6 +321,7 @@ cli-anything-minierp integrations settings/update/test-email/weather/exchange-ra
 | Balance sheet | `cli-anything-minierp reports balance-sheet --as-of YYYY-MM-DD` |
 | Create backup | `cli-anything-minierp utils backup --name "backup-name"` |
 | Health check | `cli-anything-minierp utils health-check` |
+| Default dev credentials | `admin` / `admin123` (for http://localhost:3011/api) |
 
 ---
 

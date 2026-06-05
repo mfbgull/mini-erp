@@ -5,10 +5,10 @@ import ur from '../locales/ur.json';
 
 type LocaleData = typeof en;
 
-const locales: Record<string, LocaleData> = {
+const locales = {
   en,
-  ur
-} as const;
+  ur: ur as Record<string, unknown>,
+} as Record<string, Record<string, unknown>>;
 
 type TranslationKey = string;
 

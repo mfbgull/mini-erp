@@ -23,6 +23,46 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 1200, // AG-Grid is ~1.1MB — suppress warning
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // AG-Grid is the heaviest dependency — split community and react
+          if (id.includes('ag-grid-community')) {
+            return 'vendor-ag-grid-community';
+          }
+          if (id.includes('ag-grid-react')) {
+            return 'vendor-ag-grid-react';
+          }
+          // PDF generation
+          if (id.includes('jspdf') || id.includes('html2canvas')) {
+            return 'vendor-pdf';
+          }
+          // Charting libraries
+          if (id.includes('chart.js') || id.includes('recharts') || id.includes('react-chartjs-2')) {
+            return 'vendor-charts';
+          }
+          // React core
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/scheduler')) {
+            return 'vendor-react';
+          }
+          // Routing
+          if (id.includes('react-router-dom') || id.includes('react-router')) {
+            return 'vendor-router';
+          }
+          // Query / data fetching
+          if (id.includes('@tanstack') || id.includes('axios')) {
+            return 'vendor-data';
+          }
+          // Other large deps
+          if (id.includes('node_modules/') && (id.includes('date-fns') || id.includes('zod') || id.includes('react-hot-toast'))) {
+            return 'vendor-misc';
+          }
+        }
+      }
+    }
   }
 })
 

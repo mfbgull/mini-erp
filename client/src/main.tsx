@@ -1,9 +1,11 @@
 import React from 'react'
 
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community'
+import ReactDOM from 'react-dom/client'
+
+// AG-Grid CSS must be loaded upfront (all pages may use grids)
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
-import ReactDOM from 'react-dom/client'
+import './utils/registerAgGrid'
 
 import App from './App'
 import './styles/variables.css'
@@ -27,9 +29,6 @@ import './styles/rtl.css'
 import { registerServiceWorker } from './utils/serviceWorker'
 import './utils/webmcp'
 import './utils/webmcp-mock'
-
-// Register AG Grid Community modules
-ModuleRegistry.registerModules([AllCommunityModule])
 
 // Initialize locale from localStorage
 const savedLocale = localStorage.getItem('minierp_locale');

@@ -2,6 +2,7 @@
 .purchase-orders-page {
   max-width: 100%;
   margin: 0 auto;
+  width: 100%;
 }
 
 .purchase-orders-page .page-header {

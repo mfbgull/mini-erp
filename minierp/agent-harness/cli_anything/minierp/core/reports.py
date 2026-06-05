@@ -4,16 +4,25 @@ from typing import Optional, Any
 from cli_anything.minierp.utils.erp_backend import make_client
 
 
+def _date_params(start_date: Optional[str] = None, end_date: Optional[str] = None) -> dict:
+    """Build query params that match all server endpoint conventions."""
+    params = {}
+    if start_date:
+        params["fromDate"] = start_date
+        params["startDate"] = start_date
+    if end_date:
+        params["toDate"] = end_date
+        params["endDate"] = end_date
+    return params
+
+
 def sales_summary(
     start_date: Optional[str] = None, end_date: Optional[str] = None
 ) -> Any:
     client = make_client()
     return client.get(
         "/reports/sales-summary",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -23,10 +32,7 @@ def sales_by_customer(
     client = make_client()
     return client.get(
         "/reports/sales-by-customer",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -36,10 +42,7 @@ def sales_by_item(
     client = make_client()
     return client.get(
         "/reports/sales-by-item",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -64,10 +67,7 @@ def inventory_movement(
     client = make_client()
     return client.get(
         "/reports/inventory-movement",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -77,10 +77,7 @@ def profit_loss(
     client = make_client()
     return client.get(
         "/reports/profit-loss",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -88,10 +85,7 @@ def cash_flow(start_date: Optional[str] = None, end_date: Optional[str] = None) 
     client = make_client()
     return client.get(
         "/reports/cash-flow",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -111,10 +105,7 @@ def purchase_summary(
     client = make_client()
     return client.get(
         "/reports/purchase-summary",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -124,10 +115,7 @@ def production_summary(
     client = make_client()
     return client.get(
         "/reports/production-summary",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -137,10 +125,7 @@ def expenses_report(
     client = make_client()
     return client.get(
         "/reports/expenses",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -162,10 +147,7 @@ def production_efficiency(
     client = make_client()
     return client.get(
         "/reports/production-efficiency",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -176,10 +158,7 @@ def gross_profit_analysis(
     client = make_client()
     return client.get(
         "/reports/gross-profit",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -188,10 +167,7 @@ def daily_sales(start_date: Optional[str] = None, end_date: Optional[str] = None
     client = make_client()
     return client.get(
         "/reports/daily-sales",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -229,10 +205,7 @@ def general_ledger(
     params = {}
     if account_id:
         params["account_id"] = account_id
-    if start_date:
-        params["start_date"] = start_date
-    if end_date:
-        params["end_date"] = end_date
+    params.update(_date_params(start_date, end_date))
     return client.get("/reports/general-ledger", params=params)
 
 
@@ -249,10 +222,7 @@ def income_statement(
     client = make_client()
     return client.get(
         "/reports/income-statement",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 
@@ -263,10 +233,7 @@ def tax_summary(
     client = make_client()
     return client.get(
         "/reports/tax-summary",
-        params={
-            "start_date": start_date,
-            "end_date": end_date,
-        },
+        params=_date_params(start_date, end_date),
     )
 
 

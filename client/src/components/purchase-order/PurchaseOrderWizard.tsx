@@ -246,7 +246,7 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
                 <span className="item-name">{item.item_name}</span>
                 <span className="item-code">{item.item_code}</span>
                 <span className="item-price">
-                  Cost: ${parseFloat(item.standard_cost || item.purchase_price || 0).toFixed(2)}
+                  Cost: ${(item.standard_cost || item.purchase_price || 0).toFixed(2)}
                 </span>
               </div>
               <div className="item-quantity">
@@ -257,7 +257,7 @@ export function PurchaseOrderWizard({ isOpen, onClose }: PurchaseOrderWizardProp
                   value={existingItem?.quantity || ''}
                   onChange={(e) => {
                     const qty = parseFloat(e.target.value) || 0;
-                    const unitPrice = parseFloat(item.standard_cost || item.purchase_price || 0);
+                    const unitPrice = item.standard_cost || item.purchase_price || 0;
                     if (qty === 0) {
                       setPoItems(poItems.filter(pi => pi.item_id !== item.id));
                     } else {

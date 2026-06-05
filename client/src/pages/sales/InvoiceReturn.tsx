@@ -56,7 +56,8 @@ interface InvoiceReturnProps {
 export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: InvoiceReturnProps) {
   const [returnItems, setReturnItems] = useState<InvoiceReturnItem[]>([]);
   const [reason, setReason] = useState('');
-  const { errors, validate } = useFormValidation(invoiceReturnItemSchema);
+  const { errors: validationErrors, validate } = useFormValidation(invoiceReturnItemSchema);
+  const [returnErrors, setErrors] = useState<Record<number, string>>({});
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Initialize state when items prop changes
@@ -227,7 +228,7 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: Inv
               <div className="items-list">
                 {returnItems.map((item) => {
                   const returnAmount = item.return_quantity * item.unit_price;
-                  const hasError = errors[item.invoice_item_id];
+                  const hasError = returnErrors[item.invoice_item_id];
                   
                   return (
                     <div key={item.invoice_item_id} className={`return-item-row ${item.return_quantity > 0 ? 'selected' : ''} ${hasError ? 'has-error' : ''}`}>

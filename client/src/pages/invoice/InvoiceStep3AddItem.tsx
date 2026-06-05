@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { X, Search, Plus, Minus, ArrowDown, ArrowUp, Check, Edit2, Trash2, MoreVertical, ChevronDown, ChevronUp } from 'lucide-react';
 
 import Button from '../../components/common/Button';
-import { useInvoice } from '../../context/InvoiceContext';
+import { useInvoice, InvoiceItem } from '../../context/InvoiceContext';
 import { mobileInvoiceApi } from '../../utils/invoiceApi';
 import '../../styles/pages/invoice.css';
 
@@ -53,7 +53,7 @@ export default function InvoiceStep3AddItem() {
         if (response.success) {
           setTaxRates(response.data);
           // Set default tax rate
-          const defaultTax = response.data.find((t: TaxRate) => t.is_default);
+          const defaultTax = response.data.find((t) => t.is_default);
           if (defaultTax) {
             setTaxRate(defaultTax.rate);
           }
@@ -144,7 +144,7 @@ export default function InvoiceStep3AddItem() {
   };
 
   // Select item from search
-  const handleSelectItem = (item: InvoiceItem) => {
+  const handleSelectItem = (item: any) => {
     setSelectedItem(item);
     setSearchQuery(item.item_name);
     setUnitPrice(item.price || item.standard_selling_price || 0);
@@ -259,7 +259,7 @@ export default function InvoiceStep3AddItem() {
   };
 
   // Select customer from dialog
-  const handleSelectCustomer = (customerData: Customer) => {
+  const handleSelectCustomer = (customerData: any) => {
     dispatch({
       type: 'SET_CUSTOMER',
       payload: {
@@ -467,7 +467,7 @@ export default function InvoiceStep3AddItem() {
               
               {customerSearchResults.length > 0 && (
                 <div className="miw-customer-dialog-results">
-                  {customerSearchResults.map((c: Customer) => (
+                  {customerSearchResults.map((c) => (
                     <div
                       key={c.id}
                       className="miw-customer-dialog-item"
@@ -564,7 +564,7 @@ export default function InvoiceStep3AddItem() {
                         <div className="miw-item-search-header">Recent Items</div>
                       )}
                       
-                      {!isSearching && searchResults.map((item: InvoiceItem, index: number) => (
+                      {!isSearching && searchResults.map((item, index) => (
                         <div
                           key={item.id}
                           className={`miw-item-search-result ${index === highlightedIndex ? 'highlighted' : ''}`}
@@ -649,7 +649,7 @@ export default function InvoiceStep3AddItem() {
                     value={taxRate}
                     onChange={(e) => setTaxRate(parseFloat(e.target.value))}
                   >
-                    {taxRates.map((rate: TaxRate) => (
+                    {taxRates.map((rate) => (
                       <option key={rate.id} value={rate.rate}>
                         {rate.rate}%
                       </option>

@@ -626,13 +626,13 @@ cli-anything-minierp inventory valuation
 
 ```bash
 # Check if server is running
-curl http://localhost:3010/api/health
+curl http://localhost:3011/api/health
 
 # Test authentication (default dev credentials — change in production)
 cli-anything-minierp auth login -u admin -p admin123
 
 # If using custom URL
-export MINIERP_URL=http://your-server:3010/api
+export MINIERP_URL=http://localhost:3011/api
 cli-anything-minierp auth status
 ```
 
@@ -689,7 +689,7 @@ cli-anything-minierp utils clear-cache
 1. **Never commit credentials**
    ```bash
    # Use environment variables
-   export MINIERP_URL=http://production-server:3010/api
+   export MINIERP_URL=http://localhost:3011/api
    ```
 
 2. **Change default passwords**
