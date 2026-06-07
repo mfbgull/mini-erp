@@ -127,9 +127,9 @@ export default function ProfitLossReport() {
         label: 'Amount',
         data: [
           reportData?.totalRevenue || 0,
-          -(reportData?.totalExpenses || 0), // Negative for expenses
+          -(reportData?.totalCogs || 0),         // COGS as negative (expense)
           reportData?.grossProfit || 0,
-          reportData?.totalCogs || 0,
+          -(reportData?.totalExpenses || 0),     // Expenses as negative (expense)
           reportData?.netProfit || 0
         ],
         backgroundColor: [
