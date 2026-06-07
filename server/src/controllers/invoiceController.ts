@@ -310,6 +310,7 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
     }, userId);
 
     // Insert invoice items and deduct stock via FIFO batch consumption
+    let cogsTotal = 0;
     for (const item of items) {
       const warehouseId = InvoiceModel.findWarehouseForItem(
         db,
@@ -354,6 +355,7 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
           userId,
           db
         );
+        cogsTotal += entry.consumed * entry.unitCost;
       }
     }
 
@@ -385,6 +387,17 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
         userId,
         taxAmount: computedTaxAmount,
       });
+
+      // Post COGS: Dr COGS, Cr Inventory Asset at actual FIFO cost
+      if (cogsTotal > 0) {
+        AccountingService.postCOGSEntry(db, {
+          invoiceId,
+          invoiceNo: invoice_no!,
+          cogsAmount: parseCurrency(cogsTotal),
+          invoiceDate: invoice_date,
+          userId,
+        });
+      }
 
     // --- FIX #2: Payment recording INSIDE transaction ---
     if (record_payment && payment && paymentAmountNum > 0) {

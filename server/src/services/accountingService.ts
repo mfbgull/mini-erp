@@ -440,6 +440,52 @@ export class AccountingService {
   }
 
   // ------------------------------------------------------------------
+  // COGS posting
+  // ------------------------------------------------------------------
+
+  /**
+   * Post COGS (Cost of Goods Sold) for a sales invoice.
+   * Dr COGS (5000), Cr Inventory Asset (1200) at the actual FIFO cost.
+   *
+   * Must be called AFTER stock movements have been recorded so that
+   * the caller can provide the total COGS amount computed from
+   * consumption (sum of consumed qty * unit cost across all batches).
+   */
+  static postCOGSEntry(
+    db: Database.Database,
+    args: {
+      invoiceId: number;
+      invoiceNo: string;
+      cogsAmount: number;
+      invoiceDate: string;
+      userId?: number;
+    }
+  ): PostedEntry | null {
+    if (!args.cogsAmount || args.cogsAmount <= 0) return null;
+
+    const cogs = AccountingService.getAccountByCode(db, '5000');
+    const inventory = AccountingService.getAccountByCode(db, '1200');
+    if (!cogs || !inventory) {
+      throw new Error(
+        'Chart of accounts is missing required accounts: ' +
+        '5000 (COGS) or 1200 (Inventory Asset)'
+      );
+    }
+
+    return AccountingService.postEntry(db, {
+      entry_date: args.invoiceDate,
+      description: `COGS for Invoice ${args.invoiceNo} — ${args.cogsAmount.toFixed(2)}`,
+      reference_type: 'INVOICE',
+      reference_id: args.invoiceId,
+      created_by: args.userId,
+      lines: [
+        { account_id: cogs.id, debit: args.cogsAmount, description: `COGS for ${args.invoiceNo}` },
+        { account_id: inventory.id, credit: args.cogsAmount, description: `Inventory relieved for ${args.invoiceNo}` },
+      ],
+    });
+  }
+
+  // ------------------------------------------------------------------
   // Void / reversal
   // ------------------------------------------------------------------
 
