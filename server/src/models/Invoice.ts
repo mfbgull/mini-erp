@@ -63,6 +63,13 @@ export interface CreateInvoiceDTO {
   discount_type?: string;
   discount_value?: number;
   total_amount?: number;
+  // Optional overrides for the monetary columns. When omitted, the model
+  // defaults to paid_amount=0 / balance_amount=total_amount, which is
+  // correct for invoices created without an initial payment. When a
+  // payment is recorded as part of the same request, the caller MUST
+  // pass these so the invoice's amounts reflect the recorded payment.
+  paid_amount?: number;
+  balance_amount?: number;
 }
 
 export interface CreateInvoiceItemDTO {
@@ -515,6 +522,17 @@ class InvoiceModel {
    * Create a new invoice
    */
   static createInvoice(db: Database.Database, data: CreateInvoiceDTO, userId: number): number {
+    // CRITICAL-1 fix: when the caller supplies paid_amount/balance_amount
+    // overrides (e.g., an initial payment was recorded as part of the
+    // same request), honor them. Otherwise default to 0 paid and the
+    // full total as balance. This is critical for A/R correctness:
+    // every invoice created with an initial payment was previously
+    // saved with paid=0/balance=total, which left the monetary
+    // columns inconsistent with the recorded payment_allocations.
+    const totalAmount = data.total_amount ?? 0;
+    const paidAmount = data.paid_amount ?? 0;
+    const balanceAmount = data.balance_amount ?? Math.max(0, totalAmount - paidAmount);
+
     const result = db.prepare(`
       INSERT INTO invoices (
         invoice_no, customer_id, invoice_date, due_date, status,
@@ -529,9 +547,9 @@ class InvoiceModel {
       data.invoice_date,
       data.due_date || null,
       data.status || 'Unpaid',
-      data.total_amount,
-      0, // paid_amount
-      data.total_amount, // balance_amount
+      totalAmount,
+      paidAmount,
+      balanceAmount,
       data.notes || null,
       data.discount_scope || 'invoice',
       data.discount_type || 'percentage',

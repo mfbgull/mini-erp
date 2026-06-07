@@ -726,6 +726,7 @@ runStockAdjustmentFinancialMigration();
 runForecastsMigration();
 runMissingFKIndexesMigration();
 runBatchCostingMigration();
+runGLFoundationMigration();
 
 // Rollback support: run if --rollback flag is passed
 if (process.argv.includes('--rollback')) {
@@ -1000,6 +1001,22 @@ function runStockAdjustmentFinancialMigration(): void {
     }
   } catch (error: any) {
     logger.error('Stock adjustment financial migration error:', error.message);
+  }
+}
+
+function runGLFoundationMigration(): void {
+  // Phase 1 of the GL refactor: chart_of_accounts, journal_lines,
+  // and accounting_periods. See migrations/add-gl-foundation.sql for
+  // schema and seed. The auto-open period is also handled in the SQL.
+  try {
+    const migrationSQL = fs.readFileSync(
+      path.join(__dirname, '../migrations/add-gl-foundation.sql'),
+      'utf8'
+    );
+    db.exec(migrationSQL);
+    logger.info('✅ GL foundation migration applied (chart_of_accounts, journal_lines, accounting_periods)');
+  } catch (error: any) {
+    logger.error('GL foundation migration error:', error.message);
   }
 }
 

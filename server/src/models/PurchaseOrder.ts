@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import StockMovementModel from './StockMovement';
+import AccountingService from '../services/accountingService';
 import { getNextSequenceNumber } from '../utils/sequence';
 import { StockBalance } from '../types';
 
@@ -156,6 +157,17 @@ class PurchaseOrderModel {
           credit: 0,
           description: `Purchase Order ${poNo}`
         }, db);
+
+        // GL Phase-2 wiring: post the PO commitment to the journal.
+        // Dr Inventory Asset / Cr Accounts Payable. The supplier
+        // ledger above is the sub-ledger; this is the GL posting.
+        AccountingService.postPurchaseOrderEntry(db, {
+          purchaseOrderId: poId,
+          poNo,
+          totalAmount,
+          poDate: po_date,
+          userId,
+        });
       }
 
       // Log activity

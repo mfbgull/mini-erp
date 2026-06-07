@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import { getNextSequenceNumber } from '../utils/sequence';
 import ledgerUtils from '../utils/ledgerUtils';
+import AccountingService from '../services/accountingService';
 import { parseCurrency, subtractCurrency } from '../utils/currency';
 
 interface PaymentFilters {
@@ -183,6 +184,20 @@ export class PaymentModel {
         INSERT INTO customer_ledger (customer_id, transaction_date, transaction_type, reference_no, debit, credit, balance, description)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `).run(data.customer_id, data.payment_date, 'PAYMENT', paymentNo, 0, data.amount, newBalance, `Payment against ${invoiceNumbers.join(', ')}`);
+
+      // GL Phase-2 wiring: post the payment to the journal so the
+      // new TB and BS pick it up. The customer_ledger above is the
+      // sub-ledger; this is the GL posting. Both must happen in the
+      // same transaction for atomicity.
+      AccountingService.postPaymentEntry(db, {
+        paymentId,
+        paymentNo,
+        amount: parseCurrency(data.amount),
+        paymentDate: data.payment_date,
+        paymentMethod: data.payment_method,
+        customerId: data.customer_id,
+        userId: data.userId,
+      });
 
       ledgerUtils.updateCustomerBalance(data.customer_id);
 

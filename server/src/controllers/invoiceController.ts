@@ -4,6 +4,7 @@ import { AuthRequest, InvoiceItemDTO, PaymentDTO, InvoiceStatus, Invoice } from 
 import StockMovementModel from '../models/StockMovement';
 import InvoiceModel from '../models/Invoice';
 import PaymentModel from '../models/Payment';
+import AccountingService from '../services/accountingService';
 import WarehouseModel from '../models/Warehouse';
 import ledgerUtils from '../utils/ledgerUtils';
 import logger from '../utils/logger';
@@ -281,6 +282,11 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
     }
 
     // Insert invoice
+    // CRITICAL-1 fix: pass the controller-computed initial paid and
+    // balance through to the model so the monetary columns on the
+    // invoice header match the payment that is about to be recorded
+    // below. Previously these were hard-coded to 0/total, leaving
+    // the A/R ledger inconsistent with payment_allocations.
     const invoiceId = InvoiceModel.createInvoice(db, {
       invoice_no,
       customer_id: parsedCustomerId,
@@ -288,6 +294,8 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
       due_date,
       status: initialStatus as 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled',
       total_amount: totalAmountNum,
+      paid_amount: initialPaidAmount,
+      balance_amount: initialBalanceAmount,
       notes,
       discount_scope,
       discount_type,
@@ -354,6 +362,18 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
         `Invoice ${invoice_no}`
       );
 
+      // Post the sales invoice to the GL (Dr AR / Cr Sales Revenue).
+      // GL Phase-2 wiring: every new invoice auto-posts a journal
+      // entry. This brings the new TB and BS into alignment over
+      // time as new activity flows through.
+      AccountingService.postInvoiceEntry(db, {
+        invoiceId,
+        invoiceNo: invoice_no!,
+        totalAmount: totalAmountNum,
+        invoiceDate: invoice_date,
+        userId,
+      });
+
     // --- FIX #2: Payment recording INSIDE transaction ---
     if (record_payment && payment && paymentAmountNum > 0) {
       // FIX #5: Atomic payment number generation
@@ -366,6 +386,18 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
 
       // Ledger entry for payment (credit to reduce AR)
       InvoiceModel.createLedgerEntry(db, parsedCustomerId, newPaymentNo, 0, paymentAmountNum, `Payment ${newPaymentNo} for Invoice ${invoice_no}`);
+
+      // Post the payment to the GL (Dr Cash / Cr AR). Cash vs Bank
+      // is determined by payment_method.
+      AccountingService.postPaymentEntry(db, {
+        paymentId,
+        paymentNo: newPaymentNo,
+        amount: paymentAmountNum,
+        paymentDate: payment.payment_date,
+        paymentMethod: payment.payment_method,
+        customerId: parsedCustomerId,
+        userId,
+      });
     }
 
     // --- FIX #6: Customer balance update inside transaction ---

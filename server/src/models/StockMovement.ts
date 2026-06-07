@@ -316,6 +316,70 @@ class StockMovementModel {
     `).run(journalEntryId);
   }
 
+  /**
+   * Post a financial entry for a PRODUCTION output movement.
+   *
+   * Context: prior to this fix, ProductionModel.recordProduction inserted
+   * the output stock_movement row with financial_value=NULL and
+   * financial_posted=FALSE. StockMovementModel.postFinancialEntryForAdjustment
+   * only handles movement_type='ADJUSTMENT', so production output was
+   * never linked to a journal entry. The result: the inventory asset
+   * account on the GL was never updated when goods were produced, and
+   * the balance sheet inventory figure drifted from the actual
+   * stock-on-hand value.
+   *
+   * This posts a single-line journal entry:
+   *   Debit:  inventory_asset
+   *   Credit: production_clearing
+   *   Amount: totalBatchCost (material + overhead), using the
+   *           cost-per-unit already computed by the production flow.
+   *
+   * The clearing account is a temporary holding account that reflects
+   * the net cost of goods produced in a period; a year-end / period-end
+   * close can clear it to COGS. A multi-line split (Dr finished goods,
+   * Cr raw materials, Cr overhead) requires a journal_lines table
+   * upgrade and is out of scope for this fix.
+   */
+  static postFinancialEntryForProduction(params: {
+    id: number;            // stock_movements.id of the output row
+    item_id: number;
+    quantity: number;
+    total_batch_cost: number;  // already includes overhead
+    movement_date: string;
+    created_by: number;
+  }, db: Database.Database): void {
+    const { id, total_batch_cost, movement_date, created_by } = params;
+
+    // Defensive: skip zero-value movements so we don't create noise
+    // journal entries for $0 productions (e.g., pure rework).
+    if (!total_batch_cost || total_batch_cost <= 0) {
+      return;
+    }
+
+    const value = total_batch_cost;
+
+    const jeResult = db.prepare(`
+      INSERT INTO journal_entries
+        (reference_type, reference_id, entry_date, description,
+         debit_account, credit_account, amount, created_by)
+      VALUES ('production', ?, ?, ?, 'inventory_asset', 'production_clearing', ?, ?)
+    `).run(
+      id,
+      movement_date,
+      `Production output: ${params.quantity} units (total cost ${value.toFixed(2)})`,
+      value,
+      created_by
+    );
+
+    const journalEntryId = jeResult.lastInsertRowid as number;
+
+    db.prepare(`
+      UPDATE stock_movements
+      SET financial_value = ?, financial_posted = TRUE, journal_entry_id = ?
+      WHERE id = ?
+    `).run(value, journalEntryId, id);
+  }
+
   static getStockBalances(db: Database.Database) {
     return db.prepare(`
       SELECT
@@ -345,6 +409,27 @@ class StockMovementModel {
    * Consume a quantity of an item from the oldest available stock batches (FIFO).
    * Deducts quantity_remaining from each batch until the required quantity is met.
    * Returns an array of { batchId, consumed, unitCost } for recording movements.
+   *
+   * CRITICAL-5 fix: previously, when the total batch-tracked stock was less
+   * than the requested quantity, the function silently fell back to the
+   * item's standard_cost for the remainder, masking real shortages and
+   * under-costing COGS. This made the pre-check in ProductionModel
+   * recordProduction a lie under concurrent load, and could even let stock
+   * go negative (the existing balance update would clamp at zero on the
+   * next read but the batch update would still execute).
+   *
+   * New behavior:
+   *  1. Reads the authoritative warehouse stock from stock_balances. If
+   *     the available qty is strictly less than the requested qty, throws.
+   *  2. If batches cover the request exactly, returns the FIFO breakdown.
+   *  3. If the item has positive stock in the warehouse but no batch rows
+   *     (legacy stock added before batch costing was enabled), falls back
+   *     to standard_cost for the entire quantity, with a single
+   *     warning-level log entry.
+   *  4. If batches partially cover the request (some batches existed with
+   *     qty but their sum is < requested), the function throws, because
+   *     this case implies a partial migration or a stale batch, neither
+   *     of which should be silently papered over.
    */
   static consumeFromOldestBatches(
     itemId: number,
@@ -352,6 +437,25 @@ class StockMovementModel {
     quantity: number,
     db: Database.Database
   ): Array<{ batchId: number | null; consumed: number; unitCost: number }> {
+    if (quantity <= 0) {
+      throw new Error(`consumeFromOldestBatches: quantity must be positive, got ${quantity}`);
+    }
+
+    // Authoritative check: stock_balances is the source of truth.
+    const balanceRow = db.prepare(`
+      SELECT quantity FROM stock_balances
+      WHERE item_id = ? AND warehouse_id = ?
+    `).get(itemId, warehouseId) as { quantity: number } | undefined;
+    const availableQty = balanceRow ? parseFloat(String(balanceRow.quantity)) : 0;
+
+    if (availableQty < quantity) {
+      const item = db.prepare('SELECT item_name FROM items WHERE id = ?').get(itemId) as { item_name: string } | undefined;
+      throw new Error(
+        `Insufficient stock for ${item?.item_name || `item ${itemId}`} in warehouse ${warehouseId}: ` +
+        `available ${availableQty}, required ${quantity}`
+      );
+    }
+
     const batches = db.prepare(`
       SELECT id, quantity_remaining, unit_cost
       FROM stock_batches
@@ -363,6 +467,20 @@ class StockMovementModel {
       unit_cost: number;
     }>;
 
+    // Legacy case: positive warehouse stock but no batch rows. This is
+    // stock that was added before batch costing was enabled. Use
+    // standard_cost for the entire consumption; do not throw.
+    if (batches.length === 0) {
+      const item = db.prepare('SELECT standard_cost, item_name FROM items WHERE id = ?').get(itemId) as { standard_cost: number; item_name: string } | undefined;
+      const fallbackCost = item?.standard_cost ?? 0;
+      logger.warn(
+        `[BatchCosting] No batch rows for ${item?.item_name || 'item'} in warehouse. ` +
+        `Using standard_cost (${fallbackCost}) for the entire ${quantity} units (legacy stock).`
+      );
+      return [{ batchId: null, consumed: quantity, unitCost: fallbackCost }];
+    }
+
+    // Normal FIFO path.
     let remaining = quantity;
     const consumption: Array<{ batchId: number | null; consumed: number; unitCost: number }> = [];
 
@@ -381,16 +499,16 @@ class StockMovementModel {
     }
 
     if (remaining > 0.001) {
-      // Fallback: use item's standard_cost for any remainder not covered by batches.
-      // This handles stock that existed before batch costing was enabled.
-      const item = db.prepare('SELECT standard_cost, item_name FROM items WHERE id = ?').get(itemId) as { standard_cost: number; item_name: string } | undefined;
-      const fallbackCost = item?.standard_cost ?? 0;
-      logger.warn(
-        `[BatchCosting] Insufficient batch-tracked stock for ${item?.item_name || 'item'} in warehouse. ` +
-        `Using standard_cost (${fallbackCost}) for remaining ${remaining.toFixed(3)} units.`
+      // Defensive: stock_balances said we have enough, but the batches
+      // we found don't cover the request. This means the batch table is
+      // out of sync with the balance. Throw rather than silently using
+      // a different cost basis (which would mis-cost COGS).
+      const item = db.prepare('SELECT item_name FROM items WHERE id = ?').get(itemId) as { item_name: string } | undefined;
+      throw new Error(
+        `Batch coverage shortfall for ${item?.item_name || `item ${itemId}`} in warehouse ${warehouseId}: ` +
+        `stock_balances shows ${availableQty} but batches only cover ${(quantity - remaining).toFixed(3)}. ` +
+        `Run a batch reconciliation.`
       );
-      consumption.push({ batchId: null, consumed: remaining, unitCost: fallbackCost });
-      remaining = 0;
     }
 
     return consumption;

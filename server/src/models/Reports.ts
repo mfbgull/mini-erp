@@ -1,16 +1,5 @@
 import Database from 'better-sqlite3';
-
-interface ReceivablesSummaryRow {
-  total_invoices: number;
-  total_outstanding: number;
-  total_paid: number;
-  unused_overdue_count: number;
-  partial_unpaid_count: number;
-  overdue_db_count: number;
-  unpaid_amount: number;
-  partially_paid_amount: number;
-  overdue_amount: number;
-}
+import AccountingService from '../services/accountingService';
 
 function getARAgingReport(asOfDate: string, db: Database.Database) {
   const agingData = db.prepare(`
@@ -127,37 +116,117 @@ function getDSOMetric(db: Database.Database, period: number = 30) {
 
 // Moved from reportsController
 function getReceivablesSummary(db: Database.Database, asOfDate: string = new Date().toISOString().split('T')[0]) {
+  // CRITICAL-2 fix: previously the function returned a synthetic row
+  // built from a single SELECT with case-by-status SUMs, then mapped
+  // those status sums to bucket fields (0-30, 31-60, ...) under
+  // misleading names. As a result, total_1_30 was actually the
+  // "Partially Paid" outstanding total, total_over_90 was the
+  // "Overdue" outstanding total, and the 31-60 and 61-90 buckets were
+  // hard-coded to 0. AR aging was essentially random.
+  //
+  // New behavior: compute aging buckets from each invoice's due_date
+  // relative to the asOfDate parameter (which is now actually used as
+  // a filter), classifying the invoice's current balance_amount into
+  // one of 0-30, 31-60, 61-90, or 90+ days overdue. The "current"
+  // bucket captures invoices not yet past due.
+  //
+  // The status breakdown is preserved as a separate, correctly-labeled
+  // object. Status and age are independent: an invoice can be
+  // "Partially Paid" AND 45 days past due, for example.
+
+  // The bucket math is done in SQL via julianday() so we don't have to
+  // pull every invoice row into Node. The CASE expression puts the
+  // invoice's balance into exactly one of the five buckets.
   const result = db.prepare(`
     SELECT
       COUNT(*) as total_invoices,
-      SUM(balance_amount) as total_outstanding,
-      SUM(paid_amount) as total_paid,
-      COUNT(CASE WHEN status = 'Unpaid' THEN 1 END) as unused_overdue_count,
-      COUNT(CASE WHEN status = 'Partially Paid' THEN 1 END) as partial_unpaid_count,
-      COUNT(CASE WHEN status = 'Overdue' THEN 1 END) as overdue_db_count,
-      SUM(CASE WHEN status = 'Unpaid' THEN balance_amount ELSE 0 END) as unpaid_amount,
-      SUM(CASE WHEN status = 'Partially Paid' THEN balance_amount ELSE 0 END) as partially_paid_amount,
-      SUM(CASE WHEN status = 'Overdue' THEN balance_amount ELSE 0 END) as overdue_amount
-    FROM invoices WHERE status IN ('Unpaid', 'Partially Paid', 'Overdue') AND balance_amount > 0
-  `).get() as ReceivablesSummaryRow;
+      COALESCE(SUM(balance_amount), 0) as total_outstanding,
+      COALESCE(SUM(paid_amount), 0) as total_paid,
+      COALESCE(SUM(total_amount), 0) as total_invoiced,
+
+      -- Buckets: days past due = asOfDate - due_date. Negative or zero
+      -- (not yet due) goes into "current". > 90 goes into "over_90".
+      COALESCE(SUM(CASE
+        WHEN due_date IS NULL THEN 0
+        WHEN julianday(?) - julianday(due_date) <= 0 THEN balance_amount
+        ELSE 0
+      END), 0) as current_amount,
+
+      COALESCE(SUM(CASE
+        WHEN due_date IS NULL THEN 0
+        WHEN julianday(?) - julianday(due_date) BETWEEN 1 AND 30 THEN balance_amount
+        ELSE 0
+      END), 0) as bucket_1_30,
+
+      COALESCE(SUM(CASE
+        WHEN due_date IS NULL THEN 0
+        WHEN julianday(?) - julianday(due_date) BETWEEN 31 AND 60 THEN balance_amount
+        ELSE 0
+      END), 0) as bucket_31_60,
+
+      COALESCE(SUM(CASE
+        WHEN due_date IS NULL THEN 0
+        WHEN julianday(?) - julianday(due_date) BETWEEN 61 AND 90 THEN balance_amount
+        ELSE 0
+      END), 0) as bucket_61_90,
+
+      COALESCE(SUM(CASE
+        WHEN due_date IS NULL THEN 0
+        WHEN julianday(?) - julianday(due_date) > 90 THEN balance_amount
+        ELSE 0
+      END), 0) as bucket_over_90,
+
+      -- Per-status counts and totals, unchanged in spirit but
+      -- separated from the aging buckets.
+      COALESCE(SUM(CASE WHEN status = 'Unpaid' THEN balance_amount ELSE 0 END), 0) as unpaid_amount,
+      COALESCE(SUM(CASE WHEN status = 'Partially Paid' THEN balance_amount ELSE 0 END), 0) as partially_paid_amount,
+      COALESCE(SUM(CASE WHEN status = 'Overdue' THEN balance_amount ELSE 0 END), 0) as overdue_amount,
+      COUNT(CASE WHEN status = 'Unpaid' THEN 1 END) as unpaid_count,
+      COUNT(CASE WHEN status = 'Partially Paid' THEN 1 END) as partial_count,
+      COUNT(CASE WHEN status = 'Overdue' THEN 1 END) as overdue_count
+    FROM invoices
+    WHERE status IN ('Unpaid', 'Partially Paid', 'Overdue', 'Sent')
+      AND balance_amount > 0
+      AND invoice_date <= ?
+  `).get(
+    asOfDate, asOfDate, asOfDate, asOfDate, asOfDate,
+    asOfDate
+  ) as {
+    total_invoices: number;
+    total_outstanding: number;
+    total_paid: number;
+    total_invoiced: number;
+    current_amount: number;
+    bucket_1_30: number;
+    bucket_31_60: number;
+    bucket_61_90: number;
+    bucket_over_90: number;
+    unpaid_amount: number;
+    partially_paid_amount: number;
+    overdue_amount: number;
+    unpaid_count: number;
+    partial_count: number;
+    overdue_count: number;
+  };
 
   return {
+    asOfDate,
     total_invoices: result.total_invoices,
     total_outstanding: result.total_outstanding,
     total_paid: result.total_paid,
-    unpaid_count: result.unused_overdue_count,
-    partial_count: result.partial_unpaid_count,
-    overdue_count: result.overdue_db_count,
-    overdue_amount: result.overdue_amount,
-    total_current: result.unpaid_amount,
-    total_1_30: result.partially_paid_amount,
-    total_31_60: 0,
-    total_61_90: 0,
-    total_over_90: result.overdue_amount,
+    total_invoiced: result.total_invoiced,
+    // Aging buckets. Field names match the previous API so the
+    // frontend doesn't need to change, but the values are now correct.
+    total_current: result.current_amount,
+    total_1_30: result.bucket_1_30,
+    total_31_60: result.bucket_31_60,
+    total_61_90: result.bucket_61_90,
+    total_over_90: result.bucket_over_90,
+    // Status breakdown, unchanged in shape, still meaningful.
     statusBreakdown: {
-      unpaid: { count: result.unused_overdue_count, amount: result.unpaid_amount },
-      partiallyPaid: { count: result.partial_unpaid_count, amount: result.partially_paid_amount },
-      overdue: { count: result.overdue_db_count, amount: result.overdue_amount },
+      unpaid: { count: result.unpaid_count, amount: result.unpaid_amount },
+      partiallyPaid: { count: result.partial_count, amount: result.partially_paid_amount },
+      overdue: { count: result.overdue_count, amount: result.overdue_amount },
     },
   };
 }
@@ -229,22 +298,69 @@ function getSalesByItem(db: Database.Database, startDate: string, endDate: strin
 
 // Moved from reportsController
 function getStockValuationReport(db: Database.Database) {
+  // MAJOR-9 fix: previously the report computed stock_value as
+  //   current_stock * standard_cost
+  // for every item, ignoring stock_batches entirely. With batch
+  // costing enabled, the real value of stock is the SUM of
+  // (quantity_remaining * unit_cost) across batches, which can
+  // differ materially from standard_cost when:
+  //   - items have a mix of old (cheap) and new (expensive) batches
+  //   - standard costs haven't been updated
+  //   - production costs differ from standard_cost
+  // The report also double-counted stock by LEFT JOINing
+  // stock_balances (which has one row per item-warehouse pair), so
+  // an item in 3 warehouses reported 3x the actual stock.
+  //
+  // New behavior: for each item, value = SUM(quantity_remaining *
+  // unit_cost) across stock_batches, with quantity_remaining > 0.
+  // Items with no batch rows fall back to standard_cost * current_stock
+  // (the legacy case). Quantity comes from stock_batches
+  // (not stock_balances, which is per-warehouse and would multiply).
   const valuation = db.prepare(`
-    SELECT i.id, i.item_code, i.item_name, i.category, i.unit_of_measure, i.standard_cost,
-      COALESCE(SUM(sb.quantity), 0) as total_stock, COALESCE(SUM(sb.quantity), 0) * i.standard_cost as total_value
-    FROM items i LEFT JOIN stock_balances sb ON i.id = sb.item_id WHERE i.is_active = 1
-    GROUP BY i.id ORDER BY total_value DESC
+    SELECT
+      i.id, i.item_code, i.item_name, i.category, i.unit_of_measure, i.standard_cost,
+      COALESCE(sb_summary.batch_qty, 0) as total_stock,
+      COALESCE(sb_summary.batch_value, 0) as batch_tracked_value,
+      CASE
+        WHEN COALESCE(sb_summary.batch_qty, 0) > 0
+          THEN COALESCE(sb_summary.batch_value, 0)
+        ELSE i.current_stock * i.standard_cost
+      END as total_value,
+      CASE
+        WHEN COALESCE(sb_summary.batch_qty, 0) > 0 THEN 'batch'
+        ELSE 'standard_cost_fallback'
+      END as valuation_method
+    FROM items i
+    LEFT JOIN (
+      SELECT item_id,
+             SUM(quantity_remaining) as batch_qty,
+             SUM(quantity_remaining * unit_cost) as batch_value
+      FROM stock_batches
+      WHERE quantity_remaining > 0
+      GROUP BY item_id
+    ) sb_summary ON i.id = sb_summary.item_id
+    WHERE i.is_active = 1
+    ORDER BY total_value DESC
   `).all();
 
-  const totalValue = db.prepare(`SELECT COALESCE(SUM(current_stock * standard_cost), 0) as total FROM items WHERE is_active = 1`).get() as { total: number };
+  // Total at report level: also use the same CASE formula so the
+  // summary agrees with the per-item rows. Computed in JS to keep
+  // the SQL simple (it would need a CTE for the same effect).
+  const totalValue = valuation.reduce(
+    (sum: number, r: any) => sum + (r.total_value || 0),
+    0
+  );
 
-  const reportData = { valuation, totalValue: totalValue.total };
+  // Count how many items still rely on standard_cost (legacy).
+  const legacyItems = valuation.filter((r: any) => r.valuation_method === 'standard_cost_fallback').length;
 
   return {
-    stockValuation: reportData.valuation,
+    stockValuation: valuation,
     summary: {
-      totalValue: reportData.totalValue,
-      totalItems: reportData.valuation.length
+      totalValue,
+      totalItems: valuation.length,
+      batchTrackedItems: valuation.length - legacyItems,
+      legacyItems
     }
   };
 }
@@ -338,8 +454,18 @@ function getAPSummary(asOfDate: string, db: Database.Database) {
 }
 
 function getProfitLossReport(startDate: string, endDate: string, db: Database.Database) {
+  // MAJOR-3 audit note: the original P&L formula here is correct
+  //   gross_profit = revenue - cogs
+  //   net_profit   = gross_profit - expenses
+  // (verified against the current code). The only fix needed was
+  // excluding Cancelled invoices from revenue. Note that historical
+  // SALE stock_movements may have unit_cost = sale_price (see MAJOR-6
+  // in the audit), so COGS will be slightly off until that flow is
+  // also fixed; the SQL itself is correct.
   const revenue = db.prepare(`
-    SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE invoice_date BETWEEN ? AND ?
+    SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices
+    WHERE invoice_date BETWEEN ? AND ?
+      AND status != 'Cancelled'
   `).get(startDate, endDate) as { total: number };
 
   const cogs = db.prepare(`
@@ -359,37 +485,212 @@ function getProfitLossReport(startDate: string, endDate: string, db: Database.Da
 }
 
 function getBalanceSheet(asOfDate: string, db: Database.Database) {
-  const assets = db.prepare(`
-    SELECT COALESCE(SUM(ABS(current_stock) * standard_cost), 0) as inventory_value FROM items WHERE is_active = 1
-  `).get() as { inventory_value: number };
+  // CRITICAL-3 fix: the previous implementation had four independent
+  // bugs in one report.
+  //
+  //  (a) AP = SUM(po.total_amount WHERE status='Completed')
+  //      This counted FULL PO value, not outstanding AP. Paid and
+  //      partially-paid POs were both included. Real AP is the
+  //      supplier_ledger's running balance (PO amount owed - payments
+  //      allocated against it), not the gross PO total.
+  //
+  //  (b) "Cash" was SUM(credit - debit) FROM customer_ledger WHERE
+  //      transaction_type = 'PAYMENT'. That is a per-customer running
+  //      AR balance, not cash. Two different concepts conflated.
+  //      New: derive cash from journal_entries where the account is
+  //      'cash' or 'bank'. If no journal entries reference those
+  //      accounts, returns 0 (honest "no cash tracked yet" answer
+  //      rather than a fake number). A TODO notes that proper cash
+  //      tracking needs a dedicated cash_accounts table.
+  //
+  //  (c) Equity was hard-coded to 0 (no opening retained earnings
+  //      tracked, net income silently dropped).
+  //      New: equity = opening_retained_earnings (from settings) +
+  //                    net_income_to_date (revenue - cogs - expenses
+  //                    up to asOfDate).
+  //
+  //  (d) asOfDate was accepted but never used as a filter.
+  //      New: AR, AP, and equity are all filtered by asOfDate.
+  //
+  // Inventory: switched from current_stock * standard_cost (per item)
+  // to SUM(quantity_remaining * unit_cost) across stock_batches, to
+  // match the production-fix (CRITICAL-4) and the valuation report
+  // (MAJOR-9).
+
+  // --- ASSETS ---
+  const inventoryRow = db.prepare(`
+    SELECT COALESCE(SUM(quantity_remaining * unit_cost), 0) as batch_value
+    FROM stock_batches WHERE quantity_remaining > 0
+  `).get() as { batch_value: number };
+  // Plus legacy items (stock on hand but no batch rows) valued at
+  // standard_cost. Computed as (sum of items.current_stock * standard_cost
+  // for items with no batches) so we don't double-count batch-tracked
+  // items.
+  const legacyInventoryRow = db.prepare(`
+    SELECT COALESCE(SUM(i.current_stock * i.standard_cost), 0) as legacy_value
+    FROM items i
+    WHERE i.is_active = 1
+      AND i.current_stock > 0
+      AND NOT EXISTS (SELECT 1 FROM stock_batches sb WHERE sb.item_id = i.id AND sb.quantity_remaining > 0)
+  `).get() as { legacy_value: number };
+  const inventoryValue = inventoryRow.batch_value + legacyInventoryRow.legacy_value;
 
   const ar = db.prepare(`
-    SELECT COALESCE(SUM(balance_amount), 0) as total FROM invoices WHERE status IN ('Unpaid', 'Partially Paid', 'Overdue')
-  `).get() as { total: number };
+    SELECT COALESCE(SUM(balance_amount), 0) as total FROM invoices
+    WHERE status IN ('Unpaid', 'Partially Paid', 'Overdue', 'Sent')
+      AND balance_amount > 0
+      AND invoice_date <= ?
+  `).get(asOfDate) as { total: number };
 
+  // Cash: read from the cash account via AccountingService so it pulls
+  // from both journal_lines (new) and journal_entries (legacy, matched
+  // by text_code) and returns a properly signed balance.
+  const cashAccount = AccountingService.getAccountByTextCode(db, 'cash');
+  const cashBalance = cashAccount
+    ? AccountingService.getAccountBalance(db, cashAccount.id, asOfDate).balance
+    : 0;
+
+  // --- LIABILITIES ---
+  // AP from supplier_ledger: sum the latest running balance per
+  // supplier. This is the amount currently owed, not the gross PO
+  // total. Per supplier, we take the most recent balance as of
+  // asOfDate (any transactions after asOfDate are ignored).
   const ap = db.prepare(`
-    SELECT COALESCE(SUM(total_amount), 0) as total FROM purchase_orders WHERE status = 'Completed'
-  `).get() as { total: number };
+    SELECT COALESCE(SUM(balance), 0) as total FROM (
+      SELECT sl1.supplier_id, sl1.balance
+      FROM supplier_ledger sl1
+      WHERE sl1.balance > 0
+        AND sl1.transaction_date <= ?
+        AND sl1.id = (
+          SELECT MAX(sl2.id) FROM supplier_ledger sl2
+          WHERE sl2.supplier_id = sl1.supplier_id
+            AND sl2.transaction_date <= ?
+        )
+    )
+  `).get(asOfDate, asOfDate) as { total: number };
 
-  const cash = db.prepare(`
-    SELECT COALESCE(SUM(credit - debit), 0) as balance FROM customer_ledger WHERE transaction_type = 'PAYMENT'
-  `).get() as { balance: number };
+  // --- EQUITY ---
+  // Opening retained earnings from settings table. The key is
+  // 'opening_retained_earnings' and the value is a decimal string.
+  // Default to 0 if not set.
+  const openingRE = db.prepare(`
+    SELECT value FROM settings WHERE key = 'opening_retained_earnings'
+  `).get() as { value: string } | undefined;
+  const openingRetainedEarnings = openingRE ? parseFloat(openingRE.value) || 0 : 0;
 
-  return { asOfDate, assets: { inventory: assets.inventory_value, accounts_receivable: ar.total, cash: cash.balance }, liabilities: { accounts_payable: ap.total } };
+  // Net income to date: revenue - cogs - expenses up to asOfDate.
+  // Note: this is the same calc as the P&L, just run for [earliest,
+  // asOfDate] instead of [startDate, endDate].
+  const revenueYTD = db.prepare(`
+    SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices
+    WHERE invoice_date <= ? AND status != 'Cancelled'
+  `).get(asOfDate) as { total: number };
+  const cogsYTD = db.prepare(`
+    SELECT COALESCE(ABS(SUM(quantity * unit_cost)), 0) as total
+    FROM stock_movements
+    WHERE movement_type IN ('SALE','OUT') AND movement_date <= ?
+  `).get(asOfDate) as { total: number };
+  const expensesYTD = db.prepare(`
+    SELECT COALESCE(SUM(amount), 0) as total FROM expenses
+    WHERE expense_date <= ?
+  `).get(asOfDate) as { total: number };
+  const netIncomeYTD = revenueYTD.total - cogsYTD.total - expensesYTD.total;
+  const equity = openingRetainedEarnings + netIncomeYTD;
+
+  // --- ASSEMBLE ---
+  const totalAssets = inventoryValue + ar.total + cashBalance;
+  const totalLiabilities = ap.total;
+  const totalEquity = equity;
+  const totalLiabAndEquity = totalLiabilities + totalEquity;
+  const balanced = Math.abs(totalAssets - totalLiabAndEquity) < 0.01;
+
+  return {
+    asOfDate,
+    assets: {
+      inventory: inventoryValue,
+      accounts_receivable: ar.total,
+      cash: cashBalance,
+      total: totalAssets
+    },
+    liabilities: {
+      accounts_payable: ap.total,
+      total: totalLiabilities
+    },
+    equity: {
+      opening_retained_earnings: openingRetainedEarnings,
+      net_income_ytd: netIncomeYTD,
+      revenue_ytd: revenueYTD.total,
+      cogs_ytd: cogsYTD.total,
+      expenses_ytd: expensesYTD.total,
+      total: totalEquity
+    },
+    totals: {
+      total_assets: totalAssets,
+      total_liabilities: totalLiabilities,
+      total_equity: totalEquity,
+      total_liab_and_equity: totalLiabAndEquity,
+      balanced
+    }
+  };
 }
 
 function getIncomeStatement(startDate: string, endDate: string, db: Database.Database) {
-  const revenue = db.prepare(`SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE invoice_date BETWEEN ? AND ?`).get(startDate, endDate) as { total: number };
-  const expenses = db.prepare(`SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE expense_date BETWEEN ? AND ?`).get(startDate, endDate) as { total: number };
-  return { startDate, endDate, revenue: revenue.total, expenses: expenses.total, netIncome: revenue.total - expenses.total };
+  // MAJOR-3 fix: previously this function was missing COGS entirely.
+  // netIncome was revenue - expenses, treating COGS as zero. Fix:
+  // delegate to getProfitLossReport so the two endpoints stay
+  // consistent and the user gets a real income statement.
+  const pl = getProfitLossReport(startDate, endDate, db);
+  return {
+    startDate,
+    endDate,
+    revenue: pl.totalRevenue,
+    cogs: pl.totalCogs,
+    expenses: pl.totalExpenses,
+    netIncome: pl.netProfit,
+    grossProfit: pl.grossProfit
+  };
 }
 
 function getTrialBalance(asOfDate: string, db: Database.Database) {
-  // customer_ledger doesn't have an account_name column, so group by transaction_type as proxy accounts
-  return db.prepare(`
-    SELECT transaction_type as account_name, SUM(debit) as total_debit, SUM(credit) as total_credit
-    FROM customer_ledger WHERE transaction_date <= ? GROUP BY transaction_type ORDER BY account_name
-  `).all(asOfDate);
+  // MAJOR-1 fix (Phase 2 — GL refactor): now backed by
+  // AccountingService.getAllAccountBalances which reads from
+  // journal_lines (multi-line, account_id) UNION journal_entries
+  // (legacy, text_code) and rolls them up per chart_of_accounts row.
+  //
+  // The output includes every account from chart_of_accounts, even
+  // those with a zero balance, so the report shows the full account
+  // list — not just the ones that happen to have movement. That is
+  // the standard trial balance shape and is what auditors expect.
+
+  const balances = AccountingService.getAllAccountBalances(db, asOfDate);
+
+  // Materialize as a per-account row in the standard TB shape:
+  //   account, total_debit, total_credit, balance (signed)
+  const accounts = balances.map((b) => ({
+    account_code: b.account_code,
+    account_name: b.account_name,
+    account_type: b.type,
+    total_debit: b.total_debit,
+    total_credit: b.total_credit,
+    balance: b.balance,
+    is_zero: b.total_debit === 0 && b.total_credit === 0
+  }));
+
+  const totalDebit = accounts.reduce((s, r) => s + r.total_debit, 0);
+  const totalCredit = accounts.reduce((s, r) => s + r.total_credit, 0);
+  const balanced = Math.abs(totalDebit - totalCredit) < 0.01;
+
+  return {
+    asOfDate,
+    accounts,
+    total_debit: totalDebit,
+    total_credit: totalCredit,
+    balanced,
+    note: 'Built from chart_of_accounts joined to journal_lines (canonical) ' +
+          'and journal_entries (legacy, matched by text_code). ' +
+          'New postings should use AccountingService.postEntry so they ' +
+          'land in journal_lines with a proper account_id.'
+  };
 }
 
 function getGeneralLedger(startDate: string, endDate: string, db: Database.Database) {

@@ -101,6 +101,18 @@ class ProductionModel {
 
     const materialsWarehouseId = raw_materials_warehouse_id || warehouse_id;
 
+    // CRITICAL-5 fix: use IMMEDIATE-mode transaction so the read of
+    // stock_balances and the subsequent writes happen under a single
+    // RESERVED writer lock. With the default DEFERRED mode, two
+    // concurrent productions could both read the same stock_balances
+    // row, both pass the "available >= requested" check, and then race
+    // on the write. SQLite would SQLITE_BUSY the loser, but the brief
+    // inconsistency window is exactly what allows negative stock under
+    // load. IMMEDIATE upgrades to RESERVED on BEGIN, blocking any other
+    // writer from starting a transaction until this one finishes.
+    //
+    // better-sqlite3 API: db.transaction(fn) returns a Transaction<F>
+    // with .deferred / .immediate / .exclusive call modes.
     const transaction = db.transaction(() => {
       const productionNo = this.generateProductionNo(db);
       const batchNo = this.generateBatchNo(db);
@@ -242,7 +254,7 @@ class ProductionModel {
 
       // Record output stock movement linked to the new batch
       const outputMovementNo = this.generateMovementNo(db);
-      db.prepare(`
+      const outputMovementResult = db.prepare(`
         INSERT INTO stock_movements (
           movement_no, item_id, warehouse_id, movement_type,
           quantity, unit_cost, reference_doctype, reference_docno,
@@ -262,6 +274,22 @@ class ProductionModel {
         userId,
         outputBatchId
       );
+
+      // CRITICAL-4 fix: post a financial entry for the production output
+      // so the inventory asset account on the GL is updated when goods
+      // are produced. Previously this movement was inserted without a
+      // journal entry, causing the GL inventory balance to drift from
+      // the actual stock-on-hand value. See StockMovementModel.
+      // postFinancialEntryForProduction for the full context.
+      const outputMovementId = outputMovementResult.lastInsertRowid as number;
+      StockMovementModel.postFinancialEntryForProduction({
+        id: outputMovementId,
+        item_id: output_item_id,
+        quantity: output_quantity,
+        total_batch_cost: totalBatchCost,
+        movement_date: production_date,
+        created_by: userId
+      }, db);
 
       // Update production record with batch costing info
       db.prepare(`
@@ -318,7 +346,13 @@ class ProductionModel {
       return this.getById(productionId, db) as Production;
     });
 
-    return transaction();
+    // CRITICAL-5 fix: invoke with .immediate() so the transaction opens
+    // with BEGIN IMMEDIATE (acquires RESERVED lock on entry, blocking
+    // other writers from starting their own transactions until this one
+    // commits or rolls back). This is the second half of the fix: the
+    // inside-the-fxn check (now in consumeFromOldestBatches) is correct
+    // only if it's serialized against concurrent production requests.
+    return transaction.immediate();
   }
 
   static generateProductionNo(db: Database.Database): string {
