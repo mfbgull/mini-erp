@@ -362,16 +362,23 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
         `Invoice ${invoice_no}`
       );
 
-      // Post the sales invoice to the GL (Dr AR / Cr Sales Revenue).
+      // Post the sales invoice to the GL (Dr AR / Cr Sales Revenue net / Cr Tax Payable).
       // GL Phase-2 wiring: every new invoice auto-posts a journal
       // entry. This brings the new TB and BS into alignment over
       // time as new activity flows through.
+      // MAJOR-5 fix: tax is now split out into a separate Tax Payable line
+      // when items have tax_rate > 0.
+      const computedTaxAmount = items.reduce<number>((sum, item) => {
+        const lineAmount = item.quantity * item.unit_price;
+        return sum + lineAmount * ((item.tax_rate || 0) / 100);
+      }, 0);
       AccountingService.postInvoiceEntry(db, {
         invoiceId,
         invoiceNo: invoice_no!,
         totalAmount: totalAmountNum,
         invoiceDate: invoice_date,
         userId,
+        taxAmount: computedTaxAmount,
       });
 
     // --- FIX #2: Payment recording INSIDE transaction ---

@@ -283,10 +283,12 @@ export class AccountingService {
   // ------------------------------------------------------------------
 
   /**
-   * Post a sales invoice. Dr Accounts Receivable, Cr Sales Revenue.
-   * The current implementation posts the entire invoice total to
-   * Sales Revenue. Splitting tax into a separate Tax Payable line is
-   * a future refinement (see audit MAJOR-5).
+   * Post a sales invoice. Dr Accounts Receivable, Cr Sales Revenue (net),
+   * and when taxAmount > 0, additionally Cr Tax Payable (tax).
+   *
+   * When taxAmount is omitted or 0, the full totalAmount goes to
+   * Sales Revenue (backward-compatible 2-line entry).
+   * When taxAmount > 0, the net revenue is totalAmount - taxAmount.
    *
    * Returns the posted entry's journal_entry_id, or null if the
    * total is zero (nothing to post).
@@ -299,6 +301,7 @@ export class AccountingService {
       totalAmount: number;
       invoiceDate: string;
       userId?: number;
+      taxAmount?: number;
     }
   ): PostedEntry | null {
     if (!args.totalAmount || args.totalAmount <= 0) return null;
@@ -309,6 +312,30 @@ export class AccountingService {
       throw new Error('Chart of accounts is missing required accounts: 1100 (AR) or 4000 (Sales Revenue)');
     }
 
+    const taxAmount = Number(args.taxAmount) || 0;
+    const netAmount = args.totalAmount - taxAmount;
+
+    if (taxAmount > 0) {
+      const taxPayable = AccountingService.getAccountByCode(db, '2100');
+      if (!taxPayable) {
+        throw new Error('Chart of accounts is missing required account: 2100 (Tax Payable)');
+      }
+
+      return AccountingService.postEntry(db, {
+        entry_date: args.invoiceDate,
+        description: `Sales invoice ${args.invoiceNo} — total ${args.totalAmount.toFixed(2)} (net ${netAmount.toFixed(2)} + tax ${taxAmount.toFixed(2)})`,
+        reference_type: 'INVOICE',
+        reference_id: args.invoiceId,
+        created_by: args.userId,
+        lines: [
+          { account_id: ar.id, debit: args.totalAmount, description: `AR for ${args.invoiceNo}` },
+          { account_id: revenue.id, credit: netAmount, description: `Sales revenue for ${args.invoiceNo}` },
+          { account_id: taxPayable.id, credit: taxAmount, description: `Sales tax on ${args.invoiceNo}` },
+        ],
+      });
+    }
+
+    // No tax — backward-compatible 2-line entry
     return AccountingService.postEntry(db, {
       entry_date: args.invoiceDate,
       description: `Sales invoice ${args.invoiceNo} — total ${args.totalAmount.toFixed(2)}`,
