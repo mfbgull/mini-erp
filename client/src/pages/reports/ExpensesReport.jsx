@@ -397,7 +397,7 @@ export default function ExpensesReport() {
       )}
 
       {reportData?.summary && (
-        <StatsGrid>
+        <StatsGrid className="compact">
           <StatCard
             icon={DollarSign}
             label="Total Expenses"

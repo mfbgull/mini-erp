@@ -323,7 +323,7 @@ export default function StockLevelReport() {
       )}
 
       {reportData?.summary && (
-        <StatsGrid>
+        <StatsGrid className="compact">
           <StatCard
             icon={Package}
             label="Total Items"

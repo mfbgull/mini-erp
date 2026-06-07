@@ -334,7 +334,7 @@ export default function StockValuationReport() {
       )}
 
       {reportData?.summary && (
-        <StatsGrid>
+        <StatsGrid className="compact">
           <StatCard
             icon={Package}
             label="Total Items"

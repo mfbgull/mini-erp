@@ -60,8 +60,7 @@ h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: 
 /* Layout */
 .app-container {
   display: flex;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 .main-content {
@@ -70,6 +69,7 @@ h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: 
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
+  min-height: 0;
   scrollbar-width: thin;
   margin-left: var(--sidebar-width);
   transition: margin-left 0.3s ease;
@@ -152,6 +152,15 @@ h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: 
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--space-lg);
+  /* Standard content width: cap on wide viewports so the layout reads as
+     a focused app instead of stretching edge-to-edge on big monitors. Matches
+     the items page pattern (.items-page { max-width: 1400px; margin: 0 auto; }).
+     Pages that need to be narrower (e.g. 1200px on statements) still override
+     this via their own page-wrapper class. */
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }
 
 /* Thin scrollbar for content */
@@ -173,10 +182,7 @@ h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: 
 }
 
 .page-header .header-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
+
 }
 
 .page-header .header-actions {

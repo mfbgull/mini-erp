@@ -131,7 +131,7 @@ export default function ForecastDashboard() {
         <div className="forecast-header">
           <h1>{t('forecasts.dashboard')}</h1>
         </div>
-        <StatsGrid>
+        <StatsGrid className="compact">
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -172,7 +172,7 @@ export default function ForecastDashboard() {
         </button>
       </div>
 
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={Package} label={t('forecasts.trackedItems')} value={summary.totalItems} />
         <StatCard icon={AlertTriangle} label={t('forecasts.needRestock')} value={summary.itemsNeedingRestock} alert={summary.itemsNeedingRestock > 0} />
         <StatCard icon={TrendingUp} label={t('forecasts.avgConfidence')} value={`${summary.avgConfidence}%`} />

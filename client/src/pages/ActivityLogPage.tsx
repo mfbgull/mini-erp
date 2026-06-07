@@ -128,7 +128,7 @@ export default function ActivityLog() {
 
       {/* Stats Cards */}
       {stats && (
-        <StatsGrid>
+        <StatsGrid className="compact">
           <StatCard icon={FileText} label="Total Logs" value={stats.totalLogs} />
           <StatCard icon={Zap} label="Top Action" value={stats.actions[0]?.action || '-'} subtitle={`${stats.actions[0]?.count || 0} occurrences`} />
           <StatCard icon={User} label="Most Active User" value={stats.users[0]?.username || '-'} subtitle={`${stats.users[0]?.count || 0} actions`} />

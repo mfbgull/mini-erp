@@ -544,7 +544,7 @@ export default function ExpensesPage() {
         </div>
       )}
 
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={DollarSign} label="Total Expenses" value={formatCurrency(expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0))} />
         <StatCard icon={FileText} label="Total Records" value={expenses.length} />
         <StatCard icon={CheckCircle} label="Paid Expenses" value={expenses.filter((exp) => exp.status === "Paid").length} />

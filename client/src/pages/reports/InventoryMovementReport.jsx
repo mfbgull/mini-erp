@@ -375,7 +375,7 @@ export default function InventoryMovementReport() {
       )}
 
       {reportData?.summary && (
-        <StatsGrid>
+        <StatsGrid className="compact">
           <StatCard
             icon={PackagePlus}
             label="Total Inbound"

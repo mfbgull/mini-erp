@@ -144,7 +144,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={Package} label={t('dashboard.totalItems')} value={data?.totalItems ?? 0} subtitle={`${data?.warehouseStockCount ?? 0} ${t('dashboard.warehouseStocks')}`} />
         <StatCard icon={DollarSign} label={t('dashboard.stockValue')} value={formatCurrency(data?.totalStockValue ?? 0)} subtitle={t('dashboard.currentInventoryWorth')} />
         <StatCard icon={ShoppingCart} label={t('dashboard.salesRevenue')} value={formatCurrency(data?.totalSalesRevenue ?? 0)} subtitle={t('dashboard.totalSales')} />

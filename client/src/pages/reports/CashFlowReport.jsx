@@ -220,7 +220,7 @@ export default function CashFlowReport() {
         </div>
       ) : reportData ? (
         <div className="report-content">
-          <StatsGrid>
+          <StatsGrid className="compact">
             <StatCard
               icon={DollarSign}
               label="Total Cash Inflow"

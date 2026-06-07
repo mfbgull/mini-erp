@@ -457,7 +457,7 @@ function ARAgingReport({ data, loading, formatCurrency, asOfDate }) {
 
   return (
     <div className="ar-aging-report">
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard
           icon={DollarSign}
           label="Total Receivables"

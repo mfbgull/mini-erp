@@ -199,7 +199,7 @@ export default function QuotationsPage() {
         </Button>
       </div>
 
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={FileText} label={t('common.total')} value={quotationTotals.count} />
         <StatCard icon={FileText} label={t('quotations.draft')} value={quotationTotals.draft} />
         <StatCard icon={Send} label={t('quotations.sent')} value={quotationTotals.sent} />

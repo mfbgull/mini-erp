@@ -238,7 +238,7 @@ export default function ReportsDashboard() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={TrendingUpIcon} label="Total Sales" value={formatCurrency(stats.totalSales)} subtitle="Revenue this period" />
         <StatCard icon={DollarSign} label="Outstanding" value={formatCurrency(stats.pendingPayments)} subtitle="Pending payments" style={{ borderColor: stats.pendingPayments > 0 ? '#f97316' : undefined }} />
         <StatCard icon={AlertTriangle} label="Overdue" value={formatCurrency(stats.overduePayments)} subtitle="Past due amount" alert />

@@ -252,7 +252,7 @@ export default function ProductionSummaryReport() {
       )}
 
       {reportData?.summary && (
-        <StatsGrid>
+        <StatsGrid className="compact">
           <StatCard
             icon={Factory}
             label="Total Production Orders"

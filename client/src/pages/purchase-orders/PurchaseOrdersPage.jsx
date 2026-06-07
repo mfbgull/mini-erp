@@ -71,7 +71,7 @@ export default function PurchaseOrdersPage() {
         </div>
       ) : (
         <>
-          <StatsGrid>
+          <StatsGrid className="compact">
             <StatCard icon={FileText} label="Total POs" value={stats.total} />
             <StatCard icon={FileText} label="Draft" value={stats.draft} />
             <StatCard icon={Send} label="Submitted" value={stats.submitted} />

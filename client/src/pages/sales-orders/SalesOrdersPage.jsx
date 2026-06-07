@@ -198,7 +198,7 @@ export default function SalesOrdersPage() {
         </Button>
       </div>
 
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={ShoppingCart} label={t('common.total')} value={orderTotals.count} />
         <StatCard icon={FileText} label={t('salesOrders.draft')} value={orderTotals.draft} />
         <StatCard icon={CheckCircle} label={t('salesOrders.confirmed')} value={orderTotals.confirmed} />

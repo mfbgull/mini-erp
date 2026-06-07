@@ -280,7 +280,7 @@ export default function BOMPage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={ClipboardList} label="Total BOMs" value={stats.totalBOMs} subtitle="All recipes" />
         <StatCard icon={CheckCircle} label="Active BOMs" value={stats.activeBOMs} subtitle="In use" />
         <StatCard icon={Factory} label="Finished Goods" value={stats.uniqueFinishedGoods} subtitle="Unique products" />

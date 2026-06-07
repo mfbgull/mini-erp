@@ -351,7 +351,7 @@ export default function PurchaseSummaryReport() {
       )}
 
       {reportData?.summary && (
-        <StatsGrid>
+        <StatsGrid className="compact">
           <StatCard
             icon={FileText}
             label="Total Orders"

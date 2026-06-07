@@ -325,7 +325,7 @@ export default function SalesSummaryReport() {
       )}
 
       {reportData?.summary && (
-        <StatsGrid>
+        <StatsGrid className="compact">
           <StatCard
             icon={FileText}
             label="Total Invoices"
