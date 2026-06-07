@@ -111,8 +111,13 @@ function deleteItem(req: AuthRequest, res: Response): void {
       return;
     }
 
-    if (item.current_stock && item.current_stock > 0) {
-      res.status(400).json({ error: 'Cannot delete item with existing stock' });
+    // Check stock_balances (authoritative stock count) instead of item.current_stock
+    const totalStock = db.prepare(`
+      SELECT COALESCE(SUM(quantity), 0) as total FROM stock_balances WHERE item_id = ?
+    `).get(itemId) as { total: number } | undefined;
+
+    if (totalStock && totalStock.total > 0) {
+      res.status(400).json({ error: `Cannot delete item with existing stock (${totalStock.total} units)` });
       return;
     }
 
@@ -319,7 +324,7 @@ function createStockMovement(req: AuthRequest, res: Response): void {
     }
 
     // Use batch-aware consumption for outgoing transfers and negative adjustments
-    const useBatchConsumption = ['TRANSFER', 'ADJUSTMENT'].includes(movement_type) && quantity < 0;
+    const useBatchConsumption = ['SALE', 'TRANSFER', 'ADJUSTMENT'].includes(movement_type) && quantity < 0;
 
     let results: Array<{ id: number; movement_no: string }>;
 

@@ -76,12 +76,16 @@ function createCustomer(req: AuthRequest, res: Response): void {
     const nextCustomerNo = getNextSequenceNumber(db, 'CUST_last_no');
     const newCustomerCode = `CUST${String(nextCustomerNo).padStart(3, '0')}`;
 
-    const customerId = CustomerModel.create({ ...req.body, opening_balance: opening_balance || 0 }, db);
-    CustomerModel.updateCode(customerId, newCustomerCode, db);
+    const customerId = db.transaction(() => {
+      const cid = CustomerModel.create({ ...req.body, opening_balance: opening_balance || 0 }, db);
+      CustomerModel.updateCode(cid, newCustomerCode, db);
 
-    if (opening_balance && parseFloat(opening_balance) !== 0) {
-      CustomerModel.addOpeningBalanceLedger(customerId, newCustomerCode, parseFloat(opening_balance), db);
-    }
+      if (opening_balance && parseFloat(opening_balance) !== 0) {
+        CustomerModel.addOpeningBalanceLedger(cid, newCustomerCode, parseFloat(opening_balance), db);
+      }
+
+      return cid;
+    }).immediate();
 
     const createdCustomer = CustomerModel.getById(customerId, db);
 

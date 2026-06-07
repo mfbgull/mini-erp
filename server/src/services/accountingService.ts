@@ -440,6 +440,35 @@ export class AccountingService {
   }
 
   // ------------------------------------------------------------------
+  // Void / reversal
+  // ------------------------------------------------------------------
+
+  /**
+   * Void journal lines by reference type + ID. Sets voided = 1 so that
+   * balance queries (which filter AND voided = 0) will exclude them.
+   * This is the canonical cleanup path when an invoice or payment is
+   * deleted — it preserves the audit trail while excluding the stale
+   * lines from reports.
+   *
+   * Safe to call even if no matching lines exist (no-op). Returns the
+   * number of lines voided.
+   */
+  static voidJournalLinesByReference(
+    db: Database.Database,
+    referenceType: string,
+    referenceId: number
+  ): number {
+    const result = db.prepare(`
+      UPDATE journal_lines
+      SET voided = 1
+      WHERE reference_type = ?
+        AND reference_id = ?
+        AND voided = 0
+    `).run(referenceType, referenceId);
+    return result.changes;
+  }
+
+  // ------------------------------------------------------------------
   // Period management
   // ------------------------------------------------------------------
 

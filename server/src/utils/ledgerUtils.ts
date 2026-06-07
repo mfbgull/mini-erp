@@ -113,10 +113,36 @@ function updateInvoiceBalanceAndStatus(invoiceId: number, _amountPaid: number = 
   return updateInvoiceStatus(invoiceId);
 }
 
+/**
+ * Recompute the running balance for all customer_ledger entries for a given
+ * customer. This is needed when rows are deleted (e.g. invoice or payment
+ * delete) because the remaining rows' balance column was computed based on
+ * the now-removed row.
+ *
+ * Walks all entries ordered by id and rewrites the balance column so the
+ * chain is consistent: balance = previous_balance + debit - credit.
+ */
+function rebuildLedgerBalances(customerId: number): void {
+  const entries = db.prepare(`
+    SELECT id, debit, credit FROM customer_ledger
+    WHERE customer_id = ?
+    ORDER BY id ASC
+  `).all(customerId) as Array<{ id: number; debit: number; credit: number }>;
+
+  let runningBalance = 0;
+  const updateStmt = db.prepare('UPDATE customer_ledger SET balance = ? WHERE id = ?');
+
+  for (const entry of entries) {
+    runningBalance = addCurrency(subtractCurrency(runningBalance, entry.credit), entry.debit);
+    updateStmt.run(runningBalance, entry.id);
+  }
+}
+
 export default {
   createLedgerEntry,
   updateCustomerBalance,
   calculateInvoiceBalance,
   updateInvoiceStatus,
-  updateInvoiceBalanceAndStatus
+  updateInvoiceBalanceAndStatus,
+  rebuildLedgerBalances
 };

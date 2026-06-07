@@ -253,6 +253,10 @@ export class PaymentModel {
       try { ledgerUtils.updateCustomerBalance(existing.customer_id); } catch {
         // Intentionally skip failed customer balance update
       }
+
+      try { ledgerUtils.rebuildLedgerBalances(existing.customer_id); } catch {
+        // Intentionally skip failed ledger rebuild
+      }
     })();
   }
 

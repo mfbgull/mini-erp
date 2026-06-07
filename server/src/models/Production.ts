@@ -101,6 +101,15 @@ class ProductionModel {
 
     const materialsWarehouseId = raw_materials_warehouse_id || warehouse_id;
 
+    // Validate bom_id matches output_item_id
+    if (bom_id) {
+      const bom = db.prepare('SELECT finished_item_id FROM boms WHERE id = ?').get(bom_id) as { finished_item_id: number } | undefined;
+      if (!bom) throw new Error(`BOM ${bom_id} not found`);
+      if (bom.finished_item_id !== output_item_id) {
+        throw new Error(`BOM ${bom_id} produces item ${bom.finished_item_id}, not item ${output_item_id}`);
+      }
+    }
+
     // CRITICAL-5 fix: use IMMEDIATE-mode transaction so the read of
     // stock_balances and the subsequent writes happen under a single
     // RESERVED writer lock. With the default DEFERRED mode, two
@@ -167,7 +176,7 @@ class ProductionModel {
 
         // Create one stock_movement per consumed batch for full traceability
         for (const entry of consumption) {
-          const inputMovementNo = this.generateMovementNo(db);
+          const inputMovementNo = StockMovementModel.generateMovementNo(db);
           db.prepare(`
             INSERT INTO stock_movements (
               movement_no, item_id, warehouse_id, movement_type,
@@ -253,7 +262,7 @@ class ProductionModel {
       const outputBatchId = batchRecord?.id;
 
       // Record output stock movement linked to the new batch
-      const outputMovementNo = this.generateMovementNo(db);
+      const outputMovementNo = StockMovementModel.generateMovementNo(db);
       const outputMovementResult = db.prepare(`
         INSERT INTO stock_movements (
           movement_no, item_id, warehouse_id, movement_type,
@@ -360,26 +369,6 @@ class ProductionModel {
     const settingKey = `PROD_last_no_${year}`;
     const nextNo = getNextSequenceNumber(db, settingKey);
     return `PROD-${year}-${nextNo.toString().padStart(4, '0')}`;
-  }
-
-  static generateMovementNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `STK_last_no_${year}`;
-
-    // Atomic increment using INSERT ... ON CONFLICT DO UPDATE
-    // Prevents race conditions with concurrent production recordings
-    db.prepare(`
-      INSERT INTO settings (key, value, updated_at)
-      VALUES (?, '1', CURRENT_TIMESTAMP)
-      ON CONFLICT(key) DO UPDATE SET
-        value = CAST(CAST(settings.value AS INTEGER) + 1 AS TEXT),
-        updated_at = CURRENT_TIMESTAMP
-    `).run(settingKey);
-
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string };
-    const nextNo = parseInt(setting.value);
-
-    return `STK-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
   static getAll(filters: ProductionFilters = {}, db: Database.Database): Production[] {

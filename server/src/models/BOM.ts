@@ -216,6 +216,12 @@ class BOMModel {
       throw new Error('BOM not found');
     }
 
+    const resolvedFinishedItemId = finished_item_id ?? existingBOM.finished_item_id;
+    const item = db.prepare('SELECT id FROM items WHERE id = ?').get(resolvedFinishedItemId) as { id: number } | undefined;
+    if (!item) {
+      throw new Error(`Item with id ${resolvedFinishedItemId} not found`);
+    }
+
     const transaction = db.transaction(() => {
       const updateBOM = db.prepare(`
         UPDATE boms
@@ -225,7 +231,7 @@ class BOMModel {
 
       updateBOM.run(
         bom_name,
-        finished_item_id || existingBOM.finished_item_id,
+        resolvedFinishedItemId,
         description || null,
         quantity,
         is_active !== undefined ? is_active : existingBOM.is_active,

@@ -98,6 +98,14 @@ function createPayment(req: AuthRequest, res: Response): void {
         res.status(400).json({ success: false, error: `Allocation amount for invoice ${alloc.invoice_id} must be greater than 0` });
         return;
       }
+
+      if (parseCurrency(alloc.amount) > parseCurrency(invoice.balance_amount)) {
+        res.status(400).json({
+          success: false,
+          error: `Allocation amount (${parseCurrency(alloc.amount).toFixed(2)}) for invoice ${alloc.invoice_id} exceeds the remaining balance (${parseCurrency(invoice.balance_amount).toFixed(2)})`
+        });
+        return;
+      }
     }
 
     const totalAllocated = invoice_allocations.reduce((sum: number, alloc: any) => sum + parseCurrency(alloc.amount), 0);

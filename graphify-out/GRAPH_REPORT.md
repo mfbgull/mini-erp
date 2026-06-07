@@ -1,12 +1,12 @@
 # Graph Report - /home/fawad/ai/minierp  (2026-06-07)
 
 ## Corpus Check
-- 577 files · ~882,700 words
+- 581 files · ~889,787 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7783 nodes · 18646 edges · 287 communities detected
-- Extraction: 54% EXTRACTED · 46% INFERRED · 0% AMBIGUOUS · INFERRED: 8585 edges (avg confidence: 0.75)
+- 7822 nodes · 18767 edges · 287 communities detected
+- Extraction: 54% EXTRACTED · 46% INFERRED · 0% AMBIGUOUS · INFERRED: 8653 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -326,203 +326,203 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.01
-Nodes (782): cli(), clip_add(), clip_import(), clip_list(), clip_move(), clip_remove(), clip_split(), clip_trim() (+774 more)
+Nodes (768): Enter interactive REPL mode., repl(), cli(), clip_add(), clip_import(), clip_list(), clip_move(), clip_remove() (+760 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.01
-Nodes (320): get_rms(), Read a WAV file and return (samples, sample_rate, channels, bit_depth).      Ret, Calculate RMS (Root Mean Square) level of audio samples., read_wav(), get_clip(), import_clip(), Import a clip into the project bin., _find_compositing_transition() (+312 more)
+Nodes (413): clip(), Clip management commands., get_rms(), Read a WAV file and return (samples, sample_rate, channels, bit_depth).      Ret, Calculate RMS (Root Mean Square) level of audio samples., read_wav(), import_clip(), Import a clip into the project bin. (+405 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.01
-Nodes (545): cleanup_logs(), export_logs(), get_actions(), get_activity_stats(), get_entity_activity(), get_entity_types(), get_recent_activity(), get_user_activity() (+537 more)
+Nodes (543): cleanup_logs(), export_logs(), get_actions(), get_activity_stats(), get_entity_activity(), get_entity_types(), get_recent_activity(), get_user_activity() (+535 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.01
-Nodes (582): AuthenticationError, ERPError, Base exception for ERP CLI errors., Raised when the Mini ERP server is not reachable., Raised on 401 responses., ServerNotRunningError, Exception, list_categories() (+574 more)
+Nodes (365): add_sheet(), clear_cell(), _ensure_calc(), get_cell(), _get_sheet(), get_sheet_data(), list_sheets(), LibreOffice CLI - Calc (spreadsheet) module. (+357 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.01
-Nodes (328): ActivityLogModel, cleanupLogs(), exportLogs(), getActions(), getActivityLogs(), getActivityStats(), getEntityActivity(), getEntityTypes() (+320 more)
+Nodes (382): closePeriod(), getAccount(), getAccountBalance(), getCurrentPeriod(), getPeriod(), isValidIsoDate(), listAccountBalances(), listAccounts() (+374 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.01
-Nodes (205): _anchor_offset(), crop_canvas(), get_canvas_info(), GIMP CLI - Canvas operations module., Crop the canvas to a rectangle., Set the canvas color mode., Set the canvas DPI (dots per inch)., Resize the canvas (does not scale content, adds/removes space).      Args: (+197 more)
+Nodes (580): AuthenticationError, ERPError, Base exception for ERP CLI errors., Raised when the Mini ERP server is not reachable., Raised on 401 responses., ServerNotRunningError, Exception, activity() (+572 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.01
-Nodes (172): add_keyframe(), list_keyframes(), Blender CLI - Animation and keyframe management module., Remove keyframe(s) from an object.      Args:         project: The scene dict, Set the animation frame range.      Args:         project: The scene dict, Set the animation FPS (frames per second).      Args:         project: The scene, Set the current frame.      Args:         project: The scene dict         frame:, List keyframes for an object.      Args:         project: The scene dict (+164 more)
+Nodes (182): add_keyframe(), list_keyframes(), Blender CLI - Animation and keyframe management module., Remove keyframe(s) from an object.      Args:         project: The scene dict, Set the animation frame range.      Args:         project: The scene dict, Set the animation FPS (frames per second).      Args:         project: The scene, Set the current frame.      Args:         project: The scene dict         frame:, List keyframes for an object.      Args:         project: The scene dict (+174 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.01
-Nodes (263): getAuthCookie(), add_connector(), list_connectors(), list_edge_styles(), Connector (edge) operations: add, remove, modify, list., List all available edge style presets., Add a connector between two shapes.      Args:         session: Active session., Remove a connector by ID. (+255 more)
+Nodes (240): getAuthCookie(), add_connector(), list_connectors(), list_edge_styles(), Connector (edge) operations: add, remove, modify, list., List all available edge style presets., Add a connector between two shapes.      Args:         session: Active session., Remove a connector by ID. (+232 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.01
-Nodes (185): add_sheet(), clear_cell(), _ensure_calc(), get_cell(), _get_sheet(), get_sheet_data(), list_sheets(), LibreOffice CLI - Calc (spreadsheet) module. (+177 more)
+Cohesion: 0.02
+Nodes (143): add_audio_source(), get_audio_source(), _get_audio_sources(), list_audio(), mute(), OBS Studio CLI - Audio management., Set audio sync offset in milliseconds., List all audio sources. (+135 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.02
-Nodes (136): add_audio_source(), get_audio_source(), _get_audio_sources(), list_audio(), mute(), OBS Studio CLI - Audio management., Set audio sync offset in milliseconds., List all audio sources. (+128 more)
+Cohesion: 0.01
+Nodes (238): Save configuration to ~/.config/anygen/config.json (mode 600)., save_config(), cli(), config(), config_delete(), config_get(), config_path(), config_set() (+230 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.02
-Nodes (145): ConversationEngine, Database, connect(), Connector operations: add, remove, style., Enum, _extract_customer_name(), extract_intent(), _extract_item_with_quantity() (+137 more)
+Nodes (146): ConversationEngine, Database, connect(), Connector operations: add, remove, style., Enum, _extract_customer_name(), extract_intent(), _extract_item_with_quantity() (+138 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.01
-Nodes (165): create_task(), download_file(), download_thumbnail(), encode_file(), get_api_key(), load_config(), _make_auth_token(), poll_task() (+157 more)
+Nodes (86): ARAgingReport(), ARReportsPage(), DSOReport(), ReceivablesSummary(), useAuth(), BOMForm(), BOMPage(), BOMUsageReport() (+78 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.01
-Nodes (85): ARAgingReport(), ARReportsPage(), DSOReport(), ReceivablesSummary(), useAuth(), BOMForm(), BOMPage(), BOMUsageReport() (+77 more)
+Cohesion: 0.02
+Nodes (105): activateChain(), displayName(), execute(), loadChains(), parseAgentFile(), parseChainYaml(), renderCall(), renderCard() (+97 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.02
-Nodes (98): activateChain(), displayName(), execute(), loadChains(), parseAgentFile(), parseChainYaml(), renderCall(), renderCard() (+90 more)
+Nodes (106): apply_change_speed(), apply_echo(), apply_fade_in(), apply_fade_out(), apply_gain(), apply_high_pass(), apply_limit(), apply_low_pass() (+98 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.02
-Nodes (110): clip(), Clip management commands., export_diagram(), find_drawio(), get_drawio_version(), Draw.io backend — invoke draw.io desktop CLI for diagram export.  The draw.io de, Find the draw.io CLI executable. Raises RuntimeError if not found., Get the installed draw.io version string. (+102 more)
+Nodes (59): Validate an ODF file structure., validate_odf(), clean_session(), cli(), gradient_image(), Test meeting listing., Should list upcoming meetings., Resolve installed CLI command; falls back to python -m for dev.      Set env CLI (+51 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.02
-Nodes (140): login(), login_with_code(), logout(), OAuth2 authentication flow for Zoom API.  Handles: - OAuth app setup (client_id,, Complete login with a manually provided authorization code.      Use this when t, Remove saved tokens (does not revoke on Zoom side).      Returns:         Dict c, Save OAuth app credentials.      Args:         client_id: Zoom OAuth app client, Run the OAuth2 authorization flow.      Opens a browser for user authorization, (+132 more)
+Cohesion: 0.03
+Nodes (129): Persist session metadata to disk., Persist session metadata to disk (not the project, just session info)., _auto_save_callback(), cli(), composite_blend_modes(), composite_get_blend(), composite_group(), composite_pip() (+121 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.02
-Nodes (94): apply_change_speed(), apply_echo(), apply_fade_in(), apply_fade_out(), apply_gain(), apply_high_pass(), apply_limit(), apply_low_pass() (+86 more)
+Cohesion: 0.03
+Nodes (52): get_clip(), add_guide(), list_guides(), _next_guide_id(), Kdenlive CLI - Guide/marker management module., Generate next unique guide ID., Add a guide/marker at a position (in seconds)., Remove a guide by ID. (+44 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.03
-Nodes (127): _auto_save_callback(), cli(), composite_blend_modes(), composite_get_blend(), composite_group(), composite_pip(), composite_set_blend(), composite_set_opacity() (+119 more)
+Nodes (18): addCurrency(), multiplyCurrency(), parseCurrency(), roundCurrency(), subtractCurrency(), generateDocumentNo(), calculateInvoiceBalance(), updateCustomerBalance() (+10 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.03
-Nodes (17): addCurrency(), multiplyCurrency(), parseCurrency(), roundCurrency(), subtractCurrency(), generateDocumentNo(), calculateInvoiceBalance(), updateCustomerBalance() (+9 more)
+Cohesion: 0.08
+Nodes (53): _add_heading_element(), _add_image_ref_element(), _add_list_element(), _add_page_break_element(), _add_paragraph_element(), _add_table_element(), _apply_paragraph_properties(), _apply_text_properties() (+45 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.05
-Nodes (15): Test the actual CLI entry point via subprocess., Full editing pipeline as CLI subprocess calls., Tests for CLI subprocess invocation., --help prints usage info., Full undo/redo cycle., Test the CLI as a subprocess, like a real user/agent would use it., Shape list from a file that already has shapes.          Each subprocess is stat, Run the CLI as a subprocess. (+7 more)
-
-### Community 20 - "Community 20"
-Cohesion: 0.04
-Nodes (41): parse_time(), Parse a time value that can be seconds or HH:MM:SS.mmm., build_mlt_xml(), _clip_type_num(), frames_to_seconds(), _indent(), MLT XML parsing and generation utilities.  This module handles all low-level MLT, Convert seconds (float) to HH:MM:SS.mmm timecode string. (+33 more)
-
-### Community 21 - "Community 21"
-Cohesion: 0.04
-Nodes (44): apply_filter_and_export(), batch_script_fu(), create_and_export(), find_gimp(), get_version(), GIMP backend — invoke GIMP in batch mode for image processing.  Uses GIMP's Scri, Load an image in GIMP, apply a Script-Fu filter, and export.      Args:, Find the GIMP executable. Raises RuntimeError if not found. (+36 more)
-
-### Community 22 - "Community 22"
 Cohesion: 0.04
 Nodes (35): mock_config(), Login with manual code should exchange it for tokens., Test meeting CLI commands with mocked API., meeting create should call API and show result., meeting list should show meetings., meeting info should show meeting details., meeting delete should confirm and delete., meeting update should patch meeting fields. (+27 more)
 
-### Community 23 - "Community 23"
-Cohesion: 0.08
-Nodes (51): _add_heading_element(), _add_image_ref_element(), _add_list_element(), _add_page_break_element(), _add_paragraph_element(), _add_table_element(), _apply_paragraph_properties(), _apply_text_properties() (+43 more)
-
-### Community 24 - "Community 24"
+### Community 20 - "Community 20"
 Cohesion: 0.09
-Nodes (35): abbreviateModel(), applyAgentPatch(), audit(), cleanShutdown(), execute(), fallbackColor(), findSystemPromptPath(), handleInboundPrompt() (+27 more)
+Nodes (27): TestTransforms, Apply multiple transforms and verify., clear_transform(), _format_number(), _get_object(), get_transform(), parse_transform_string(), Inkscape CLI - Transform operations module.  Handles translate, rotate, scale, a (+19 more)
 
-### Community 25 - "Community 25"
+### Community 21 - "Community 21"
 Cohesion: 0.06
-Nodes (26): generate_invoice_pdf(), Apply color code if colors are supported., Apply color code if colors are supported., Apply color code if colors are supported., Build a styled prompt string for prompt_toolkit or input().          Args:, Build a styled prompt string for prompt_toolkit or input().          Args:, Build a styled prompt string for prompt_toolkit or input().          Args:, Print a success message with green checkmark. (+18 more)
+Nodes (35): apply_filter_and_export(), batch_script_fu(), create_and_export(), find_gimp(), get_version(), GIMP backend — invoke GIMP in batch mode for image processing.  Uses GIMP's Scri, Load an image in GIMP, apply a Script-Fu filter, and export.      Args:, Find the GIMP executable. Raises RuntimeError if not found. (+27 more)
 
-### Community 26 - "Community 26"
+### Community 22 - "Community 22"
+Cohesion: 0.09
+Nodes (32): abbreviateModel(), ackOk(), bindEndpoint(), cleanShutdown(), execute(), fallbackColor(), findSystemPromptPath(), handlePrompt() (+24 more)
+
+### Community 23 - "Community 23"
 Cohesion: 0.06
 Nodes (9): handleCardClick(), handleCardClick(), handleCardClick(), handleCardClick(), handleApiError(), handleError(), handleFormError(), logError() (+1 more)
 
-### Community 27 - "Community 27"
-Cohesion: 0.11
-Nodes (18): find_ffmpeg(), find_melt(), get_melt_version(), MLT/melt backend — invoke melt for rendering MLT XML projects.  Shotcut and Kden, Render a color bars test video using melt's built-in producer.      This doesn't, Find the melt executable. Raises RuntimeError if not found., Find ffmpeg executable., Get the installed melt version string. (+10 more)
+### Community 24 - "Community 24"
+Cohesion: 0.07
+Nodes (22): generate_invoice_pdf(), Apply color code if colors are supported., Apply color code if colors are supported., Apply color code if colors are supported., Build a styled prompt string for prompt_toolkit or input().          Args:, Build a styled prompt string for prompt_toolkit or input().          Args:, Build a styled prompt string for prompt_toolkit or input().          Args:, Print a subtle hint message. (+14 more)
 
-### Community 28 - "Community 28"
+### Community 25 - "Community 25"
+Cohesion: 0.1
+Nodes (21): find_ffmpeg(), find_melt(), get_melt_version(), MLT/melt backend — invoke melt for rendering MLT XML projects.  Shotcut and Kden, Render a color bars test video using melt's built-in producer.      This doesn't, Find the melt executable. Raises RuntimeError if not found., Find ffmpeg executable., Get the installed melt version string. (+13 more)
+
+### Community 26 - "Community 26"
 Cohesion: 0.09
 Nodes (1): MiniERPWebMCP
 
-### Community 29 - "Community 29"
+### Community 27 - "Community 27"
 Cohesion: 0.09
 Nodes (1): LibreOffice CLI - Tests package.
 
-### Community 30 - "Community 30"
+### Community 28 - "Community 28"
+Cohesion: 0.2
+Nodes (2): AccountingService, getTrialBalance()
+
+### Community 29 - "Community 29"
 Cohesion: 0.22
 Nodes (6): NotificationService, sendDeliveryDelayAlertSMS(), sendLowStockAlertSMS(), sendNewOrderAlertSMS(), sendPaymentNotificationSMS(), sendSMS()
 
-### Community 31 - "Community 31"
+### Community 30 - "Community 30"
 Cohesion: 0.18
 Nodes (2): EmailService, sendEmail()
 
-### Community 32 - "Community 32"
+### Community 31 - "Community 31"
 Cohesion: 0.21
 Nodes (3): validateEmail(), validatePhoneNumber(), ValidationService
 
-### Community 33 - "Community 33"
+### Community 32 - "Community 32"
 Cohesion: 0.21
 Nodes (2): getWeather(), WeatherService
 
-### Community 34 - "Community 34"
+### Community 33 - "Community 33"
 Cohesion: 0.14
 Nodes (14): cli-anything Plugin, List Command, Refine Command, Test Command, Validate Command, Expand Tests, Gap Analysis, Implement New Commands (+6 more)
 
-### Community 35 - "Community 35"
+### Community 34 - "Community 34"
 Cohesion: 0.29
 Nodes (5): calculateItemTotal(), getSubtotal(), getTotalDiscount(), safeParseFloat(), safeToString()
 
-### Community 36 - "Community 36"
+### Community 35 - "Community 35"
 Cohesion: 0.28
 Nodes (3): handleKeyDown(), handleSelect(), toggleOption()
 
-### Community 37 - "Community 37"
+### Community 36 - "Community 36"
 Cohesion: 0.22
 Nodes (0): 
 
-### Community 38 - "Community 38"
+### Community 37 - "Community 37"
 Cohesion: 0.25
 Nodes (5): handle_call_tool(), handle_list_resources(), handle_read_resource(), List available resources (project files, docs, etc.), Read a specific resource
 
-### Community 39 - "Community 39"
+### Community 38 - "Community 38"
 Cohesion: 0.43
 Nodes (5): getTimeoutSeconds(), handleMouseEnter(), handleMouseLeave(), startTimer(), stopTimer()
 
-### Community 40 - "Community 40"
+### Community 39 - "Community 39"
 Cohesion: 0.29
 Nodes (0): 
 
-### Community 41 - "Community 41"
+### Community 40 - "Community 40"
 Cohesion: 0.43
 Nodes (5): handleValidationErrors(), validateZod(), validateZodBody(), validateZodParams(), validateZodQuery()
 
-### Community 42 - "Community 42"
+### Community 41 - "Community 41"
 Cohesion: 0.29
 Nodes (1): Allow running as python3 -m cli.inkscape_cli
 
-### Community 43 - "Community 43"
+### Community 42 - "Community 42"
 Cohesion: 0.29
 Nodes (7): Codebase Analysis, CLI Architecture Design, Implementation, Test Planning, Test Implementation, Test Documentation, PyPI Publishing
 
-### Community 44 - "Community 44"
+### Community 43 - "Community 43"
 Cohesion: 0.29
 Nodes (7): CORS Configuration, Environment Variables, JWT Authentication, Password Hashing, Rate Limiting, Security Configuration, Security Checklist
+
+### Community 44 - "Community 44"
+Cohesion: 0.33
+Nodes (0): 
 
 ### Community 45 - "Community 45"
 Cohesion: 0.33
 Nodes (0): 
 
 ### Community 46 - "Community 46"
-Cohesion: 0.33
-Nodes (0): 
-
-### Community 47 - "Community 47"
 Cohesion: 0.47
 Nodes (4): calculateItemAmount(), reducer(), useAutoSaveDraft(), useInvoice()
 
-### Community 48 - "Community 48"
+### Community 47 - "Community 47"
 Cohesion: 0.33
 Nodes (0): 
 
-### Community 49 - "Community 49"
+### Community 48 - "Community 48"
 Cohesion: 0.4
 Nodes (2): ensureDatabaseDirectory(), getDatabasePath()
+
+### Community 49 - "Community 49"
+Cohesion: 0.4
+Nodes (0): 
 
 ### Community 50 - "Community 50"
 Cohesion: 0.4
@@ -558,31 +558,31 @@ Nodes (0):
 
 ### Community 58 - "Community 58"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (5): Dual Output Modes, Methodology, REPL Mode, Stateful Session, Comprehensive Testing
 
 ### Community 59 - "Community 59"
 Cohesion: 0.4
-Nodes (5): Dual Output Modes, Methodology, REPL Mode, Stateful Session, Comprehensive Testing
+Nodes (5): Database Backup, Electron Packaging, Process Management, Production Build, Reverse Proxy
 
 ### Community 60 - "Community 60"
-Cohesion: 0.4
-Nodes (5): Database Backup, Electron Packaging, Process Management, Production Build, Reverse Proxy
+Cohesion: 0.5
+Nodes (0): 
 
 ### Community 61 - "Community 61"
 Cohesion: 0.5
 Nodes (0): 
 
 ### Community 62 - "Community 62"
-Cohesion: 0.5
-Nodes (0): 
-
-### Community 63 - "Community 63"
 Cohesion: 0.83
 Nodes (3): isAGGridCellFocused(), isAGGridEditing(), shouldIgnoreForAGGrid()
 
-### Community 64 - "Community 64"
+### Community 63 - "Community 63"
 Cohesion: 0.5
 Nodes (2): shutdownRateLimiters(), globalTeardown()
+
+### Community 64 - "Community 64"
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 65 - "Community 65"
 Cohesion: 0.67
@@ -597,12 +597,12 @@ Cohesion: 0.67
 Nodes (0): 
 
 ### Community 68 - "Community 68"
-Cohesion: 0.67
-Nodes (0): 
-
-### Community 69 - "Community 69"
 Cohesion: 1.0
 Nodes (2): formatCurrency(), formatCurrencyWithDefaultSettings()
+
+### Community 69 - "Community 69"
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 70 - "Community 70"
 Cohesion: 0.67
@@ -625,7 +625,7 @@ Cohesion: 0.67
 Nodes (0): 
 
 ### Community 75 - "Community 75"
-Cohesion: 0.67
+Cohesion: 1.0
 Nodes (0): 
 
 ### Community 76 - "Community 76"
@@ -734,23 +734,23 @@ Nodes (0):
 
 ### Community 102 - "Community 102"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): GitHub Repository, Local Installation
 
 ### Community 103 - "Community 103"
 Cohesion: 1.0
-Nodes (2): GitHub Repository, Local Installation
+Nodes (2): NPM Package, Claude Plugin Directory
 
 ### Community 104 - "Community 104"
 Cohesion: 1.0
-Nodes (2): NPM Package, Claude Plugin Directory
+Nodes (2): Release Workflow, Semantic Versioning
 
 ### Community 105 - "Community 105"
 Cohesion: 1.0
-Nodes (2): Release Workflow, Semantic Versioning
+Nodes (2): Application Settings, Database Configuration
 
 ### Community 106 - "Community 106"
 Cohesion: 1.0
-Nodes (2): Application Settings, Database Configuration
+Nodes (0): 
 
 ### Community 107 - "Community 107"
 Cohesion: 1.0
@@ -1475,189 +1475,191 @@ Nodes (1): Troubleshooting
 ## Knowledge Gaps
 - **1844 isolated node(s):** `List available resources (project files, docs, etc.)`, `Read a specific resource`, `Remove ANSI escape codes for length calculation.`, `Get visible length of text (excluding ANSI codes).`, `Unified REPL skin for cli-anything CLIs.      Provides consistent branding, prom` (+1839 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 76`** (2 nodes): `vite.config.js`, `manualChunks()`
+- **Thin community `Community 75`** (2 nodes): `vite.config.js`, `manualChunks()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 77`** (2 nodes): `handleSort()`, `DataTable.tsx`
+- **Thin community `Community 76`** (2 nodes): `handleSort()`, `DataTable.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 78`** (2 nodes): `Modal.tsx`, `Modal()`
+- **Thin community `Community 77`** (2 nodes): `Modal.tsx`, `Modal()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 79`** (2 nodes): `PageLoader.tsx`, `PageLoader()`
+- **Thin community `Community 78`** (2 nodes): `PageLoader.tsx`, `PageLoader()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (2 nodes): `CompactUserCard()`, `CompactUserCard.tsx`
+- **Thin community `Community 79`** (2 nodes): `CompactUserCard()`, `CompactUserCard.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (2 nodes): `DateRangePicker.jsx`, `DateRangePicker()`
+- **Thin community `Community 80`** (2 nodes): `DateRangePicker.jsx`, `DateRangePicker()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (2 nodes): `handleBackdropClick()`, `CompactRoleCard.tsx`
+- **Thin community `Community 81`** (2 nodes): `handleBackdropClick()`, `CompactRoleCard.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 83`** (2 nodes): `SupplierCard.jsx`, `SupplierCard()`
+- **Thin community `Community 82`** (2 nodes): `SupplierCard.jsx`, `SupplierCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 84`** (2 nodes): `InvoiceWizard.tsx`, `InvoiceWizard()`
+- **Thin community `Community 83`** (2 nodes): `InvoiceWizard.tsx`, `InvoiceWizard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 85`** (2 nodes): `InvoiceDebugger.tsx`, `InvoiceDebugger()`
+- **Thin community `Community 84`** (2 nodes): `InvoiceDebugger.tsx`, `InvoiceDebugger()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 86`** (2 nodes): `PurchaseOrderWizard.tsx`, `PurchaseOrderWizard()`
+- **Thin community `Community 85`** (2 nodes): `PurchaseOrderWizard.tsx`, `PurchaseOrderWizard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 87`** (2 nodes): `PageHeader.tsx`, `handleBack()`
+- **Thin community `Community 86`** (2 nodes): `PageHeader.tsx`, `handleBack()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 88`** (2 nodes): `FloatingActionButton.tsx`, `FloatingActionButton()`
+- **Thin community `Community 87`** (2 nodes): `FloatingActionButton.tsx`, `FloatingActionButton()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 89`** (2 nodes): `useInvoiceNavigation.ts`, `useInvoiceNavigation()`
+- **Thin community `Community 88`** (2 nodes): `useInvoiceNavigation.ts`, `useInvoiceNavigation()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 90`** (2 nodes): `SearchContext.tsx`, `useSearch()`
+- **Thin community `Community 89`** (2 nodes): `SearchContext.tsx`, `useSearch()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 91`** (2 nodes): `focusTrap.jsx`, `FocusTrap()`
+- **Thin community `Community 90`** (2 nodes): `focusTrap.jsx`, `FocusTrap()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 92`** (2 nodes): `IntegrationsPage.jsx`, `IntegrationsPage()`
+- **Thin community `Community 91`** (2 nodes): `IntegrationsPage.jsx`, `IntegrationsPage()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 93`** (2 nodes): `EcosystemView.tsx`, `EcosystemView()`
+- **Thin community `Community 92`** (2 nodes): `EcosystemView.tsx`, `EcosystemView()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 94`** (2 nodes): `handleBackdropClick()`, `CustomerPreview.tsx`
+- **Thin community `Community 93`** (2 nodes): `handleBackdropClick()`, `CustomerPreview.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 95`** (2 nodes): `SalesPreview.tsx`, `getStatusInfo()`
+- **Thin community `Community 94`** (2 nodes): `SalesPreview.tsx`, `getStatusInfo()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 96`** (2 nodes): `InvoicePreview.tsx`, `getStatusColor()`
+- **Thin community `Community 95`** (2 nodes): `InvoicePreview.tsx`, `getStatusColor()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 97`** (2 nodes): `StockMovementPreview.tsx`, `getMovementTypeInfo()`
+- **Thin community `Community 96`** (2 nodes): `StockMovementPreview.tsx`, `getMovementTypeInfo()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 98`** (2 nodes): `SkeletonCard()`, `ForecastTrends.tsx`
+- **Thin community `Community 97`** (2 nodes): `SkeletonCard()`, `ForecastTrends.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 99`** (2 nodes): `PurchasePreview.tsx`, `handleBackdropClick()`
+- **Thin community `Community 98`** (2 nodes): `PurchasePreview.tsx`, `handleBackdropClick()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 100`** (2 nodes): `server.ts`, `getLocalIP()`
+- **Thin community `Community 99`** (2 nodes): `server.ts`, `getLocalIP()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 101`** (2 nodes): `getAllowedOrigins()`, `app.ts`
+- **Thin community `Community 100`** (2 nodes): `getAllowedOrigins()`, `app.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 102`** (2 nodes): `setup.ts`, `cleanupTestDb()`
+- **Thin community `Community 101`** (2 nodes): `setup.ts`, `cleanupTestDb()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 103`** (2 nodes): `GitHub Repository`, `Local Installation`
+- **Thin community `Community 102`** (2 nodes): `GitHub Repository`, `Local Installation`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 104`** (2 nodes): `NPM Package`, `Claude Plugin Directory`
+- **Thin community `Community 103`** (2 nodes): `NPM Package`, `Claude Plugin Directory`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 105`** (2 nodes): `Release Workflow`, `Semantic Versioning`
+- **Thin community `Community 104`** (2 nodes): `Release Workflow`, `Semantic Versioning`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 106`** (2 nodes): `Application Settings`, `Database Configuration`
+- **Thin community `Community 105`** (2 nodes): `Application Settings`, `Database Configuration`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 107`** (1 nodes): `playwright.config.js`
+- **Thin community `Community 106`** (1 nodes): `playwright.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 108`** (1 nodes): `eslint.config.js`
+- **Thin community `Community 107`** (1 nodes): `eslint.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 109`** (1 nodes): `sw.js`
+- **Thin community `Community 108`** (1 nodes): `sw.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 110`** (1 nodes): `types.ts`
+- **Thin community `Community 109`** (1 nodes): `types.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 111`** (1 nodes): `main.tsx`
+- **Thin community `Community 110`** (1 nodes): `main.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 112`** (1 nodes): `FormInput.tsx`
+- **Thin community `Community 111`** (1 nodes): `FormInput.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 113`** (1 nodes): `Button.tsx`
+- **Thin community `Community 112`** (1 nodes): `Button.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 114`** (1 nodes): `CompactStockByWarehouseCard.tsx`
+- **Thin community `Community 113`** (1 nodes): `CompactStockByWarehouseCard.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 115`** (1 nodes): `StatCard.tsx`
+- **Thin community `Community 114`** (1 nodes): `StatCard.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 116`** (1 nodes): `SummaryCard.tsx`
+- **Thin community `Community 115`** (1 nodes): `SummaryCard.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 117`** (1 nodes): `Card.tsx`
+- **Thin community `Community 116`** (1 nodes): `Card.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 118`** (1 nodes): `InvoiceNavigationExamples.tsx`
+- **Thin community `Community 117`** (1 nodes): `InvoiceNavigationExamples.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 119`** (1 nodes): `InvoiceActionBar.tsx`
+- **Thin community `Community 118`** (1 nodes): `InvoiceActionBar.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 120`** (1 nodes): `registerAgGrid.ts`
+- **Thin community `Community 119`** (1 nodes): `registerAgGrid.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 121`** (1 nodes): `invoiceApi.ts`
+- **Thin community `Community 120`** (1 nodes): `invoiceApi.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 122`** (1 nodes): `storage.ts`
+- **Thin community `Community 121`** (1 nodes): `storage.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 123`** (1 nodes): `api.ts`
+- **Thin community `Community 122`** (1 nodes): `api.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 124`** (1 nodes): `salesApi.ts`
+- **Thin community `Community 123`** (1 nodes): `salesApi.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 125`** (1 nodes): `StickyFooter.tsx`
+- **Thin community `Community 124`** (1 nodes): `StickyFooter.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 126`** (1 nodes): `WarehousePreview.tsx`
+- **Thin community `Community 125`** (1 nodes): `WarehousePreview.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 127`** (1 nodes): `ItemPreview.tsx`
+- **Thin community `Community 126`** (1 nodes): `ItemPreview.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 128`** (1 nodes): `StockByWarehousePreview.tsx`
+- **Thin community `Community 127`** (1 nodes): `StockByWarehousePreview.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 128`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 129`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 130`** (1 nodes): `index.ts`
+- **Thin community `Community 130`** (1 nodes): `jest.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 131`** (1 nodes): `jest.config.js`
+- **Thin community `Community 131`** (1 nodes): `check-and-create-bom.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 132`** (1 nodes): `check-and-create-bom.js`
+- **Thin community `Community 132`** (1 nodes): `query-all-boms.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 133`** (1 nodes): `query-all-boms.js`
+- **Thin community `Community 133`** (1 nodes): `run-migration.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 134`** (1 nodes): `run-migration.js`
+- **Thin community `Community 134`** (1 nodes): `add_customers.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 135`** (1 nodes): `add_customers.js`
+- **Thin community `Community 135`** (1 nodes): `add-bom-to-productions.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 136`** (1 nodes): `add-bom-to-productions.js`
+- **Thin community `Community 136`** (1 nodes): `query-brown-products.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 137`** (1 nodes): `query-brown-products.js`
+- **Thin community `Community 137`** (1 nodes): `run-raw-materials-warehouse-migration.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 138`** (1 nodes): `run-raw-materials-warehouse-migration.js`
+- **Thin community `Community 138`** (1 nodes): `add_warehouses.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 139`** (1 nodes): `add_warehouses.js`
+- **Thin community `Community 139`** (1 nodes): `query-products.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 140`** (1 nodes): `query-products.js`
+- **Thin community `Community 140`** (1 nodes): `query-yellow-products.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 141`** (1 nodes): `query-yellow-products.js`
+- **Thin community `Community 141`** (1 nodes): `run-bom-migration.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 142`** (1 nodes): `run-bom-migration.js`
+- **Thin community `Community 142`** (1 nodes): `check_db.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 143`** (1 nodes): `check_db.js`
+- **Thin community `Community 143`** (1 nodes): `add_suppliers.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 144`** (1 nodes): `add_suppliers.js`
+- **Thin community `Community 144`** (1 nodes): `add_items.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 145`** (1 nodes): `add_items.js`
+- **Thin community `Community 145`** (1 nodes): `run-expense-migration.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 146`** (1 nodes): `run-expense-migration.js`
+- **Thin community `Community 146`** (1 nodes): `query-packaging.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 147`** (1 nodes): `query-packaging.js`
+- **Thin community `Community 147`** (1 nodes): `logger.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 148`** (1 nodes): `logger.ts`
+- **Thin community `Community 148`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 149`** (1 nodes): `index.ts`
+- **Thin community `Community 149`** (1 nodes): `express.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 150`** (1 nodes): `express.d.ts`
+- **Thin community `Community 150`** (1 nodes): `models.test.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 151`** (1 nodes): `models.test.ts`
+- **Thin community `Community 151`** (1 nodes): `auth.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 152`** (1 nodes): `auth.ts`
+- **Thin community `Community 152`** (1 nodes): `suppliers.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 153`** (1 nodes): `suppliers.ts`
+- **Thin community `Community 153`** (1 nodes): `forecasts.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 154`** (1 nodes): `forecasts.ts`
+- **Thin community `Community 154`** (1 nodes): `roles.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 155`** (1 nodes): `roles.ts`
+- **Thin community `Community 155`** (1 nodes): `expenses.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 156`** (1 nodes): `expenses.ts`
+- **Thin community `Community 156`** (1 nodes): `users.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 157`** (1 nodes): `users.ts`
+- **Thin community `Community 157`** (1 nodes): `purchaseOrders.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 158`** (1 nodes): `purchaseOrders.ts`
+- **Thin community `Community 158`** (1 nodes): `sales.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 159`** (1 nodes): `sales.ts`
+- **Thin community `Community 159`** (1 nodes): `pos.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 160`** (1 nodes): `pos.ts`
+- **Thin community `Community 160`** (1 nodes): `dashboard.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 161`** (1 nodes): `dashboard.ts`
+- **Thin community `Community 161`** (1 nodes): `customers.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 162`** (1 nodes): `customers.ts`
+- **Thin community `Community 162`** (1 nodes): `integrations.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 163`** (1 nodes): `integrations.ts`
+- **Thin community `Community 163`** (1 nodes): `settings.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 164`** (1 nodes): `settings.ts`
+- **Thin community `Community 164`** (1 nodes): `reports.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 165`** (1 nodes): `reports.ts`
+- **Thin community `Community 165`** (1 nodes): `bom.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 166`** (1 nodes): `bom.ts`
+- **Thin community `Community 166`** (1 nodes): `invoices.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 167`** (1 nodes): `invoices.ts`
+- **Thin community `Community 167`** (1 nodes): `accounting.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 168`** (1 nodes): `activityLog.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -1901,12 +1903,12 @@ Nodes (1): Troubleshooting
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ReplSkin` connect `Community 3` to `Community 0`, `Community 2`, `Community 4`, `Community 7`, `Community 10`, `Community 11`, `Community 17`, `Community 25`?**
-  _High betweenness centrality (0.107) - this node is a cross-community bridge._
-- **Why does `_resolve_cli()` connect `Community 11` to `Community 1`, `Community 2`, `Community 5`, `Community 6`, `Community 7`, `Community 8`, `Community 16`?**
-  _High betweenness centrality (0.043) - this node is a cross-community bridge._
-- **Why does `make_client()` connect `Community 2` to `Community 3`?**
-  _High betweenness centrality (0.037) - this node is a cross-community bridge._
+- **Why does `ReplSkin` connect `Community 5` to `Community 0`, `Community 2`, `Community 4`, `Community 7`, `Community 10`, `Community 15`, `Community 24`?**
+  _High betweenness centrality (0.083) - this node is a cross-community bridge._
+- **Why does `make_client()` connect `Community 2` to `Community 5`?**
+  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+- **Why does `_resolve_cli()` connect `Community 14` to `Community 1`, `Community 2`, `Community 3`, `Community 6`, `Community 7`, `Community 13`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **Are the 345 inferred relationships involving `ReplSkin` (e.g. with `Mini ERP CLI — agent-native command-line interface.  Usage:     cli-anything-min` and `Print data as JSON or human-readable based on --json flag.`) actually correct?**
   _`ReplSkin` has 345 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 376 inferred relationships involving `ERPError` (e.g. with `Mini ERP CLI — agent-native command-line interface.  Usage:     cli-anything-min` and `Print data as JSON or human-readable based on --json flag.`) actually correct?**

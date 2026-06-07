@@ -274,6 +274,11 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
     const initialPaidAmount = paymentAmountNum;
     const initialBalanceAmount = subtractCurrency(totalAmountNum, paymentAmountNum);
 
+    // Guard: payment cannot exceed the invoice total
+    if (record_payment && payment && paymentAmountNum > totalAmountNum) {
+      throw new Error(`Payment amount (${paymentAmountNum.toFixed(2)}) exceeds invoice total (${totalAmountNum.toFixed(2)})`);
+    }
+
     let initialStatus: InvoiceStatus;
     if (record_payment && payment && paymentAmountNum > 0) {
       initialStatus = paymentAmountNum >= totalAmountNum ? 'Paid' : 'Partially Paid';
@@ -523,6 +528,9 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
             }
         }
 
+        // Rebuild running balances after deleting payment ledger entries
+        ledgerUtils.rebuildLedgerBalances(parsedCustomerId);
+
         // === Handle new payment recording (FIX #2: inside transaction) ===
         let newPaymentAmount = 0;
         if (record_payment && payment && parseCurrency(payment.amount) > 0) {
@@ -694,6 +702,8 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
 
           if (paymentInfo) {
             InvoiceModel.deleteLedgerEntryByReference(db, paymentInfo.payment_no);
+            // Void the payment's journal_lines entries (Dr Cash / Cr AR)
+            AccountingService.voidJournalLinesByReference(db, 'PAYMENT', alloc.payment_id);
           }
 
           PaymentModel.delete(db, alloc.payment_id);
@@ -703,17 +713,23 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
       // Reverse stock movements (before deleting invoice items — reversal looks up SALE movements by invoice_no)
       InvoiceModel.reverseStockForItems(db, invoiceItems, invoice.invoice_no, userId, 'INVOICE_DELETE');
 
+      // Void the invoice's journal_lines entries (Dr AR / Cr Sales Revenue / Cr Tax Payable)
+      AccountingService.voidJournalLinesByReference(db, 'INVOICE', invoiceId);
+
       // Delete invoice items after stock reversal is complete
       InvoiceModel.deleteInvoiceItems(db, invoiceId);
 
       // Delete related ledger entries
       InvoiceModel.deleteLedgerEntryByReference(db, invoice.invoice_no);
 
+      // Rebuild running balances so remaining ledger rows are consistent
+      ledgerUtils.rebuildLedgerBalances(invoice.customer_id);
+
       // Delete invoice
       InvoiceModel.deleteInvoice(db, invoiceId);
 
-      // --- FIX #6: Customer balance update inside transaction ---
-      // updateCustomerBalance would typically be called but is handled by ledgerUtils
+      // Recalculate customer's current_balance now that the invoice is gone
+      ledgerUtils.updateCustomerBalance(invoice.customer_id);
     });
 
     transaction();
