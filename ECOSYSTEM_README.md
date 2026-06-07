@@ -1,194 +1,205 @@
-# 🌊 Mini ERP Living Ecosystem
+# Mini ERP Ecosystem
 
-A **bioluminescent underwater ecosystem** visualization of your Mini ERP system. This is a completely novel way to interact with and understand your business data.
+## Overview
 
-## What Is This?
+MiniERP is a full-stack ERP solution for small-to-medium businesses. It uses a
+monorepo structure with separate frontend (React) and backend (Express) packages,
+a shared SQLite database, and a Python CLI tool for agent-native operations.
 
-Instead of traditional dashboards and charts, your entire ERP system is represented as a **living, breathing ocean habitat**:
-
-- **🪸 Coral Reefs** = Core ERP modules (Dashboard, Inventory, Sales, Purchases, Production, etc.)
-- **🐟 Fish Schools** = Sub-features and data entities swarming around each module
-- **✨ Particle Currents** = Data flowing through your system in real-time
-- **🌋 Hydrothermal Vents** = Alerts and notifications (erupt when issues detected)
-- **🦠 Plankton Clouds** = User activity and input data
-
-## How to Access
-
-### Option 1: From the Dashboard
-1. Open Mini ERP
-2. Go to the Dashboard
-3. Click the **"Living Ecosystem"** button in Quick Actions (highlighted in bioluminescent teal)
-
-### Option 2: Direct URL
-Navigate to: `http://localhost:5173/ecosystem`
-
-### Option 3: Standalone
-Open the file directly in your browser: `/home/fawad/ai/minierp/ecosystem.html`
-
-## Features
-
-### 🎨 Visual Representation
-
-| ERP Element | Ecosystem Representation | Behavior |
-|-------------|-------------------------|----------|
-| **Core Modules** | Bioluminescent coral reefs | Pulse based on real-time activity levels |
-| **Sub-features** | Schools of fish | Swarm in patterns around parent module |
-| **Data Flow** | Particle currents | Drift through the ecosystem showing data movement |
-| **Alerts** | Hydrothermal vents | Erupt bubbles when low stock or issues detected |
-| **User Inputs** | Plankton clouds | Float and swirl around active modules |
-
-### 🎮 Interactive Controls
-
-- **Mouse Drag**: Rotate your view around the ecosystem
-- **Scroll**: Zoom in/out (swim closer or further)
-- **Click on Coral**: Explore a module and see real metrics
-- **Escape Key**: Close panel and reset view
-- **Reset View Button**: Return to default overview
-
-### 🔊 Audio System
-- Toggle ambient ocean soundscape
-- Procedural bubble sounds
-- Web Audio API powered (no external files needed)
-
-### 👁 Accessibility
-- **Colorblind Mode**: Shifts to high-contrast, colorblind-friendly palette
-- **Keyboard Navigation**: Full keyboard support
-- **Screen Reader Compatible**: ARIA labels on all interactive elements
-
-### 📊 Real Data Integration
-
-When connected to your running Mini ERP backend:
-- Coral activity levels reflect actual usage
-- Sales reef glows brighter with more revenue
-- Inventory coral pulses based on stock levels
-- Vents erupt if low stock alerts exist
-- Click any coral to see live metrics
-
-## Technical Implementation
-
-### Stack
-- **Three.js r128**: 3D rendering via WebGL
-- **Web Audio API**: Procedural soundscapes
-- **Vanilla JavaScript**: Zero build dependencies
-- **CDN-loaded**: No npm install required
-
-### Architecture
 ```
-ecosystem.html (standalone)
-├── Three.js scene
-│   ├── Seafloor (procedural terrain)
-│   ├── Water surface (animated)
-│   ├── Coral reefs (8 modules)
-│   │   ├── Branching structures
-│   │   ├── Bioluminescent tips
-│   │   └── Point lights
-│   ├── Fish schools (96+ fish)
-│   ├── Particle system (2000 particles)
-│   ├── Hydrothermal vents (2)
-│   └── Plankton clouds (8 clouds, 1600 particles)
-├── API Integration
-│   └── Fetches /api/dashboard/summary
-└── Audio Engine
-    ├── Ocean drone (80Hz sine)
-    └── Bubble sounds (procedural)
+mini-erp/
+├── client/               # React + Vite + TypeScript frontend
+│   ├── src/
+│   │   ├── components/   # Reusable UI components (AG-Grid desktop, cards mobile)
+│   │   ├── pages/        # Route-level page components
+│   │   ├── hooks/        # Custom React hooks
+│   │   └── services/     # API client layer (TanStack Query)
+│   └── vite.config.ts
+├── server/               # Node.js + Express + TypeScript backend
+│   ├── src/
+│   │   ├── controllers/  # Request/response handling
+│   │   ├── services/     # Business logic layer
+│   │   ├── models/       # Database access layer
+│   │   ├── routes/       # Route definitions
+│   │   ├── migrations/   # SQL migration files
+│   │   ├── utils/        # Shared utilities (currency, ledger, logger)
+│   │   └── __tests__/    # Jest test suites
+│   ├── database/         # SQLite database files
+│   └── logs/             # Application logs
+├── electron/             # Desktop app wrapper (optional)
+├── agent-harness/        # Python CLI tool (cli-anything-minierp)
+└── AGENTS.md             # Operational rules for AI agents
 ```
-
-### Data Flow
-```
-Mini ERP Backend (port 3010)
-  ↓ HTTP GET /api/dashboard/summary
-Ecosystem Visualizer
-  ↓ Parse metrics
-Living Ecosystem
-  ├─ Update coral activity levels
-  ├─ Adjust bioluminescence intensity
-  ├─ Trigger vent animations
-  └─ Display metrics on click
-```
-
-## Customization
-
-### Adding New Modules
-Edit the `moduleData` array in `ecosystem.html`:
-```javascript
-const moduleData = [
-  { 
-    name: 'ModuleName', 
-    desc: 'Description', 
-    color: 0xhexcolor, 
-    position: [x, y, z], 
-    scale: size 
-  },
-  // ...
-];
-```
-
-### Changing Colors
-Each module has a `color` property (hex). The system auto-generates:
-- Emissive glow
-- Fish school colors
-- Plankton cloud colors
-
-### Adjusting Activity Sensitivity
-Modify `updateCoralActivity()` to change how data maps to visual intensity:
-```javascript
-reef.userData.activityLevel = Math.min(1, (metric / threshold));
-```
-
-## Performance
-
-- **GPU-accelerated**: WebGL rendering
-- **Efficient**: ~60 FPS on modern hardware
-- **Lightweight**: Single HTML file, ~500 lines
-- **No dependencies**: Loads Three.js from CDN only
-
-## Browser Support
-
-✅ Chrome/Edge 90+\
-✅ Firefox 88+\
-✅ Safari 14+\
-❌ IE11 (no WebGL 2.0)
-
-## Future Enhancements
-
-- [ ] WebXR support for VR immersion
-- [ ] Multi-user mode (collaborative ecosystems)
-- [ ] Machine learning for predictive coral growth
-- [ ] Physics-based water currents (Cannon.js)
-- [ ] Seasonal ecosystem changes
-- [ ] Sound themes (whalesong, different ocean biomes)
-
-## Why This Matters
-
-This isn't just a gimmick—it's a **new paradigm for data visualization**:
-
-1. **Pattern Recognition**: Humans are evolved to read natural environments
-2. **At-a-Glance Health**: See your entire business state in one view
-3. **Engagement**: Makes mundane ERP data feel alive and important
-4. **Scalability**: Add 100 modules? The ecosystem just grows naturally
-5. **Accessibility**: Natural metaphors work across languages/cultures
-
-## Troubleshooting
-
-### "Demo Mode" showing instead of live data?
-- Ensure Mini ERP backend is running on port 3010
-- Check browser console for CORS errors
-- Verify `/api/dashboard/summary` endpoint works
-
-### Performance issues?
-- Reduce particle count (line 389: `particleCount = 2000`)
-- Lower fish count per school
-- Disable audio
-
-### Can't see the ecosystem button?
-- Added to Dashboard Quick Actions section
-- Also accessible via `/ecosystem` route
-
-## Credits
-
-Created as an innovative visualization layer for Mini ERP.\
-Inspired by bioluminescent deep-sea ecosystems.
 
 ---
 
-**Try it now**: Open your browser and navigate to `http://localhost:5173/ecosystem` 🌊
+## Architecture Principles
+
+### Layered Backend
+
+Routes → Controllers → Services → Models. Each layer has a single responsibility
+and data flows in one direction. Controllers never touch the database directly;
+Models never format HTTP responses.
+
+### Dual-Frontend Pattern
+
+Desktop users get AG-Grid (data tables with sorting, filtering, export). Mobile
+users (<768px) get compact card views with the same data. Both render from the
+same TanStack Query hooks.
+
+### SQLite as Primary Storage
+
+better-sqlite3 provides synchronous, single-writer access. WAL mode enables
+concurrent reads. Indexes exist on all foreign keys and frequently-queried columns.
+
+---
+
+## Modules
+
+| Module        | Backend Files                    | Frontend Pages          | Description                           |
+|---------------|----------------------------------|-------------------------|---------------------------------------|
+| Inventory     | inventoryController, Item, StockMovement, Warehouse | /inventory | Items, warehouses, stock tracking, batch FIFO |
+| Sales         | salesController, Invoice, Payment, Customer     | /sales, /invoices      | Quotations, orders, invoices, payments, AR |
+| Purchases     | purchasesController, PurchaseOrder, Supplier    | /purchases             | POs, supplier management, AP          |
+| Manufacturing | Production, BOM                  | /production             | Bills of Materials, work orders       |
+| Expenses      | expensesController, Expense       | /expenses               | Expense tracking by category          |
+| Accounting    | accountingService, accountingController, ledgerUtils, journalEntry | — (API only) | Double-entry GL, chart of accounts, periods |
+| Reports       | Reports                          | /reports                | 20+ reports (P&L, balance sheet, AR aging, etc.) |
+| Admin         | usersController, rolesController  | /admin                  | User & role management                |
+
+---
+
+## Accounting / General Ledger
+
+The GL subsystem was added in Phase 2 and follows standard double-entry
+bookkeeping. Every journal entry has at least one debit and one credit posting
+to the `journal_lines` table, balanced to 4 decimal places.
+
+### Chart of Accounts (15 accounts)
+
+| Code | Name                | Normal Balance | Type     |
+|------|---------------------|----------------|----------|
+| 1000 | Cash                | debit          | asset    |
+| 1010 | Bank                | debit          | asset    |
+| 1100 | Accounts Receivable | debit          | asset    |
+| 1200 | Inventory Asset     | debit          | asset    |
+| 2000 | Accounts Payable    | credit         | liability|
+| 2100 | Tax Payable         | credit         | liability|
+| 3000 | Owner's Equity      | credit         | equity   |
+| 3100 | Retained Earnings   | credit         | equity   |
+| 4000 | Sales Revenue       | credit         | revenue  |
+| 5000 | Cost of Goods Sold  | debit          | expense  |
+| 6000 | Operating Expenses  | debit          | expense  |
+| 6100 | Wages & Salaries    | debit          | expense  |
+| 7000 | Production Clearing | debit          | expense  |
+| 7100 | Inventory Correction| debit          | expense  |
+| 7200 | Inventory Shrinkage | debit          | expense  |
+
+### Posting Flows
+
+- **Invoice creation**: Dr AR (1100), Cr Sales Revenue (4000), Cr Tax Payable (2100)
+- **COGS**: Dr COGS (5000), Cr Inventory Asset (1200) — at actual FIFO cost
+- **Payment received**: Dr Cash (1000) or Bank (1010), Cr AR (1100)
+- **Purchase order**: Dr Inventory Asset (1200), Cr AP (2000) — via `postPurchaseOrderEntry`
+
+### Current Limitations
+
+- No production cost posting (Dr/Cr Production Clearing not wired to work orders)
+- No closing entries (revenue/expense → Retained Earnings)
+- No sales returns / discounts accounting
+- No AP payment posting
+- See `AGENTS.md` or `docs/API.md` for REST endpoints
+
+---
+
+## CLI Tool (`cli-anything-minierp`)
+
+A Python CLI at `~/.local/bin/cli-anything-minierp` that provides agent-native
+control over every module. Always use `--json` for structured output.
+
+```bash
+cli-anything-minierp auth login -u admin -p admin123  # dev default
+cli-anything-minierp inventory items list              # list all items
+cli-anything-minierp reports profit-loss               # financial reports
+cli-anything-minierp utils backup --name "backup"      # database backup
+```
+
+The CLI is an editable pip package at `agent-harness/`.
+
+---
+
+## Testing
+
+```bash
+cd server
+
+# Unit + integration tests (Jest)
+npm test
+
+# Accounting-specific end-to-end tests
+bash /tmp/test-accounting.sh
+
+# TypeScript typecheck only
+npx tsc --noEmit
+
+# Full build
+npm run build
+```
+
+25 accounting end-to-end tests exercise the GL endpoints (accounts, periods,
+journal entries, trial balance). The Jest test suite covers models, controllers,
+and services with shared test helpers in `src/__tests__/helpers/`.
+
+---
+
+## API Conventions
+
+All API responses follow a consistent shape:
+
+```json
+{
+  "success": true,
+  "data": { ... }
+}
+
+// Error shape
+{
+  "success": false,
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "Human-readable message"
+  }
+}
+```
+
+Error codes: `INVALID_INPUT`, `RESOURCE_NOT_FOUND`,
+`RESOURCE_ALREADY_EXISTS`, `CSRF_FAILED`, `INSUFFICIENT_PERMISSIONS`.
+
+Auth: JWT `Authorization: Bearer <token>` header. CSRF double-submit cookie
+(`csrf-token` cookie + `x-csrf-token` header).
+
+---
+
+## Development
+
+```bash
+# Backend
+cd server && npm install && npm start     # port 3011
+
+# Frontend
+cd client && npm install && npm run dev   # port 5173
+
+# Build for production
+cd client && npm run build
+cd server && npm run build
+```
+
+Default login: `admin` / `admin123` (change in production).
+
+---
+
+## Sequence Diagrams
+
+Refer to `docs/architecture.html` for visual architecture diagrams generated
+from the codebase structure. Controllers, services, and models are documented
+in the `docs/` HTML files.

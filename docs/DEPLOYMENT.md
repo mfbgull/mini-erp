@@ -239,6 +239,21 @@ echo "Backup completed: erp_${DATE}.db"
 2. **Port already in use** — Change `PORT` in `.env` or stop the conflicting process
 3. **Database locked** — Ensure only one server instance is running
 
+### Migration failures on startup
+
+The server runs `server/src/migrations/` SQL files alphabetically on startup.
+If a migration fails:
+1. Check the server log for the exact SQL error
+2. Migrations are idempotent (use `IF NOT EXISTS` / `CREATE OR REPLACE`)
+3. To re-run, delete the applied marker from the `migrations` table or restore
+   the database from backup
+
+### Accounting period issues
+
+1. **Period already exists** — Periods are created once. Use `POST /api/accounting/periods/{id}/close` to close a period before creating a new one
+2. **Trial balance doesn't balance** — Run `POST /api/accounting/journal/rebalance` to recalculate account balances
+3. **Missing COA accounts** — New accounts can be added via the CLI: see `cli-anything-minierp --help`
+
 ### Client assets not loading in production
 
 1. Verify `client/dist/` exists and contains `index.html`

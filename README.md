@@ -29,12 +29,16 @@ cd client && npm run dev
 
 | Module | Description |
 |--------|-------------|
-| Inventory | Items, warehouses, stock tracking |
-| Sales | Orders, invoices, payments, customers |
-| Purchases | Purchase orders, suppliers |
-| Manufacturing | BOM, work orders, production |
+| Inventory | Items, warehouses, stock tracking, FIFO batch costing |
+| Sales | Quotations, orders, invoices, payments, AR aging |
+| Purchases | Purchase orders, suppliers, AP tracking |
+| Manufacturing | BOM, work orders, production cost tracking |
+| **General Ledger** | **Double-entry GL, chart of accounts, accounting periods, trial balance** |
 | Expenses | Categories, expense tracking |
-| Reports | 20+ reports (P&L, balance sheet, AR/AP, etc.) |
+| Reports | 20+ reports (P&L, balance sheet, AR/AP aging, cash flow) |
+| CLI | `cli-anything-minierp` — full feature access from terminal |
+
+> See **[ECOSYSTEM_README.md](ECOSYSTEM_README.md)** for the full system architecture, module map, GL posting flows, and sequence diagrams.
 
 ## CLI Usage
 
