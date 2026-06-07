@@ -222,7 +222,7 @@ export default function PurchasesPage() {
       </div>
 
       {/* Summary Statistics Cards */}
-      <StatsGrid>
+      <StatsGrid className="compact">
         <StatCard icon={ShoppingCart} label={t('purchases.totalPurchasesCard')} value={stats.totalPurchases} subtitle={t('purchases.allTransactions')} />
         <StatCard icon={DollarSign} label={t('purchases.totalValueCard')} value={formatCurrency(stats.totalValue)} subtitle={t('purchases.purchaseCost')} />
         <StatCard icon={BarChart3} label={t('purchases.totalQuantityCard')} value={parseFloat(stats.totalQuantity).toFixed(2)} subtitle={t('purchases.aggregateItems')} />

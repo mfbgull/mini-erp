@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -22,6 +22,7 @@ import {
   ClipboardList,
   Wallet,
   Building2,
+  Plus,
 } from "lucide-react";
 
 import Button from "../../components/common/Button";
@@ -29,6 +30,7 @@ import CompactStockMovementCardView from "../../components/common/CompactStockMo
 import FormInput from "../../components/common/FormInput";
 import Modal from "../../components/common/Modal";
 import StatCard, { StatsGrid } from "../../components/common/StatCard";
+import QuickActionsPanel from "../../components/layout/QuickActionsPanel";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
@@ -40,8 +42,19 @@ import "./StockMovementPage.css";
 export default function StockMovementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
+
+  // Hide the global FAB on mobile — its Quick Actions functionality is
+  // available from the mobile action bar instead.
+  useEffect(() => {
+    if (!isMobile) return;
+    document.body.classList.add('sm-page-mobile');
+    return () => {
+      document.body.classList.remove('sm-page-mobile');
+    };
+  }, [isMobile]);
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -290,7 +303,7 @@ export default function StockMovementPage() {
         </div>
         <div className="quick-actions">
           <button className="quick-action-btn" onClick={handleExport} type="button">
-            <Download className="action-icon" size={24} />
+            <Download className="action-icon" size={16} />
             <span className="action-text">{t('stockMovements.exportCsv')}</span>
           </button>
           <button
@@ -298,7 +311,7 @@ export default function StockMovementPage() {
             onClick={() => navigate("/reports/inventory-movement")}
             type="button"
           >
-            <ClipboardList className="action-icon" size={24} />
+            <ClipboardList className="action-icon" size={16} />
             <span className="action-text">{t('stockMovements.movementReport')}</span>
           </button>
           <button
@@ -306,7 +319,7 @@ export default function StockMovementPage() {
             onClick={() => navigate("/reports/stock-valuation")}
             type="button"
           >
-            <Wallet className="action-icon" size={24} />
+            <Wallet className="action-icon" size={16} />
             <span className="action-text">{t('stockMovements.stockValuation')}</span>
           </button>
           <button
@@ -314,7 +327,7 @@ export default function StockMovementPage() {
             onClick={() => navigate("/inventory/stock-by-warehouse")}
             type="button"
           >
-            <Building2 className="action-icon" size={24} />
+            <Building2 className="action-icon" size={16} />
             <span className="action-text">{t('stockMovements.stockByWarehouse')}</span>
           </button>
         </div>
@@ -331,12 +344,25 @@ export default function StockMovementPage() {
           <div className="mobile-action-bar">
             <Button
               variant="primary"
+              onClick={() => setIsQuickActionsOpen(true)}
+              className="fab-button fab-button--quick-actions"
+            >
+              <Plus size={16} />
+              {t('dashboard.quickActions')}
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => setIsModalOpen(true)}
               className="fab-button"
             >
               + {t('stockMovements.newAdjustment')}
             </Button>
           </div>
+
+          <QuickActionsPanel
+            isOpen={isQuickActionsOpen}
+            onClose={() => setIsQuickActionsOpen(false)}
+          />
         </>
       ) : (
         // Desktop ag-grid view

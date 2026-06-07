@@ -197,7 +197,7 @@ export default function SalesPage() {
 
   return (
     <div className="sales-page">
-      <div className="page-header">
+      <div className="page-header" id="salesPageHeader">
         <div className="header-content">
           <h1>{t('nav.sales')}</h1>
           <p className="page-subtitle">{t('sales.invoices')}</p>

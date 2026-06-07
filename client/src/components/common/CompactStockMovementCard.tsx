@@ -5,6 +5,7 @@ import { ArrowUp, ArrowDown, X, Download, Upload, Factory, ArrowLeftRight, Setti
 
 import Card from './Card';
 import '../../styles/components/card.css';
+import './CompactStockMovementCard.css';
 
 interface StockMovement {
   id: number;

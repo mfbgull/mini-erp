@@ -4,6 +4,15 @@
   flex-direction: column;
   gap: var(--space-md);
   overflow: visible;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.compact-mobile-cards-wrapper > * {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .compact-mobile-search-container {
@@ -47,6 +56,9 @@
   flex-direction: column;
   gap: var(--space-sm);
   overflow: visible;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* Compact Card */
@@ -348,6 +360,9 @@
   align-items: center;
   padding: 12px;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .card-content-clickable {
@@ -749,6 +764,106 @@
 .btn-icon {
   width: 16px;
   height: 16px;
+}
+
+/* Mobile refinements for the detail modal */
+@media (max-width: 768px) {
+  .details-modal {
+    border-radius: 12px 12px 0 0;
+    max-height: 90vh;
+  }
+
+  .details-header {
+    padding: 14px 14px 10px;
+  }
+
+  .details-title {
+    font-size: 16px;
+  }
+
+  .details-content {
+    padding: 12px 14px;
+  }
+
+  .detail-section {
+    margin-bottom: 18px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .detail-item {
+    padding: 10px 12px;
+  }
+
+  .detail-value {
+    font-size: 14px;
+  }
+
+  .section-title {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .status-banner {
+    padding: 12px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .details-actions {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .action-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .close-button {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 413px) {
+  .details-header {
+    padding: 12px 12px 8px;
+  }
+
+  .details-title {
+    font-size: 15px;
+  }
+
+  .details-content {
+    padding: 8px 12px;
+  }
+
+  .detail-item {
+    padding: 8px 10px;
+  }
+
+  .detail-value {
+    font-size: 13px;
+  }
+
+  .details-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+
+  .status-banner {
+    padding: 10px 12px;
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
 }
 
 @media (min-width: 769px) {

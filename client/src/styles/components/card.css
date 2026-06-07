@@ -1535,6 +1535,7 @@
   padding-bottom: 80px;
   max-width: 600px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .compact-mobile-search-container {
@@ -1796,6 +1797,7 @@
   flex-direction: column;
   gap: var(--space-md);
   overflow: visible;
+  width: 100%;
 }
 
 .compact-mobile-search-container {
@@ -2129,18 +2131,7 @@
   }
 }
 
-/* Compact Invoice Card with Menu */
-.compact-invoice-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 12px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  gap: 12px;
-}
+/* Compact Invoice Card - Menu & styling scoped below */
 
 .card-content-clickable {
   flex: 1;
@@ -2155,57 +2146,6 @@
 
 .card-content-clickable:active {
   opacity: 0.7;
-}
-
-.invoice-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.invoice-name {
-  font-weight: 500;
-  font-size: 15px;
-  color: #1a1a1a;
-  margin: 0 0 4px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.invoice-code {
-  font-size: 12px;
-  color: #6c757d;
-  margin: 0;
-}
-
-.invoice-amount-info {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.amount-label {
-  font-size: 11px;
-  color: #6c757d;
-  margin: 0 0 2px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.amount-value {
-  font-weight: 700;
-  font-size: 16px;
-  color: #1a1a1a;
-  margin: 0;
-}
-
-.amount-value.amount-paid {
-  color: #28a745;
-}
-
-.amount-balance {
-  font-size: 11px;
-  color: #dc3545;
-  margin: 4px 0 0 0;
 }
 
 /* Menu */
@@ -2542,11 +2482,7 @@
   height: 16px;
 }
 
-@media (min-width: 769px) {
-  .compact-invoice-card {
-    display: none;
-  }
-}
+
 
 /* Compact Payment Card Styles */
 .compact-payment-card {
@@ -6436,6 +6372,22 @@
   min-height: 28px;
 }
 
+.compact-invoice-card .quantity-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.compact-invoice-card .qty-text.qty-positive {
+  color: #10b981;
+}
+
+.compact-invoice-card .qty-text.qty-low {
+  color: #f59e0b;
+}
+
 .compact-invoice-card .menu-container {
   grid-column: 2;
   grid-row: 1;
@@ -6469,12 +6421,7 @@
   .compact-invoice-card {
     display: none;
   }
-}
-
-/* Compact Payment Card */
-.compact-payment-card {
-  background: white;
-  border-radius: 12px;
+}rder-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 12px;
   position: relative;
@@ -6830,5 +6777,146 @@
   .status-badge,
   .category-badge {
     border: 2px solid currentColor;
+  }
+}
+/* Mobile Responsive Fixes for Sales Page Cards */
+@media (max-width: 768px) {
+  /* Remove max-width constraints on mobile */
+  .compact-mobile-cards-wrapper {
+    max-width: none !important;
+    width: 100% !important;
+    padding: 12px !important;
+  }
+  
+  .compact-mobile-cards-container {
+    width: 100% !important;
+  }
+  
+  /* Make cards full width */
+  .compact-invoice-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Override card size constraints */
+  .card-size-medium {
+    max-width: 100% !important;
+  }
+  
+  /* Ensure sales content takes full width */
+  .sales-content {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .sales-page {
+    padding: 12px !important;
+  }
+}
+
+/* Mobile Responsive Styles for Compact Cards */
+@media (max-width: 768px) {
+  /* Show compact invoice cards on mobile */
+  .compact-invoice-card {
+    display: grid !important;
+  }
+  
+  /* Hide AG-Grid on mobile */
+  .ag-theme-quartz {
+    display: none !important;
+  }
+  
+  /* Ensure cards take full width */
+  .compact-mobile-cards-wrapper {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 12px !important;
+  }
+  
+  .compact-mobile-cards-container {
+    width: 100% !important;
+  }
+  
+  .compact-invoice-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Override card size constraints on mobile */
+  .card-size-medium {
+    max-width: 100% !important;
+  }
+  
+  /* Ensure sales content area takes full width */
+  .sales-content {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .sales-page {
+    padding: 12px !important;
+  }
+  
+  /* Adjust stats grid for mobile */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  /* Adjust page header for mobile */
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .header-actions {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .header-actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  /* Adjust search and quick actions */
+  .search-quick-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  
+  .search-input-field {
+    font-size: 14px !important;
+    padding: 10px 36px !important;
+    height: 40px !important;
+  }
+  
+  .quick-actions {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  
+  .quick-action-btn {
+    flex: 1 !important;
+    min-width: 0 !important;
+    padding: 6px 8px !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+  }
+  
+  .quick-action-btn .action-icon {
+    display: block !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .quick-action-btn .action-text {
+    font-size: 11px !important;
   }
 }
