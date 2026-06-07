@@ -3,6 +3,7 @@ import { getNextSequenceNumber } from '../utils/sequence';
 import ledgerUtils from '../utils/ledgerUtils';
 import AccountingService from '../services/accountingService';
 import { parseCurrency, subtractCurrency } from '../utils/currency';
+import logger from '../utils/logger';
 
 interface PaymentFilters {
   search?: string;
@@ -245,17 +246,17 @@ export class PaymentModel {
         try {
           ledgerUtils.calculateInvoiceBalance(alloc.invoice_id);
           ledgerUtils.updateInvoiceStatus(alloc.invoice_id);
-        } catch {
-          // Intentionally skip failed invoice updates to process remaining allocations
+        } catch (err) {
+          logger.warn('Payment.delete: failed to update invoice balance', { invoice_id: alloc.invoice_id, error: err instanceof Error ? err.message : err });
         }
       }
 
-      try { ledgerUtils.updateCustomerBalance(existing.customer_id); } catch {
-        // Intentionally skip failed customer balance update
+      try { ledgerUtils.updateCustomerBalance(existing.customer_id); } catch (err) {
+        logger.warn('Payment.delete: failed to update customer balance', { customer_id: existing.customer_id, error: err instanceof Error ? err.message : err });
       }
 
-      try { ledgerUtils.rebuildLedgerBalances(existing.customer_id); } catch {
-        // Intentionally skip failed ledger rebuild
+      try { ledgerUtils.rebuildLedgerBalances(existing.customer_id); } catch (err) {
+        logger.warn('Payment.delete: failed to rebuild ledger balances', { customer_id: existing.customer_id, error: err instanceof Error ? err.message : err });
       }
     })();
   }

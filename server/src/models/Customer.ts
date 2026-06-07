@@ -1,5 +1,22 @@
 import Database from 'better-sqlite3';
 
+// Whitelist for ORDER BY to prevent SQL injection
+const ALLOWED_SORT_COLUMNS = [
+  'id', 'customer_code', 'customer_name', 'email', 'phone',
+  'created_at', 'updated_at', 'is_active', 'current_balance',
+  'credit_limit', 'transaction_date', 'debit', 'credit', 'balance',
+];
+const ALLOWED_SORT_DIRECTIONS = ['ASC', 'DESC'];
+
+function safeSortBy(sortBy: string | undefined, sortOrder: string | undefined): { sortBy: string; sortOrder: string } {
+  const sb = (sortBy || 'id').trim().toLowerCase();
+  const so = (sortOrder || 'DESC').trim().toUpperCase();
+  return {
+    sortBy: ALLOWED_SORT_COLUMNS.includes(sb) ? sb : 'id',
+    sortOrder: ALLOWED_SORT_DIRECTIONS.includes(so) ? so : 'DESC',
+  };
+}
+
 interface Customer {
   id: number;
   customer_code: string;
@@ -94,7 +111,8 @@ class CustomerModel {
       query += filters.status === 'active' ? ' AND is_active = 1' : ' AND is_active = 0';
     }
 
-    query += ` ORDER BY ${sortBy} ${sortOrder}`;
+    const { sortBy: safeBy, sortOrder: safeOrder } = safeSortBy(sortBy, sortOrder);
+    query += ` ORDER BY ${safeBy} ${safeOrder}`;
     const offset = (page - 1) * limit;
     query += ` LIMIT ? OFFSET ?`;
     params.push(limit, offset);
@@ -210,12 +228,13 @@ class CustomerModel {
   }
 
   static getLedger(id: string | string[] | number, sortBy: string, sortOrder: string, db: Database.Database): LedgerEntry[] {
+    const { sortBy: safeBy, sortOrder: safeOrder } = safeSortBy(sortBy, sortOrder);
     return db.prepare(`
       SELECT id, transaction_date, transaction_type, reference_no,
         debit, credit, balance, description, created_at
       FROM customer_ledger
       WHERE customer_id = ?
-      ORDER BY ${sortBy} ${sortOrder}
+      ORDER BY ${safeBy} ${safeOrder}
     `).all(id) as LedgerEntry[];
   }
 

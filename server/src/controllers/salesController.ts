@@ -3,6 +3,15 @@ import { AuthRequest } from '../types';
 import SalesService from '../services/salesService';
 import logger from '../utils/logger';
 
+function parseIdParam(req: Request, res: Response): number | null {
+  const id = Number(req.params.id);
+  if (isNaN(id) || id <= 0) {
+    res.status(400).json({ error: 'Invalid ID parameter' });
+    return null;
+  }
+  return id;
+}
+
 // ============ Quotation Controllers ============
 
 /**
@@ -90,7 +99,9 @@ function getQuotations(req: Request, res: Response): void {
  */
 function getQuotation(req: Request, res: Response): void {
   try {
-    const quotation = SalesService.getQuotation(Number(req.params.id));
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const quotation = SalesService.getQuotation(id);
 
     if (!quotation) {
       res.status(404).json({ error: 'Quotation not found' });
@@ -127,7 +138,9 @@ function updateQuotation(req: AuthRequest, res: Response): void {
  */
 function deleteQuotation(req: AuthRequest, res: Response): void {
   try {
-    const result = SalesService.deleteQuotation(Number(req.params.id), req.user!.id);
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const result = SalesService.deleteQuotation(id, req.user!.id);
     res.json({ success: true, message: 'Quotation deleted successfully' });
   } catch (error: any) {
     logger.error('Delete quotation error:', error);
@@ -162,7 +175,9 @@ function convertQuotationToSalesOrder(req: AuthRequest, res: Response): void {
  */
 function getQuotationCycleChain(req: Request, res: Response): void {
   try {
-    const chain = SalesService.getQuotationCycleChain(Number(req.params.id));
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const chain = SalesService.getQuotationCycleChain(id);
     res.json(chain);
   } catch (error: any) {
     logger.error('Get quotation cycle chain error:', error);
@@ -258,7 +273,9 @@ function getSalesOrders(req: Request, res: Response): void {
  */
 function getSalesOrder(req: Request, res: Response): void {
   try {
-    const salesOrder = SalesService.getSalesOrder(Number(req.params.id));
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const salesOrder = SalesService.getSalesOrder(id);
 
     if (!salesOrder) {
       res.status(404).json({ error: 'Sales order not found' });
@@ -295,7 +312,9 @@ function updateSalesOrder(req: AuthRequest, res: Response): void {
  */
 function deleteSalesOrder(req: AuthRequest, res: Response): void {
   try {
-    const result = SalesService.deleteSalesOrder(Number(req.params.id), req.user!.id);
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const result = SalesService.deleteSalesOrder(id, req.user!.id);
     res.json({ success: true, message: 'Sales order deleted successfully' });
   } catch (error: any) {
     logger.error('Delete sales order error:', error);
@@ -309,7 +328,9 @@ function deleteSalesOrder(req: AuthRequest, res: Response): void {
  */
 function cancelSalesOrder(req: AuthRequest, res: Response): void {
   try {
-    const result = SalesService.cancelSalesOrder(Number(req.params.id), req.user!.id);
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const result = SalesService.cancelSalesOrder(id, req.user!.id);
     res.json({ success: true, message: 'Sales order cancelled successfully', ...result });
   } catch (error: any) {
     logger.error('Cancel sales order error:', error);
@@ -344,7 +365,9 @@ function convertSalesOrderToInvoice(req: AuthRequest, res: Response): void {
  */
 function getSalesOrderCycleChain(req: Request, res: Response): void {
   try {
-    const chain = SalesService.getSalesOrderCycleChain(Number(req.params.id));
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const chain = SalesService.getSalesOrderCycleChain(id);
     res.json(chain);
   } catch (error: any) {
     logger.error('Get sales order cycle chain error:', error);
@@ -360,7 +383,9 @@ function getSalesOrderCycleChain(req: Request, res: Response): void {
  */
 function getInvoicesBySalesOrder(req: Request, res: Response): void {
   try {
-    const invoices = SalesService.getInvoicesBySalesOrder(Number(req.params.id));
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const invoices = SalesService.getInvoicesBySalesOrder(id);
     res.json(invoices);
   } catch (error: any) {
     logger.error('Get invoices by SO error:', error);
@@ -374,7 +399,9 @@ function getInvoicesBySalesOrder(req: Request, res: Response): void {
  */
 function getInvoicesByQuotation(req: Request, res: Response): void {
   try {
-    const invoices = SalesService.getInvoicesByQuotation(Number(req.params.id));
+    const id = parseIdParam(req, res);
+    if (!id) return;
+    const invoices = SalesService.getInvoicesByQuotation(id);
     res.json(invoices);
   } catch (error: any) {
     logger.error('Get invoices by quotation error:', error);
