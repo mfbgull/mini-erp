@@ -6,6 +6,7 @@ import { MoreVertical, Eye, Edit2, Trash2, X, CreditCard, Search } from 'lucide-
 import Card from './Card';
 import { formatCurrency } from '../../utils/formatters';
 import '../../styles/components/card.css';
+import './CompactPaymentCard.css';
 
 interface Payment {
   id: number;

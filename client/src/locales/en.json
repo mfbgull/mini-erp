@@ -147,7 +147,8 @@
     "stockByWarehouse": "Stock by Warehouse",
     "trackTransactions": "Track all stock transactions",
     "newAdjustment": "New Adjustment",
-    "allTransactions": "All transactions"
+    "allTransactions": "All transactions",
+    "searchPlaceholder": "Search movements..."
   },
   "stockByWarehouse": {
     "viewByWarehouse": "View current stock levels for each item by warehouse",
@@ -307,7 +308,10 @@
     "totalPaid": "Total Paid",
     "totalDue": "Total Due",
     "recordSale": "Record Sale",
-    "createInvoice": "Create Invoice"
+    "createInvoice": "Create Invoice",
+    "pos": "POS",
+    "salesReport": "Sales Summary",
+    "stockValuation": "Stock Valuation"
   },
   "inventory": {
     "items": "Items",

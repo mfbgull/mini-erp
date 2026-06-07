@@ -6,6 +6,7 @@ import { MoreVertical, Eye, Edit2, Trash2, X, FileText } from 'lucide-react';
 import Card from './Card';
 import { formatCurrency } from '../../utils/formatters';
 import '../../styles/components/card.css';
+import './CompactInvoiceCard.css';
 
 interface Invoice {
   id: number;

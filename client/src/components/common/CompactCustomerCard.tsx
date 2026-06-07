@@ -5,6 +5,7 @@ import { MoreVertical, Eye, Edit2, CreditCard, X, Users } from 'lucide-react';
 import Card from './Card';
 import { formatCurrency } from '../../utils/formatters';
 import '../../styles/components/card.css';
+import './CompactCustomerCard.css';
 
 interface Customer {
   id: number;

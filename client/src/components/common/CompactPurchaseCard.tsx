@@ -6,6 +6,7 @@ import { MoreVertical, Eye, Edit2, X, ShoppingCart } from 'lucide-react';
 import Card from './Card';
 import { formatCurrency } from '../../utils/formatters';
 import '../../styles/components/card.css';
+import './CompactPurchaseCard.css';
 
 interface Purchase {
   id: number;

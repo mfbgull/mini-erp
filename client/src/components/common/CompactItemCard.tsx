@@ -6,6 +6,7 @@ import Card from './Card';
 import { useSettings } from '../../context/SettingsContext';
 import type { Item } from '../../types/index';
 import '../../styles/components/card.css';
+import './CompactItemCard.css';
 
 interface CompactItemCardProps {
   item: Item;

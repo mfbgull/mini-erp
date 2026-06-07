@@ -5,6 +5,7 @@ import { MoreVertical, Edit, Trash2, X } from 'lucide-react';
 import Card from './Card';
 import type { Warehouse as WarehouseType } from '../../types';
 import '../../styles/components/card.css';
+import './CompactWarehouseCard.css';
 
 interface CompactWarehouseCardProps {
   warehouse: WarehouseType;

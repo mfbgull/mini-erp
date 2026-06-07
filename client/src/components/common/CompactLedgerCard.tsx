@@ -5,6 +5,7 @@ import { MoreVertical, Eye, X, FileText, CreditCard, Scale, BarChart3, TrendingD
 
 import Card from './Card';
 import '../../styles/components/card.css';
+import './CompactLedgerCard.css';
 
 interface LedgerEntry {
   id: number;

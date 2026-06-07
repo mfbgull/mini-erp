@@ -4,6 +4,7 @@ import { X, Package, MapPin, Search, AlertTriangle } from 'lucide-react';
 
 import Card from './Card';
 import '../../styles/components/card.css';
+import './CompactStockByWarehouseCard.css';
 
 interface StockByWarehouse {
   id: number;
