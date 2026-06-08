@@ -117,11 +117,13 @@ export default function InvoiceViewPage() {
     setReturnMutationState({ loading: true });
     try {
       await api.post(`/invoices/${invoiceId}/return`, {
-        items: returnItems,
+        items: returnItems.map(i => ({ invoice_item_id: i.invoice_item_id, return_quantity: i.return_quantity })),
         reason: returnItems[0]?.reason || ''
       });
       toast.success('Return processed successfully');
       setIsReturnModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['invoice', invoiceId] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
     } catch (error) {
       toast.error(error.response?.data?.error || 'Failed to process return');
     } finally {

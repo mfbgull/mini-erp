@@ -901,7 +901,7 @@ class InvoiceModel {
 
   static getItems(invoiceId: number, db: Database.Database) {
     return db.prepare(`
-      SELECT ii.item_id, ii.quantity, ii.unit_price, ii.amount, ii.tax_rate,
+      SELECT ii.id, ii.item_id, ii.quantity, ii.unit_price, ii.amount, ii.tax_rate,
              ii.discount_type, ii.discount_value, item.item_name, item.item_code
       FROM invoice_items ii LEFT JOIN items item ON ii.item_id = item.id
       WHERE ii.invoice_id = ?

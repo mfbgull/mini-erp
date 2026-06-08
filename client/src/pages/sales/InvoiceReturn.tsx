@@ -44,16 +44,10 @@ interface InvoiceReturnProps {
   items: InvoiceItem[];
   onClose: () => void;
   onSubmit: (returnItems: { invoice_item_id: number; return_quantity: number; reason: string }[]) => void;
+  loading?: boolean;
 }
 
-interface InvoiceReturnProps {
-  invoice: Invoice;
-  items: InvoiceItem[];
-  onClose: () => void;
-  onSubmit: (returnItems: { invoice_item_id: number; return_quantity: number; reason: string }[]) => void;
-}
-
-export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: InvoiceReturnProps) {
+export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loading }: InvoiceReturnProps) {
   const [returnItems, setReturnItems] = useState<InvoiceReturnItem[]>([]);
   const [reason, setReason] = useState('');
   const { errors: validationErrors, validate } = useFormValidation(invoiceReturnItemSchema);
@@ -311,12 +305,12 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit }: Inv
             Cancel
           </button>
           <button 
-            className={`action-btn submit ${!hasReturns || !reason.trim() ? 'disabled' : ''}`}
+            className={`action-btn submit ${!hasReturns || !reason.trim() || loading ? 'disabled' : ''}`}
             onClick={handleSubmit}
-            disabled={!hasReturns || !reason.trim()}
+            disabled={!hasReturns || !reason.trim() || loading}
           >
             <RotateCcw size={18} />
-            Process Return
+            {loading ? 'Processing...' : 'Process Return'}
           </button>
         </div>
       </div>
