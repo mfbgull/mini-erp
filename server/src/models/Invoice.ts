@@ -509,7 +509,7 @@ class InvoiceModel {
           unit_cost: avgUnitCost,
           reference_doctype: referenceDoctype,
           reference_docno: invoiceNo,
-          remarks: `Stock reversed - Invoice ${invoiceNo} ${referenceDoctype === 'INVOICE_DELETE' ? 'deleted' : 'updated'}`,
+          remarks: `Stock reversed - Invoice ${invoiceNo} ${referenceDoctype === 'INVOICE_DELETE' ? 'deleted' : referenceDoctype === 'RETURN' ? 'returned' : 'updated'}`,
           movement_date: new Date().toISOString().split('T')[0],
         },
         userId,

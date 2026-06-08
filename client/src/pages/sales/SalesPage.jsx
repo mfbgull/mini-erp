@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2, Search, X, Download, BarChart3, Wallet } from 'lucide-react';
+import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2, Search, X, Download, BarChart3, Wallet, RotateCcw } from 'lucide-react';
 
 import InvoicePreview from './InvoicePreview';
+import InvoiceReturn from './InvoiceReturn';
 import Button from '../../components/common/Button';
 import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
@@ -28,6 +29,9 @@ export default function SalesPage() {
   const [previewInvoice, setPreviewInvoice] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showPOSSales, setShowPOSSales] = useState(false);
+  const [returnInvoice, setReturnInvoice] = useState(null);
+  const [returnItems, setReturnItems] = useState([]);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
   useKeyboardShortcut('Alt+N', () => {
     navigate('/sales/invoice');
@@ -87,6 +91,52 @@ export default function SalesPage() {
     if (window.confirm(`${t('sales.confirmDelete')} "${invoice.invoice_no}"?`)) {
       deleteInvoiceMutation.mutate(invoice.id);
     }
+  };
+
+  // Return invoice mutation
+  const returnInvoiceMutation = useMutation({
+    mutationFn: async ({ id, data }) => {
+      return api.post(`/invoices/${id}/return`, data);
+    },
+    onSuccess: () => {
+      toast.success('Return processed successfully');
+      queryClient.invalidateQueries(['invoices']);
+      setIsReturnModalOpen(false);
+      setReturnInvoice(null);
+      setReturnItems([]);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to process return');
+    }
+  });
+
+  const handleOpenReturn = async (invoice) => {
+    try {
+      const response = await api.get(`/invoices/${invoice.id}`);
+      const invoiceData = response.data;
+      const items = invoiceData.items || [];
+      setReturnInvoice({
+        id: invoiceData.id,
+        invoice_no: invoiceData.invoice_no,
+        invoice_date: invoiceData.invoice_date,
+        customer_id: invoiceData.customer_id,
+        customer_name: invoiceData.customer_name,
+        total_amount: invoiceData.total_amount,
+        status: invoiceData.status,
+      });
+      setReturnItems(items);
+      setIsReturnModalOpen(true);
+    } catch (error) {
+      toast.error('Failed to load invoice data');
+    }
+  };
+
+  const handleSubmitReturn = (items) => {
+    if (!returnInvoice) return;
+    returnInvoiceMutation.mutate({
+      id: returnInvoice.id,
+      data: { items, reason: items[0]?.reason || '' }
+    });
   };
 
   // Invoice column definitions
@@ -171,7 +221,7 @@ export default function SalesPage() {
     {
       headerName: t('common.actions'),
       field: 'actions',
-      width: 120,
+      width: 160,
       sortable: false,
       filter: false,
       cellRenderer: (params) => (
@@ -189,6 +239,14 @@ export default function SalesPage() {
             title="Edit Invoice"
           >
             <Edit2 size={14} />
+          </button>
+          <button
+            className="action-btn return-btn"
+            onClick={() => handleOpenReturn(params.data)}
+            title="Return Items"
+            style={{ color: '#f59e0b' }}
+          >
+            <RotateCcw size={14} />
           </button>
         </div>
       )
@@ -291,6 +349,7 @@ export default function SalesPage() {
             onView={(invoice) => setPreviewInvoice(invoice)}
             onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}?mode=edit`)}
             onDelete={handleDeleteInvoice}
+            onReturn={handleOpenReturn}
           />
         ) : (
           <div className="ag-theme-quartz grid-fill">
@@ -319,6 +378,22 @@ export default function SalesPage() {
           onClose={() => setPreviewInvoice(null)}
           onEdit={() => navigate(`/sales/invoice/${previewInvoice.id}?mode=edit`)}
           onDelete={() => handleDeleteInvoice(previewInvoice)}
+          onReturn={() => handleOpenReturn(previewInvoice)}
+        />
+      )}
+
+      {/* Return Modal */}
+      {isReturnModalOpen && returnInvoice && (
+        <InvoiceReturn
+          invoice={returnInvoice}
+          items={returnItems}
+          onClose={() => {
+            setIsReturnModalOpen(false);
+            setReturnInvoice(null);
+            setReturnItems([]);
+          }}
+          onSubmit={handleSubmitReturn}
+          loading={returnInvoiceMutation.isPending}
         />
       )}
     </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { format } from 'date-fns';
-import { X, Eye, Edit2, Printer, FileText } from 'lucide-react';
+import { X, Eye, Edit2, Printer, FileText, RotateCcw } from 'lucide-react';
 
 import { formatCurrency } from '../../utils/formatters';
 import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
@@ -31,13 +31,15 @@ interface PurchasePreviewProps {
   onClose: () => void;
   onView?: () => void;
   onEdit?: () => void;
+  onReturn?: () => void;
 }
 
 export default function PurchasePreview({
   purchase,
   onClose,
   onView,
-  onEdit
+  onEdit,
+  onReturn
 }: PurchasePreviewProps) {
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -154,6 +156,12 @@ export default function PurchasePreview({
 
         {/* Actions */}
         <div className="mobile-preview-actions">
+          {onReturn && (
+            <button className="preview-action-btn return-btn" onClick={onReturn}>
+              <RotateCcw size={18} />
+              <span>Return</span>
+            </button>
+          )}
           {onEdit && (
             <button className="preview-action-btn primary" onClick={onEdit}>
               <Edit2 size={18} />

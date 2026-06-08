@@ -486,6 +486,118 @@ export class AccountingService {
   }
 
   // ------------------------------------------------------------------
+  // Return / reversal posting
+  // ------------------------------------------------------------------
+
+  /**
+   * Post GL reversal for a sales invoice return.
+   * Reverses what postInvoiceEntry originally posted:
+   *   Cr AR (1100) — reduce receivable
+   *   Dr Sales Returns (4100) — contra-revenue, reduces revenue
+   *   Dr Tax Payable (2100) — reverse tax liability
+   *
+   * Returns the posted entry's journal_entry_id, or null if total is zero.
+   */
+  static postInvoiceReturnEntry(
+    db: Database.Database,
+    args: {
+      invoiceId: number;
+      invoiceNo: string;
+      returnAmount: number;
+      invoiceDate: string;
+      userId?: number;
+      taxAmount?: number;
+    }
+  ): PostedEntry | null {
+    if (!args.returnAmount || args.returnAmount <= 0) return null;
+
+    const ar = AccountingService.getAccountByCode(db, '1100');
+    const salesReturns = AccountingService.getAccountByCode(db, '4100');
+    if (!ar || !salesReturns) {
+      throw new Error(
+        'Chart of accounts is missing required accounts: 1100 (AR) or 4100 (Sales Returns)'
+      );
+    }
+
+    const taxAmount = Number(args.taxAmount) || 0;
+    const netAmount = args.returnAmount - taxAmount;
+
+    if (taxAmount > 0) {
+      const taxPayable = AccountingService.getAccountByCode(db, '2100');
+      if (!taxPayable) {
+        throw new Error('Chart of accounts is missing required account: 2100 (Tax Payable)');
+      }
+
+      return AccountingService.postEntry(db, {
+        entry_date: args.invoiceDate,
+        description: `Sales return for ${args.invoiceNo} — ${args.returnAmount.toFixed(2)} (net ${netAmount.toFixed(2)} + tax ${taxAmount.toFixed(2)})`,
+        reference_type: 'INVOICE_RETURN',
+        reference_id: args.invoiceId,
+        created_by: args.userId,
+        lines: [
+          { account_id: ar.id, credit: args.returnAmount, description: `AR reduced for return of ${args.invoiceNo}` },
+          { account_id: salesReturns.id, debit: netAmount, description: `Sales returns contra-revenue for ${args.invoiceNo}` },
+          { account_id: taxPayable.id, debit: taxAmount, description: `Tax reversal for return of ${args.invoiceNo}` },
+        ],
+      });
+    }
+
+    // No tax — 2-line reversal
+    return AccountingService.postEntry(db, {
+      entry_date: args.invoiceDate,
+      description: `Sales return for ${args.invoiceNo} — ${args.returnAmount.toFixed(2)}`,
+      reference_type: 'INVOICE_RETURN',
+      reference_id: args.invoiceId,
+      created_by: args.userId,
+      lines: [
+        { account_id: ar.id, credit: args.returnAmount, description: `AR reduced for return of ${args.invoiceNo}` },
+        { account_id: salesReturns.id, debit: args.returnAmount, description: `Sales returns contra-revenue for ${args.invoiceNo}` },
+      ],
+    });
+  }
+
+  /**
+   * Post GL reversal for a purchase return.
+   * Reverses what postPurchaseOrderEntry originally posted:
+   *   Dr AP (2000) — reduce liability
+   *   Cr Inventory Asset (1200) — remove returned stock value
+   *
+   * Returns the posted entry's journal_entry_id, or null if total is zero.
+   */
+  static postPurchaseReturnEntry(
+    db: Database.Database,
+    args: {
+      purchaseId: number;
+      purchaseNo: string;
+      returnAmount: number;
+      returnDate: string;
+      userId?: number;
+    }
+  ): PostedEntry | null {
+    if (!args.returnAmount || args.returnAmount <= 0) return null;
+
+    const inventory = AccountingService.getAccountByCode(db, '1200');
+    const ap = AccountingService.getAccountByCode(db, '2000');
+    if (!inventory || !ap) {
+      throw new Error(
+        'Chart of accounts is missing required accounts: 1200 (Inventory Asset) or 2000 (AP)'
+      );
+    }
+
+    return AccountingService.postEntry(db, {
+      entry_date: args.returnDate,
+      description: `Purchase return for ${args.purchaseNo} — ${args.returnAmount.toFixed(2)}`,
+      reference_type: 'PURCHASE_RETURN',
+      reference_id: args.purchaseId,
+      created_by: args.userId,
+      lines: [
+        { account_id: ap.id, debit: args.returnAmount, description: `AP reduced for return of ${args.purchaseNo}` },
+        { account_id: inventory.id, credit: args.returnAmount, description: `Inventory removed for return of ${args.purchaseNo}` },
+      ],
+    });
+  }
+
+  // ------------------------------------------------------------------
   // Void / reversal
   // ------------------------------------------------------------------
 

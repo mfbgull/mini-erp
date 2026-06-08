@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { format } from 'date-fns';
-import { X, Edit2, Trash2, Check, AlertTriangle, MinusCircle, Circle, AlertCircle } from 'lucide-react';
+import { X, Edit2, Trash2, Check, AlertTriangle, MinusCircle, Circle, AlertCircle, RotateCcw } from 'lucide-react';
 
 import { formatCurrency } from '../../utils/formatters';
 import './InvoicePreview.css';
@@ -24,9 +24,10 @@ interface InvoicePreviewProps {
   onClose: () => void;
   onEdit: () => void;
   onDelete?: () => void;
+  onReturn?: () => void;
 }
 
-export default function InvoicePreview({ invoice, onClose, onEdit, onDelete }: InvoicePreviewProps) {
+export default function InvoicePreview({ invoice, onClose, onEdit, onDelete, onReturn }: InvoicePreviewProps) {
   const isPaid = parseFloat(String(invoice.balance_amount || '0')) === 0;
   const isOverdue = invoice.status?.toLowerCase() === 'overdue';
 
@@ -150,6 +151,12 @@ export default function InvoicePreview({ invoice, onClose, onEdit, onDelete }: I
 
         {/* Actions */}
         <div className="invoice-preview-actions">
+          {onReturn && (
+            <button className="preview-action-btn return-btn" onClick={onReturn}>
+              <RotateCcw size={18} />
+              <span>Return</span>
+            </button>
+          )}
           <button className="preview-action-btn edit-btn" onClick={onEdit}>
             <Edit2 size={18} />
             <span>Edit Invoice</span>

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
 import Purchase from '../models/Purchase';
+import AccountingService from '../services/accountingService';
 import db from '../config/database';
 import logger from '../utils/logger';
 
@@ -146,6 +147,47 @@ function deletePurchase(req: AuthRequest, res: Response): void {
   }
 }
 
+function returnPurchaseItems(req: AuthRequest, res: Response): Response | void {
+  try {
+    const { id } = req.params;
+    const purchaseId = parseInt(id as string, 10);
+    const userId = req.user!.id;
+
+    const { quantity, reason } = req.body as {
+      quantity: number;
+      reason?: string;
+    };
+
+    if (!quantity || quantity <= 0) {
+      return res.status(400).json({ error: 'A positive return quantity is required' });
+    }
+
+    // Fetch purchase first to get its number for the GL entry
+    const purchase = Purchase.getById(purchaseId, db);
+    if (!purchase) {
+      return res.status(404).json({ error: 'Purchase not found' });
+    }
+
+    // Return stock and get the cost for GL posting
+    const result = Purchase.returnPurchaseItems(db, purchaseId, quantity, userId, reason);
+
+    // Post GL reversal — Dr AP, Cr Inventory
+    AccountingService.postPurchaseReturnEntry(db, {
+      purchaseId,
+      purchaseNo: purchase.purchase_no,
+      returnAmount: result.totalCost,
+      returnDate: new Date().toISOString().split('T')[0],
+      userId,
+    });
+
+    res.json({ success: true, message: 'Return processed successfully', data: result });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Return purchase items error:', { error: errorMessage });
+    res.status(400).json({ error: errorMessage });
+  }
+}
+
 export default {
   recordPurchase,
   getPurchases,
@@ -153,5 +195,6 @@ export default {
   getPurchaseSummaryByItem,
   getPurchaseSummaryByDateRange,
   getTopSuppliers,
-  deletePurchase
+  deletePurchase,
+  returnPurchaseItems,
 };

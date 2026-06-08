@@ -313,6 +313,107 @@ class PurchaseModel {
     `).all(limit);
   }
 
+  static returnPurchaseItems(
+    db: Database.Database,
+    purchaseId: number,
+    returnQuantity: number,
+    userId: number,
+    reason?: string
+  ): { returnedQuantity: number; totalCost: number } {
+    const purchase = this.getById(purchaseId, db);
+    if (!purchase) throw new Error('Purchase not found');
+
+    if (returnQuantity <= 0) throw new Error('Return quantity must be positive');
+    if (returnQuantity > purchase.quantity) {
+      throw new Error(
+        `Return quantity (${returnQuantity}) exceeds original quantity (${purchase.quantity}) for purchase ${purchase.purchase_no}`
+      );
+    }
+
+    const transaction = db.transaction(() => {
+      // Find the stock_batch created by this purchase
+      const batch = db.prepare(`
+        SELECT id, batch_no, quantity_remaining, unit_cost
+        FROM stock_batches
+        WHERE source_type = 'PURCHASE' AND source_id = ?
+      `).get(purchaseId) as { id: number; batch_no: string; quantity_remaining: number; unit_cost: number } | undefined;
+
+      if (!batch) throw new Error('No stock batch found for this purchase');
+
+      if (returnQuantity > batch.quantity_remaining) {
+        throw new Error(
+          `Insufficient stock remaining to return. Requested: ${returnQuantity}, Available: ${batch.quantity_remaining}`
+        );
+      }
+
+      const returnCost = returnQuantity * batch.unit_cost;
+      const now = new Date().toISOString().split('T')[0];
+
+      // Create ADJUSTMENT movement to remove stock (negative quantity)
+      StockMovementModel.recordMovement(
+        {
+          item_id: purchase.item_id,
+          warehouse_id: purchase.warehouse_id,
+          movement_type: 'ADJUSTMENT',
+          quantity: -returnQuantity,
+          unit_cost: batch.unit_cost,
+          reference_doctype: 'PURCHASE_RETURN',
+          reference_docno: purchase.purchase_no,
+          remarks: `Stock reversed - Purchase ${purchase.purchase_no} returned${reason ? ': ' + reason : ''} (batch ${batch.batch_no})`,
+          movement_date: now,
+        },
+        userId,
+        db
+      );
+
+      // Reduce the batch quantity_remaining
+      db.prepare('UPDATE stock_batches SET quantity_remaining = quantity_remaining - ? WHERE id = ?')
+        .run(returnQuantity, batch.id);
+
+      // Update stock_balances
+      const existingBalance = db.prepare(`
+        SELECT * FROM stock_balances
+        WHERE item_id = ? AND warehouse_id = ?
+      `).get(purchase.item_id, purchase.warehouse_id) as Record<string, unknown> | undefined;
+
+      if (existingBalance) {
+        db.prepare(`
+          UPDATE stock_balances
+          SET quantity = quantity - ?,
+              last_updated = CURRENT_TIMESTAMP
+          WHERE item_id = ? AND warehouse_id = ?
+        `).run(returnQuantity, purchase.item_id, purchase.warehouse_id);
+      }
+
+      // Update items.current_stock
+      db.prepare(`
+        UPDATE items
+        SET current_stock = (
+          SELECT COALESCE(SUM(quantity), 0)
+          FROM stock_balances
+          WHERE item_id = ?
+        )
+        WHERE id = ?
+      `).run(purchase.item_id, purchase.item_id);
+
+      // Log activity
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'RETURN',
+        'Purchase',
+        purchaseId,
+        `Return processed for ${returnQuantity} unit(s) on Purchase ${purchase.purchase_no}${reason ? ': ' + reason : ''}`
+      );
+
+      return { returnedQuantity: returnQuantity, totalCost: returnCost };
+    });
+
+    return transaction();
+  }
+
   static delete(id: number, userId: number, db: Database.Database): boolean {
     const purchase = this.getById(id, db);
 

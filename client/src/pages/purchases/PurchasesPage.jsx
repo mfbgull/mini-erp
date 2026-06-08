@@ -18,9 +18,11 @@ import {
   Download,
   ClipboardList,
   Wallet,
+  RotateCcw,
 } from "lucide-react";
 
 import PurchasePreview from "./PurchasePreview";
+import PurchaseReturn from "./PurchaseReturn";
 import Button from "../../components/common/Button";
 import CompactPurchaseCardView from "../../components/common/CompactPurchaseCard";
 import StatCard, { StatsGrid } from "../../components/common/StatCard";
@@ -37,6 +39,8 @@ import "./PurchasesPage.css";
 export default function PurchasesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewPurchase, setPreviewPurchase] = useState(null);
+  const [returnPurchase, setReturnPurchase] = useState(null);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
   const { t } = useTranslation();
@@ -137,6 +141,35 @@ export default function PurchasesPage() {
     toast.success(t('purchases.purchaseSaved'));
   };
 
+  // Return purchase mutation
+  const returnPurchaseMutation = useMutation({
+    mutationFn: async ({ id, data }) => {
+      return api.post(`/purchases/${id}/return`, data);
+    },
+    onSuccess: () => {
+      toast.success('Return processed successfully');
+      queryClient.invalidateQueries(['purchases']);
+      setIsReturnModalOpen(false);
+      setReturnPurchase(null);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to process return');
+    }
+  });
+
+  const handleOpenReturn = (purchase) => {
+    setReturnPurchase(purchase);
+    setIsReturnModalOpen(true);
+  };
+
+  const handleSubmitReturn = ({ quantity, reason }) => {
+    if (!returnPurchase) return;
+    returnPurchaseMutation.mutate({
+      id: returnPurchase.id,
+      data: { quantity, reason }
+    });
+  };
+
   const columnDefs = [
     {
       headerName: t('purchases.purchaseNumber'),
@@ -200,6 +233,25 @@ export default function PurchasesPage() {
       field: "warehouse_name",
       filter: true,
       flex: 1.5,
+    },
+    {
+      headerName: 'Actions',
+      field: 'actions',
+      width: 100,
+      sortable: false,
+      filter: false,
+      cellRenderer: (params) => (
+        <div className="action-buttons">
+          <button
+            className="action-btn return-btn"
+            onClick={() => handleOpenReturn(params.data)}
+            title="Return to Supplier"
+            style={{ color: '#f59e0b' }}
+          >
+            <RotateCcw size={14} />
+          </button>
+        </div>
+      ),
     },
   ];
 
@@ -298,6 +350,7 @@ export default function PurchasesPage() {
             toast.info(t('errors.comingSoon'));
           }}
           onNew={handleNew}
+          onReturn={handleOpenReturn}
         />
       ) : (
         <div className="ag-theme-quartz ag-grid-container">
@@ -325,6 +378,32 @@ export default function PurchasesPage() {
           onEdit={() => {
             toast.info(t('errors.comingSoon'));
           }}
+          onReturn={() => handleOpenReturn(previewPurchase)}
+        />
+      )}
+
+      {/* Purchase Return Modal */}
+      {isReturnModalOpen && returnPurchase && (
+        <PurchaseReturn
+          purchase={{
+            id: returnPurchase.id,
+            purchase_no: returnPurchase.purchase_no,
+            supplier_name: returnPurchase.supplier_name,
+            quantity: returnPurchase.quantity,
+            rate: returnPurchase.unit_cost,
+            amount: returnPurchase.total_cost,
+            item_name: returnPurchase.item_name,
+            item_code: returnPurchase.item_code || '',
+            unit_of_measure: returnPurchase.unit_of_measure,
+            purchase_date: returnPurchase.purchase_date,
+            status: returnPurchase.status || 'Received',
+          }}
+          onClose={() => {
+            setIsReturnModalOpen(false);
+            setReturnPurchase(null);
+          }}
+          onSubmit={handleSubmitReturn}
+          loading={returnPurchaseMutation.isPending}
         />
       )}
 

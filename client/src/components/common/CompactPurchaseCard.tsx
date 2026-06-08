@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { format } from 'date-fns';
-import { MoreVertical, Eye, Edit2, X, ShoppingCart } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, X, ShoppingCart, RotateCcw } from 'lucide-react';
 
 import Card from './Card';
 import { formatCurrency } from '../../utils/formatters';
@@ -27,9 +27,10 @@ interface CompactPurchaseCardProps {
   purchase: Purchase;
   onView: (purchase: Purchase) => void;
   onEdit: (purchase: Purchase) => void;
+  onReturn?: (purchase: Purchase) => void;
 }
 
-export function CompactPurchaseCard({ purchase, onView, onEdit }: CompactPurchaseCardProps) {
+export function CompactPurchaseCard({ purchase, onView, onEdit, onReturn }: CompactPurchaseCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -75,6 +76,12 @@ export function CompactPurchaseCard({ purchase, onView, onEdit }: CompactPurchas
                     <Edit2 className="dropdown-icon" />
                     Edit
                   </button>
+                  {onReturn && (
+                    <button type="button" className="dropdown-item" onClick={() => { setShowMenu(false); onReturn(purchase); }}>
+                      <RotateCcw className="dropdown-icon" />
+                      Return
+                    </button>
+                  )}
                 </div>
               </>
             )}
@@ -190,11 +197,13 @@ export function CompactPurchaseCard({ purchase, onView, onEdit }: CompactPurchas
 export default function CompactPurchaseCardView({
   purchases,
   onView,
-  onEdit
+  onEdit,
+  onReturn
 }: {
   purchases: Purchase[],
   onView: (purchase: Purchase) => void,
-  onEdit: (purchase: Purchase) => void
+  onEdit: (purchase: Purchase) => void,
+  onReturn?: (purchase: Purchase) => void
 }) {
   if (purchases.length === 0) {
     return (
@@ -212,7 +221,7 @@ export default function CompactPurchaseCardView({
     <div className="compact-mobile-cards-wrapper">
       <div className="compact-mobile-cards-container">
         {purchases.map((purchase) => (
-          <CompactPurchaseCard key={purchase.id} purchase={purchase} onView={onView} onEdit={onEdit} />
+          <CompactPurchaseCard key={purchase.id} purchase={purchase} onView={onView} onEdit={onEdit} onReturn={onReturn} />
         ))}
       </div>
     </div>

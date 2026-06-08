@@ -5,10 +5,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import { ArrowLeft, Printer, Download, Edit2, Mail, Share2 } from 'lucide-react';
+import { ArrowLeft, Printer, Download, Edit2, Mail, Share2, RotateCcw } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
+import InvoiceReturn from './InvoiceReturn';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
 import './InvoiceViewPage.css';
@@ -19,6 +20,8 @@ export default function InvoiceViewPage() {
   const { isMobile } = useMobileDetection();
   const invoiceRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [returnMutation, setReturnMutationState] = useState({ loading: false });
 
   // Fetch invoice data
   const { data: invoice, isLoading, error } = useQuery({
@@ -109,6 +112,23 @@ export default function InvoiceViewPage() {
     }
   };
 
+  const handleReturn = async (returnItems) => {
+    if (!invoice) return;
+    setReturnMutationState({ loading: true });
+    try {
+      await api.post(`/invoices/${invoiceId}/return`, {
+        items: returnItems,
+        reason: returnItems[0]?.reason || ''
+      });
+      toast.success('Return processed successfully');
+      setIsReturnModalOpen(false);
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to process return');
+    } finally {
+      setReturnMutationState({ loading: false });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="invoice-view-page">
@@ -140,6 +160,10 @@ export default function InvoiceViewPage() {
           <h2 className="toolbar-title">Invoice {invoice.invoice_no}</h2>
         </div>
         <div className="toolbar-right">
+          <Button variant="secondary" onClick={() => setIsReturnModalOpen(true)}>
+            <RotateCcw size={18} />
+            Return
+          </Button>
           <Button variant="secondary" onClick={() => navigate(`/sales/invoice/${invoiceId}?mode=edit`)}>
             <Edit2 size={18} />
             Edit
@@ -169,6 +193,25 @@ export default function InvoiceViewPage() {
           />
         </div>
       </div>
+
+      {/* Return Modal */}
+      {isReturnModalOpen && invoice && (
+        <InvoiceReturn
+          invoice={{
+            id: invoice.id,
+            invoice_no: invoice.invoice_no,
+            invoice_date: invoice.invoice_date,
+            customer_id: invoice.customer_id,
+            customer_name: invoice.customer_name,
+            total_amount: invoice.total_amount,
+            status: invoice.status
+          }}
+          items={invoice.items || []}
+          onClose={() => setIsReturnModalOpen(false)}
+          onSubmit={handleReturn}
+          loading={returnMutation.loading}
+        />
+      )}
 
       {/* Mobile Action Bar */}
       {isMobile && (

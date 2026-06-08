@@ -833,6 +833,21 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         'RETURN'
       );
 
+      // Post GL reversal — reverse AR, reduce revenue, reverse tax
+      const returnAmount = processedItems.reduce(
+        (sum: number, item: { quantity: number; unit_price: number }) =>
+          sum + Number(item.quantity) * Number(item.unit_price),
+        0
+      );
+
+      AccountingService.postInvoiceReturnEntry(db, {
+        invoiceId,
+        invoiceNo: invoice.invoice_no,
+        returnAmount,
+        invoiceDate: invoice.invoice_date,
+        userId,
+      });
+
       // Log the return activity
       db.prepare(`
         INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)

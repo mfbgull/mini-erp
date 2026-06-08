@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { format } from 'date-fns';
-import { MoreVertical, Eye, Edit2, Trash2, X, FileText } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, Trash2, X, FileText, RotateCcw } from 'lucide-react';
 
 import Card from './Card';
 import { formatCurrency } from '../../utils/formatters';
@@ -25,9 +25,10 @@ interface CompactInvoiceCardProps {
   onView: (invoice: Invoice) => void;
   onEdit: (invoice: Invoice) => void;
   onDelete?: (invoice: Invoice) => void;
+  onReturn?: (invoice: Invoice) => void;
 }
 
-export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete }: CompactInvoiceCardProps) {
+export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn }: CompactInvoiceCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -94,6 +95,12 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete }: Compac
                     <Edit2 className="dropdown-icon" />
                     Edit
                   </button>
+                  {onReturn && (
+                    <button type="button" className="dropdown-item" onClick={() => { setShowMenu(false); onReturn(invoice); }}>
+                      <RotateCcw className="dropdown-icon" />
+                      Return
+                    </button>
+                  )}
                   {onDelete && (
                     <button type="button" className="dropdown-item delete" onClick={() => { setShowMenu(false); onDelete(invoice); }}>
                       <Trash2 className="dropdown-icon" />
@@ -196,11 +203,12 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete }: Compac
   );
 }
 
-export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDelete }: {
+export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDelete, onReturn }: {
   invoices: Invoice[],
   onView: (invoice: Invoice) => void,
   onEdit: (invoice: Invoice) => void,
-  onDelete?: (invoice: Invoice) => void
+  onDelete?: (invoice: Invoice) => void,
+  onReturn?: (invoice: Invoice) => void
 }) {
   if (invoices.length === 0) {
     return (
@@ -218,7 +226,7 @@ export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDel
     <div className="compact-mobile-cards-wrapper">
       <div className="compact-mobile-cards-container">
         {invoices.map((invoice) => (
-          <CompactInvoiceCard key={invoice.id} invoice={invoice} onView={onView} onEdit={onEdit} onDelete={onDelete} />
+          <CompactInvoiceCard key={invoice.id} invoice={invoice} onView={onView} onEdit={onEdit} onDelete={onDelete} onReturn={onReturn} />
         ))}
       </div>
     </div>
