@@ -172,6 +172,11 @@
   color: var(--neutral-600);
 }
 
+.status-returned {
+  background: #fef3c7;
+  color: #d97706;
+  margin-left: 4px;
+}
 .status-unknown {
   background: var(--neutral-100);
   color: var(--neutral-500);

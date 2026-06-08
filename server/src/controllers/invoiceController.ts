@@ -848,6 +848,11 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         userId,
       });
 
+      // Update returned_amount on the invoice
+      db.prepare(`
+        UPDATE invoices SET returned_amount = returned_amount + ? WHERE id = ?
+      `).run(returnAmount.toFixed(2), invoiceId);
+
       // Log the return activity
       db.prepare(`
         INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)

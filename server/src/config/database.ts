@@ -1018,6 +1018,19 @@ function runGLFoundationMigration(): void {
   } catch (error: any) {
     logger.error('GL foundation migration error:', error.message);
   }
+
+  // Add returned_amount column to invoices (idempotent – added in v3.1)
+  try {
+    const hasReturnedAmt = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('invoices') WHERE name='returned_amount'`
+    ).get() as { count: number };
+    if (hasReturnedAmt.count === 0) {
+      db.exec("ALTER TABLE invoices ADD COLUMN returned_amount DECIMAL(15,2) NOT NULL DEFAULT 0");
+      logger.info('✅ returned_amount column added to invoices');
+    }
+  } catch (error: any) {
+    logger.error('returned_amount migration error:', error.message);
+  }
 }
 
 function runBatchCostingMigration(): void {

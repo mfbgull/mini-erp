@@ -211,12 +211,22 @@ export default function SalesPage() {
       field: 'status',
       sortable: true,
       filter: true,
-      width: 120,
-      cellRenderer: (params) => (
-        <span className={`status-badge status-${(params.value || 'unknown').toLowerCase().replace(' ', '-')}`}>
-          {params.value || 'Unknown'}
-        </span>
-      )
+      width: 160,
+      cellRenderer: (params) => {
+        const hasReturn = parseFloat(params.data?.returned_amount || 0) > 0;
+        return (
+          <div className="status-cell">
+            <span className={`status-badge status-${(params.value || 'unknown').toLowerCase().replace(' ', '-')}`}>
+              {params.value || 'Unknown'}
+            </span>
+            {hasReturn && (
+              <span className="status-badge status-returned">
+                Returned
+              </span>
+            )}
+          </div>
+        );
+      }
     },
     {
       headerName: t('common.actions'),
