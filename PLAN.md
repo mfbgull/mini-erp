@@ -22,6 +22,22 @@ Follow the same pattern as **Sales Returns** (inline tracking, no separate retur
 8. Add a purchase return report in the reports module (reuse PurchaseSummaryReport patterns)
 9. Integrate return button into Purchase Order detail page
 
+### Design Decision: Separate Accumulator Pattern (Do Not Mutate Originals)
+
+All return tracking uses **separate accumulator fields** added to existing tables — original values (`quantity`, `received_quantity`, `total_amount`) are **never modified**. Net values are computed on-the-fly:
+
+| Context | Original Field | Accumulator | Net Calc |
+|---|---|---|---|
+| Purchases (direct) | `quantity` | `returned_quantity` | `quantity - returned_quantity` = returnable |
+| PO Items | `received_quantity` | `returned_quantity` | `received_quantity - returned_quantity` = net received |
+| Invoices (existing) | `total_amount` | `returned_amount` | `total - paid - returned` = balance |
+
+**Why separate accumulators:**
+- Preserves full audit trail (original receipt/delivery is never erased)
+- Enables partial returns without losing history
+- Matches the existing Invoice Return model (`returned_amount`)
+- `received_quantity` on PO items stays as a true record of what was physically received
+
 ## Files to modify
 
 ### Database
@@ -83,11 +99,26 @@ Follow the same pattern as **Sales Returns** (inline tracking, no separate retur
 ### Step 3: Add Purchase Order return support
 - [ ] Add `PurchaseOrderModel.returnReceiptItems()` method:
   - Validates the PO/Receipt exists
-  - Reduces `received_quantity` on `purchase_order_items` (or tracks via `returned_quantity`)
+  - **Increments** `returned_quantity` on `purchase_order_items` — does NOT reduce `received_quantity`
+  - Validates that `return_quantity <= (received_quantity - returned_quantity)` i.e., cannot return more than net received
   - Creates ADJUSTMENT stock movement with reference_doctype = 'PO_RETURN'
-  - Updates stock_balances and recalculates PO status
+  - Updates stock_balances and recalculates PO status via `updatePOStatus()`
   - Posts GL reversal via AccountingService.postPurchaseReturnEntry()
 - [ ] Add controller `purchaseOrderController.returnReceiptItems()`
+
+**PO Status Recalculation (update `calculateStatus()` or `updatePOStatus()`):**
+```sql
+-- Conceptually, replace:
+--   received_quantity >= quantity  → 'Completed'
+-- With:
+--   (received_quantity - COALESCE(returned_quantity, 0)) >= quantity  → 'Completed'
+--   (received_quantity - COALESCE(returned_quantity, 0)) > 0  → 'Partially Received'
+--   ELSE  → 'Submitted'
+```
+This handles:
+- **Partial return on a Completed PO**: status drops to "Partially Received"
+- **Full return of all received qty**: status resets to "Submitted"
+- **Partial return on an already partial PO**: net received decreases but stays partial
 
 ### Step 4: Server routes
 - [ ] Add `GET /purchases/returns` → `purchaseController.getReturnHistory`
@@ -130,19 +161,32 @@ Follow the same pattern as **Sales Returns** (inline tracking, no separate retur
    - Verify: purchase's returned_quantity is updated
    - Verify: cannot return more than original qty
 
-2. **Purchase Order Return**:
-   - Go to PO detail page for a received PO
-   - Click return on a received item
-   - Process return
-   - Verify: stock reversed, PO status recalculated, PO item returned_quantity updated
+2. **Purchase Order Return — Partial**:
+   - Go to PO detail page for a Completed PO (received 100 of 100)
+   - Return 30 units
+   - Verify: stock reversed by 30, `purchase_order_items.returned_quantity = 30`, `received_quantity` still shows 100
+   - Verify: PO status recalculated from "Completed" → "Partially Received"
+   - Verify: cannot return more than 70 next time (100 - 30 = 70 net remaining)
 
-3. **Return History Page**:
+3. **Purchase Order Return — Full**:
+   - Return remaining 70 units to fully reverse the receipt
+   - Verify: `returned_quantity = received_quantity`, net received = 0
+   - Verify: PO status resets to "Submitted"
+
+4. **Purchase Order Return — Over-return blocked**:
+   - Try to return more than `received_quantity - returned_quantity`
+   - Verify: error returned, no stock movement created
+
+5. **Return History Page**:
    - Navigate to `/purchases/returns`
    - Verify all return transactions are listed with correct data
 
-4. **Edge cases**:
+6. **Edge cases**:
    - Return exactly the original quantity → purchase becomes fully returned
    - Return more than available → error
    - Return from a deleted purchase → error
    - Return with negative quantity → error
    - Return zero quantity → error
+   - PO with mixed items: return some items fully, others partially, some not at all → PO status reflects each item's net state
+   - Return from a PO that never had a goods receipt → error (no received_quantity to return against)
+   - Multiple sequential returns on same PO item → accumulative tracking works correctly
