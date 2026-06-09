@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { ArrowLeft, Printer, Download, Edit2, Mail, Share2, RotateCcw } from 'lucide-react';
@@ -17,6 +17,7 @@ import './InvoiceViewPage.css';
 export default function InvoiceViewPage() {
   const { id: invoiceId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { isMobile } = useMobileDetection();
   const invoiceRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);

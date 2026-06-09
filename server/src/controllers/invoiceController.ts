@@ -729,6 +729,9 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
       // Void the invoice's journal_lines entries (Dr AR / Cr Sales Revenue / Cr Tax Payable)
       AccountingService.voidJournalLinesByReference(db, 'INVOICE', invoiceId);
 
+      // Also void any return-related journal_lines (Cr AR / Dr Sales Returns / Dr Tax Payable / Dr Inventory / Cr COGS)
+      AccountingService.voidJournalLinesByReference(db, 'INVOICE_RETURN', invoiceId);
+
       // Delete invoice items after stock reversal is complete
       InvoiceModel.deleteInvoiceItems(db, invoiceId);
 
@@ -840,18 +843,70 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         0
       );
 
+      const todayDate = new Date().toISOString().split('T')[0];
+
       AccountingService.postInvoiceReturnEntry(db, {
         invoiceId,
         invoiceNo: invoice.invoice_no,
         returnAmount,
-        invoiceDate: invoice.invoice_date,
+        invoiceDate: todayDate,
         userId,
       });
 
+      // Post COGS reversal — Dr Inventory Asset, Cr COGS at actual FIFO cost
+      // Compute the FIFO cost of returned items from the original SALE movements
+      let returnCogsTotal = 0;
+      for (const item of processedItems) {
+        const saleMovements = db.prepare(`
+          SELECT quantity, unit_cost, batch_id
+          FROM stock_movements
+          WHERE item_id = ? AND reference_docno = ? AND movement_type = 'SALE'
+          ORDER BY id
+        `).all(item.item_id, invoice.invoice_no) as Array<{
+          quantity: number; unit_cost: number; batch_id: number | null;
+        }>;
+
+        if (saleMovements.length === 0) continue;
+
+        const totalSold = saleMovements.reduce((sum, m) => sum + Math.abs(m.quantity), 0);
+        const ratio = totalSold > 0 ? Math.min(Math.abs(item.quantity) / totalSold, 1) : 1;
+
+        for (const movement of saleMovements) {
+          returnCogsTotal += Math.abs(movement.quantity) * movement.unit_cost * ratio;
+        }
+      }
+
+      if (returnCogsTotal > 0) {
+        AccountingService.postCOGSReversalEntry(db, {
+          invoiceId,
+          invoiceNo: invoice.invoice_no,
+          cogsAmount: parseCurrency(returnCogsTotal),
+          entryDate: todayDate,
+          userId,
+        });
+      }
+
       // Update returned_amount on the invoice
-      db.prepare(`
-        UPDATE invoices SET returned_amount = returned_amount + ? WHERE id = ?
-      `).run(returnAmount.toFixed(2), invoiceId);
+      db.prepare(
+        `UPDATE invoices SET returned_amount = returned_amount + ? WHERE id = ?`
+      ).run(returnAmount.toFixed(2), invoiceId);
+
+      // Recalculate invoice balance and status based on the new total
+      calculateInvoiceBalance(invoiceId);
+      updateInvoiceStatus(invoiceId);
+
+      // Create customer ledger entry for the return (credit to reduce AR)
+      createLedgerEntry(
+        invoice.customer_id,
+        'RETURN',
+        invoice.invoice_no,
+        0,
+        returnAmount,
+        `Return on Invoice ${invoice.invoice_no}`
+      );
+
+      // Sync the customer's current_balance
+      updateCustomerBalance(invoice.customer_id);
 
       // Log the return activity
       db.prepare(`

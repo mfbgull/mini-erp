@@ -56,7 +56,7 @@ function updateCustomerBalance(customerId: number): number {
 }
 
 function calculateInvoiceBalance(invoiceId: number): number {
-  const invoice = db.prepare('SELECT total_amount FROM invoices WHERE id = ?').get(invoiceId) as { total_amount: number } | undefined;
+  const invoice = db.prepare('SELECT total_amount, returned_amount FROM invoices WHERE id = ?').get(invoiceId) as { total_amount: number; returned_amount?: number } | undefined;
 
   if (!invoice) {
     throw new Error(`Invoice ${invoiceId} not found`);
@@ -70,7 +70,9 @@ function calculateInvoiceBalance(invoiceId: number): number {
 
   const totalPaid = parseCurrency(paidResult?.total_paid);
   const totalAmount = parseCurrency(invoice.total_amount);
-  const newBalance = subtractCurrency(totalAmount, totalPaid);
+  const returnedAmount = parseCurrency(invoice.returned_amount || 0);
+  // Balance = total owed minus paid minus returned
+  const newBalance = subtractCurrency(subtractCurrency(totalAmount, totalPaid), returnedAmount);
 
   db.prepare('UPDATE invoices SET paid_amount = ?, balance_amount = ? WHERE id = ?')
     .run(totalPaid, newBalance, invoiceId);
@@ -79,8 +81,8 @@ function calculateInvoiceBalance(invoiceId: number): number {
 }
 
 function updateInvoiceStatus(invoiceId: number): string {
-  const invoice = db.prepare('SELECT balance_amount, total_amount, paid_amount, due_date FROM invoices WHERE id = ?')
-    .get(invoiceId) as { balance_amount: number; total_amount: number; paid_amount: number; due_date: string | null } | undefined;
+  const invoice = db.prepare('SELECT balance_amount, total_amount, paid_amount, due_date, returned_amount, status FROM invoices WHERE id = ?')
+    .get(invoiceId) as { balance_amount: number; total_amount: number; paid_amount: number; due_date: string | null; returned_amount?: number; status?: string } | undefined;
 
   if (!invoice) {
     throw new Error(`Invoice ${invoiceId} not found`);
@@ -88,12 +90,21 @@ function updateInvoiceStatus(invoiceId: number): string {
 
   const balance = parseCurrency(invoice.balance_amount);
   const total = parseCurrency(invoice.total_amount);
+  const returned = parseCurrency(invoice.returned_amount || 0);
+  const currentStatus = String(invoice.status || '');
 
   let newStatus = 'Unpaid';
 
-  if (balance <= 0 && total > 0) {
+  if (currentStatus === 'Cancelled') {
+    newStatus = 'Cancelled';
+  } else if (currentStatus === 'Returned') {
+    newStatus = 'Returned';
+  } else if (returned >= total && total > 0) {
+    // All items returned — mark as Returned
+    newStatus = 'Returned';
+  } else if (balance <= 0 && total > 0) {
     newStatus = 'Paid';
-  } else if (balance > 0 && balance < total) {
+  } else if (balance < total && balance > 0) {
     newStatus = 'Partially Paid';
   } else if (balance === total && total > 0) {
     newStatus = 'Unpaid';

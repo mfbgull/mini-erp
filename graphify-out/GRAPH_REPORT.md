@@ -1,12 +1,12 @@
-# Graph Report - /home/fawad/ai/minierp  (2026-06-07)
+# Graph Report - /home/fawad/ai/minierp  (2026-06-08)
 
 ## Corpus Check
-- 581 files · ~889,787 words
+- 582 files · ~893,214 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 7822 nodes · 18767 edges · 287 communities detected
-- Extraction: 54% EXTRACTED · 46% INFERRED · 0% AMBIGUOUS · INFERRED: 8653 edges (avg confidence: 0.75)
+- 7835 nodes · 18809 edges · 287 communities detected
+- Extraction: 54% EXTRACTED · 46% INFERRED · 0% AMBIGUOUS · INFERRED: 8663 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -326,107 +326,107 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.01
-Nodes (768): Enter interactive REPL mode., repl(), cli(), clip_add(), clip_import(), clip_list(), clip_move(), clip_remove() (+760 more)
+Nodes (416): getAuthCookie(), get_rms(), Read a WAV file and return (samples, sample_rate, channels, bit_depth).      Ret, Calculate RMS (Root Mean Square) level of audio samples., read_wav(), get_clip(), import_clip(), list_clips() (+408 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.01
-Nodes (413): clip(), Clip management commands., get_rms(), Read a WAV file and return (samples, sample_rate, channels, bit_depth).      Ret, Calculate RMS (Root Mean Square) level of audio samples., read_wav(), import_clip(), Import a clip into the project bin. (+405 more)
+Nodes (696): Enter interactive REPL mode., repl(), cli(), clip_add(), clip_import(), clip_list(), clip_move(), clip_remove() (+688 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.01
-Nodes (543): cleanup_logs(), export_logs(), get_actions(), get_activity_stats(), get_entity_activity(), get_entity_types(), get_recent_activity(), get_user_activity() (+535 more)
+Cohesion: 0.0
+Nodes (560): get_users(), Get all users for filtering., get_auth_status(), Check current authentication status.      Returns:         Dict with auth status, BOMModel, create_bom(), delete_bom(), get_bom() (+552 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.01
-Nodes (365): add_sheet(), clear_cell(), _ensure_calc(), get_cell(), _get_sheet(), get_sheet_data(), list_sheets(), LibreOffice CLI - Calc (spreadsheet) module. (+357 more)
+Nodes (601): cleanup_logs(), export_logs(), get_actions(), get_activity_stats(), get_entity_activity(), get_entity_types(), get_recent_activity(), get_user_activity() (+593 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.01
-Nodes (382): closePeriod(), getAccount(), getAccountBalance(), getCurrentPeriod(), getPeriod(), isValidIsoDate(), listAccountBalances(), listAccounts() (+374 more)
+Nodes (344): closePeriod(), getAccount(), getAccountBalance(), getCurrentPeriod(), getPeriod(), isValidIsoDate(), listAccountBalances(), listAccounts() (+336 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.01
-Nodes (580): AuthenticationError, ERPError, Base exception for ERP CLI errors., Raised when the Mini ERP server is not reachable., Raised on 401 responses., ServerNotRunningError, Exception, activity() (+572 more)
+Nodes (221): _anchor_offset(), crop_canvas(), get_canvas_info(), GIMP CLI - Canvas operations module., Crop the canvas to a rectangle., Set the canvas color mode., Set the canvas DPI (dots per inch)., Resize the canvas (does not scale content, adds/removes space).      Args: (+213 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.01
-Nodes (182): add_keyframe(), list_keyframes(), Blender CLI - Animation and keyframe management module., Remove keyframe(s) from an object.      Args:         project: The scene dict, Set the animation frame range.      Args:         project: The scene dict, Set the animation FPS (frames per second).      Args:         project: The scene, Set the current frame.      Args:         project: The scene dict         frame:, List keyframes for an object.      Args:         project: The scene dict (+174 more)
+Nodes (170): add_keyframe(), list_keyframes(), Blender CLI - Animation and keyframe management module., Remove keyframe(s) from an object.      Args:         project: The scene dict, Set the animation frame range.      Args:         project: The scene dict, Set the animation FPS (frames per second).      Args:         project: The scene, Set the current frame.      Args:         project: The scene dict         frame:, List keyframes for an object.      Args:         project: The scene dict (+162 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.01
-Nodes (240): getAuthCookie(), add_connector(), list_connectors(), list_edge_styles(), Connector (edge) operations: add, remove, modify, list., List all available edge style presets., Add a connector between two shapes.      Args:         session: Active session., Remove a connector by ID. (+232 more)
+Nodes (190): add_sheet(), clear_cell(), _ensure_calc(), get_cell(), _get_sheet(), get_sheet_data(), list_sheets(), LibreOffice CLI - Calc (spreadsheet) module. (+182 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.02
-Nodes (143): add_audio_source(), get_audio_source(), _get_audio_sources(), list_audio(), mute(), OBS Studio CLI - Audio management., Set audio sync offset in milliseconds., List all audio sources. (+135 more)
+Cohesion: 0.01
+Nodes (264): create_task(), download_file(), download_thumbnail(), encode_file(), get_api_key(), load_config(), _make_auth_token(), poll_task() (+256 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.01
-Nodes (238): Save configuration to ~/.config/anygen/config.json (mode 600)., save_config(), cli(), config(), config_delete(), config_get(), config_path(), config_set() (+230 more)
+Nodes (220): add_connector(), list_connectors(), list_edge_styles(), Connector (edge) operations: add, remove, modify, list., List all available edge style presets., Add a connector between two shapes.      Args:         session: Active session., Remove a connector by ID., Update a connector's label. (+212 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.02
-Nodes (146): ConversationEngine, Database, connect(), Connector operations: add, remove, style., Enum, _extract_customer_name(), extract_intent(), _extract_item_with_quantity() (+138 more)
+Cohesion: 0.01
+Nodes (151): ConversationEngine, Database, connect(), Connector operations: add, remove, style., Enum, _extract_customer_name(), extract_intent(), _extract_item_with_quantity() (+143 more)
 
 ### Community 11 - "Community 11"
+Cohesion: 0.02
+Nodes (123): add_audio_source(), get_audio_source(), _get_audio_sources(), list_audio(), mute(), OBS Studio CLI - Audio management., Set audio sync offset in milliseconds., List all audio sources. (+115 more)
+
+### Community 12 - "Community 12"
 Cohesion: 0.01
 Nodes (86): ARAgingReport(), ARReportsPage(), DSOReport(), ReceivablesSummary(), useAuth(), BOMForm(), BOMPage(), BOMUsageReport() (+78 more)
 
-### Community 12 - "Community 12"
-Cohesion: 0.02
-Nodes (105): activateChain(), displayName(), execute(), loadChains(), parseAgentFile(), parseChainYaml(), renderCall(), renderCard() (+97 more)
-
 ### Community 13 - "Community 13"
 Cohesion: 0.02
-Nodes (106): apply_change_speed(), apply_echo(), apply_fade_in(), apply_fade_out(), apply_gain(), apply_high_pass(), apply_limit(), apply_low_pass() (+98 more)
+Nodes (87): find_ffmpeg(), find_melt(), get_melt_version(), MLT/melt backend — invoke melt for rendering MLT XML projects.  Shotcut and Kden, Render a color bars test video using melt's built-in producer.      This doesn't, Find the melt executable. Raises RuntimeError if not found., Find ffmpeg executable., Get the installed melt version string. (+79 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.02
-Nodes (59): Validate an ODF file structure., validate_odf(), clean_session(), cli(), gradient_image(), Test meeting listing., Should list upcoming meetings., Resolve installed CLI command; falls back to python -m for dev.      Set env CLI (+51 more)
+Nodes (98): activateChain(), displayName(), execute(), loadChains(), parseAgentFile(), parseChainYaml(), renderCall(), renderCard() (+90 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.03
-Nodes (129): Persist session metadata to disk., Persist session metadata to disk (not the project, just session info)., _auto_save_callback(), cli(), composite_blend_modes(), composite_get_blend(), composite_group(), composite_pip() (+121 more)
+Cohesion: 0.02
+Nodes (88): apply_change_speed(), apply_echo(), apply_fade_in(), apply_fade_out(), apply_gain(), apply_high_pass(), apply_limit(), apply_low_pass() (+80 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.03
-Nodes (52): get_clip(), add_guide(), list_guides(), _next_guide_id(), Kdenlive CLI - Guide/marker management module., Generate next unique guide ID., Add a guide/marker at a position (in seconds)., Remove a guide by ID. (+44 more)
+Cohesion: 0.02
+Nodes (95): clip(), Clip management commands., _apply_filters(), _apply_sepia(), _apply_single_filter(), _blend_with_mode(), _build_audio_fade(), _build_brightness() (+87 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.03
-Nodes (18): addCurrency(), multiplyCurrency(), parseCurrency(), roundCurrency(), subtractCurrency(), generateDocumentNo(), calculateInvoiceBalance(), updateCustomerBalance() (+10 more)
+Nodes (129): Persist session metadata to disk., Persist session metadata to disk (not the project, just session info)., _auto_save_callback(), cli(), composite_blend_modes(), composite_get_blend(), composite_group(), composite_pip() (+121 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.08
-Nodes (53): _add_heading_element(), _add_image_ref_element(), _add_list_element(), _add_page_break_element(), _add_paragraph_element(), _add_table_element(), _apply_paragraph_properties(), _apply_text_properties() (+45 more)
+Cohesion: 0.04
+Nodes (8): generateDocumentNo(), generatePOSTransactionNo(), ProductionModel, PurchaseModel, PurchaseOrderModel, QuotationModel, SalesOrderModel, getNextSequenceNumber()
 
 ### Community 19 - "Community 19"
 Cohesion: 0.04
-Nodes (35): mock_config(), Login with manual code should exchange it for tokens., Test meeting CLI commands with mocked API., meeting create should call API and show result., meeting list should show meetings., meeting info should show meeting details., meeting delete should confirm and delete., meeting update should patch meeting fields. (+27 more)
+Nodes (41): parse_time(), Parse a time value that can be seconds or HH:MM:SS.mmm., build_mlt_xml(), _clip_type_num(), frames_to_seconds(), _indent(), MLT XML parsing and generation utilities.  This module handles all low-level MLT, Convert seconds (float) to HH:MM:SS.mmm timecode string. (+33 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.09
-Nodes (27): TestTransforms, Apply multiple transforms and verify., clear_transform(), _format_number(), _get_object(), get_transform(), parse_transform_string(), Inkscape CLI - Transform operations module.  Handles translate, rotate, scale, a (+19 more)
+Cohesion: 0.04
+Nodes (44): apply_filter_and_export(), batch_script_fu(), create_and_export(), find_gimp(), get_version(), GIMP backend — invoke GIMP in batch mode for image processing.  Uses GIMP's Scri, Load an image in GIMP, apply a Script-Fu filter, and export.      Args:, Find the GIMP executable. Raises RuntimeError if not found. (+36 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.06
-Nodes (35): apply_filter_and_export(), batch_script_fu(), create_and_export(), find_gimp(), get_version(), GIMP backend — invoke GIMP in batch mode for image processing.  Uses GIMP's Scri, Load an image in GIMP, apply a Script-Fu filter, and export.      Args:, Find the GIMP executable. Raises RuntimeError if not found. (+27 more)
+Cohesion: 0.08
+Nodes (53): _add_heading_element(), _add_image_ref_element(), _add_list_element(), _add_page_break_element(), _add_paragraph_element(), _add_table_element(), _apply_paragraph_properties(), _apply_text_properties() (+45 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.09
-Nodes (32): abbreviateModel(), ackOk(), bindEndpoint(), cleanShutdown(), execute(), fallbackColor(), findSystemPromptPath(), handlePrompt() (+24 more)
+Cohesion: 0.04
+Nodes (35): mock_config(), Login with manual code should exchange it for tokens., Test meeting CLI commands with mocked API., meeting create should call API and show result., meeting list should show meetings., meeting info should show meeting details., meeting delete should confirm and delete., meeting update should patch meeting fields. (+27 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.06
-Nodes (9): handleCardClick(), handleCardClick(), handleCardClick(), handleCardClick(), handleApiError(), handleError(), handleFormError(), logError() (+1 more)
+Cohesion: 0.09
+Nodes (35): abbreviateModel(), applyAgentPatch(), audit(), cleanShutdown(), execute(), fallbackColor(), findSystemPromptPath(), handleInboundPrompt() (+27 more)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.07
-Nodes (22): generate_invoice_pdf(), Apply color code if colors are supported., Apply color code if colors are supported., Apply color code if colors are supported., Build a styled prompt string for prompt_toolkit or input().          Args:, Build a styled prompt string for prompt_toolkit or input().          Args:, Build a styled prompt string for prompt_toolkit or input().          Args:, Print a subtle hint message. (+14 more)
+Cohesion: 0.06
+Nodes (26): generate_invoice_pdf(), Apply color code if colors are supported., Apply color code if colors are supported., Apply color code if colors are supported., Build a styled prompt string for prompt_toolkit or input().          Args:, Build a styled prompt string for prompt_toolkit or input().          Args:, Build a styled prompt string for prompt_toolkit or input().          Args:, Print a success message with green checkmark. (+18 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.1
-Nodes (21): find_ffmpeg(), find_melt(), get_melt_version(), MLT/melt backend — invoke melt for rendering MLT XML projects.  Shotcut and Kden, Render a color bars test video using melt's built-in producer.      This doesn't, Find the melt executable. Raises RuntimeError if not found., Find ffmpeg executable., Get the installed melt version string. (+13 more)
+Cohesion: 0.06
+Nodes (9): handleCardClick(), handleCardClick(), handleCardClick(), handleCardClick(), handleApiError(), handleError(), handleFormError(), logError() (+1 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.09
@@ -437,24 +437,24 @@ Cohesion: 0.09
 Nodes (1): LibreOffice CLI - Tests package.
 
 ### Community 28 - "Community 28"
-Cohesion: 0.2
+Cohesion: 0.18
 Nodes (2): AccountingService, getTrialBalance()
 
 ### Community 29 - "Community 29"
+Cohesion: 0.2
+Nodes (12): addCurrency(), divideCurrency(), multiplyCurrency(), parseCurrency(), percentageOf(), roundCurrency(), subtractCurrency(), calculateInvoiceBalance() (+4 more)
+
+### Community 30 - "Community 30"
 Cohesion: 0.22
 Nodes (6): NotificationService, sendDeliveryDelayAlertSMS(), sendLowStockAlertSMS(), sendNewOrderAlertSMS(), sendPaymentNotificationSMS(), sendSMS()
 
-### Community 30 - "Community 30"
+### Community 31 - "Community 31"
 Cohesion: 0.18
 Nodes (2): EmailService, sendEmail()
 
-### Community 31 - "Community 31"
-Cohesion: 0.21
-Nodes (3): validateEmail(), validatePhoneNumber(), ValidationService
-
 ### Community 32 - "Community 32"
 Cohesion: 0.21
-Nodes (2): getWeather(), WeatherService
+Nodes (3): validateEmail(), validatePhoneNumber(), ValidationService
 
 ### Community 33 - "Community 33"
 Cohesion: 0.14
@@ -485,40 +485,40 @@ Cohesion: 0.29
 Nodes (0): 
 
 ### Community 40 - "Community 40"
-Cohesion: 0.43
-Nodes (5): handleValidationErrors(), validateZod(), validateZodBody(), validateZodParams(), validateZodQuery()
-
-### Community 41 - "Community 41"
 Cohesion: 0.29
 Nodes (1): Allow running as python3 -m cli.inkscape_cli
 
-### Community 42 - "Community 42"
+### Community 41 - "Community 41"
 Cohesion: 0.29
 Nodes (7): Codebase Analysis, CLI Architecture Design, Implementation, Test Planning, Test Implementation, Test Documentation, PyPI Publishing
 
-### Community 43 - "Community 43"
+### Community 42 - "Community 42"
 Cohesion: 0.29
 Nodes (7): CORS Configuration, Environment Variables, JWT Authentication, Password Hashing, Rate Limiting, Security Configuration, Security Checklist
+
+### Community 43 - "Community 43"
+Cohesion: 0.33
+Nodes (0): 
 
 ### Community 44 - "Community 44"
 Cohesion: 0.33
 Nodes (0): 
 
 ### Community 45 - "Community 45"
-Cohesion: 0.33
-Nodes (0): 
-
-### Community 46 - "Community 46"
 Cohesion: 0.47
 Nodes (4): calculateItemAmount(), reducer(), useAutoSaveDraft(), useInvoice()
 
-### Community 47 - "Community 47"
+### Community 46 - "Community 46"
 Cohesion: 0.33
 Nodes (0): 
 
-### Community 48 - "Community 48"
+### Community 47 - "Community 47"
 Cohesion: 0.4
 Nodes (2): ensureDatabaseDirectory(), getDatabasePath()
+
+### Community 48 - "Community 48"
+Cohesion: 0.4
+Nodes (0): 
 
 ### Community 49 - "Community 49"
 Cohesion: 0.4
@@ -554,31 +554,31 @@ Nodes (0):
 
 ### Community 57 - "Community 57"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (5): Dual Output Modes, Methodology, REPL Mode, Stateful Session, Comprehensive Testing
 
 ### Community 58 - "Community 58"
 Cohesion: 0.4
-Nodes (5): Dual Output Modes, Methodology, REPL Mode, Stateful Session, Comprehensive Testing
+Nodes (5): Database Backup, Electron Packaging, Process Management, Production Build, Reverse Proxy
 
 ### Community 59 - "Community 59"
-Cohesion: 0.4
-Nodes (5): Database Backup, Electron Packaging, Process Management, Production Build, Reverse Proxy
+Cohesion: 0.5
+Nodes (0): 
 
 ### Community 60 - "Community 60"
 Cohesion: 0.5
 Nodes (0): 
 
 ### Community 61 - "Community 61"
-Cohesion: 0.5
-Nodes (0): 
-
-### Community 62 - "Community 62"
 Cohesion: 0.83
 Nodes (3): isAGGridCellFocused(), isAGGridEditing(), shouldIgnoreForAGGrid()
 
-### Community 63 - "Community 63"
+### Community 62 - "Community 62"
 Cohesion: 0.5
 Nodes (2): shutdownRateLimiters(), globalTeardown()
+
+### Community 63 - "Community 63"
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 64 - "Community 64"
 Cohesion: 0.67
@@ -593,12 +593,12 @@ Cohesion: 0.67
 Nodes (0): 
 
 ### Community 67 - "Community 67"
-Cohesion: 0.67
-Nodes (0): 
-
-### Community 68 - "Community 68"
 Cohesion: 1.0
 Nodes (2): formatCurrency(), formatCurrencyWithDefaultSettings()
+
+### Community 68 - "Community 68"
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 69 - "Community 69"
 Cohesion: 0.67
@@ -1903,12 +1903,12 @@ Nodes (1): Troubleshooting
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ReplSkin` connect `Community 5` to `Community 0`, `Community 2`, `Community 4`, `Community 7`, `Community 10`, `Community 15`, `Community 24`?**
-  _High betweenness centrality (0.083) - this node is a cross-community bridge._
-- **Why does `make_client()` connect `Community 2` to `Community 5`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
-- **Why does `_resolve_cli()` connect `Community 14` to `Community 1`, `Community 2`, `Community 3`, `Community 6`, `Community 7`, `Community 13`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Why does `ReplSkin` connect `Community 3` to `Community 1`, `Community 2`, `Community 4`, `Community 9`, `Community 10`, `Community 17`, `Community 24`?**
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `ItemsPage()` connect `Community 12` to `Community 2`?**
+  _High betweenness centrality (0.042) - this node is a cross-community bridge._
+- **Why does `create_project()` connect `Community 0` to `Community 1`, `Community 11`, `Community 4`, `Community 5`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Are the 345 inferred relationships involving `ReplSkin` (e.g. with `Mini ERP CLI — agent-native command-line interface.  Usage:     cli-anything-min` and `Print data as JSON or human-readable based on --json flag.`) actually correct?**
   _`ReplSkin` has 345 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 376 inferred relationships involving `ERPError` (e.g. with `Mini ERP CLI — agent-native command-line interface.  Usage:     cli-anything-min` and `Print data as JSON or human-readable based on --json flag.`) actually correct?**

@@ -490,6 +490,48 @@ export class AccountingService {
   // ------------------------------------------------------------------
 
   /**
+   * Post COGS reversal for returned items. Reverses what postCOGSEntry
+   * originally posted:
+   *   Dr Inventory Asset (1200) — restore inventory value
+   *   Cr COGS (5000) — reverse cost of goods sold
+   *
+   * Must be called with the actual FIFO cost of the returned items.
+   */
+  static postCOGSReversalEntry(
+    db: Database.Database,
+    args: {
+      invoiceId: number;
+      invoiceNo: string;
+      cogsAmount: number;
+      entryDate: string;
+      userId?: number;
+    }
+  ): PostedEntry | null {
+    if (!args.cogsAmount || args.cogsAmount <= 0) return null;
+
+    const inventory = AccountingService.getAccountByCode(db, '1200');
+    const cogs = AccountingService.getAccountByCode(db, '5000');
+    if (!inventory || !cogs) {
+      throw new Error(
+        'Chart of accounts is missing required accounts: ' +
+        '1200 (Inventory Asset) or 5000 (COGS)'
+      );
+    }
+
+    return AccountingService.postEntry(db, {
+      entry_date: args.entryDate,
+      description: `COGS reversal for Invoice return ${args.invoiceNo} — ${args.cogsAmount.toFixed(2)}`,
+      reference_type: 'INVOICE_RETURN',
+      reference_id: args.invoiceId,
+      created_by: args.userId,
+      lines: [
+        { account_id: inventory.id, debit: args.cogsAmount, description: `Inventory restored for return of ${args.invoiceNo}` },
+        { account_id: cogs.id, credit: args.cogsAmount, description: `COGS reversed for return of ${args.invoiceNo}` },
+      ],
+    });
+  }
+
+  /**
    * Post GL reversal for a sales invoice return.
    * Reverses what postInvoiceEntry originally posted:
    *   Cr AR (1100) — reduce receivable
