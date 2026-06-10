@@ -795,6 +795,23 @@ function cancelInvoice(req: AuthRequest, res: Response): Response | void {
         WHERE id = ?
       `).run(invoiceId);
 
+      // Void the invoice's GL journal_lines (Dr AR / Cr Sales Revenue / Cr Tax Payable)
+      AccountingService.voidJournalLinesByReference(db, 'INVOICE', invoiceId);
+
+      // Void any COGS journal_lines (Dr COGS / Cr Inventory Asset)
+      AccountingService.voidJournalLinesByReference(db, 'COGS', invoiceId);
+
+      // Void any return-related GL journal_lines (Cr AR / Dr Sales Returns / Dr Tax Payable)
+      AccountingService.voidJournalLinesByReference(db, 'INVOICE_RETURN', invoiceId);
+
+      // Void payment GL journal_lines (Dr Cash / Cr AR) for all payments on this invoice
+      const allocations = PaymentModel.getAllocationsByInvoiceId(db, invoiceId);
+      for (const alloc of allocations) {
+        AccountingService.voidJournalLinesByReference(db, 'PAYMENT', alloc.payment_id);
+        // Also void refund GL lines if any exist
+        AccountingService.voidJournalLinesByReference(db, 'REFUND', alloc.payment_id);
+      }
+
       // Add a CANCELLED ledger entry (credit to offset the original debit)
       // This neutralizes the AR impact without deleting history
       createLedgerEntry(
