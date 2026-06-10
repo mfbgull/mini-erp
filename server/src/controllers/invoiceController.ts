@@ -701,6 +701,17 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
         return res.status(404).json({ error: 'Invoice not found' });
     }
 
+    // Block deletion of paid, returned, or cancelled invoices.
+    // Only Draft and Unpaid invoices with no payments or returns may be deleted.
+    const paidAmount = parseCurrency(invoice.paid_amount);
+    const returnedAmount = parseCurrency(invoice.returned_amount);
+    const deletableStatuses: string[] = ['Draft', 'Unpaid'];
+    if (!deletableStatuses.includes(invoice.status) || paidAmount > 0 || returnedAmount > 0) {
+      return res.status(400).json({
+        error: 'Cannot delete this invoice. Only unpaid/draft invoices with no payments or returns can be deleted. Use Cancel instead.'
+      });
+    }
+
     const invoiceItems = InvoiceModel.getItemsForStockReverse(invoiceId, db);
 
     const transaction = db.transaction(() => {
@@ -754,6 +765,71 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
   } catch (error: unknown) {
     logger.error('Delete invoice error:', { error });
     res.status(500).json({ error: 'Failed to delete invoice' });
+  }
+}
+
+/**
+ * PUT /api/invoices/:id/cancel
+ * Cancel an invoice. Sets status to 'Cancelled' without reversing stock,
+ * payments, or returns. The invoice data is preserved for audit purposes.
+ */
+function cancelInvoice(req: AuthRequest, res: Response): Response | void {
+  try {
+    const { id } = req.params;
+    const invoiceId = parseInt(id as string, 10);
+    const userId = req.user!.id;
+
+    const invoice = InvoiceModel.getById(invoiceId, db);
+    if (!invoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    if (invoice.status === 'Cancelled') {
+      return res.status(400).json({ error: 'Invoice is already cancelled' });
+    }
+
+    const transaction = db.transaction(() => {
+      // Update status to Cancelled
+      db.prepare(`
+        UPDATE invoices SET status = 'Cancelled', updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(invoiceId);
+
+      // Add a CANCELLED ledger entry (credit to offset the original debit)
+      // This neutralizes the AR impact without deleting history
+      createLedgerEntry(
+        invoice.customer_id,
+        'CANCELLATION',
+        invoice.invoice_no,
+        0,
+        invoice.total_amount,
+        `Invoice ${invoice.invoice_no} cancelled`
+      );
+
+      // Recalculate customer balance
+      ledgerUtils.rebuildLedgerBalances(invoice.customer_id);
+      ledgerUtils.updateCustomerBalance(invoice.customer_id);
+
+      // Log the cancellation
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'CANCEL',
+        'Invoice',
+        invoiceId,
+        `Invoice ${invoice.invoice_no} cancelled`
+      );
+    });
+
+    transaction();
+
+    const updatedInvoice = InvoiceModel.getWithCustomer(invoiceId, db);
+    res.json({ success: true, message: 'Invoice cancelled successfully', data: updatedInvoice });
+  } catch (error: unknown) {
+    logger.error('Cancel invoice error:', { error });
+    res.status(500).json({ error: 'Failed to cancel invoice' });
   }
 }
 
@@ -1178,6 +1254,7 @@ export {
   createInvoice,
   updateInvoice,
   deleteInvoice,
+  cancelInvoice,
   getInvoicePayments,
   returnInvoiceItems,
   getInvoiceReturnHistory,
@@ -1189,6 +1266,7 @@ export default {
   createInvoice,
   updateInvoice,
   deleteInvoice,
+  cancelInvoice,
   getInvoicePayments,
   returnInvoiceItems,
   getInvoiceReturnHistory,

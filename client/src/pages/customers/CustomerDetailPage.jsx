@@ -25,7 +25,8 @@ import {
   Download,
   Printer,
   Image,
-  FileSpreadsheet
+  FileSpreadsheet,
+  X
 } from 'lucide-react';
 
 
@@ -129,8 +130,46 @@ export default function CustomerDetailPage() {
     }
   });
 
+  // Cancel invoice mutation
+  const cancelInvoiceMutation = useMutation({
+    mutationFn: async (invoiceId) => {
+      return api.put(`/invoices/${invoiceId}/cancel`);
+    },
+    onSuccess: () => {
+      toast.success('Invoice cancelled successfully');
+      queryClient.invalidateQueries(['customerInvoices', id]);
+      queryClient.invalidateQueries(['customer', id]);
+      queryClient.invalidateQueries(['customerLedger', id]);
+      queryClient.invalidateQueries(['invoices']);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to cancel invoice');
+    }
+  });
+
+  const canDeleteInvoice = (invoice) => {
+    const paidAmount = parseFloat(invoice.paid_amount || 0);
+    const returnedAmount = parseFloat(invoice.returned_amount || 0);
+    const deletableStatuses = ['Draft', 'Unpaid'];
+    return deletableStatuses.includes(invoice.status) && paidAmount === 0 && returnedAmount === 0;
+  };
+
   const handleDeleteInvoice = (invoice) => {
+    if (!canDeleteInvoice(invoice)) {
+      toast.error('Only unpaid/draft invoices with no payments or returns can be deleted. Use Cancel instead.');
+      return;
+    }
     setInvoiceToDelete(invoice);
+  };
+
+  const handleCancelInvoice = (invoice) => {
+    if (invoice.status === 'Cancelled') {
+      toast.error('Invoice is already cancelled');
+      return;
+    }
+    if (window.confirm(`Are you sure you want to cancel invoice "${invoice.invoice_no}"? This will mark it as cancelled but keep all records.`)) {
+      cancelInvoiceMutation.mutate(invoice.id);
+    }
   };
 
   const confirmDeleteInvoice = () => {
@@ -319,6 +358,7 @@ export default function CustomerDetailPage() {
                   onView={(invoice) => navigate(`/sales/invoice/${invoice.id}?mode=view`)}
                   onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}?mode=edit`)}
                   onDelete={handleDeleteInvoice}
+                  onCancel={handleCancelInvoice}
                 />
               </div>
             ) : (
@@ -849,13 +889,25 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice }) {
           >
             <Edit2 size={14} />
           </button>
-          <button
-            className="action-btn delete-btn"
-            onClick={() => onDeleteInvoice(params.data)}
-            title="Delete Invoice"
-          >
-            <Trash2 size={14} />
-          </button>
+          {((params.data.paid_amount || 0) === 0 && (params.data.returned_amount || 0) === 0 && ['Draft', 'Unpaid'].includes(params.data.status)) && (
+            <button
+              className="action-btn delete-btn"
+              onClick={() => onDeleteInvoice(params.data)}
+              title="Delete Invoice"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+          {params.data.status !== 'Cancelled' && (
+            <button
+              className="action-btn"
+              onClick={() => handleCancelInvoice(params.data)}
+              title="Cancel Invoice"
+              style={{ color: '#ef4444' }}
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       )
     }

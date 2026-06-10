@@ -12,6 +12,7 @@ router.get('/:id/payments', invoiceController.getInvoicePayments);
 router.post('/', invoiceController.createInvoice);
 router.put('/:id', invoiceController.updateInvoice);
 router.delete('/:id', requireAdmin, invoiceController.deleteInvoice);
+router.put('/:id/cancel', requireAdmin, invoiceController.cancelInvoice);
 router.post('/:id/return', requireAdmin, invoiceController.returnInvoiceItems);
 
 export default router;

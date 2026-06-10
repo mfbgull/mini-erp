@@ -26,9 +26,10 @@ interface CompactInvoiceCardProps {
   onEdit: (invoice: Invoice) => void;
   onDelete?: (invoice: Invoice) => void;
   onReturn?: (invoice: Invoice) => void;
+  onCancel?: (invoice: Invoice) => void;
 }
 
-export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn }: CompactInvoiceCardProps) {
+export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn, onCancel }: CompactInvoiceCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -101,10 +102,21 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn
                       Return
                     </button>
                   )}
-                  {onDelete && (
-                    <button type="button" className="dropdown-item delete" onClick={() => { setShowMenu(false); onDelete(invoice); }}>
-                      <Trash2 className="dropdown-icon" />
-                      Delete
+                  {onDelete && (() => {
+                    const paidAmt = parseFloat(String(invoice.paid_amount || '0'));
+                    const returnedAmt = parseFloat(String((invoice as Record<string, unknown>).returned_amount || '0'));
+                    const isDeletable = ['Draft', 'Unpaid'].includes(invoice.status) && paidAmt === 0 && returnedAmt === 0;
+                    return isDeletable ? (
+                      <button type="button" className="dropdown-item delete" onClick={() => { setShowMenu(false); onDelete(invoice); }}>
+                        <Trash2 className="dropdown-icon" />
+                        Delete
+                      </button>
+                    ) : null;
+                  })()}
+                  {onCancel && invoice.status !== 'Cancelled' && (
+                    <button type="button" className="dropdown-item delete" onClick={() => { setShowMenu(false); onCancel(invoice); }}>
+                      <X className="dropdown-icon" />
+                      Cancel
                     </button>
                   )}
                 </div>
@@ -203,12 +215,13 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn
   );
 }
 
-export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDelete, onReturn }: {
+export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDelete, onReturn, onCancel }: {
   invoices: Invoice[],
   onView: (invoice: Invoice) => void,
   onEdit: (invoice: Invoice) => void,
   onDelete?: (invoice: Invoice) => void,
-  onReturn?: (invoice: Invoice) => void
+  onReturn?: (invoice: Invoice) => void,
+  onCancel?: (invoice: Invoice) => void
 }) {
   if (invoices.length === 0) {
     return (
@@ -226,7 +239,7 @@ export default function CompactInvoiceCardView({ invoices, onView, onEdit, onDel
     <div className="compact-mobile-cards-wrapper">
       <div className="compact-mobile-cards-container">
         {invoices.map((invoice) => (
-          <CompactInvoiceCard key={invoice.id} invoice={invoice} onView={onView} onEdit={onEdit} onDelete={onDelete} onReturn={onReturn} />
+          <CompactInvoiceCard key={invoice.id} invoice={invoice} onView={onView} onEdit={onEdit} onDelete={onDelete} onReturn={onReturn} onCancel={onCancel} />
         ))}
       </div>
     </div>

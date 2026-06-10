@@ -87,9 +87,44 @@ export default function SalesPage() {
     }
   });
 
+  // Cancel invoice mutation
+  const cancelInvoiceMutation = useMutation({
+    mutationFn: async (invoiceId) => {
+      return api.put(`/invoices/${invoiceId}/cancel`);
+    },
+    onSuccess: () => {
+      toast.success('Invoice cancelled successfully');
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to cancel invoice');
+    }
+  });
+
+  const canDeleteInvoice = (invoice) => {
+    const paidAmount = parseFloat(invoice.paid_amount || 0);
+    const returnedAmount = parseFloat(invoice.returned_amount || 0);
+    const deletableStatuses = ['Draft', 'Unpaid'];
+    return deletableStatuses.includes(invoice.status) && paidAmount === 0 && returnedAmount === 0;
+  };
+
   const handleDeleteInvoice = (invoice) => {
+    if (!canDeleteInvoice(invoice)) {
+      toast.error('Only unpaid/draft invoices with no payments or returns can be deleted. Use Cancel instead.');
+      return;
+    }
     if (window.confirm(`${t('sales.confirmDelete')} "${invoice.invoice_no}"?`)) {
       deleteInvoiceMutation.mutate(invoice.id);
+    }
+  };
+
+  const handleCancelInvoice = (invoice) => {
+    if (invoice.status === 'Cancelled') {
+      toast.error('Invoice is already cancelled');
+      return;
+    }
+    if (window.confirm(`Are you sure you want to cancel invoice "${invoice.invoice_no}"? This will mark it as cancelled but keep all records.`)) {
+      cancelInvoiceMutation.mutate(invoice.id);
     }
   };
 
@@ -131,11 +166,11 @@ export default function SalesPage() {
     }
   };
 
-  const handleSubmitReturn = (items) => {
+  const handleSubmitReturn = (returnPayload) => {
     if (!returnInvoice) return;
     returnInvoiceMutation.mutate({
       id: returnInvoice.id,
-      data: { items, reason: items[0]?.reason || '' }
+      data: returnPayload
     });
   };
 
@@ -260,6 +295,16 @@ export default function SalesPage() {
               <RotateCcw size={14} />
             </button>
           )}
+          {params.data?.status !== 'Cancelled' && (
+            <button
+              className="action-btn"
+              onClick={() => handleCancelInvoice(params.data)}
+              title="Cancel Invoice"
+              style={{ color: '#ef4444' }}
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       )
     }
@@ -370,6 +415,7 @@ export default function SalesPage() {
             onEdit={(invoice) => navigate(`/sales/invoice/${invoice.id}?mode=edit`)}
             onDelete={handleDeleteInvoice}
             onReturn={handleOpenReturn}
+            onCancel={handleCancelInvoice}
           />
         ) : (
           <div className="ag-theme-quartz grid-fill">
