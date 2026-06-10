@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
 import PurchaseOrderModel from '../models/PurchaseOrder';
 import SupplierLedgerModel from '../models/SupplierLedger';
+import AccountingService from '../services/accountingService';
 import db from '../config/database';
 import logger from '../utils/logger';
 
@@ -324,6 +325,43 @@ function createGoodsReceipt(req: AuthRequest, res: Response): void {
   }
 }
 
+function returnReceiptItems(req: AuthRequest, res: Response): void {
+  try {
+    const { id } = req.params;
+    const poId = parseInt(id as string, 10);
+    const userId = req.user!.id;
+    const { items, reason } = req.body;
+
+    if (!items || items.length === 0) {
+      res.status(400).json({ error: 'At least one item must be returned' });
+      return;
+    }
+
+    for (const item of items) {
+      if (!item.po_item_id || !item.return_quantity || item.return_quantity <= 0) {
+        res.status(400).json({ error: 'Each return item must have po_item_id and a positive return_quantity' });
+        return;
+      }
+    }
+
+    const result = PurchaseOrderModel.returnReceiptItems(poId, items, userId, db, reason);
+
+    // Post GL reversal — Dr AP, Cr Inventory
+    AccountingService.postPurchaseReturnEntry(db, {
+      purchaseId: poId,
+      purchaseNo: `PO-${poId}`, // Will be resolved properly inside the method if needed
+      returnAmount: result.totalAmount,
+      returnDate: new Date().toISOString().split('T')[0],
+      userId,
+    });
+
+    res.json({ success: true, message: 'Return processed successfully', data: result });
+  } catch (error: any) {
+    logger.error('Return receipt items error:', error);
+    res.status(400).json({ error: error.message || 'Failed to process return' });
+  }
+}
+
 function getPendingOrders(req: Request, res: Response): void {
   try {
     const pos = PurchaseOrderModel.getPendingOrders(db);
@@ -410,6 +448,7 @@ export default {
   updateStatus,
   getGoodsReceipts,
   createGoodsReceipt,
+  returnReceiptItems,
   getPendingOrders,
   getSummaryBySupplier,
   getSupplierBalance,

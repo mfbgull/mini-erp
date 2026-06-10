@@ -747,6 +747,162 @@ class PurchaseOrderModel {
     return transaction();
   }
 
+  /**
+   * Return (reverse) items that were previously received via a Goods Receipt.
+   * This reduces received_quantity on the PO item, reverses stock via an
+   * ADJUSTMENT movement, updates stock_balances, and recalculates the PO status.
+   *
+   * @param poId - Purchase Order ID
+   * @param items - Array of { po_item_id, return_quantity }
+   * @param userId - User performing the return
+   * @param db - Database connection
+   * @param reason - Optional reason for the return
+   * @returns Summary of returned items
+   */
+  static returnReceiptItems(
+    poId: number,
+    items: Array<{ po_item_id: number; return_quantity: number }>,
+    userId: number,
+    db: Database.Database,
+    reason?: string
+  ): { returnedCount: number; totalQuantity: number; totalAmount: number } {
+    if (!items || items.length === 0) {
+      throw new Error('At least one item must be returned');
+    }
+
+    const po = this.getById(poId, db);
+    if (!po) throw new Error('Purchase Order not found');
+
+    if (po.status === 'Draft') {
+      throw new Error('Cannot return items from a Draft Purchase Order');
+    }
+
+    const transaction = db.transaction(() => {
+      let totalQuantity = 0;
+      let totalAmount = 0;
+      let returnedCount = 0;
+
+      for (const returnItem of items) {
+        if (returnItem.return_quantity <= 0) {
+          throw new Error('Return quantity must be positive');
+        }
+
+        const poItem = db.prepare(`
+          SELECT * FROM purchase_order_items WHERE id = ?
+        `).get(returnItem.po_item_id) as {
+          id: number; po_id: number; item_id: number;
+          quantity: number; received_quantity: number;
+          returned_quantity: number; unit_price: number;
+        } | undefined;
+
+        if (!poItem) {
+          throw new Error(`Purchase Order Item ${returnItem.po_item_id} not found`);
+        }
+
+        if (poItem.po_id !== poId) {
+          throw new Error(`Item ${poItem.id} does not belong to PO ${poId}`);
+        }
+
+        // Net received = received_quantity - already returned
+        const netReceived = (poItem.received_quantity || 0) - (poItem.returned_quantity || 0);
+        if (returnItem.return_quantity > netReceived) {
+          throw new Error(
+            `Return quantity (${returnItem.return_quantity}) exceeds net received quantity ` +
+            `(${netReceived}) for PO item ${poItem.id}`
+          );
+        }
+
+        const returnAmount = returnItem.return_quantity * poItem.unit_price;
+
+        // Reduce PO item received_quantity (net effect)
+        db.prepare(`
+          UPDATE purchase_order_items
+          SET received_quantity = received_quantity - ?,
+              returned_quantity = COALESCE(returned_quantity, 0) + ?
+          WHERE id = ?
+        `).run(returnItem.return_quantity, returnItem.return_quantity, returnItem.po_item_id);
+
+        // Create ADJUSTMENT stock movement (negative qty = removal)
+        const movementNo = StockMovementModel.generateMovementNo(db);
+        db.prepare(`
+          INSERT INTO stock_movements (
+            movement_no, item_id, warehouse_id, movement_type,
+            quantity, unit_cost, reference_doctype, reference_docno,
+            remarks, movement_date, created_by
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          movementNo,
+          poItem.item_id,
+          po.warehouse_id,
+          'ADJUSTMENT',
+          -returnItem.return_quantity,
+          poItem.unit_price,
+          'PO_RETURN',
+          po.po_no,
+          `Stock reversed - PO ${po.po_no} item return${reason ? ': ' + reason : ''}`,
+          new Date().toISOString().split('T')[0],
+          userId
+        );
+
+        // Update stock_balances
+        const existingBalance = db.prepare(`
+          SELECT * FROM stock_balances
+          WHERE item_id = ? AND warehouse_id = ?
+        `).get(poItem.item_id, po.warehouse_id) as StockBalance | undefined;
+
+        if (existingBalance) {
+          db.prepare(`
+            UPDATE stock_balances
+            SET quantity = quantity - ?,
+                last_updated = CURRENT_TIMESTAMP
+            WHERE item_id = ? AND warehouse_id = ?
+          `).run(returnItem.return_quantity, poItem.item_id, po.warehouse_id);
+        }
+
+        // Update items.current_stock
+        db.prepare(`
+          UPDATE items
+          SET current_stock = (
+            SELECT COALESCE(SUM(quantity), 0)
+            FROM stock_balances
+            WHERE item_id = ?
+          )
+          WHERE id = ?
+        `).run(poItem.item_id, poItem.item_id);
+
+        totalQuantity += returnItem.return_quantity;
+        totalAmount += returnAmount;
+        returnedCount++;
+      }
+
+      // Recalculate PO status after return
+      const newStatus = this.calculateStatus(poId, db);
+      if (newStatus !== po.status) {
+        db.prepare(`
+          UPDATE purchase_orders
+          SET status = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).run(newStatus, poId);
+      }
+
+      // Log activity
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'RETURN',
+        'PurchaseOrder',
+        poId,
+        `Return processed for ${returnedCount} item(s) (${totalQuantity} units, ${totalAmount.toFixed(2)}) on PO ${po.po_no}${reason ? ': ' + reason : ''}`
+      );
+
+      return { returnedCount, totalQuantity, totalAmount };
+    });
+
+    return transaction();
+  }
+
   static generateReceiptNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `GR_last_no_${year}`;

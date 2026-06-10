@@ -123,6 +123,28 @@ function getPurchaseSummaryByDateRange(req: Request, res: Response): void {
   }
 }
 
+function getReturnHistory(req: Request, res: Response): void {
+  try {
+    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
+    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
+    const itemIdParam = Array.isArray(req.query.item_id) ? req.query.item_id[0] : req.query.item_id;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+
+    const filters = {
+      start_date: startDateParam as string | undefined,
+      end_date: endDateParam as string | undefined,
+      item_id: itemIdParam ? Number(itemIdParam) : undefined,
+      limit: limitParam ? parseInt(String(limitParam)) : undefined
+    };
+
+    const returns = Purchase.getReturnHistory(filters, db);
+    res.json(returns);
+  } catch (error) {
+    logger.error('Get purchase return history error:', error);
+    res.status(500).json({ error: 'Failed to get purchase return history' });
+  }
+}
+
 function getTopSuppliers(req: Request, res: Response): void {
   try {
     const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
@@ -195,6 +217,7 @@ export default {
   getPurchaseSummaryByItem,
   getPurchaseSummaryByDateRange,
   getTopSuppliers,
+  getReturnHistory,
   deletePurchase,
   returnPurchaseItems,
 };

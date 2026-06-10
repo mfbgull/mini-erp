@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, RotateCcw } from 'lucide-react';
 import Button from '../../components/common/Button';
 import { formatCurrency } from '../../utils/formatters';
-import '../../pages/sales/InvoiceReturn.css';
+import './PurchaseReturn.css';
 
 interface Purchase {
   id: number;
@@ -65,62 +65,62 @@ export default function PurchaseReturn({ purchase, onClose, onSubmit, loading }:
   };
 
   return (
-    <div className="return-overlay" onClick={onClose}>
-      <div className="return-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="return-header">
-          <div className="return-header-left">
-            <RotateCcw className="return-header-icon" />
+    <div className="purchase-return-overlay" onClick={onClose}>
+      <div className="purchase-return-container" onClick={(e) => e.stopPropagation()}>
+        <div className="purchase-return-header">
+          <div className="purchase-return-header-left">
+            <RotateCcw className="purchase-return-header-icon" />
             <div>
-              <h2 className="return-title">Purchase Return</h2>
-              <p className="return-subtitle">{purchase.purchase_no}</p>
+              <h2 className="purchase-return-title">Purchase Return</h2>
+              <p className="purchase-return-subtitle">{purchase.purchase_no}</p>
             </div>
           </div>
-          <button className="return-close" onClick={onClose}>
+          <button className="purchase-return-close" onClick={onClose}>
             <X size={24} />
           </button>
         </div>
 
-        <div className="return-body">
+        <div className="purchase-return-body">
           {/* Purchase Info */}
-          <div className="return-info-grid">
-            <div className="return-info-item">
-              <span className="return-info-label">Supplier</span>
-              <span className="return-info-value">{purchase.supplier_name}</span>
+          <div className="purchase-return-info-grid">
+            <div className="purchase-return-info-item">
+              <span className="purchase-return-info-label">Supplier</span>
+              <span className="purchase-return-info-value">{purchase.supplier_name}</span>
             </div>
-            <div className="return-info-item">
-              <span className="return-info-label">Date</span>
-              <span className="return-info-value">{purchase.purchase_date}</span>
+            <div className="purchase-return-info-item">
+              <span className="purchase-return-info-label">Date</span>
+              <span className="purchase-return-info-value">{purchase.purchase_date}</span>
             </div>
-            <div className="return-info-item">
-              <span className="return-info-label">Status</span>
-              <span className="return-info-value">{purchase.status}</span>
+            <div className="purchase-return-info-item">
+              <span className="purchase-return-info-label">Status</span>
+              <span className="purchase-return-info-value">{purchase.status}</span>
             </div>
-            <div className="return-info-item">
-              <span className="return-info-label">Total Amount</span>
-              <span className="return-info-value">{formatCurrency(purchase.amount || 0)}</span>
+            <div className="purchase-return-info-item">
+              <span className="purchase-return-info-label">Total Amount</span>
+              <span className="purchase-return-info-value">{formatCurrency(purchase.amount || 0)}</span>
             </div>
           </div>
 
           {/* Item Detail */}
-          <div className="return-item-list">
-            <div className="return-item-row header-row">
-              <span className="return-item-field item-name-col">Item</span>
-              <span className="return-item-field item-qty-col">Original Qty</span>
-              <span className="return-item-field item-rate-col">Rate</span>
-              <span className="return-item-field item-return-col">Return Qty</span>
-              <span className="return-item-field item-amount-col">Return Value</span>
+          <div className="purchase-return-item-list">
+            <div className="purchase-return-item-row header-row">
+              <span className="purchase-return-item-field item-name-col">Item</span>
+              <span className="purchase-return-item-field item-qty-col">Original Qty</span>
+              <span className="purchase-return-item-field item-rate-col">Rate</span>
+              <span className="purchase-return-item-field item-return-col">Return Qty</span>
+              <span className="purchase-return-item-field item-amount-col">Return Value</span>
             </div>
-            <div className="return-item-row">
-              <div className="return-item-field item-name-col">
+            <div className="purchase-return-item-row">
+              <div className="purchase-return-item-field item-name-col">
                 <span className="item-code-label">{purchase.item_code}</span>
                 <span className="item-name-label">{purchase.item_name}</span>
               </div>
-              <span className="return-item-field item-qty-col">{maxQuantity}</span>
-              <span className="return-item-field item-rate-col">{formatCurrency(purchase.rate || 0)}</span>
-              <div className="return-item-field item-return-col">
+              <span className="purchase-return-item-field item-qty-col">{maxQuantity}</span>
+              <span className="purchase-return-item-field item-rate-col">{formatCurrency(purchase.rate || 0)}</span>
+              <div className="purchase-return-item-field item-return-col">
                 <input
                   type="number"
-                  className="return-qty-input"
+                  className="purchase-return-qty-input"
                   min={0}
                   max={maxQuantity}
                   value={returnQuantity || ''}
@@ -128,17 +128,17 @@ export default function PurchaseReturn({ purchase, onClose, onSubmit, loading }:
                   placeholder="0"
                 />
               </div>
-              <span className="return-item-field item-amount-col return-amount">
+              <span className="purchase-return-item-field item-amount-col purchase-return-amount">
                 {formatCurrency(returnAmount)}
               </span>
             </div>
           </div>
 
           {/* Reason */}
-          <div className="return-reason">
-            <label className="return-reason-label">Reason for Return (optional)</label>
+          <div className="purchase-return-reason">
+            <label className="purchase-return-reason-label">Reason for Return (optional)</label>
             <textarea
-              className="return-reason-input"
+              className="purchase-return-reason-input"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Enter reason for return..."
@@ -148,25 +148,25 @@ export default function PurchaseReturn({ purchase, onClose, onSubmit, loading }:
 
           {/* Error */}
           {error && (
-            <div className="return-error">
+            <div className="purchase-return-error">
               <span>{error}</span>
             </div>
           )}
 
           {/* Summary */}
-          <div className="return-summary">
-            <div className="return-summary-row">
+          <div className="purchase-return-summary">
+            <div className="purchase-return-summary-row">
               <span>Returning</span>
               <span>{returnQuantity} of {maxQuantity} units</span>
             </div>
-            <div className="return-summary-row total">
+            <div className="purchase-return-summary-row total">
               <span>Total Return Value</span>
               <span>{formatCurrency(returnAmount)}</span>
             </div>
           </div>
         </div>
 
-        <div className="return-footer">
+        <div className="purchase-return-footer">
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>

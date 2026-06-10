@@ -8,6 +8,7 @@ router.use(authenticateToken);
 
 router.post('/purchases', sensitiveOperationLimiter, purchaseController.recordPurchase);
 router.get('/purchases', purchaseController.getPurchases);
+router.get('/purchases/returns', purchaseController.getReturnHistory);
 router.get('/purchases/:id', purchaseController.getPurchase);
 router.delete('/purchases/:id', requireAdmin, sensitiveOperationLimiter, purchaseController.deletePurchase);
 router.post('/purchases/:id/return', requireAdmin, sensitiveOperationLimiter, purchaseController.returnPurchaseItems);

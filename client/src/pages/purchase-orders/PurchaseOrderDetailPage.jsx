@@ -24,6 +24,10 @@ export default function PurchaseOrderDetailPage() {
   const [remarks, setRemarks] = useState('');
   const [receiveQuantities, setReceiveQuantities] = useState({});
 
+  const [showReturnForm, setShowReturnForm] = useState(false);
+  const [returnQuantities, setReturnQuantities] = useState({});
+  const [returnReason, setReturnReason] = useState('');
+
   const { data: po, isLoading } = useQuery({
     queryKey: ['purchaseOrder', id],
     queryFn: async () => {
@@ -69,6 +73,23 @@ export default function PurchaseOrderDetailPage() {
     },
     onError: (error) => {
       toast.error(error.response?.data?.error || 'Failed to receive items');
+    }
+  });
+
+  const returnMutation = useMutation({
+    mutationFn: async (returnData) => {
+      return api.post(`/purchase-orders/${id}/return-receipt`, returnData);
+    },
+    onSuccess: () => {
+      toast.success('Items returned successfully');
+      queryClient.invalidateQueries(['purchaseOrder', id]);
+      queryClient.invalidateQueries(['purchaseOrders']);
+      setShowReturnForm(false);
+      setReturnReason('');
+      setReturnQuantities({});
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to process return');
     }
   });
 
@@ -122,6 +143,46 @@ export default function PurchaseOrderDetailPage() {
     });
   };
 
+  const handleOpenReturnForm = () => {
+    if (po?.items) {
+      const defaults = {};
+      po.items.forEach(item => {
+        const returnable = (item.received_quantity || 0) - (item.returned_quantity || 0);
+        if (returnable > 0) {
+          defaults[item.id] = 0;
+        }
+      });
+      setReturnQuantities(defaults);
+    }
+    setReturnReason('');
+    setShowReturnForm(true);
+  };
+
+  const handleReturnQtyChange = (itemId, value, maxReturnable) => {
+    const numValue = Math.max(0, Math.min(Number(value), maxReturnable));
+    setReturnQuantities(prev => ({ ...prev, [itemId]: numValue }));
+  };
+
+  const handleConfirmReturn = () => {
+    const items = [];
+    for (const [poItemId, qty] of Object.entries(returnQuantities)) {
+      const numQty = Number(qty);
+      if (numQty > 0) {
+        items.push({ po_item_id: Number(poItemId), return_quantity: numQty });
+      }
+    }
+
+    if (items.length === 0) {
+      toast.error('Enter at least one item quantity to return');
+      return;
+    }
+
+    returnMutation.mutate({
+      items,
+      reason: returnReason || undefined
+    });
+  };
+
   const handleQtyChange = (itemId, value, maxPending) => {
     const numValue = Math.max(0, Math.min(Number(value), maxPending));
     setReceiveQuantities(prev => ({ ...prev, [itemId]: numValue }));
@@ -166,6 +227,12 @@ export default function PurchaseOrderDetailPage() {
     return item.quantity - (item.received_quantity || 0);
   };
 
+  const returnableQuantity = (item) => {
+    return (item.received_quantity || 0) - (item.returned_quantity || 0);
+  };
+
+  const hasReturnableItems = po?.items?.some(item => returnableQuantity(item) > 0);
+
   const canReceive = ['Submitted', 'Partially Received'].includes(po.status);
 
   return (
@@ -203,6 +270,16 @@ export default function PurchaseOrderDetailPage() {
                 disabled={showReceiveForm}
               >
                 Receive Items
+              </Button>
+            )}
+            {hasReturnableItems && po.status !== 'Draft' && (
+              <Button
+                variant="primary"
+                onClick={handleOpenReturnForm}
+                disabled={showReturnForm}
+                style={{ background: '#f59e0b', borderColor: '#f59e0b' }}
+              >
+                Return Items
               </Button>
             )}
             {['Draft', 'Submitted', 'Partially Received'].includes(po.status) && (
@@ -470,6 +547,82 @@ export default function PurchaseOrderDetailPage() {
         </div>
       )}
 
+      {showReturnForm && (
+        <div className="receive-form">
+          <div className="receive-form-header">
+            <h3>Return Items</h3>
+            <Button variant="secondary" onClick={() => setShowReturnForm(false)}>
+              Cancel
+            </Button>
+          </div>
+
+          <div className="receive-form-fields">
+            <div className="form-input-group" style={{ flex: '1' }}>
+              <label>Reason for Return</label>
+              <textarea
+                className="form-input"
+                value={returnReason}
+                onChange={(e) => setReturnReason(e.target.value)}
+                placeholder="Optional reason..."
+                rows={2}
+              />
+            </div>
+          </div>
+
+          <table className="items-table receive-items-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Received</th>
+                <th>Already Returned</th>
+                <th>Returnable</th>
+                <th>Qty to Return</th>
+              </tr>
+            </thead>
+            <tbody>
+              {po.items?.map(item => {
+                const retQty = returnableQuantity(item);
+                const isDisabled = retQty <= 0;
+                return (
+                  <tr key={item.id} className={isDisabled ? 'receive-row-disabled' : ''}>
+                    <td>{item.item_code} - {item.item_name}</td>
+                    <td>{item.received_quantity || 0} {item.unit_of_measure}</td>
+                    <td>{item.returned_quantity || 0} {item.unit_of_measure}</td>
+                    <td>{retQty} {item.unit_of_measure}</td>
+                    <td>
+                      <input
+                        type="number"
+                        className="receive-qty-input"
+                        value={returnQuantities[item.id] ?? 0}
+                        onChange={(e) => handleReturnQtyChange(item.id, e.target.value, retQty)}
+                        min={0}
+                        max={retQty}
+                        disabled={isDisabled}
+                        style={{ borderColor: Number(returnQuantities[item.id] || 0) > 0 ? '#f59e0b' : undefined }}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          <div className="receive-form-actions">
+            <Button variant="secondary" onClick={() => setShowReturnForm(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleConfirmReturn}
+              disabled={returnMutation.isPending}
+              style={{ background: '#f59e0b', borderColor: '#f59e0b' }}
+            >
+              {returnMutation.isPending ? 'Processing...' : 'Confirm Return'}
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="status-info">
         <p className="info-text">
           <strong>Status Notes:</strong>
@@ -509,6 +662,16 @@ export default function PurchaseOrderDetailPage() {
               disabled={showReceiveForm}
             >
               Receive Items
+            </Button>
+          )}
+          {hasReturnableItems && po.status !== 'Draft' && (
+            <Button
+              variant="primary"
+              onClick={handleOpenReturnForm}
+              disabled={showReturnForm}
+              style={{ background: '#f59e0b', borderColor: '#f59e0b' }}
+            >
+              Return Items
             </Button>
           )}
           {['Draft', 'Submitted', 'Partially Received'].includes(po.status) && (

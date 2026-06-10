@@ -16,6 +16,7 @@ interface Purchase {
   remarks?: string;
   batch_no?: string;
   batch_id?: number;
+  returned_quantity?: number;
   created_by: number;
   created_at?: string;
   item_code?: string;
@@ -313,6 +314,74 @@ class PurchaseModel {
     `).all(limit);
   }
 
+  /**
+   * Return a list of all purchase-return stock movements for the returns history page.
+   * Filters by reference_doctype = 'PURCHASE_RETURN' (and optionally 'PO_RETURN').
+   */
+  static getReturnHistory(
+    filters: {
+      start_date?: string;
+      end_date?: string;
+      item_id?: number;
+      limit?: number;
+    } = {},
+    db: Database.Database
+  ): any[] {
+    let query = `
+      SELECT
+        sm.id,
+        sm.movement_no,
+        sm.item_id,
+        sm.warehouse_id,
+        sm.quantity,
+        sm.unit_cost,
+        sm.reference_doctype,
+        sm.reference_docno,
+        sm.remarks,
+        sm.movement_date as return_date,
+        sm.created_at,
+        sm.created_by,
+        i.item_code,
+        i.item_name,
+        i.unit_of_measure,
+        w.warehouse_code,
+        w.warehouse_name,
+        u.username as created_by_username
+      FROM stock_movements sm
+      JOIN items i ON sm.item_id = i.id
+      JOIN warehouses w ON sm.warehouse_id = w.id
+      LEFT JOIN users u ON sm.created_by = u.id
+      WHERE sm.reference_doctype IN ('PURCHASE_RETURN', 'PO_RETURN')
+        AND sm.quantity < 0
+    `;
+
+    const params: any[] = [];
+
+    if (filters.start_date) {
+      query += ' AND sm.movement_date >= ?';
+      params.push(filters.start_date);
+    }
+
+    if (filters.end_date) {
+      query += ' AND sm.movement_date <= ?';
+      params.push(filters.end_date);
+    }
+
+    if (filters.item_id) {
+      query += ' AND sm.item_id = ?';
+      params.push(filters.item_id);
+    }
+
+    query += ' ORDER BY sm.movement_date DESC, sm.created_at DESC';
+
+    if (filters.limit) {
+      query += ' LIMIT ?';
+      params.push(filters.limit);
+    }
+
+    return db.prepare(query).all(...params) as any[];
+  }
+
   static returnPurchaseItems(
     db: Database.Database,
     purchaseId: number,
@@ -324,9 +393,15 @@ class PurchaseModel {
     if (!purchase) throw new Error('Purchase not found');
 
     if (returnQuantity <= 0) throw new Error('Return quantity must be positive');
-    if (returnQuantity > purchase.quantity) {
+
+    const alreadyReturned = purchase.returned_quantity || 0;
+    const totalReturnedAfter = alreadyReturned + returnQuantity;
+
+    if (totalReturnedAfter > purchase.quantity) {
       throw new Error(
-        `Return quantity (${returnQuantity}) exceeds original quantity (${purchase.quantity}) for purchase ${purchase.purchase_no}`
+        `Return quantity (${returnQuantity}) would exceed remaining available quantity. ` +
+        `Already returned: ${alreadyReturned}, Original: ${purchase.quantity}, ` +
+        `Available for return: ${purchase.quantity - alreadyReturned}`
       );
     }
 
@@ -369,6 +444,10 @@ class PurchaseModel {
       // Reduce the batch quantity_remaining
       db.prepare('UPDATE stock_batches SET quantity_remaining = quantity_remaining - ? WHERE id = ?')
         .run(returnQuantity, batch.id);
+
+      // Track cumulative returned quantity on the purchase record
+      db.prepare('UPDATE purchases SET returned_quantity = COALESCE(returned_quantity, 0) + ? WHERE id = ?')
+        .run(returnQuantity, purchaseId);
 
       // Update stock_balances
       const existingBalance = db.prepare(`

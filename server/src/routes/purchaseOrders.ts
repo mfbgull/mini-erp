@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
-import { authenticateToken } from '../middleware/auth';
+import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { sensitiveOperationLimiter } from '../middleware/rateLimiter';
 import purchaseOrderController from '../controllers/purchaseOrderController';
 
 router.use(authenticateToken);
@@ -24,6 +25,7 @@ router.get('/purchase-orders/pending', purchaseOrderController.getPendingOrders)
 // Goods Receipts
 router.get('/purchase-orders/:id/receipts', purchaseOrderController.getGoodsReceipts);
 router.post('/purchase-orders/:id/receipts', purchaseOrderController.createGoodsReceipt);
+router.post('/purchase-orders/:id/return-receipt', requireAdmin, sensitiveOperationLimiter, purchaseOrderController.returnReceiptItems);
 
 // Summary & Reporting
 router.get('/purchase-orders/summary/supplier/:supplierId', purchaseOrderController.getSummaryBySupplier);

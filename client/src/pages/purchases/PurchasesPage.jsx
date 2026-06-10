@@ -333,6 +333,13 @@ export default function PurchasesPage() {
           <Package className="action-icon" size={isMobile ? 18 : 24} />
           <span className="action-text">{t('purchases.itemsAction')}</span>
         </button>
+        <button
+          className="quick-action-btn"
+          onClick={() => navigate("/purchases/returns")}
+        >
+          <RotateCcw className="action-icon" size={isMobile ? 18 : 24} />
+          <span className="action-text">{t('purchases.returnHistory')}</span>
+        </button>
       </div>
 
       {isLoading ? (

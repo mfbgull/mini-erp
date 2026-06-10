@@ -372,6 +372,15 @@ export default function PurchaseSummaryReport() {
             label="Avg. Order Value"
             value={formatCurrency(reportData.summary.averageOrderValue)}
           />
+          {reportData.summary.returnCount > 0 && (
+            <StatCard
+              icon={ShoppingCart}
+              label="Returns"
+              value={`${reportData.summary.returnCount} (${reportData.summary.returnQuantity.toFixed(1)} qty)`}
+              subtitle={`Value: ${formatCurrency(reportData.summary.returnValue)}`}
+              style={{ borderColor: '#f59e0b' }}
+            />
+          )}
         </StatsGrid>
       )}
 

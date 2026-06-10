@@ -813,6 +813,18 @@ function getPurchaseSummary(startDate: string, endDate: string, db: Database.Dat
     total_items: number; received_amount: number; balance_amount: number;
   }>;
 
+  // Compute return metrics from stock movements
+  const returnData = db.prepare(`
+    SELECT
+      COUNT(*) as return_count,
+      COALESCE(SUM(ABS(quantity)), 0) as return_quantity,
+      COALESCE(SUM(ABS(quantity) * unit_cost), 0) as return_value
+    FROM stock_movements
+    WHERE reference_doctype IN ('PURCHASE_RETURN', 'PO_RETURN')
+      AND quantity < 0
+      AND movement_date BETWEEN ? AND ?
+  `).get(startDate, endDate) as { return_count: number; return_quantity: number; return_value: number };
+
   const totalOrders = rows.length;
   const totalCost = rows.reduce((s, r) => s + (r.total_cost || 0), 0);
   const totalPurchasedItems = rows.reduce((s, r) => s + (r.total_items || 0), 0);
@@ -820,7 +832,15 @@ function getPurchaseSummary(startDate: string, endDate: string, db: Database.Dat
 
   return {
     purchases: rows,
-    summary: { totalOrders, totalCost, totalItems: totalPurchasedItems, averageOrderValue }
+    summary: {
+      totalOrders,
+      totalCost,
+      totalItems: totalPurchasedItems,
+      averageOrderValue,
+      returnCount: returnData?.return_count || 0,
+      returnQuantity: returnData?.return_quantity || 0,
+      returnValue: returnData?.return_value || 0
+    }
   };
 }
 

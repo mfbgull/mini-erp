@@ -386,6 +386,32 @@ function runPurchasesMigration(): void {
   }
 }
 
+function runPurchaseReturnMigration(): void {
+  try {
+    const hasReturnedQty = db.prepare(`
+      SELECT COUNT(*) as count FROM pragma_table_info('purchases')
+      WHERE name='returned_quantity'
+    `).get() as { count: number };
+
+    if (hasReturnedQty.count === 0) {
+      logger.info('Running purchase return fields migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-purchase-return-fields.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      logger.info('✅ Purchase return fields migration completed!');
+    } else {
+      logger.info('✅ Purchase return fields already applied.');
+    }
+  } catch (error: any) {
+    logger.error('Purchase return fields migration error:', error.message);
+  }
+}
+
 function runProductionsMigration(): void {
   try {
     const productionsTableCheck = db.prepare(`
@@ -708,6 +734,7 @@ function runMissingFKIndexesMigration(): void {
 initializeDatabase();
 runExpensesMigration();
 runPurchasesMigration();
+runPurchaseReturnMigration();
 runProductionsMigration();
 runBOMMigration();
 runSalesMigration();

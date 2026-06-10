@@ -186,6 +186,24 @@ export const invoiceReturnItemSchema = z.object({
   return_quantity: z.coerce.number().min(0, 'Quantity cannot be negative'),
 });
 
+// ── Purchase Returns ──────────────────────────────────────────────
+export const purchaseReturnSchema = z.object({
+  quantity: z.coerce.number()
+    .positive('Return quantity must be greater than 0'),
+  reason: z.string().optional(),
+});
+
+export const purchaseReturnItemSchema = z.object({
+  po_item_id: z.coerce.number().positive('PO item is required'),
+  return_quantity: z.coerce.number()
+    .positive('Return quantity must be greater than 0'),
+});
+
+export const purchaseReturnBatchSchema = z.object({
+  items: z.array(purchaseReturnItemSchema).min(1, 'At least one item must be returned'),
+  reason: z.string().optional(),
+});
+
 // ── Settings ──────────────────────────────────────────────────────
 export const settingsSchema = z.object({
   currency_symbol: z.string().min(1, 'Currency symbol is required'),

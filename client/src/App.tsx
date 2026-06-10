@@ -27,6 +27,7 @@ const StockByWarehousePage = lazy(() => import('./pages/inventory/StockByWarehou
 
 // Lazy loaded - Purchase module
 const PurchasesPage = lazy(() => import('./pages/purchases/PurchasesPage'));
+const PurchaseReturnHistory = lazy(() => import('./pages/purchases/PurchaseReturnHistory'));
 const PurchaseOrdersPage = lazy(() => import('./pages/purchase-orders/PurchaseOrdersPage'));
 const PurchaseOrderFormPage = lazy(() => import('./pages/purchase-orders/PurchaseOrderFormPage'));
 const PurchaseOrderDetailPage = lazy(() => import('./pages/purchase-orders/PurchaseOrderDetailPage'));
@@ -182,6 +183,7 @@ function AppLayout() {
               <Route path="/inventory/stock-movements" element={<StockMovementPage />} />
               <Route path="/inventory/stock-by-warehouse" element={<StockByWarehousePage />} />
               <Route path="/purchases" element={<PurchasesPage />} />
+              <Route path="/purchases/returns" element={<PurchaseReturnHistory />} />
               <Route path="/suppliers" element={<SuppliersPage />} />
               <Route path="/suppliers/create" element={<SupplierFormPage mode="create" />} />
               <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
