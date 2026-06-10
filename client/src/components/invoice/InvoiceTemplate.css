@@ -308,6 +308,10 @@
   color: #16a34a;
 }
 
+.summary-row.returned {
+  color: #dc2626;
+}
+
 .summary-row.balance {
   background: #fef3c7;
   margin: 10px -20px -20px -20px;

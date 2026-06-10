@@ -43,6 +43,7 @@ export interface InvoiceItem {
   tax_rate: number;
   discount_type: 'none' | 'percentage' | 'flat';
   discount_value: number;
+  returned_qty: number;
 }
 
 export interface CreateInvoiceDTO {
@@ -145,7 +146,7 @@ class InvoiceModel {
      // Get items
      const items = db.prepare(`
        SELECT
-         ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.unit_price, ii.amount,
+         ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.returned_qty, ii.unit_price, ii.amount,
          ii.tax_rate, ii.discount_type, ii.discount_value,
          i.item_code, i.item_name
        FROM invoice_items ii
@@ -229,7 +230,7 @@ class InvoiceModel {
      return invoices.map(invoice => {
        const items = db.prepare(`
          SELECT
-           ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.unit_price, ii.amount,
+           ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.returned_qty, ii.unit_price, ii.amount,
            ii.tax_rate, ii.discount_type, ii.discount_value,
            i.item_code, i.item_name
          FROM invoice_items ii
@@ -777,7 +778,7 @@ class InvoiceModel {
     return invoices.map(invoice => {
       const items = db.prepare(`
         SELECT
-          ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.unit_price, ii.amount,
+          ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.returned_qty, ii.unit_price, ii.amount,
           ii.tax_rate, ii.discount_type, ii.discount_value,
           i.item_code, i.item_name
         FROM invoice_items ii
@@ -875,7 +876,7 @@ class InvoiceModel {
      return invoices.map(invoice => {
        const items = db.prepare(`
          SELECT
-           ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.unit_price, ii.amount,
+           ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.returned_qty, ii.unit_price, ii.amount,
            ii.tax_rate, ii.discount_type, ii.discount_value,
            i.item_code, i.item_name
          FROM invoice_items ii
@@ -901,7 +902,7 @@ class InvoiceModel {
 
   static getItems(invoiceId: number, db: Database.Database) {
     return db.prepare(`
-      SELECT ii.id, ii.item_id, ii.quantity, ii.unit_price, ii.amount, ii.tax_rate,
+      SELECT ii.id, ii.item_id, ii.quantity, ii.returned_qty, ii.unit_price, ii.amount, ii.tax_rate,
              ii.discount_type, ii.discount_value, item.item_name, item.item_code
       FROM invoice_items ii LEFT JOIN items item ON ii.item_id = item.id
       WHERE ii.invoice_id = ?
@@ -941,6 +942,77 @@ class InvoiceModel {
       FROM invoices
       WHERE invoice_date BETWEEN ? AND ?
     `).all(startDate, endDate);
+  }
+
+  /**
+   * Return a list of all invoice-return stock movements for the returns history page.
+   * Filters by reference_doctype = 'RETURN' (from invoice return processing).
+   */
+  static getReturnHistory(
+    filters: {
+      start_date?: string;
+      end_date?: string;
+      item_id?: number;
+      limit?: number;
+    } = {},
+    db: Database.Database
+  ): any[] {
+    let query = `
+      SELECT
+        sm.id,
+        sm.movement_no,
+        sm.item_id,
+        sm.warehouse_id,
+        sm.quantity,
+        sm.unit_cost,
+        sm.reference_doctype,
+        sm.reference_docno as invoice_no,
+        sm.remarks,
+        sm.movement_date as return_date,
+        sm.created_at,
+        sm.created_by,
+        i.item_code,
+        i.item_name,
+        i.unit_of_measure,
+        w.warehouse_code,
+        w.warehouse_name,
+        u.username as created_by_username,
+        inv.customer_name,
+        inv.customer_id
+      FROM stock_movements sm
+      JOIN items i ON sm.item_id = i.id
+      JOIN warehouses w ON sm.warehouse_id = w.id
+      LEFT JOIN users u ON sm.created_by = u.id
+      LEFT JOIN invoices inv ON sm.reference_docno = inv.invoice_no
+      WHERE sm.reference_doctype = 'RETURN'
+        AND sm.quantity > 0
+    `;
+
+    const params: any[] = [];
+
+    if (filters.start_date) {
+      query += ' AND sm.movement_date >= ?';
+      params.push(filters.start_date);
+    }
+
+    if (filters.end_date) {
+      query += ' AND sm.movement_date <= ?';
+      params.push(filters.end_date);
+    }
+
+    if (filters.item_id) {
+      query += ' AND sm.item_id = ?';
+      params.push(filters.item_id);
+    }
+
+    query += ' ORDER BY sm.movement_date DESC, sm.created_at DESC';
+
+    if (filters.limit) {
+      query += ' LIMIT ?';
+      params.push(filters.limit);
+    }
+
+    return db.prepare(query).all(...params) as any[];
   }
 }
 

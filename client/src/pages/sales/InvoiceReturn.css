@@ -312,6 +312,42 @@
   text-align: right;
 }
 
+/* Return Quantity Info (already returned / available) */
+.return-qty-info {
+  display: block;
+  font-size: 11px;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+.return-qty-info strong {
+  color: #495057;
+  font-weight: 600;
+}
+
+.fully-returned-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.return-item-row.fully-returned {
+  opacity: 0.6;
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+.return-item-row.fully-returned .item-name {
+  color: #6b7280;
+}
+
 .return-qty {
   font-size: 12px;
   color: #dc2626;

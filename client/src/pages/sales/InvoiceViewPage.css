@@ -244,3 +244,21 @@
   }
 }
 
+/* Returned Amount Banner */
+.returned-amount-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 0 24px 16px 24px;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.returned-amount-banner strong {
+  color: #dc2626;
+}
+

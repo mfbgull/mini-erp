@@ -814,9 +814,12 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
           throw new Error('Return quantity must be positive');
         }
 
-        if (returnItem.return_quantity > invoiceItem.quantity) {
+        const returnedQty = Number(invoiceItem.returned_qty) || 0;
+        const availableQty = Number(invoiceItem.quantity) - returnedQty;
+
+        if (returnItem.return_quantity > availableQty) {
           throw new Error(
-            `Return quantity (${returnItem.return_quantity}) exceeds original quantity (${invoiceItem.quantity}) for item ${invoiceItem.item_name}`
+            `Return quantity (${returnItem.return_quantity}) exceeds available quantity (${availableQty}) for item ${invoiceItem.item_name}. Already returned: ${returnedQty}.`
           );
         }
 
@@ -825,6 +828,10 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
           quantity: returnItem.return_quantity,
           unit_price: invoiceItem.unit_price,
         });
+
+        // Update per-item returned quantity tracking
+        db.prepare(`UPDATE invoice_items SET returned_qty = returned_qty + ? WHERE id = ?`)
+          .run(returnItem.return_quantity, returnItem.invoice_item_id);
       }
 
       // Reverse stock for the returned items using the same batch-aware logic
@@ -935,6 +942,37 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
   }
 }
 
+/**
+ * GET /api/invoices/returns
+ * Retrieve invoice return history from stock movements.
+ */
+function getInvoiceReturnHistory(req: AuthRequest, res: Response): void {
+  try {
+    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
+    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
+    const itemIdParam = Array.isArray(req.query.item_id) ? req.query.item_id[0] : req.query.item_id;
+    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+
+    const filters: {
+      start_date?: string;
+      end_date?: string;
+      item_id?: number;
+      limit?: number;
+    } = {
+      start_date: startDateParam as string | undefined,
+      end_date: endDateParam as string | undefined,
+      item_id: itemIdParam ? Number(itemIdParam) : undefined,
+      limit: limitParam ? parseInt(String(limitParam)) : undefined
+    };
+
+    const returns = InvoiceModel.getReturnHistory(filters, db);
+    res.json(returns);
+  } catch (error: unknown) {
+    logger.error('Get invoice return history error:', { error });
+    res.status(500).json({ error: 'Failed to get invoice return history' });
+  }
+}
+
 export {
   getInvoices,
   getInvoice,
@@ -943,6 +981,7 @@ export {
   deleteInvoice,
   getInvoicePayments,
   returnInvoiceItems,
+  getInvoiceReturnHistory,
 };
 
 export default {
@@ -953,4 +992,5 @@ export default {
   deleteInvoice,
   getInvoicePayments,
   returnInvoiceItems,
+  getInvoiceReturnHistory,
 };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { format } from 'date-fns';
-import { X, RotateCcw, Minus, Plus } from 'lucide-react';
+import { X, RotateCcw, Minus, Plus, Info } from 'lucide-react';
 
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { invoiceReturnItemSchema } from '../../schemas';
@@ -16,6 +16,7 @@ interface InvoiceItem {
   quantity: number;
   unit_price: number;
   unit_of_measure?: string;
+  returned_qty?: number;
 }
 
 interface InvoiceReturnItem {
@@ -24,6 +25,8 @@ interface InvoiceReturnItem {
   item_name: string;
   item_code?: string;
   original_quantity: number;
+  returned_qty: number;
+  available_quantity: number;
   return_quantity: number;
   unit_price: number;
   unit_of_measure?: string;
@@ -59,16 +62,24 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
     setIsInitialLoad(false);
     
     if (items && items.length > 0) {
-      const mappedItems = items.map((item) => ({
-        invoice_item_id: item.id,
-        item_id: item.item_id,
-        item_name: item.item_name,
-        item_code: item.item_code,
-        original_quantity: parseFloat(String(item.quantity)) || 0,
-        return_quantity: 0,
-        unit_price: parseFloat(String(item.unit_price)) || 0,
-        unit_of_measure: item.unit_of_measure
-      }));
+      const mappedItems = items.map((item) => {
+        const originalQty = parseFloat(String(item.quantity)) || 0;
+        const returnedQty = parseFloat(String(item.returned_qty)) || 0;
+        const availableQty = Math.max(0, originalQty - returnedQty);
+        
+        return {
+          invoice_item_id: item.id,
+          item_id: item.item_id,
+          item_name: item.item_name,
+          item_code: item.item_code,
+          original_quantity: originalQty,
+          returned_qty: returnedQty,
+          available_quantity: availableQty,
+          return_quantity: 0,
+          unit_price: parseFloat(String(item.unit_price)) || 0,
+          unit_of_measure: item.unit_of_measure
+        };
+      });
       setReturnItems(mappedItems);
     }
   }, [items]);
@@ -86,8 +97,13 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
       return;
     }
     
-    if (numValue > item.original_quantity) {
-      setErrors(prev => ({ ...prev, [itemId]: `Maximum: ${item.original_quantity}` }));
+    if (numValue > item.available_quantity) {
+      setErrors(prev => ({ ...prev, [itemId]: `Maximum: ${item.available_quantity} (already returned ${item.returned_qty} of ${item.original_quantity})` }));
+      return;
+    }
+
+    if (numValue === 0 && parseFloat(value) !== 0) {
+      setErrors(prev => ({ ...prev, [itemId]: 'Quantity must be a valid number' }));
       return;
     }
 
@@ -100,7 +116,7 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
 
   const incrementQuantity = (itemId: number) => {
     const item = returnItems.find(i => i.invoice_item_id === itemId);
-    if (item && item.return_quantity < item.original_quantity) {
+    if (item && item.return_quantity < item.available_quantity) {
       handleQuantityChange(itemId, String(item.return_quantity + 1));
     }
   };
@@ -223,14 +239,25 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
                 {returnItems.map((item) => {
                   const returnAmount = item.return_quantity * item.unit_price;
                   const hasError = returnErrors[item.invoice_item_id];
+                  const isFullyReturned = item.available_quantity <= 0;
                   
                   return (
-                    <div key={item.invoice_item_id} className={`return-item-row ${item.return_quantity > 0 ? 'selected' : ''} ${hasError ? 'has-error' : ''}`}>
+                    <div key={item.invoice_item_id} className={`return-item-row ${item.return_quantity > 0 ? 'selected' : ''} ${hasError ? 'has-error' : ''} ${isFullyReturned ? 'fully-returned' : ''}`}>
                       <div className="item-info">
                         <span className="item-name">{item.item_name}</span>
                         <span className="item-code">
                           {item.item_code && `${item.item_code} • `}
                           {formatCurrency(item.unit_price)}/{item.unit_of_measure || 'unit'}
+                        </span>
+                        <span className="return-qty-info">
+                          {item.returned_qty > 0 ? (
+                            <>Already returned: <strong>{item.returned_qty}</strong> | Available: <strong>{item.available_quantity}</strong></>
+                          ) : (
+                            <>Available: <strong>{item.available_quantity}</strong></>
+                          )}
+                          {isFullyReturned && (
+                            <span className="fully-returned-badge">Fully returned</span>
+                          )}
                         </span>
                       </div>
 
@@ -240,7 +267,7 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
                           type="button"
                           className="qty-btn minus"
                           onClick={() => decrementQuantity(item.invoice_item_id)}
-                          disabled={item.return_quantity === 0}
+                          disabled={item.return_quantity === 0 || isFullyReturned}
                         >
                           <Minus size={14} />
                         </button>
@@ -250,14 +277,15 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
                           value={item.return_quantity}
                           onChange={(e) => handleQuantityChange(item.invoice_item_id, e.target.value)}
                           min="0"
-                          max={item.original_quantity}
+                          max={item.available_quantity}
                           step="1"
+                          disabled={isFullyReturned}
                         />
                         <button
                           type="button"
                           className="qty-btn plus"
                           onClick={() => incrementQuantity(item.invoice_item_id)}
-                          disabled={item.return_quantity >= item.original_quantity}
+                          disabled={item.return_quantity >= item.available_quantity || isFullyReturned}
                         >
                           <Plus size={14} />
                         </button>

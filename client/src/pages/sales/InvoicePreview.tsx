@@ -151,7 +151,7 @@ export default function InvoicePreview({ invoice, onClose, onEdit, onDelete, onR
 
         {/* Actions */}
         <div className="invoice-preview-actions">
-          {onReturn && (
+          {onReturn && invoice.status !== 'Cancelled' && (
             <button className="preview-action-btn return-btn" onClick={onReturn}>
               <RotateCcw size={18} />
               <span>Return</span>

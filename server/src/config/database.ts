@@ -1058,6 +1058,19 @@ function runGLFoundationMigration(): void {
   } catch (error: any) {
     logger.error('returned_amount migration error:', error.message);
   }
+
+  // Add returned_qty column to invoice_items (per-item return tracking)
+  try {
+    const hasReturnedQty = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('invoice_items') WHERE name='returned_qty'`
+    ).get() as { count: number };
+    if (hasReturnedQty.count === 0) {
+      db.exec("ALTER TABLE invoice_items ADD COLUMN returned_qty DECIMAL(15,3) NOT NULL DEFAULT 0");
+      logger.info('✅ returned_qty column added to invoice_items');
+    }
+  } catch (error: any) {
+    logger.error('returned_qty migration error:', error.message);
+  }
 }
 
 function runBatchCostingMigration(): void {

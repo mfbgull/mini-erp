@@ -45,6 +45,7 @@ const ProductionPage = lazy(() => import('./pages/production/ProductionPage'));
 const SalesPage = lazy(() => import('./pages/sales/SalesPage'));
 const SalesInvoicePage = lazy(() => import('./pages/sales/SalesInvoicePage'));
 const InvoiceViewPage = lazy(() => import('./pages/sales/InvoiceViewPage'));
+const InvoiceReturnHistory = lazy(() => import('./pages/sales/InvoiceReturnHistory'));
 const InvoiceRouter = lazy(() => import('./components/invoice/InvoiceRouter'));
 const InvoiceWizardPage = lazy(() => import('./pages/invoice/InvoiceWizardPage'));
 
@@ -231,6 +232,7 @@ function AppLayout() {
               <Route path="/sales/invoice/:id" element={<InvoiceRouter />} />
               <Route path="/sales/invoice/:id/view" element={<InvoiceViewPage />} />
               <Route path="/sales/invoice/:id/edit" element={<InvoiceRouter defaultMode="edit" />} />
+              <Route path="/sales/returns" element={<InvoiceReturnHistory />} />
               <Route path="/invoices/create" element={<InvoiceWizardPage />} />
               <Route path="/pos" element={<POSPage />} />
               <Route path="/settings" element={<SettingsPage />} />

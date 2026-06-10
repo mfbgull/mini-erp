@@ -80,7 +80,7 @@ export default function SalesPage() {
     },
     onSuccess: () => {
       toast.success(t('sales.invoiceDeleted'));
-      queryClient.invalidateQueries(['invoices']);
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
     },
     onError: (error) => {
       toast.error(error.response?.data?.error || t('messages.error'));
@@ -100,7 +100,7 @@ export default function SalesPage() {
     },
     onSuccess: () => {
       toast.success('Return processed successfully');
-      queryClient.invalidateQueries(['invoices']);
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       setIsReturnModalOpen(false);
       setReturnInvoice(null);
       setReturnItems([]);
@@ -250,14 +250,16 @@ export default function SalesPage() {
           >
             <Edit2 size={14} />
           </button>
-          <button
-            className="action-btn return-btn"
-            onClick={() => handleOpenReturn(params.data)}
-            title="Return Items"
-            style={{ color: '#f59e0b' }}
-          >
-            <RotateCcw size={14} />
-          </button>
+          {params.data?.status !== 'Cancelled' && (
+            <button
+              className="action-btn return-btn"
+              onClick={() => handleOpenReturn(params.data)}
+              title="Return Items"
+              style={{ color: '#f59e0b' }}
+            >
+              <RotateCcw size={14} />
+            </button>
+          )}
         </div>
       )
     }
@@ -335,6 +337,14 @@ export default function SalesPage() {
           >
             <DollarSign className="action-icon" size={24} />
             <span className="action-text">{t('sales.stockValuation')}</span>
+          </button>
+          <button
+            className="quick-action-btn"
+            onClick={() => navigate("/sales/returns")}
+            type="button"
+          >
+            <RotateCcw className="action-icon" size={24} />
+            <span className="action-text">Returns</span>
           </button>
           <button
             className="quick-action-btn"

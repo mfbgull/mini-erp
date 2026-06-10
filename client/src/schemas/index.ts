@@ -183,7 +183,9 @@ export const invoiceSchema = z.object({
 });
 
 export const invoiceReturnItemSchema = z.object({
-  return_quantity: z.coerce.number().min(0, 'Quantity cannot be negative'),
+  return_quantity: z.coerce.number()
+    .positive('Return quantity must be greater than 0')
+    .min(0.001, 'Return quantity must be greater than 0'),
 });
 
 // ── Purchase Returns ──────────────────────────────────────────────

@@ -31,6 +31,7 @@ interface Invoice {
   total_amount: number;
   paid_amount?: number | null;
   balance_amount?: number | null;
+  returned_amount?: number | null;
   discount_type?: string | null;
   discount_value?: number | null;
 }
@@ -392,6 +393,12 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
                 <span>Paid</span>
                 <span>-{formatCurrency(safeParseFloat(invoice.paid_amount || 0))}</span>
               </div>
+              {safeParseFloat(invoice.returned_amount) > 0 && (
+                <div className="summary-row returned">
+                  <span>Returned</span>
+                  <span>-{formatCurrency(safeParseFloat(invoice.returned_amount))}</span>
+                </div>
+              )}
               <div className="summary-row balance">
                 <span>Balance Due</span>
                 <span>{formatCurrency(safeParseFloat(invoice.balance_amount || 0))}</span>

@@ -71,7 +71,7 @@ export default function SalesInvoicePage() {
       api.delete(`/sales/customers/${customerId}`)
         .then(() => {
           // Invalidate and refetch queries
-          queryClient.invalidateQueries(['sales']);
+          queryClient.invalidateQueries({ queryKey: ['sales'] });
         })
         .catch((error) => {
           toast.error('Failed to delete customer');
@@ -477,9 +477,9 @@ export default function SalesInvoicePage() {
     },
     onSuccess: () => {
       toast.success(invoiceId ? 'Invoice updated successfully!' : 'Invoice created successfully!');
-      queryClient.invalidateQueries(['invoices']);
-      queryClient.invalidateQueries(['customers']);
-      queryClient.invalidateQueries(['customerInvoices', invoice.customer_id]);
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customerInvoices', invoice.customer_id] });
       // Navigate to customer detail page
       navigate(`/customers/${invoice.customer_id}`);
     },
@@ -500,7 +500,7 @@ export default function SalesInvoicePage() {
     },
     onSuccess: async () => {
       toast.success('Payment recorded successfully!');
-      queryClient.invalidateQueries(['invoices']);
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
       // Refresh existing payments list
       try {
         const paymentsResponse = await api.get(`/invoices/${invoiceId}/payments`);

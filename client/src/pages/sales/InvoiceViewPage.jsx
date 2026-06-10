@@ -11,6 +11,7 @@ import Button from '../../components/common/Button';
 import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
 import InvoiceReturn from './InvoiceReturn';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { formatCurrency } from '../../utils/formatters';
 import api from '../../utils/api';
 import './InvoiceViewPage.css';
 
@@ -163,10 +164,12 @@ export default function InvoiceViewPage() {
           <h2 className="toolbar-title">Invoice {invoice.invoice_no}</h2>
         </div>
         <div className="toolbar-right">
-          <Button variant="secondary" onClick={() => setIsReturnModalOpen(true)}>
-            <RotateCcw size={18} />
-            Return
-          </Button>
+          {invoice.status !== 'Cancelled' && (
+            <Button variant="secondary" onClick={() => setIsReturnModalOpen(true)}>
+              <RotateCcw size={18} />
+              Return
+            </Button>
+          )}
           <Button variant="secondary" onClick={() => navigate(`/sales/invoice/${invoiceId}?mode=edit`)}>
             <Edit2 size={18} />
             Edit
@@ -185,6 +188,14 @@ export default function InvoiceViewPage() {
           </Button>
         </div>
       </div>
+
+      {/* Returned Amount Banner */}
+      {parseFloat(invoice.returned_amount || 0) > 0 && (
+        <div className="returned-amount-banner">
+          <RotateCcw size={16} />
+          <span>Returned total: <strong>{formatCurrency(parseFloat(invoice.returned_amount))}</strong></span>
+        </div>
+      )}
 
       {/* Invoice Preview */}
       <div className="invoice-view-container">

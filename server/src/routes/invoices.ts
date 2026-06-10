@@ -6,6 +6,7 @@ import { authenticateToken, requireAdmin } from '../middleware/auth';
 router.use(authenticateToken);
 
 router.get('/', invoiceController.getInvoices);
+router.get('/returns', invoiceController.getInvoiceReturnHistory);
 router.get('/:id', invoiceController.getInvoice);
 router.get('/:id/payments', invoiceController.getInvoicePayments);
 router.post('/', invoiceController.createInvoice);
