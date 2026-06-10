@@ -118,18 +118,8 @@ export default function InvoiceViewPage() {
     if (!invoice) return;
     setReturnMutationState({ loading: true });
     try {
-      // Normalize payload: support both new format { items, disposition, ... }
-      // and legacy format (direct array of items)
-      const items = Array.isArray(returnPayload) ? returnPayload : (returnPayload.items || []);
-      const disposition = returnPayload.disposition || (items.length > 0 && invoice.balance_amount <= 0 ? 'refund' : 'credit');
-      const adjust_invoice_ids = returnPayload.adjust_invoice_ids;
-
-      await api.post(`/invoices/${invoiceId}/return`, {
-        items: items.map(i => ({ invoice_item_id: i.invoice_item_id, return_quantity: i.return_quantity })),
-        reason: items[0]?.reason || '',
-        disposition,
-        adjust_invoice_ids
-      });
+      // Send the full returnPayload to the backend — let the server normalize
+      await api.post(`/invoices/${invoiceId}/return`, returnPayload);
       toast.success('Return processed successfully');
       setIsReturnModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ['invoice', invoiceId] });

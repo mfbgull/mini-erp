@@ -779,15 +779,21 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
     const invoiceId = parseInt(id as string, 10);
     const userId = req.user!.id;
 
-    const { items: returnItems, reason, disposition, adjust_invoice_ids } = req.body as {
-      items: Array<{ invoice_item_id: number; return_quantity: number }>;
-      reason?: string;
-      disposition?: 'refund' | 'credit' | 'adjust';
-      adjust_invoice_ids?: number[];
-    };
+    // Normalize payload: support both legacy format (items + reason at top level)
+    // and new format from InvoiceReturn.tsx (items with reason inside each item, disposition, adjust_invoice_ids)
+    const body = req.body as Record<string, any>;
+    const rawItems = body.items;
+    const rawDisposition = body.disposition;
+    const rawAdjustInvoiceIds = body.adjust_invoice_ids;
+    const rawReason = body.reason;
 
-    if (!returnItems || returnItems.length === 0) {
-      return res.status(400).json({ error: 'At least one return item is required' });
+    const returnItems: Array<{ invoice_item_id: number; return_quantity: number }> = Array.isArray(rawItems) ? rawItems : [];
+    const reason: string = rawReason || (returnItems.length > 0 ? (returnItems[0] as any).reason || '' : '');
+    const disposition: 'refund' | 'credit' | 'adjust' | undefined = rawDisposition;
+    const adjust_invoice_ids: number[] | undefined = rawAdjustInvoiceIds;
+
+    if (returnItems.length === 0) {
+      return res.status(400).json({ error: 'Invalid request: items must be a non-empty array' });
     }
 
     const invoice = InvoiceModel.getById(invoiceId, db);
