@@ -639,6 +639,54 @@ export class AccountingService {
     });
   }
 
+  /**
+   * Post GL entry for a refund paid out to a customer.
+   * Reverses the cash impact of a return when the customer gets money back:
+   *   Dr Accounts Receivable (1100) — bring AR back to $0 (reverses the credit balance)
+   *   Cr Cash/Bank (1000/1010) — cash paid out
+   *
+   * This is paired with postInvoiceReturnEntry which already did:
+   *   Cr AR / Dr Sales Returns
+   *
+   * The combined effect for a refund is:
+   *   Dr Sales Returns (revenue contra)
+   *   Cr Cash/Bank (cash paid out)
+   *   (AR goes from $0 -> credit -> back to $0)
+   */
+  static postRefundEntry(
+    db: Database.Database,
+    args: {
+      refundPaymentId: number;
+      refundPaymentNo: string;
+      amount: number;
+      refundDate: string;
+      paymentMethod?: string;
+      customerId?: number;
+      userId?: number;
+    }
+  ): PostedEntry | null {
+    if (!args.amount || args.amount <= 0) return null;
+
+    const cashCode = AccountingService._cashOrBankAccountCode(args.paymentMethod);
+    const cash = AccountingService.getAccountByCode(db, cashCode);
+    const ar = AccountingService.getAccountByCode(db, '1100');
+    if (!cash || !ar) {
+      throw new Error(`Chart of accounts is missing required accounts: ${cashCode} or 1100 (AR)`);
+    }
+
+    return AccountingService.postEntry(db, {
+      entry_date: args.refundDate,
+      description: `Refund ${args.refundPaymentNo} — ${args.amount.toFixed(2)} (${cashCode})`,
+      reference_type: 'REFUND',
+      reference_id: args.refundPaymentId,
+      created_by: args.userId,
+      lines: [
+        { account_id: ar.id, debit: args.amount, description: `AR adjusted for refund ${args.refundPaymentNo}` },
+        { account_id: cash.id, credit: args.amount, description: `Cash/Bank out for refund ${args.refundPaymentNo}` },
+      ],
+    });
+  }
+
   // ------------------------------------------------------------------
   // Void / reversal
   // ------------------------------------------------------------------

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 
 import { format } from 'date-fns';
-import { X, RotateCcw, Minus, Plus, Info } from 'lucide-react';
+import { X, RotateCcw, Minus, Plus, Info, DollarSign, Banknote, FileText } from 'lucide-react';
 
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { invoiceReturnItemSchema } from '../../schemas';
 import { formatCurrency } from '../../utils/formatters';
+import api from '../../utils/api';
 import './InvoiceReturn.css';
 
 interface InvoiceItem {
@@ -17,6 +18,7 @@ interface InvoiceItem {
   unit_price: number;
   unit_of_measure?: string;
   returned_qty?: number;
+  tax_rate?: number;
 }
 
 interface InvoiceReturnItem {
@@ -42,11 +44,25 @@ interface Invoice {
   status: string;
 }
 
+interface UnpaidInvoice {
+  id: number;
+  invoice_no: string;
+  invoice_date: string;
+  total_amount: number;
+  paid_amount: number;
+  balance_amount: number;
+  status: string;
+}
+
 interface InvoiceReturnProps {
   invoice: Invoice;
   items: InvoiceItem[];
   onClose: () => void;
-  onSubmit: (returnItems: { invoice_item_id: number; return_quantity: number; reason: string }[]) => void;
+  onSubmit: (returnData: {
+    items: { invoice_item_id: number; return_quantity: number; reason: string }[];
+    disposition: 'refund' | 'credit' | 'adjust';
+    adjust_invoice_ids?: number[];
+  }) => void;
   loading?: boolean;
 }
 
@@ -56,6 +72,10 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
   const { errors: validationErrors, validate } = useFormValidation(invoiceReturnItemSchema);
   const [returnErrors, setErrors] = useState<Record<number, string>>({});
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [disposition, setDisposition] = useState<'refund' | 'credit' | 'adjust'>('refund');
+  const [unpaidInvoices, setUnpaidInvoices] = useState<UnpaidInvoice[]>([]);
+  const [selectedAdjustInvoices, setSelectedAdjustInvoices] = useState<number[]>([]);
+  const [loadingUnpaid, setLoadingUnpaid] = useState(false);
 
   // Initialize state when items prop changes
   useEffect(() => {
@@ -82,7 +102,45 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
       });
       setReturnItems(mappedItems);
     }
-  }, [items]);
+
+    // Default disposition based on invoice status
+    if (invoice.status === 'Paid' || invoice.status === 'Partially Paid') {
+      setDisposition('refund');
+    } else {
+      setDisposition('credit');
+    }
+  }, [items, invoice]);
+
+  // Fetch unpaid invoices when disposition changes to 'adjust'
+  useEffect(() => {
+    if (disposition === 'adjust' && invoice.customer_id) {
+      setLoadingUnpaid(true);
+      api.get('/invoices', {
+        params: {
+          customerId: invoice.customer_id,
+          status: 'Unpaid,Partially Paid'
+        }
+      })
+        .then((response) => {
+          const data = response.data?.data || response.data || [];
+          // Filter to only invoices with balance > 0, exclude the current invoice
+          const filtered = data.filter((inv: UnpaidInvoice) => 
+            inv.id !== invoice.id && 
+            (inv.balance_amount || 0) > 0
+          );
+          setUnpaidInvoices(filtered);
+        })
+        .catch(() => {
+          setUnpaidInvoices([]);
+        })
+        .finally(() => {
+          setLoadingUnpaid(false);
+        });
+    } else {
+      setUnpaidInvoices([]);
+      setSelectedAdjustInvoices([]);
+    }
+  }, [disposition, invoice.customer_id, invoice.id]);
 
   const handleQuantityChange = (itemId: number, value: string) => {
     const numValue = parseFloat(value) || 0;
@@ -132,6 +190,22 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
     return returnItems.reduce((sum, item) => sum + (item.return_quantity * item.unit_price), 0);
   };
 
+  const handleToggleInvoice = (invoiceId: number) => {
+    setSelectedAdjustInvoices(prev => {
+      if (prev.includes(invoiceId)) {
+        return prev.filter(id => id !== invoiceId);
+      }
+      return [...prev, invoiceId];
+    });
+  };
+
+  const handleSelectAllUnpaid = () => {
+    const allIds = unpaidInvoices.map(inv => inv.id);
+    setSelectedAdjustInvoices(
+      selectedAdjustInvoices.length === allIds.length ? [] : allIds
+    );
+  };
+
   const handleSubmit = () => {
     const itemsToReturn = returnItems.filter(item => item.return_quantity > 0);
 
@@ -142,6 +216,11 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
 
     if (!reason.trim()) {
       alert('Please enter a reason for the return');
+      return;
+    }
+
+    if (disposition === 'adjust' && selectedAdjustInvoices.length === 0) {
+      alert('Please select at least one invoice to adjust against, or choose a different disposition');
       return;
     }
 
@@ -156,16 +235,19 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
       return;
     }
 
-    onSubmit(
-      itemsToReturn.map(item => ({
+    onSubmit({
+      items: itemsToReturn.map(item => ({
         invoice_item_id: item.invoice_item_id,
         return_quantity: item.return_quantity,
         reason
-      }))
-    );
+      })),
+      disposition,
+      adjust_invoice_ids: disposition === 'adjust' ? selectedAdjustInvoices : undefined
+    });
   };
 
   const hasReturns = returnItems.some(item => item.return_quantity > 0);
+  const returnTotal = calculateReturnTotal();
 
   return (
     <div className="invoice-return-overlay" onClick={onClose}>
@@ -232,7 +314,6 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
               <div className="no-items-message">
                 <p>No items found in this invoice</p>
                 <p className="debug-info">Items received: {Array.isArray(items) ? items.length : 'invalid'}</p>
-                <p className="debug-info">Raw items: {JSON.stringify(items)}</p>
               </div>
             ) : (
               <div className="items-list">
@@ -308,6 +389,161 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
             )}
           </div>
 
+          {/* Disposition Options */}
+          {hasReturns && (
+            <div className="return-disposition-section">
+              <h3 className="section-title">
+                <Info size={16} />
+                How to handle the returned amount?
+              </h3>
+              <p className="disposition-hint">
+                You are returning <strong>{formatCurrency(returnTotal)}</strong> worth of items.
+              </p>
+
+              <div className="disposition-options">
+                {/* Refund Option */}
+                <label className={`disposition-option ${disposition === 'refund' ? 'active' : ''}`}>
+                  <input
+                    type="radio"
+                    name="disposition"
+                    value="refund"
+                    checked={disposition === 'refund'}
+                    onChange={() => setDisposition('refund')}
+                  />
+                  <div className="disposition-option-content">
+                    <div className="disposition-option-header">
+                      <Banknote size={20} />
+                      <span className="disposition-option-title">Refund to Customer</span>
+                    </div>
+                    <p className="disposition-option-desc">
+                      Pay the returned amount back to the customer in cash or bank transfer.
+                    </p>
+                  </div>
+                </label>
+
+                {/* Credit Option */}
+                <label className={`disposition-option ${disposition === 'credit' ? 'active' : ''}`}>
+                  <input
+                    type="radio"
+                    name="disposition"
+                    value="credit"
+                    checked={disposition === 'credit'}
+                    onChange={() => setDisposition('credit')}
+                  />
+                  <div className="disposition-option-content">
+                    <div className="disposition-option-header">
+                      <DollarSign size={20} />
+                      <span className="disposition-option-title">Customer Credit</span>
+                    </div>
+                    <p className="disposition-option-desc">
+                      Keep the amount as a credit balance on the customer's account for future purchases.
+                    </p>
+                  </div>
+                </label>
+
+                {/* Adjust Option */}
+                <label className={`disposition-option ${disposition === 'adjust' ? 'active' : ''}`}>
+                  <input
+                    type="radio"
+                    name="disposition"
+                    value="adjust"
+                    checked={disposition === 'adjust'}
+                    onChange={() => setDisposition('adjust')}
+                  />
+                  <div className="disposition-option-content">
+                    <div className="disposition-option-header">
+                      <FileText size={20} />
+                      <span className="disposition-option-title">Adjust Against Unpaid Invoices</span>
+                    </div>
+                    <p className="disposition-option-desc">
+                      Apply the return credit to one or more outstanding unpaid or partially-paid invoices.
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              {/* Invoice Selection for Adjust Mode */}
+              {disposition === 'adjust' && (
+                <div className="adjust-invoice-selection">
+                  <div className="adjust-invoice-header">
+                    <span className="adjust-invoice-title">
+                      Select Invoices to Adjust
+                      {unpaidInvoices.length > 0 && (
+                        <span className="adjust-invoice-count">({unpaidInvoices.length} available)</span>
+                      )}
+                    </span>
+                    {unpaidInvoices.length > 0 && (
+                      <button
+                        type="button"
+                        className="select-all-btn"
+                        onClick={handleSelectAllUnpaid}
+                      >
+                        {selectedAdjustInvoices.length === unpaidInvoices.length ? 'Deselect All' : 'Select All'}
+                      </button>
+                    )}
+                  </div>
+
+                  {loadingUnpaid ? (
+                    <div className="no-items-message">
+                      <p>Loading unpaid invoices...</p>
+                    </div>
+                  ) : unpaidInvoices.length === 0 ? (
+                    <div className="no-items-message">
+                      <p>No unpaid or partially-paid invoices found for this customer.</p>
+                      <p className="disposition-hint">
+                        Choose a different disposition option, or the amount will be kept as customer credit.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="adjust-invoice-list">
+                      {unpaidInvoices.map((inv) => {
+                        const isSelected = selectedAdjustInvoices.includes(inv.id);
+                        return (
+                          <label
+                            key={inv.id}
+                            className={`adjust-invoice-item ${isSelected ? 'selected' : ''}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleToggleInvoice(inv.id)}
+                            />
+                            <div className="adjust-invoice-info">
+                              <span className="adjust-invoice-no">{inv.invoice_no}</span>
+                              <span className="adjust-invoice-date">
+                                {inv.invoice_date ? format(new Date(inv.invoice_date), 'MMM dd, yyyy') : ''}
+                              </span>
+                            </div>
+                            <div className="adjust-invoice-amounts">
+                              <span className="adjust-invoice-total">{formatCurrency(inv.total_amount)}</span>
+                              <span className="adjust-invoice-balance">
+                                Balance: <strong>{formatCurrency(inv.balance_amount)}</strong>
+                              </span>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {selectedAdjustInvoices.length > 0 && (
+                    <div className="adjust-summary">
+                      <span>{selectedAdjustInvoices.length} invoice(s) selected</span>
+                      <span className="adjust-credit-amount">
+                        Credit: {formatCurrency(Math.min(
+                          returnTotal,
+                          unpaidInvoices
+                            .filter(inv => selectedAdjustInvoices.includes(inv.id))
+                            .reduce((sum, inv) => sum + inv.balance_amount, 0)
+                        ))} / {formatCurrency(returnTotal)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Return Summary */}
           {hasReturns && (
             <div className="return-summary">
@@ -321,8 +557,26 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
               </div>
               <div className="summary-row total">
                 <span>Return Amount:</span>
-                <span className="negative">-{formatCurrency(calculateReturnTotal())}</span>
+                <span className="negative">-{formatCurrency(returnTotal)}</span>
               </div>
+              {disposition === 'credit' && (
+                <div className="summary-row credit-note">
+                  <span>Disposition:</span>
+                  <span>Added to customer credit balance</span>
+                </div>
+              )}
+              {disposition === 'refund' && (
+                <div className="summary-row refund-note">
+                  <span>Disposition:</span>
+                  <span>Cash refund to customer</span>
+                </div>
+              )}
+              {disposition === 'adjust' && (
+                <div className="summary-row adjust-note">
+                  <span>Disposition:</span>
+                  <span>Adjusted against {selectedAdjustInvoices.length} invoice(s)</span>
+                </div>
+              )}
             </div>
           )}
         </div>

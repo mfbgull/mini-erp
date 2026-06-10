@@ -114,13 +114,21 @@ export default function InvoiceViewPage() {
     }
   };
 
-  const handleReturn = async (returnItems) => {
+  const handleReturn = async (returnPayload) => {
     if (!invoice) return;
     setReturnMutationState({ loading: true });
     try {
+      // Normalize payload: support both new format { items, disposition, ... }
+      // and legacy format (direct array of items)
+      const items = Array.isArray(returnPayload) ? returnPayload : (returnPayload.items || []);
+      const disposition = returnPayload.disposition || (items.length > 0 && invoice.balance_amount <= 0 ? 'refund' : 'credit');
+      const adjust_invoice_ids = returnPayload.adjust_invoice_ids;
+
       await api.post(`/invoices/${invoiceId}/return`, {
-        items: returnItems.map(i => ({ invoice_item_id: i.invoice_item_id, return_quantity: i.return_quantity })),
-        reason: returnItems[0]?.reason || ''
+        items: items.map(i => ({ invoice_item_id: i.invoice_item_id, return_quantity: i.return_quantity })),
+        reason: items[0]?.reason || '',
+        disposition,
+        adjust_invoice_ids
       });
       toast.success('Return processed successfully');
       setIsReturnModalOpen(false);

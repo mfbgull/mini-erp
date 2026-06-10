@@ -754,6 +754,7 @@ runForecastsMigration();
 runMissingFKIndexesMigration();
 runBatchCostingMigration();
 runGLFoundationMigration();
+runCreditBalanceMigration();
 
 // Rollback support: run if --rollback flag is passed
 if (process.argv.includes('--rollback')) {
@@ -1132,6 +1133,30 @@ function runBatchCostingMigration(): void {
     logger.info('✅ Batch costing migration completed!');
   } catch (error: any) {
     logger.error('Batch costing migration error:', error.message);
+  }
+}
+
+function runCreditBalanceMigration(): void {
+  try {
+    const hasCreditBalance = db.prepare(`
+      SELECT COUNT(*) as count FROM pragma_table_info('customers')
+      WHERE name='credit_balance'
+    `).get() as { count: number };
+
+    if (hasCreditBalance.count === 0) {
+      logger.info('Running credit balance migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-credit-balance.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      logger.info('✅ Credit balance column added to customers table!');
+    }
+  } catch (error: any) {
+    logger.error('Credit balance migration error:', error.message);
   }
 }
 

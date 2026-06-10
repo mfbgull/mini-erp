@@ -45,15 +45,18 @@ The return flow will be extended to:
 
 ## Steps
 
-- [ ] **1. Add `customers` table migration for `credit_balance` field** — or reuse `current_balance` (which is computed from outstanding invoices) and add a separate `credit_balance` column to track refunds/credits not yet applied.
-- [ ] **2. Backend: Extend `returnInvoiceItems` controller** to accept `disposition` and `adjust_invoice_ids` fields in the request body.
-- [ ] **3. Backend: Implement refund disposition** — create a negative payment record (or a `REFUND` type), reverse payment allocation proportionally, create ledger entry (Dr AR $0 / Cr Cash), and post GL entry.
-- [ ] **4. Backend: Implement credit disposition** — add the returned amount to a `credit_balance` on the customer record, create a ledger entry showing the credit.
-- [ ] **5. Backend: Implement adjust disposition** — fetch unpaid/partially-paid invoices for the customer, allocate the credit across selected invoices (or auto-allocate to oldest first), create payment allocations, update invoice balances/statuses, create ledger entries and GL entries.
-- [ ] **6. Frontend: Add disposition selector UI** in `InvoiceReturn.tsx` — three radio options below the reason textarea. Show an invoice selection list (checkboxes) when "adjust" is selected, filtered to unpaid/partially-paid invoices for this customer.
-- [ ] **7. Frontend: Update API call** in `InvoiceViewPage.jsx` — pass `disposition` and optional `adjust_invoice_ids` to the return endpoint.
-- [ ] **8. Frontend: Style the new UI** in `InvoiceReturn.css` — disposition selector, invoice picker for adjust mode.
-- [ ] **9. Test end-to-end** — process a return with each disposition option and verify balances, ledger, payments, and stock movements are correct.
+- [x] **1. Add `customers` table migration for `credit_balance` field** — Added migration file and migration function in database.ts. ✅
+- [x] **2. Backend: Extend `returnInvoiceItems` controller** — Accepts `disposition` and `adjust_invoice_ids` from request body. ✅
+- [x] **3. Backend: Implement refund disposition** — Creates negative payment record (PAY012 with -1000), refund allocation, ledger entry, and GL entry via `postRefundEntry`. ✅
+- [x] **4. Backend: Implement credit disposition** — Adds returned amount to customer's `credit_balance` column on customers table. ✅
+- [x] **5. Backend: Implement adjust disposition** — Applies credit to selected unpaid invoices, creates payment allocations, updates invoice balances/statuses, creates ledger entries. Leftover credit added to `credit_balance`. ✅
+- [x] **6. Frontend: Add disposition selector UI** in `InvoiceReturn.tsx` — Three radio options (Refund/Credit/Adjust). Invoice selection list (checkboxes) shown when "adjust" is selected. ✅
+- [x] **7. Frontend: Update API call** in `InvoiceViewPage.jsx` — Passes `disposition` and `adjust_invoice_ids` to the return endpoint. ✅
+- [x] **8. Frontend: Style the new UI** in `InvoiceReturn.css` — Added styles for disposition options, invoice picker, summaries. ✅
+- [x] **9. Test end-to-end** — All three dispositions tested and verified:
+  - **CREDIT**: credit_balance incremented, ledger entries created ✅
+  - **REFUND**: Refund payment (negative amount) created, payment allocation created, ledger entry created ✅
+  - **ADJUST**: Target unpaid invoice balance reduced to $0, payment allocation created, ledger entries created ✅
 
 ## Verification
 

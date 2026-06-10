@@ -779,9 +779,11 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
     const invoiceId = parseInt(id as string, 10);
     const userId = req.user!.id;
 
-    const { items: returnItems, reason } = req.body as {
+    const { items: returnItems, reason, disposition, adjust_invoice_ids } = req.body as {
       items: Array<{ invoice_item_id: number; return_quantity: number }>;
       reason?: string;
+      disposition?: 'refund' | 'credit' | 'adjust';
+      adjust_invoice_ids?: number[];
     };
 
     if (!returnItems || returnItems.length === 0) {
@@ -797,8 +799,13 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
       return res.status(400).json({ error: 'Cannot return a cancelled invoice' });
     }
 
+    // Default disposition: if invoice was paid, default to refund; otherwise default to credit
+    const resolvedDisposition: 'refund' | 'credit' | 'adjust' =
+      disposition || (invoice.balance_amount <= 0 ? 'refund' : 'credit');
+
     const transaction = db.transaction(() => {
       const processedItems: Array<{ item_id: number; quantity: number; unit_price: number }> = [];
+      let returnTotalTaxAmount = 0;
 
       for (const returnItem of returnItems) {
         // Find the invoice item to get item_id, unit_price
@@ -829,6 +836,10 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
           unit_price: invoiceItem.unit_price,
         });
 
+        // Accumulate tax for the returned items
+        const lineAmount = Number(returnItem.return_quantity) * Number(invoiceItem.unit_price);
+        returnTotalTaxAmount += lineAmount * ((Number(invoiceItem.tax_rate) || 0) / 100);
+
         // Update per-item returned quantity tracking
         db.prepare(`UPDATE invoice_items SET returned_qty = returned_qty + ? WHERE id = ?`)
           .run(returnItem.return_quantity, returnItem.invoice_item_id);
@@ -843,7 +854,7 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         'RETURN'
       );
 
-      // Post GL reversal — reverse AR, reduce revenue, reverse tax
+      // Calculate the total return amount
       const returnAmount = processedItems.reduce(
         (sum: number, item: { quantity: number; unit_price: number }) =>
           sum + Number(item.quantity) * Number(item.unit_price),
@@ -852,16 +863,17 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
 
       const todayDate = new Date().toISOString().split('T')[0];
 
+      // Post GL reversal — reverse AR, reduce revenue, reverse tax
       AccountingService.postInvoiceReturnEntry(db, {
         invoiceId,
         invoiceNo: invoice.invoice_no,
         returnAmount,
         invoiceDate: todayDate,
         userId,
+        taxAmount: returnTotalTaxAmount,
       });
 
       // Post COGS reversal — Dr Inventory Asset, Cr COGS at actual FIFO cost
-      // Compute the FIFO cost of returned items from the original SALE movements
       let returnCogsTotal = 0;
       for (const item of processedItems) {
         const saleMovements = db.prepare(`
@@ -898,10 +910,6 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         `UPDATE invoices SET returned_amount = returned_amount + ? WHERE id = ?`
       ).run(returnAmount.toFixed(2), invoiceId);
 
-      // Recalculate invoice balance and status based on the new total
-      calculateInvoiceBalance(invoiceId);
-      updateInvoiceStatus(invoiceId);
-
       // Create customer ledger entry for the return (credit to reduce AR)
       createLedgerEntry(
         invoice.customer_id,
@@ -912,10 +920,191 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         `Return on Invoice ${invoice.invoice_no}`
       );
 
-      // Sync the customer's current_balance
+      // ==================================================================
+      // DISPOSITION HANDLING
+      // ==================================================================
+
+      if (resolvedDisposition === 'refund') {
+        // ----------------------------------------------------------------
+        // REFUND: Create a refund payment (negative payment record),
+        // reverse/fraction the original payment allocation, post GL entry
+        // ----------------------------------------------------------------
+
+        const refundPaymentNo = InvoiceModel.generatePaymentNoAtomic(db);
+
+        // Create a refund payment (negative amount)
+        const refundPaymentId = InvoiceModel.createPayment(
+          db,
+          refundPaymentNo,
+          invoice.customer_id,
+          todayDate,
+          -returnAmount,  // negative = money going out
+          invoice.paid_amount > 0 ? 'Cash' : 'Cash',
+          null,
+          `Refund for return on ${invoice.invoice_no}`
+        );
+
+        // Record a refund allocation (negative allocation = reduction of original payment)
+        InvoiceModel.createPaymentAllocation(db, refundPaymentId, invoiceId, -returnAmount);
+
+        // Ledger entry: Dr (debit) the refund payment no. to reflect cash out
+        createLedgerEntry(
+          invoice.customer_id,
+          'REFUND',
+          refundPaymentNo,
+          returnAmount,   // debit = customer owes us more (contra)
+          0,
+          `Refund ${refundPaymentNo} for return on ${invoice.invoice_no}`
+        );
+
+        // Post GL entry for refund: Dr Sales Returns (already done above in postInvoiceReturnEntry),
+        // but also need to reverse the cash side: Dr AR (credit the original overpayment) / Cr Cash
+        // Since postInvoiceReturnEntry already credited AR, we need an additional entry
+        // that reverses the cash impact: Dr AR / Cr Cash (refund paid out)
+        AccountingService.postRefundEntry(db, {
+          refundPaymentId,
+          refundPaymentNo,
+          amount: returnAmount,
+          refundDate: todayDate,
+          paymentMethod: invoice.paid_amount > 0 ? 'Cash' : 'Cash',
+          customerId: invoice.customer_id,
+          userId,
+        });
+      }
+
+      else if (resolvedDisposition === 'credit') {
+        // ----------------------------------------------------------------
+        // CREDIT: Add the returned amount to customer's credit_balance
+        // ----------------------------------------------------------------
+
+        const currentCreditBalance = db.prepare(
+          `SELECT credit_balance FROM customers WHERE id = ?`
+        ).get(invoice.customer_id) as { credit_balance: number } | undefined;
+
+        const newCreditBalance = (currentCreditBalance?.credit_balance || 0) + returnAmount;
+
+        db.prepare(
+          `UPDATE customers SET credit_balance = ? WHERE id = ?`
+        ).run(newCreditBalance, invoice.customer_id);
+
+        // Already created a RETURN ledger entry above with the credit
+        // No additional GL entry needed — the credit balance is tracked separately
+      }
+
+      else if (resolvedDisposition === 'adjust') {
+        // ----------------------------------------------------------------
+        // ADJUST: Apply the return credit to unpaid/partially-paid invoices
+        // ----------------------------------------------------------------
+
+        let remainingCredit = returnAmount;
+
+        // Determine which invoices to adjust
+        let targetInvoiceIds = adjust_invoice_ids;
+
+        if (!targetInvoiceIds || targetInvoiceIds.length === 0) {
+          // Auto-fetch oldest unpaid/partially-paid invoices for this customer
+          const unpaidInvoices = db.prepare(`
+            SELECT id FROM invoices
+            WHERE customer_id = ? AND status IN ('Unpaid', 'Partially Paid')
+              AND balance_amount > 0
+            ORDER BY invoice_date ASC, id ASC
+          `).all(invoice.customer_id) as Array<{ id: number }>;
+
+          targetInvoiceIds = unpaidInvoices.map((inv: { id: number }) => inv.id);
+        }
+
+        if (!targetInvoiceIds || targetInvoiceIds.length === 0) {
+          throw new Error('No unpaid invoices found to adjust against');
+        }
+
+        for (const targetInvoiceId of targetInvoiceIds) {
+          if (remainingCredit <= 0) break;
+
+          const targetInvoice = db.prepare(
+            `SELECT id, invoice_no, total_amount, paid_amount, balance_amount, status FROM invoices WHERE id = ?`
+          ).get(targetInvoiceId) as {
+            id: number; invoice_no: string; total_amount: number;
+            paid_amount: number; balance_amount: number; status: string;
+          } | undefined;
+
+          if (!targetInvoice) continue;
+          if (targetInvoice.balance_amount <= 0) continue;
+
+          const allocAmount = Math.min(remainingCredit, targetInvoice.balance_amount);
+
+          // Generate a payment number for the adjustment
+          const adjustPaymentNo = InvoiceModel.generatePaymentNoAtomic(db);
+
+          // Create a zero-amount payment record to track the allocation
+          const adjustPaymentId = InvoiceModel.createPayment(
+            db,
+            adjustPaymentNo,
+            invoice.customer_id,
+            todayDate,
+            0,  // no actual cash movement
+            'Credit',
+            null,
+            `Credit adjustment from return on ${invoice.invoice_no}`
+          );
+
+          // Allocate the credit to the target invoice
+          InvoiceModel.createPaymentAllocation(db, adjustPaymentId, targetInvoiceId, allocAmount);
+
+          // Recalculate target invoice balance and status
+          calculateInvoiceBalance(targetInvoiceId);
+          updateInvoiceStatus(targetInvoiceId);
+
+          // Ledger entry for the adjustment on the target invoice (credit = payment)
+          createLedgerEntry(
+            invoice.customer_id,
+            'ADJUSTMENT',
+            adjustPaymentNo,
+            0,
+            allocAmount,
+            `Credit adjustment from return on ${invoice.invoice_no} applied to ${targetInvoice.invoice_no}`
+          );
+
+          // Post GL entry for the credit adjustment:
+          // This reduces AR (credit) and the sales returns (debit) which was already
+          // recorded in postInvoiceReturnEntry. No additional GL entry needed for the
+          // credit adjustment itself since postInvoiceReturnEntry already handled the
+          // revenue reversal. The payment allocation just re-allocates within AR.
+
+          remainingCredit -= allocAmount;
+        }
+
+        if (remainingCredit > 0) {
+          // If there's leftover credit, add it to customer's credit_balance
+          const currentCreditBalance = db.prepare(
+            `SELECT credit_balance FROM customers WHERE id = ?`
+          ).get(invoice.customer_id) as { credit_balance: number } | undefined;
+
+          const newCreditBalance = (currentCreditBalance?.credit_balance || 0) + remainingCredit;
+
+          db.prepare(
+            `UPDATE customers SET credit_balance = ? WHERE id = ?`
+          ).run(newCreditBalance, invoice.customer_id);
+        }
+      }
+
+      // ==================================================================
+      // FINALIZE
+      // ==================================================================
+
+      // Recalculate return invoice balance and status
+      calculateInvoiceBalance(invoiceId);
+      updateInvoiceStatus(invoiceId);
+
+      // Sync the customer's current_balance and credit_balance-aware total
       updateCustomerBalance(invoice.customer_id);
 
-      // Log the return activity
+      // Log the return activity (include disposition info)
+      const dispositionLabels: Record<string, string> = {
+        refund: 'Refund to customer',
+        credit: 'Customer credit',
+        adjust: 'Adjusted against unpaid invoice(s)',
+      };
+
       db.prepare(`
         INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
         VALUES (?, ?, ?, ?, ?)
@@ -924,12 +1113,16 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         'RETURN',
         'Invoice',
         invoiceId,
-        `Return processed for ${processedItems.length} item(s) on Invoice ${invoice.invoice_no}${reason ? ': ' + reason : ''}`
+        `Return processed for ${processedItems.length} item(s) on Invoice ${invoice.invoice_no}` +
+        ` — Disposition: ${dispositionLabels[resolvedDisposition] || resolvedDisposition}` +
+        `${reason ? '. Reason: ' + reason : ''}`
       );
 
       return {
         returnedItems: processedItems,
         totalItems: processedItems.length,
+        disposition: resolvedDisposition,
+        returnAmount,
       };
     });
 
