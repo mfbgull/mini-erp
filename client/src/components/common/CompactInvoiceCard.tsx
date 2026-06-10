@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { format } from 'date-fns';
-import { MoreVertical, Eye, Edit2, Trash2, X, FileText, RotateCcw } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, Trash2, X, FileText, RotateCcw, Ban } from 'lucide-react';
 
 import Card from './Card';
 import { formatCurrency } from '../../utils/formatters';
@@ -115,7 +115,7 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn
                   })()}
                   {onCancel && invoice.status !== 'Cancelled' && (
                     <button type="button" className="dropdown-item delete" onClick={() => { setShowMenu(false); onCancel(invoice); }}>
-                      <X className="dropdown-icon" />
+                      <Ban className="dropdown-icon" />
                       Cancel
                     </button>
                   )}

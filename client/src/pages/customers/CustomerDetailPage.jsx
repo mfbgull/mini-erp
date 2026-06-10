@@ -26,7 +26,7 @@ import {
   Printer,
   Image,
   FileSpreadsheet,
-  X
+  Ban
 } from 'lucide-react';
 
 
@@ -900,12 +900,11 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice }) {
           )}
           {params.data.status !== 'Cancelled' && (
             <button
-              className="action-btn"
+              className="action-btn cancel-btn"
               onClick={() => handleCancelInvoice(params.data)}
               title="Cancel Invoice"
-              style={{ color: '#ef4444' }}
             >
-              <X size={14} />
+              <Ban size={14} />
             </button>
           )}
         </div>

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2, Search, X, Download, BarChart3, Wallet, RotateCcw } from 'lucide-react';
+import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2, Search, X, Download, BarChart3, Wallet, RotateCcw, Ban } from 'lucide-react';
 
 import InvoicePreview from './InvoicePreview';
 import InvoiceReturn from './InvoiceReturn';
@@ -297,12 +297,11 @@ export default function SalesPage() {
           )}
           {params.data?.status !== 'Cancelled' && (
             <button
-              className="action-btn"
+              className="action-btn cancel-btn"
               onClick={() => handleCancelInvoice(params.data)}
               title="Cancel Invoice"
-              style={{ color: '#ef4444' }}
             >
-              <X size={14} />
+              <Ban size={14} />
             </button>
           )}
         </div>

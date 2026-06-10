@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import { ArrowLeft, Printer, Download, Edit2, Mail, Share2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Printer, Download, Edit2, Mail, Share2, RotateCcw, Ban } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
@@ -24,6 +24,7 @@ export default function InvoiceViewPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
   const [returnMutation, setReturnMutationState] = useState({ loading: false });
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // Fetch invoice data
   const { data: invoice, isLoading, error } = useQuery({
@@ -114,6 +115,28 @@ export default function InvoiceViewPage() {
     }
   };
 
+  const handleCancel = async () => {
+    if (!invoice) return;
+    if (invoice.status === 'Cancelled') {
+      toast.error('Invoice is already cancelled');
+      return;
+    }
+    if (!window.confirm(`Are you sure you want to cancel invoice "${invoice.invoice_no}"? This will mark it as cancelled but keep all records.`)) {
+      return;
+    }
+    setIsCancelling(true);
+    try {
+      await api.put(`/invoices/${invoiceId}/cancel`);
+      toast.success('Invoice cancelled successfully');
+      queryClient.invalidateQueries({ queryKey: ['invoice', invoiceId] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to cancel invoice');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   const handleReturn = async (returnPayload) => {
     if (!invoice) return;
     setReturnMutationState({ loading: true });
@@ -166,6 +189,12 @@ export default function InvoiceViewPage() {
             <Button variant="secondary" onClick={() => setIsReturnModalOpen(true)}>
               <RotateCcw size={18} />
               Return
+            </Button>
+          )}
+          {invoice.status !== 'Cancelled' && (
+            <Button variant="danger" onClick={handleCancel} loading={isCancelling}>
+              <Ban size={18} />
+              Cancel
             </Button>
           )}
           <Button variant="secondary" onClick={() => navigate(`/sales/invoice/${invoiceId}?mode=edit`)}>
