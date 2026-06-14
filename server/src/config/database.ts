@@ -755,6 +755,7 @@ runMissingFKIndexesMigration();
 runBatchCostingMigration();
 runGLFoundationMigration();
 runCreditBalanceMigration();
+runEmployeesMigration();
 
 // Rollback support: run if --rollback flag is passed
 if (process.argv.includes('--rollback')) {
@@ -1181,6 +1182,30 @@ function runForecastsMigration(): void {
     }
   } catch (error: any) {
     logger.error('Demand forecasts migration error:', error.message);
+  }
+}
+
+function runEmployeesMigration(): void {
+  try {
+    const employeesTableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='employees'
+    `).get() as { name: string } | undefined;
+
+    if (!employeesTableCheck) {
+      logger.info('Running employees migration...');
+
+      const employeesSQL = fs.readFileSync(
+        path.join(__dirname, '../../migrations/add-employees-table.sql'),
+        'utf8'
+      );
+
+      db.exec(employeesSQL);
+
+      logger.info('✅ Employees migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Employees migration error:', error.message);
   }
 }
 

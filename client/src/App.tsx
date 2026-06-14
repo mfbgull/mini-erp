@@ -90,6 +90,7 @@ const UsersPage = lazy(() => import('./pages/users/UsersPage'));
 const RolesPage = lazy(() => import('./pages/roles/RolesPage'));
 const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'));
 const ExpensesPage = lazy(() => import('./pages/expenses/ExpensesPage'));
+const EmployeesPage = lazy(() => import('./pages/employees/EmployeesPage'));
 const PaymentsPage = lazy(() => import('./pages/payments/PaymentsPage'));
 const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
 const ForecastDashboard = lazy(() => import('./pages/forecasts/ForecastDashboard'));
@@ -218,6 +219,7 @@ function AppLayout() {
               <Route path="/reports/bom-usage" element={<BOMUsageReport />} />
               <Route path="/reports/expenses" element={<ExpensesReport />} />
               <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/employees" element={<EmployeesPage />} />
               <Route path="/payments" element={<PaymentsPage />} />
 <Route path="/sales" element={<SalesPage />} />
               <Route path="/quotations" element={<QuotationsPage />} />

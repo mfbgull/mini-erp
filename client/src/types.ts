@@ -91,6 +91,57 @@ export interface Supplier {
   is_active: boolean;
 }
 
+/* ── HR / Employees ────────────────────────────────────────────── */
+
+export interface Employee {
+  id: number;
+  employee_code: string;
+  first_name: string;
+  last_name: string;
+  email?: string;
+  phone?: string;
+  mobile?: string;
+  cnic_no?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
+  date_of_birth?: string;
+  gender?: string;
+  department?: string;
+  designation?: string;
+  employment_type?: string;
+  date_of_joining?: string;
+  date_of_leaving?: string;
+  salary: number;
+  bank_name?: string;
+  bank_account_no?: string;
+  bank_iban?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  profile_photo?: string;
+  notes?: string;
+  is_active: number;
+  created_by?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface EmployeeDocument {
+  id: number;
+  employee_id: number;
+  document_name: string;
+  document_type?: string;
+  document_number?: string;
+  issue_date?: string;
+  expiry_date?: string;
+  file_path?: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 /* ── Activity Log ───────────────────────────────────────────────── */
 
 export interface Activity {

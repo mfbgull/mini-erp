@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
   ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, 
-  TrendingUp, ChevronDown, LogOut, PanelLeft, CreditCard
+  TrendingUp, ChevronDown, LogOut, PanelLeft, CreditCard, Briefcase
 } from 'lucide-react';
 
 import './TopMenu.css';
@@ -81,6 +81,13 @@ const getNavItems = (): NavItem[] => [
   { path: '/bom', labelKey: 'nav.bom', icon: <ClipboardList size={18} strokeWidth={1.5} /> },
   { path: '/production', labelKey: 'nav.production', icon: <Factory size={18} strokeWidth={1.5} /> },
   { path: '/expenses', labelKey: 'nav.expenses', icon: <Receipt size={18} strokeWidth={1.5} /> },
+  {
+    labelKey: 'nav.hr',
+    icon: <Briefcase size={18} strokeWidth={1.5} />,
+    children: [
+      { path: '/employees', labelKey: 'nav.employees' }
+    ]
+  },
   {
     labelKey: 'nav.administrator',
     icon: <Settings size={18} strokeWidth={1.5} />,

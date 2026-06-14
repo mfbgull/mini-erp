@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import {
   Menu, X, LogOut,
   LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
-  ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, TrendingUp, Users, Shield, LayoutGrid, ChevronRight, CreditCard
+  ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, TrendingUp, Users, Shield, LayoutGrid, ChevronRight, CreditCard, Briefcase
 } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
@@ -83,6 +83,13 @@ const getNavItems = (): NavItem[] => [
     icon: <Receipt size={20} strokeWidth={1.5} />,
     children: [
       { path: '/expenses', labelKey: 'nav.expenses' }
+    ]
+  },
+  {
+    labelKey: 'nav.hr',
+    icon: <Briefcase size={20} strokeWidth={1.5} />,
+    children: [
+      { path: '/employees', labelKey: 'nav.employees' }
     ]
   },
   {
