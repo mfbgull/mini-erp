@@ -143,28 +143,28 @@
 }
 
 .status-paid {
-  background: #dcfce7;
+  background: var(--success-bg, #dcfce7);
   color: #15803d;
 }
 
 .status-unpaid {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }
 
 .status-partial {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #d97706;
 }
 
 .status-partially-paid {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #d97706;
 }
 
 .status-overdue {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }
 
 .status-draft {
@@ -173,7 +173,7 @@
 }
 
 .status-returned {
-  background: #ede9fe;
+  background: var(--info-bg, #ede9fe);
   color: #7c3aed;
   margin-left: 4px;
   font-size: 11px;
@@ -226,11 +226,11 @@
 }
 
 .action-btn.edit-btn {
-  color: #f59e0b;
+  color: var(--warning, #f59e0b);
 }
 
 .action-btn.edit-btn:hover {
-  background: #fffbeb;
+  background: var(--warning-bg, #fffbeb);
   border-color: #fcd34d;
 }
 
@@ -240,7 +240,7 @@
 }
 
 .text-danger {
-  color: #dc2626 !important;
+  color: var(--error, #dc2626) !important;
 }
 
 /* Quick Actions */
@@ -259,8 +259,8 @@
   gap: 2px;
   min-width: 48px;
   padding: 4px 8px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
   border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--neutral-700);
@@ -314,7 +314,7 @@
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
   border-radius: var(--radius-md);
   background: var(--card-bg, #fff);
   color: var(--neutral-600);
@@ -334,13 +334,13 @@
 }
 
 .pos-filter-toggle.active {
-  background: #ecfdf5;
+  background: var(--success-bg, #ecfdf5);
   border-color: #10b981;
   color: #047857;
 }
 
 .pos-filter-toggle.active:hover {
-  background: #d1fae5;
+  background: var(--success-bg, #d1fae5);
   border-color: #059669;
 }
 
@@ -391,7 +391,7 @@
 .search-input-field {
   width: 100%;
   padding: 12px 40px 12px 40px;
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
   border-radius: var(--radius-md);
   font-size: 15px;
   transition: all 0.2s;

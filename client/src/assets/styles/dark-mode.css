@@ -41,6 +41,10 @@ html.dark {
   --text-secondary: #86EFAC;
   --text-muted: #6B7280;
   --text-tertiary: #6B7280;
+    --warning-bg: #422006;
+    --error-bg: #450a0a;
+    --success-bg: #052e16;
+    --info-bg: #172554;
   --success: #34D399;
   --error: #FB7185;
   --warning: #FBBF24;

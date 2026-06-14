@@ -59,7 +59,7 @@
 .btn-secondary {
   background: var(--neutral-100);
   color: var(--neutral-700);
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -73,11 +73,11 @@
 }
 
 .cancel-btn {
-  color: #ef4444;
+  color: var(--error, #ef4444);
 }
 
 .cancel-btn:hover {
-  background: #fef2f2;
+  background: var(--error-bg, #fef2f2);
   border-color: #fca5a5;
 }
 
@@ -92,13 +92,13 @@
 }
 
 .btn-success:hover:not(:disabled) {
-  background: #157347;
+  background: var(--success, #157347);
 }
 
 /* Warning Button */
 .btn-warning {
   background: var(--warning, #ffc107);
-  color: #212529;
+  color: var(--text-primary, #212529);
 }
 
 .btn-warning:hover:not(:disabled) {

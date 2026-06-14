@@ -57,7 +57,7 @@
 .form-group input {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
   border-radius: var(--radius-sm);
   font-size: 14px;
   transition: border-color 0.2s;
@@ -78,7 +78,7 @@
 .login-footer {
   text-align: center;
   padding-top: var(--space-lg);
-  border-top: 1px solid #DEE2E6;
+  border-top: 1px solid var(--border-color, #DEE2E6);
 }
 
 .login-footer p {

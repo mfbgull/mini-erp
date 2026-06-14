@@ -13,8 +13,8 @@
   gap: 6px;
   min-height: 36px;
   padding: 6px 12px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
   border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--neutral-700);
@@ -153,7 +153,7 @@ body.sm-page-mobile .fab {
 
 /* Movement card */
 .movement-card {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-left: 4px solid var(--primary);
@@ -222,12 +222,12 @@ body.sm-page-mobile .fab {
 
 .movement-type-badge.type-transfer {
   background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  color: var(--info, #3b82f6);
 }
 
 .movement-type-badge.type-adjustment {
   background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
+  color: var(--warning, #f59e0b);
 }
 
 .movement-card-body {
@@ -351,7 +351,7 @@ body.sm-page-mobile .fab {
   left: 0;
   right: 0;
   padding: var(--space-md);
-  background: white;
+  background: var(--card-bg, #ffffff);
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   z-index: 100;
   display: flex;
@@ -377,7 +377,7 @@ body.sm-page-mobile .fab {
 .search-input-field {
   width: 100%;
   padding: 12px 40px 12px 40px;
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
   border-radius: var(--radius-md);
   font-size: 15px;
   transition: all 0.2s;
@@ -441,7 +441,7 @@ body.sm-page-mobile .fab {
   flex-direction: column;
   gap: 4px;
   padding: var(--space-sm) var(--space-md);
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-sm);
 }

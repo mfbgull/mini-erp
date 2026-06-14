@@ -8,7 +8,7 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: var(--radius-sm);
   padding: var(--space-md);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
@@ -33,7 +33,7 @@
 }
 
 .summary-card.danger {
-  border-color: var(--danger, #ef4444);
+  border-color: var(--danger, var(--error, #ef4444));
 }
 
 .summary-card.info {
@@ -76,11 +76,11 @@
 }
 
 .summary-card.danger .summary-icon {
-  background: color-mix(in srgb, var(--danger, #ef4444) 15%, transparent);
+  background: color-mix(in srgb, var(--danger, var(--error, #ef4444)) 15%, transparent);
 }
 
 .summary-card.danger .summary-icon svg {
-  color: var(--danger, #ef4444);
+  color: var(--danger, var(--error, #ef4444));
 }
 
 .summary-card.info .summary-icon {

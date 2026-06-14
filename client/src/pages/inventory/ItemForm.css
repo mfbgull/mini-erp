@@ -161,19 +161,7 @@
   color: var(--error);
 }
 
-.form-input,
-.form-select,
-.form-textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-family: inherit;
-  color: var(--text-primary);
-  background: var(--neutral-100);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
+
 
 .form-input:focus,
 .form-select:focus,
@@ -293,22 +281,22 @@
 
 .checkbox-custom.raw {
   border-color: #0369a1;
-  background: #e0f2fe;
+  background: var(--info-bg, #e0f2fe);
 }
 
 .checkbox-custom.finished {
   border-color: #15803d;
-  background: #f0fdf4;
+  background: var(--success-bg, #f0fdf4);
 }
 
 .checkbox-custom.purchased {
   border-color: #b45309;
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
 }
 
 .checkbox-custom.manufactured {
   border-color: #7c3aed;
-  background: #ede9fe;
+  background: var(--info-bg, #ede9fe);
 }
 
 .type-checkbox-item input:checked + .checkbox-custom.raw {

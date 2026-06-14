@@ -1,7 +1,7 @@
 /* Quotation View Page - Print-Ready Design */
 .quotation-view-page {
   min-height: 100vh;
-  background: #f1f5f9;
+  background: var(--neutral-100, #f1f5f9);
 }
 
 .quotation-view-toolbar {
@@ -9,8 +9,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--card-bg, #ffffff);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -25,7 +25,7 @@
 .toolbar-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary, #1e293b);
   margin: 0;
 }
 
@@ -53,8 +53,8 @@
   left: 0;
   right: 0;
   padding: 12px 16px 20px;
-  background: white;
-  border-top: 1px solid #e2e8f0;
+  background: var(--card-bg, #ffffff);
+  border-top: 1px solid var(--border-color, #e2e8f0);
   z-index: 100;
 }
 
@@ -70,7 +70,7 @@
   }
 
   .quotation-view-page {
-    background: white;
+    background: var(--card-bg, #ffffff);
     min-height: auto;
   }
 

@@ -33,23 +33,23 @@
 }
 
 .expense-status-paid {
-  background: #dcfce7;
-  color: #16a34a;
+  background: var(--success-bg, #dcfce7);
+  color: var(--success, #16a34a);
 }
 
 .expense-status-approved {
-  background: #dbeafe;
-  color: #2563eb;
+  background: var(--info-bg, #dbeafe);
+  color: var(--info, #2563eb);
 }
 
 .expense-status-pending {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #d97706;
 }
 
 .expense-status-rejected {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }
 
 /* Expense Preview - Match Item Preview Structure */
@@ -260,7 +260,7 @@
 }
 
 .expense-preview-action-btn.delete-btn:hover {
-  background: #fee2e2;
+  background: var(--error-bg, #fee2e2);
   color: var(--error);
 }
 

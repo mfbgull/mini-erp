@@ -156,7 +156,7 @@
 }
 
 .summary-item.cogs {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid var(--error, #ef4444);
 }
 
 .summary-item.gross-profit {
@@ -164,7 +164,7 @@
 }
 
 .summary-item.expenses {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--warning, #f59e0b);
 }
 
 .summary-item.net-profit {

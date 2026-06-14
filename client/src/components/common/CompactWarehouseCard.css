@@ -688,7 +688,7 @@ NZ|}
 }
 
 .preview-action-btn.delete-btn:hover {
-  background: #fee2e2;
+  background: var(--error-bg, #fee2e2);
 }
 
 /* BOM Toggle Button */
@@ -703,7 +703,7 @@ NZ|}
 }
 
 .bom-toggle-deactivate:hover {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
 }
 
 .bom-toggle-activate {
@@ -712,5 +712,5 @@ NZ|}
 }
 
 .bom-toggle-activate:hover {
-  background: #d1fae5;
+  background: var(--success-bg, #d1fae5);
 }

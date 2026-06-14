@@ -2,7 +2,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--space-md);
-  background: white;
+  background: var(--card-bg, #ffffff);
 }
 
 .statement-header {
@@ -59,7 +59,7 @@
 }
 
 .statement-body {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   padding: var(--space-lg);
@@ -209,7 +209,7 @@
 /* Print styles */
 @media print {
   body {
-    background: white;
+    background: var(--card-bg, #ffffff);
   }
   
   .customer-statement-page {

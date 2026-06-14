@@ -54,7 +54,7 @@
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-sm);
   margin-bottom: var(--space-xs);
-  background: white;
+  background: var(--card-bg, #ffffff);
   font-size: 0.9rem;
 }
 

@@ -13,7 +13,7 @@
 }
 
 .po-wizard-modal {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 16px;
   width: 100%;
   max-width: 600px;
@@ -29,8 +29,8 @@
   display: flex;
   justify-content: space-around;
   padding: 20px 16px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background: var(--neutral-50, #f8f9fa);
+  border-bottom: 1px solid var(--neutral-200, #e9ecef);
 }
 
 .progress-step {
@@ -51,7 +51,7 @@
   height: 32px;
   border-radius: 50%;
   background: #dee2e6;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,7 +68,7 @@
 .step-label {
   font-size: 11px;
   font-weight: 500;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -90,14 +90,14 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   z-index: 10;
   transition: all 0.2s;
 }
 
 .wizard-close:hover {
   background: rgba(0, 0, 0, 0.15);
-  color: #212529;
+  color: var(--text-primary, #212529);
 }
 
 .wizard-step {
@@ -113,7 +113,7 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 24px;
-  color: #212529;
+  color: var(--text-primary, #212529);
 }
 
 .step-header.success {
@@ -128,7 +128,7 @@
 }
 
 .step-header.success p {
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   font-size: 14px;
   margin: 0;
 }
@@ -146,17 +146,17 @@
 .search-input {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border-color, #dee2e6);
   border-radius: 10px;
   font-size: 15px;
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   transition: all 0.2s;
 }
 
 .search-input:focus {
   outline: none;
   border-color: #367BF5;
-  background: white;
+  background: var(--card-bg, #ffffff);
   box-shadow: 0 0 0 3px rgba(54, 123, 245, 0.1);
 }
 
@@ -175,7 +175,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 2px solid #e9ecef;
   border-radius: 12px;
   cursor: pointer;
@@ -201,12 +201,12 @@
 .card-title {
   font-weight: 600;
   font-size: 15px;
-  color: #212529;
+  color: var(--text-primary, #212529);
 }
 
 .card-subtitle {
   font-size: 13px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
 }
 
 .check-icon {
@@ -232,17 +232,17 @@
   gap: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: #495057;
+  color: var(--neutral-600, #495057);
 }
 
 .form-input,
 .form-select,
 .form-textarea {
   padding: 12px 14px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border-color, #dee2e6);
   border-radius: 10px;
   font-size: 15px;
-  background: white;
+  background: var(--card-bg, #ffffff);
   transition: all 0.2s;
 }
 
@@ -274,9 +274,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px;
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   border-radius: 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--neutral-200, #e9ecef);
 }
 
 .item-info {
@@ -290,7 +290,7 @@
 .item-name {
   font-weight: 600;
   font-size: 14px;
-  color: #212529;
+  color: var(--text-primary, #212529);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -298,7 +298,7 @@
 
 .item-code {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
 }
 
 .item-price {
@@ -317,7 +317,7 @@
 .qty-input {
   width: 80px;
   padding: 8px 10px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border-color, #dee2e6);
   border-radius: 8px;
   font-size: 15px;
   text-align: center;
@@ -333,7 +333,7 @@
   display: flex;
   justify-content: space-between;
   padding: 14px 16px;
-  background: #e9ecef;
+  background: var(--neutral-200, #e9ecef);
   border-radius: 10px;
   margin-bottom: 16px;
   font-weight: 600;
@@ -347,7 +347,7 @@
 }
 
 .review-group {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   padding: 16px;
   border-radius: 12px;
 }
@@ -356,21 +356,21 @@
   margin: 0 0 10px 0;
   font-size: 13px;
   text-transform: uppercase;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   letter-spacing: 0.5px;
 }
 
 .review-value {
   font-size: 16px;
   font-weight: 600;
-  color: #212529;
+  color: var(--text-primary, #212529);
 }
 
 .review-row {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--neutral-200, #e9ecef);
   font-size: 14px;
 }
 
@@ -381,7 +381,7 @@
 .review-row.total {
   font-weight: 700;
   font-size: 16px;
-  color: #212529;
+  color: var(--text-primary, #212529);
   padding-top: 12px;
   margin-top: 8px;
   border-top: 2px solid #dee2e6;
@@ -391,18 +391,18 @@
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--neutral-200, #e9ecef);
   font-size: 14px;
 }
 
 .review-totals {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   padding: 16px;
   border-radius: 12px;
 }
 
 .confirmation-details {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 16px;
@@ -412,7 +412,7 @@
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--neutral-200, #e9ecef);
   font-size: 15px;
 }
 
@@ -423,7 +423,7 @@
 .confirm-row.total {
   font-weight: 700;
   font-size: 18px;
-  color: #212529;
+  color: var(--text-primary, #212529);
   padding-top: 16px;
   margin-top: 8px;
   border-top: 2px solid #dee2e6;
@@ -443,7 +443,7 @@
   display: flex;
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--neutral-200, #e9ecef);
   margin-top: auto;
 }
 
@@ -477,8 +477,8 @@
 }
 
 .btn-secondary {
-  background: #e9ecef;
-  color: #495057;
+  background: var(--neutral-200, #e9ecef);
+  color: var(--neutral-600, #495057);
 }
 
 .btn-secondary:hover:not(:disabled) {

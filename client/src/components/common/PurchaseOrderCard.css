@@ -85,12 +85,12 @@ MY|.po-card-status {
 }
 
 .po-card-status.submitted {
-  background: #3b82f6;
+  background: var(--info, #3b82f6);
   color: white;
 }
 
 .po-card-status.partial {
-  background: #f59e0b;
+  background: var(--warning, #f59e0b);
   color: white;
 }
 
@@ -100,7 +100,7 @@ MY|.po-card-status {
 }
 
 .po-card-status.cancelled {
-  background: #ef4444;
+  background: var(--error, #ef4444);
   color: white;
 }
 
@@ -280,12 +280,12 @@ ZP|.po-modal-status {
 }
 
 .po-modal-status.submitted {
-  background: #3b82f6;
+  background: var(--info, #3b82f6);
   color: white;
 }
 
 .po-modal-status.partial {
-  background: #f59e0b;
+  background: var(--warning, #f59e0b);
   color: white;
 }
 
@@ -295,7 +295,7 @@ ZP|.po-modal-status {
 }
 
 .po-modal-status.cancelled {
-  background: #ef4444;
+  background: var(--error, #ef4444);
   color: white;
 }
 

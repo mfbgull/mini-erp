@@ -66,7 +66,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   font-size: 14px;
-  background: white;
+  background: var(--card-bg, #ffffff);
   cursor: pointer;
 }
 
@@ -124,12 +124,12 @@
 }
 
 .role-admin {
-  background: #ede9fe;
+  background: var(--info-bg, #ede9fe);
   color: #7c3aed;
 }
 
 .role-user {
-  background: #e0f2fe;
+  background: var(--info-bg, #e0f2fe);
   color: #0369a1;
 }
 
@@ -145,13 +145,13 @@
 }
 
 .status-active {
-  background: #dcfce7;
-  color: #16a34a;
+  background: var(--success-bg, #dcfce7);
+  color: var(--success, #16a34a);
 }
 
 .status-inactive {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }
 
 /* Table Actions */
@@ -180,7 +180,7 @@
 }
 
 .action-btn.danger:hover {
-  background: #fee2e2;
+  background: var(--error-bg, #fee2e2);
   color: var(--error);
 }
 

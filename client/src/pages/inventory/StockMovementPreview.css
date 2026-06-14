@@ -352,5 +352,5 @@
 }
 
 .status-dot.pending {
-  background: #f59e0b;
+  background: var(--warning, #f59e0b);
 }

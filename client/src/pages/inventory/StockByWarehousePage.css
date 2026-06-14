@@ -14,8 +14,8 @@
   gap: 2px;
   min-width: 48px;
   padding: 4px 8px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
   border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--neutral-700);
@@ -124,7 +124,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    background: white;
+    background: var(--card-bg, #ffffff);
     border: 1px solid #DEE2E6;
     border-radius: var(--radius-md);
     padding: 0 var(--space-md);

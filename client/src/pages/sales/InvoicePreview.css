@@ -16,7 +16,7 @@
 }
 
 .invoice-preview-container {
-  background: white;
+  background: var(--card-bg, #ffffff);
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -55,7 +55,7 @@
 
 .invoice-preview-subtitle {
   font-size: 14px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin: 4px 0 0 0;
 }
 
@@ -65,7 +65,7 @@
   border-radius: 10px;
   background: #f1f3f5;
   border: none;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,7 +75,7 @@
 }
 
 .invoice-preview-close:hover {
-  background: #e9ecef;
+  background: var(--neutral-200, #e9ecef);
 }
 
 /* Status Banner */
@@ -114,7 +114,7 @@
 }
 
 .preview-stat {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   border-radius: 12px;
   padding: 14px;
   text-align: center;
@@ -123,7 +123,7 @@
 .preview-stat-label {
   display: block;
   font-size: 11px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -141,7 +141,7 @@
 }
 
 .preview-stat-value.balance-due {
-  color: #dc2626;
+  color: var(--error, #dc2626);
 }
 
 .preview-stat-value.balance-paid {
@@ -156,7 +156,7 @@
 }
 
 .preview-detail-item {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   border-radius: 10px;
   padding: 12px;
 }
@@ -168,7 +168,7 @@
 .preview-detail-label {
   display: block;
   font-size: 11px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -186,7 +186,7 @@
   flex-direction: column;
   gap: 2px;
   font-size: 13px;
-  color: #495057;
+  color: var(--neutral-600, #495057);
 }
 
 /* Stock Alerts */
@@ -209,8 +209,8 @@
 }
 
 .stock-alert.preview-alert {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
   border: 1px solid #fecaca;
 }
 
@@ -219,7 +219,7 @@
   display: flex;
   gap: 12px;
   padding: 16px 20px 24px 20px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--neutral-200, #e9ecef);
   flex-shrink: 0;
 }
 
@@ -238,7 +238,7 @@
 }
 
 .preview-action-btn.edit-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, var(--info, #3b82f6) 0%, #1d4ed8 100%);
   border: none;
   color: white;
 }
@@ -248,13 +248,13 @@
 }
 
 .preview-action-btn.delete-btn {
-  background: white;
-  border: 1px solid #dc2626;
-  color: #dc2626;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--error, #dc2626);
+  color: var(--error, #dc2626);
 }
 
 .preview-action-btn.delete-btn:hover {
-  background: #fee2e2;
+  background: var(--error-bg, #fee2e2);
 }
 
 /* Mobile Responsive */

@@ -266,7 +266,7 @@
   padding: var(--space-xs) var(--space-sm);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  background: white;
+  background: var(--card-bg, #ffffff);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;

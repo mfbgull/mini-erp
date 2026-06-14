@@ -41,6 +41,15 @@
   --border-color: #E2E8F0;
   --border-color-light: #F1F5F9;
 
+  /* Reset Semantic Background Colors */
+  --warning-bg: #FEF3C7;
+  --error-bg: #FEE2E2;
+  --success-bg: #DCFCE7;
+  --info-bg: #E3F2FD;
+
+  /* Reset Text-on-Primary Color */
+  --text-on-primary: #FFFFFF;
+
   /* Reset Spacing */
   --space-xs: 8px;
   --space-sm: 12px;

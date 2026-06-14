@@ -63,7 +63,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-md);
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-bottom: 1px solid var(--neutral-200);
   cursor: pointer;
   transition: background 0.15s;
@@ -142,7 +142,7 @@
 /* Context Menu */
 .po-context-menu {
   position: fixed;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: var(--radius-md);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   min-width: 160px;
@@ -191,7 +191,7 @@
 }
 
 .po-context-menu-item.danger:hover:not(:disabled) {
-  background: #fef2f2;
+  background: var(--error-bg, #fef2f2);
 }
 
 /* Add Item Button */
@@ -223,7 +223,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -296,7 +296,7 @@
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   font-size: 0.875rem;
-  background: white;
+  background: var(--card-bg, #ffffff);
   transition: all 0.2s;
 }
 
@@ -321,7 +321,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
   max-height: 280px;
@@ -435,7 +435,7 @@
   align-items: center;
   justify-content: center;
   padding: 2px 6px;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid var(--neutral-300);
   border-radius: 4px;
   font-size: 0.7rem;
@@ -458,7 +458,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid var(--neutral-300);
   border-radius: var(--radius-md);
   color: var(--primary-500);
@@ -482,7 +482,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: var(--neutral-900);
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid var(--neutral-300);
   border-radius: var(--radius-md);
   padding: var(--space-sm);

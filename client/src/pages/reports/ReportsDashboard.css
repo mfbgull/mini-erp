@@ -111,11 +111,11 @@
 }
 
 .category-icon.bg-blue-500 {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, var(--info, #3b82f6) 0%, var(--info, #2563eb) 100%);
 }
 
 .category-icon.bg-green-500 {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, #22c55e 0%, var(--success, #16a34a) 100%);
 }
 
 .category-icon.bg-purple-500 {
@@ -131,7 +131,7 @@
 }
 
 .category-icon.bg-red-500 {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(135deg, var(--error, #ef4444) 0%, var(--error, #dc2626) 100%);
 }
 
 .category-title {
@@ -174,7 +174,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3b82f6;
+  color: var(--info, #3b82f6);
   flex-shrink: 0;
   margin-top: var(--space-xs);
 }

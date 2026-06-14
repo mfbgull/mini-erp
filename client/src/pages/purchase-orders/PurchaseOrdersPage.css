@@ -158,12 +158,12 @@ VQ|
 }
 
 .status-submitted {
-  background: #3b82f6;
+  background: var(--info, #3b82f6);
   color: white;
 }
 
 .status-partial {
-  background: #f59e0b;
+  background: var(--warning, #f59e0b);
   color: white;
 }
 
@@ -173,7 +173,7 @@ VQ|
 }
 
 .status-cancelled {
-  background: #ef4444;
+  background: var(--error, #ef4444);
   color: white;
 }
 
@@ -225,7 +225,7 @@ VQ|
 .po-form .form-section {
   margin: 0;
   padding: 0;
-  border-bottom: 1px solid #DEE2E6;
+  border-bottom: 1px solid var(--border-color, #DEE2E6);
 }
 
 .po-form .form-section:last-child {
@@ -236,7 +236,7 @@ VQ|
 .po-form .form-section-header {
   background: var(--neutral-50);
   padding: var(--space-md) var(--space-lg);
-  border-bottom: 1px solid #DEE2E6;
+  border-bottom: 1px solid var(--border-color, #DEE2E6);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -290,7 +290,7 @@ VQ|
   background: var(--neutral-50);
   border-radius: var(--radius-sm);
   padding: var(--space-md);
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
 }
 
 .po-form .po-detail-card label {
@@ -337,7 +337,7 @@ VQ|
 .po-form .items-table th,
 .po-form .items-table td {
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
   text-align: left;
   vertical-align: top;
 }
@@ -363,7 +363,7 @@ VQ|
 .po-form .items-table td .form-input {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
   border-radius: var(--radius-sm);
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -423,7 +423,7 @@ VQ|
 .po-form .totals-section {
   background: var(--card-bg);
   padding: var(--space-lg);
-  border-top: 1px solid #DEE2E6;
+  border-top: 1px solid var(--border-color, #DEE2E6);
 }
 
 .po-form .totals {
@@ -441,7 +441,7 @@ VQ|
 }
 
 .po-form .totals-row.subtotal {
-  border-bottom: 1px solid #DEE2E6;
+  border-bottom: 1px solid var(--border-color, #DEE2E6);
 }
 
 .po-form .totals-row.total {
@@ -473,7 +473,7 @@ VQ|
   gap: var(--space-md);
   padding: var(--space-lg);
   background: var(--neutral-50);
-  border-top: 1px solid #DEE2E6;
+  border-top: 1px solid var(--border-color, #DEE2E6);
 }
 
 /* PO Number Display */
@@ -489,7 +489,7 @@ VQ|
 /* Searchable Select in Table */
 .po-form .items-table .searchable-select-trigger {
   padding: 10px 12px;
-  border: 1px solid #DEE2E6;
+  border: 1px solid var(--border-color, #DEE2E6);
   border-radius: var(--radius-sm);
   background: var(--card-bg);
   cursor: pointer;
@@ -773,7 +773,7 @@ VQ|
 }
 
 .actions-menu-dropdown .action-item.danger:hover:not(:disabled) {
-  background: #fef2f2;
+  background: var(--error-bg, #fef2f2);
 }
 
 .actions-menu-dropdown .action-divider {
@@ -1180,7 +1180,7 @@ VQ|
 }
 
 .purchase-orders-page .action-btn.edit-btn:hover {
-  background: #ecfdf5;
+  background: var(--success-bg, #ecfdf5);
 }
 
 .purchase-orders-page .action-btn.delete-btn {
@@ -1188,7 +1188,7 @@ VQ|
 }
 
 .purchase-orders-page .action-btn.delete-btn:hover {
-  background: #fef2f2;
+  background: var(--error-bg, #fef2f2);
 }
 
 /* Status badges */
@@ -1207,12 +1207,12 @@ VQ|
 }
 
 .purchase-orders-page .status-submitted {
-  background: #3b82f6;
+  background: var(--info, #3b82f6);
   color: white;
 }
 
 .purchase-orders-page .status-partially-received {
-  background: #f59e0b;
+  background: var(--warning, #f59e0b);
   color: white;
 }
 

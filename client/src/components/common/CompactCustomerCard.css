@@ -148,7 +148,7 @@
 }
 
 .stock-value.status-pending {
-  color: #f59e0b;
+  color: var(--warning, #f59e0b);
 }
 
 .stock-value.status-partial {
@@ -156,7 +156,7 @@
 }
 
 .stock-value.status-overdue {
-  color: #ef4444;
+  color: var(--error, #ef4444);
 }
 
 .stock-balance {
@@ -205,7 +205,7 @@
 }
 
 .customer-action-btn.primary:hover {
-  background: #ecfdf5;
+  background: var(--success-bg, #ecfdf5);
   color: #059669;
 }
 

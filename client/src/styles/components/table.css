@@ -13,7 +13,7 @@
 
 .data-table thead {
   background: var(--neutral-50);
-  border-bottom: 2px solid #DEE2E6;
+  border-bottom: 2px solid var(--border-color, #DEE2E6);
 }
 
 .data-table th {
@@ -39,7 +39,7 @@
 }
 
 .data-table tbody tr {
-  border-bottom: 1px solid #DEE2E6;
+  border-bottom: 1px solid var(--border-color, #DEE2E6);
   transition: background-color 0.15s;
 }
 

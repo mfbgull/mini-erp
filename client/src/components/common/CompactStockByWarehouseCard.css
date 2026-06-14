@@ -51,7 +51,7 @@
 
 /* Compact Card */
 .compact-mobile-card {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: var(--space-sm) var(--space-md);
@@ -136,7 +136,7 @@
   justify-content: center;
   padding: var(--space-xl);
   text-align: center;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
 }

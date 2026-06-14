@@ -104,13 +104,13 @@
 }
 
 .customer-status-banner.active {
-  background: #ecfdf5;
+  background: var(--success-bg, #ecfdf5);
   color: #059669;
   border: 1px solid #a7f3d0;
 }
 
 .customer-status-banner.inactive {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #d97706;
   border: 1px solid #fcd34d;
 }

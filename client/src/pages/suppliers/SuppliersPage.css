@@ -614,7 +614,7 @@
 }
 
 .suppliers-page .action-btn.edit-btn:hover {
-  background: #ecfdf5;
+  background: var(--success-bg, #ecfdf5);
 }
 
 .suppliers-page .action-btn.delete-btn {
@@ -622,7 +622,7 @@
 }
 
 .suppliers-page .action-btn.delete-btn:hover {
-  background: #fef2f2;
+  background: var(--error-bg, #fef2f2);
 }
 
 /* Supplier status badge */

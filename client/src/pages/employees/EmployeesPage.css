@@ -248,7 +248,7 @@
 }
 
 .action-btn.edit-btn:hover {
-  background: #ecfdf5;
+  background: var(--success-bg, #ecfdf5);
 }
 
 .action-btn.delete-btn {
@@ -256,7 +256,7 @@
 }
 
 .action-btn.delete-btn:hover {
-  background: #fef2f2;
+  background: var(--error-bg, #fef2f2);
 }
 
 /* Employee Form */
@@ -414,7 +414,7 @@
 }
 
 .dropzone-remove-btn:hover {
-  background: #fef2f2;
+  background: var(--error-bg, #fef2f2);
   border-color: var(--error);
 }
 

@@ -127,7 +127,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
@@ -161,7 +161,7 @@
 }
 
 .dropdown-item.delete:hover {
-  background: #fee2e2;
+  background: var(--error-bg, #fee2e2);
 }
 
 .dropdown-icon {

@@ -151,28 +151,28 @@
 }
 
 .status-paid {
-  background: #dcfce7;
+  background: var(--success-bg, #dcfce7);
   color: #15803d;
 }
 
 .status-partial,
 .status-partially-paid {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #b45309;
 }
 
 .status-overdue {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }
 
 .status-cancelled {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--neutral-100, #f3f4f6);
+  color: var(--text-secondary, #6b7280);
 }
 
 .status-pending {
-  background: #e0f2fe;
+  background: var(--info-bg, #e0f2fe);
   color: #0369a1;
 }
 
@@ -351,7 +351,7 @@
 
 /* Compact Invoice Card with Menu */
 .compact-invoice-card {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 12px;
@@ -397,7 +397,7 @@
 
 .invoice-code {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin: 0;
 }
 
@@ -408,7 +408,7 @@
 
 .amount-label {
   font-size: 11px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin: 0 0 2px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -422,12 +422,12 @@
 }
 
 .amount-value.amount-paid {
-  color: #28a745;
+  color: var(--success, #28a745);
 }
 
 .amount-balance {
   font-size: 11px;
-  color: #dc3545;
+  color: var(--error, #dc3545);
   margin: 4px 0 0 0;
 }
 
@@ -443,8 +443,8 @@
   height: 32px;
   min-width: 32px;
   min-height: 32px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: var(--neutral-50, #f8f9fa);
+  border: 1px solid var(--neutral-200, #e9ecef);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -455,7 +455,7 @@
 }
 
 .menu-trigger:hover {
-  background: #e9ecef;
+  background: var(--neutral-200, #e9ecef);
 }
 
 .menu-trigger:active {
@@ -466,7 +466,7 @@
 .menu-icon {
   width: 16px;
   height: 16px;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   pointer-events: none;
 }
 
@@ -484,7 +484,7 @@
   position: absolute;
   right: 0;
   top: calc(100% + 4px);
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 128px;
@@ -508,10 +508,10 @@
   width: 100%;
   padding: 10px 12px;
   border: none;
-  background: white;
+  background: var(--card-bg, #ffffff);
   text-align: left;
   font-size: 14px;
-  color: #212529;
+  color: var(--text-primary, #212529);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -520,11 +520,11 @@
 }
 
 .dropdown-item:hover {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
 }
 
 .dropdown-item:active {
-  background: #e9ecef;
+  background: var(--neutral-200, #e9ecef);
 }
 
 .dropdown-icon {
@@ -554,7 +554,7 @@
 }
 
 .details-modal {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 16px 16px 0 0;
   max-height: 85vh;
   width: 100%;
@@ -572,7 +572,7 @@
 
 .details-header {
   padding: 16px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--neutral-200, #e9ecef);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -589,7 +589,7 @@
 
 .details-subtitle {
   font-size: 13px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin: 0;
 }
 
@@ -608,13 +608,13 @@
 }
 
 .close-button:hover {
-  background: #e9ecef;
+  background: var(--neutral-200, #e9ecef);
 }
 
 .close-icon {
   width: 18px;
   height: 18px;
-  color: #495057;
+  color: var(--neutral-600, #495057);
 }
 
 .details-content {
@@ -634,7 +634,7 @@
 .section-title {
   font-weight: 600;
   font-size: 14px;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   margin: 0 0 12px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -646,7 +646,7 @@
 }
 
 .detail-item {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   padding: 10px 12px;
   border-radius: 8px;
 }
@@ -654,7 +654,7 @@
 .detail-label {
   display: block;
   font-size: 11px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin-bottom: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -664,11 +664,11 @@
   display: block;
   font-weight: 600;
   font-size: 15px;
-  color: #212529;
+  color: var(--text-primary, #212529);
 }
 
 .detail-value.balance-due {
-  color: #dc3545;
+  color: var(--error, #dc3545);
 }
 
 .status-banner {
@@ -683,33 +683,33 @@
 }
 
 .status-banner.status-paid {
-  background: #ecfdf5;
+  background: var(--success-bg, #ecfdf5);
   color: #059669;
   border: 1px solid #a7f3d0;
 }
 
 .status-banner.status-partial {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #d97706;
   border: 1px solid #fcd34d;
 }
 
 .status-banner.status-overdue {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
   border: 1px solid #fecaca;
 }
 
 .status-banner.status-pending {
-  background: #e0f2fe;
+  background: var(--info-bg, #e0f2fe);
   color: #0369a1;
   border: 1px solid #bae6fd;
 }
 
 .status-banner.status-cancelled {
-  background: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
+  background: var(--neutral-100, #f3f4f6);
+  color: var(--text-secondary, #6b7280);
+  border: 1px solid var(--border-color, #e5e7eb);
 }
 
 .status-banner .status-icon {
@@ -718,7 +718,7 @@
 
 .details-actions {
   padding: 16px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--neutral-200, #e9ecef);
   display: flex;
   gap: 12px;
   flex-shrink: 0;

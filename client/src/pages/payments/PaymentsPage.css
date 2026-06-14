@@ -83,7 +83,7 @@
   width: 100%;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: #fff;
+  background: var(--card-bg, #fff);
 }
 
 .ag-grid-skeleton {

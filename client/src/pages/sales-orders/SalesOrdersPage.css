@@ -70,17 +70,17 @@
 }
 
 .sales-orders-page .status-confirmed {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--info-bg, #e3f2fd);
+  color: var(--info, #1976d2);
 }
 
 .sales-orders-page .status-invoiced {
-  background: #f3e5f5;
+  background: var(--info-bg, #f3e5f5);
   color: #7b1fa2;
 }
 
 .sales-orders-page .status-completed {
-  background: #e8f5e9;
+  background: var(--success-bg, #e8f5e9);
   color: #388e3c;
 }
 

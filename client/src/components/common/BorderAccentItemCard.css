@@ -1,5 +1,5 @@
 .item-card {
-  background-color: #ffffff;
+  background-color: var(--card-bg, #ffffff);
   padding: 16px;
   border-radius: 12px;
   border-left: 4px solid #667eea;
@@ -26,7 +26,7 @@
 
 .card-item-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #333);
   font-size: 16px;
   margin: 0;
   padding-right: 12px;
@@ -43,18 +43,18 @@
   background-color: #f8f9fa;
   border: none;
   cursor: pointer;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   transition: background-color 0.2s;
   flex-shrink: 0;
 }
 
 .menu-trigger-btn:hover {
-  background-color: #e9ecef;
-  color: #495057;
+  background-color: var(--neutral-200, #e9ecef);
+  color: var(--neutral-600, #495057);
 }
 
 .stock-row-divider {
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--neutral-200, #e9ecef);
   padding-top: 12px;
   display: flex;
   justify-content: space-between;
@@ -63,23 +63,23 @@
 
 .stock-label-text {
   font-size: 14px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin: 0;
 }
 
 .stock-value-text {
   font-weight: 600;
   font-size: 14px;
-  color: #212529;
+  color: var(--text-primary, #212529);
   margin: 0;
 }
 
 .stock-value-text.low-stock {
-  color: #ef4444;
+  color: var(--error, #ef4444);
 }
 
 .stock-value-text.out-of-stock {
-  color: #dc3545;
+  color: var(--error, #dc3545);
 }
 
 .item-card .menu-container {
@@ -90,7 +90,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid #eee;
@@ -119,21 +119,21 @@
   background: none;
   text-align: left;
   font-size: 14px;
-  color: #4b5563;
+  color: var(--text-secondary, #4b5563);
   cursor: pointer;
   border-radius: 4px;
 }
 
 .item-card .dropdown-item:hover {
-  background-color: #f3f4f6;
+  background-color: var(--neutral-100, #f3f4f6);
 }
 
 .item-card .dropdown-item.delete {
-  color: #ef4444;
+  color: var(--error, #ef4444);
 }
 
 .item-card .dropdown-item.delete:hover {
-  background-color: #fee2e2;
+  background-color: var(--error-bg, #fee2e2);
 }
 
 .item-card .dropdown-icon {
@@ -157,7 +157,7 @@
 
 /* Modal Container */
 .hero-stock-modal {
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-radius: 24px 24px 0 0;
   width: 100%;
   max-width: 420px;
@@ -180,7 +180,7 @@
 /* Header */
 .modal-header {
   padding: 16px 20px 20px 20px;
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-bottom: 2px solid #f0f0f0;
 }
 
@@ -222,7 +222,7 @@
 .stock-value {
   font-size: 32px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-on-primary, #ffffff);
 }
 
 .stock-unit {
@@ -235,7 +235,7 @@
 /* Content Area */
 .modal-content {
   padding: 20px;
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   flex: 1;
   overflow-y: auto;
 }
@@ -246,7 +246,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
 }
 
 .info-row:last-of-type {
@@ -268,7 +268,7 @@
 
 /* Description Box */
 .description-box {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   padding: 16px;
   border-radius: 12px;
   margin: 20px 0;
@@ -286,7 +286,7 @@
 .description-text {
   font-size: 15px;
   font-weight: 400;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   line-height: 1.6;
   margin: 0;
 }
@@ -308,22 +308,22 @@
 }
 
 .raw-badge {
-  background: #ecfdf5;
+  background: var(--success-bg, #ecfdf5);
   color: #059669;
 }
 
 .purchased-badge {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--info-bg, #eff6ff);
+  color: var(--info, #2563eb);
 }
 
 .finished-badge {
-  background: #f3e8ff;
+  background: var(--info-bg, #f3e8ff);
   color: #7c3aed;
 }
 
 .manufactured-badge {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #d97706;
 }
 
@@ -332,7 +332,7 @@
   padding: 16px 20px 20px 20px;
   display: flex;
   gap: 12px;
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-top: 2px solid #f0f0f0;
 }
 
@@ -348,10 +348,10 @@
 
 .edit-btn {
   background: #667eea;
-  color: #ffffff;
+  color: var(--text-on-primary, #ffffff);
 }
 
 .delete-btn {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }

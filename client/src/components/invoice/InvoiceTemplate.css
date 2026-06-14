@@ -4,9 +4,9 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 40px;
-  background: white;
+  background: var(--card-bg, #ffffff);
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #1e293b;
+  color: var(--text-primary, #1e293b);
   line-height: 1.5;
 }
 
@@ -16,7 +16,7 @@
   justify-content: space-between;
   align-items: flex-start;
   padding-bottom: 30px;
-  border-bottom: 3px solid #3b82f6;
+  border-bottom: 3px solid var(--info, #3b82f6);
   margin-bottom: 30px;
 }
 
@@ -29,7 +29,7 @@
 .invoice-template-logo .logo-placeholder {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, var(--info, #3b82f6) 0%, #1d4ed8 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -54,7 +54,7 @@
 
 .invoice-template-company .company-detail {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   margin: 0;
 }
 
@@ -65,14 +65,14 @@
 .invoice-template-title {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #3b82f6;
+  color: var(--info, #3b82f6);
   margin: 0;
   letter-spacing: -1px;
 }
 
 .invoice-template-number {
   font-size: 1rem;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   margin-top: 4px;
   font-family: 'Monaco', 'Consolas', monospace;
 }
@@ -89,33 +89,33 @@
 }
 
 .invoice-template-status.status-paid {
-  background: #dcfce7;
+  background: var(--success-bg, #dcfce7);
   color: #166534;
 }
 
 .invoice-template-status.status-partial {
-  background: #dbeafe;
+  background: var(--info-bg, #dbeafe);
   color: #1d4ed8;
 }
 
 .invoice-template-status.status-unpaid {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #92400e;
 }
 
 .invoice-template-status.status-overdue {
-  background: #fee2e2;
+  background: var(--error-bg, #fee2e2);
   color: #991b1b;
 }
 
 .invoice-template-status.status-draft {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--neutral-100, #f1f5f9);
+  color: var(--text-secondary, #475569);
 }
 
 .invoice-template-status.status-cancelled {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--neutral-100, #f1f5f9);
+  color: var(--text-secondary, #64748b);
 }
 
 /* Info Section */
@@ -129,14 +129,14 @@
 .invoice-template-bill-to,
 .invoice-template-details {
   padding: 20px;
-  background: #f8fafc;
+  background: var(--neutral-50, #f8fafc);
   border-radius: 8px;
 }
 
 .info-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 12px 0;
@@ -151,7 +151,7 @@
 
 .invoice-template-bill-to .customer-detail {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   margin: 0;
   line-height: 1.6;
 }
@@ -160,7 +160,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
 .invoice-template-details .detail-row:last-child {
@@ -169,7 +169,7 @@
 
 .detail-label {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
 }
 
 .detail-value {
@@ -211,11 +211,11 @@
 }
 
 .invoice-template-table tbody tr {
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
 .invoice-template-table tbody tr:hover {
-  background: #f8fafc;
+  background: var(--neutral-50, #f8fafc);
 }
 
 .invoice-template-table td {
@@ -241,7 +241,7 @@
 
 .invoice-template-table .item-code {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--text-tertiary, #94a3b8);
   margin-top: 2px;
   font-family: 'Monaco', 'Consolas', monospace;
 }
@@ -266,19 +266,19 @@
 .summary-notes h4 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-secondary, #475569);
   margin: 0 0 8px 0;
 }
 
 .summary-notes p {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   margin: 0 0 20px 0;
   line-height: 1.6;
 }
 
 .summary-totals {
-  background: #f8fafc;
+  background: var(--neutral-50, #f8fafc);
   border-radius: 8px;
   padding: 20px;
 }
@@ -288,11 +288,11 @@
   justify-content: space-between;
   padding: 10px 0;
   font-size: 0.9375rem;
-  color: #475569;
+  color: var(--text-secondary, #475569);
 }
 
 .summary-row.discount {
-  color: #16a34a;
+  color: var(--success, #16a34a);
 }
 
 .summary-row.total {
@@ -305,15 +305,15 @@
 }
 
 .summary-row.paid {
-  color: #16a34a;
+  color: var(--success, #16a34a);
 }
 
 .summary-row.returned {
-  color: #dc2626;
+  color: var(--error, #dc2626);
 }
 
 .summary-row.balance {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   margin: 10px -20px -20px -20px;
   padding: 16px 20px;
   border-radius: 0 0 8px 8px;
@@ -324,7 +324,7 @@
 
 /* Footer */
 .invoice-template-footer {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-color, #e2e8f0);
   padding-top: 30px;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -339,13 +339,13 @@
 .footer-message p {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #3b82f6;
+  color: var(--info, #3b82f6);
   margin: 0;
 }
 
 .footer-payment-info {
   grid-column: 1 / -1;
-  background: #f8fafc;
+  background: var(--neutral-50, #f8fafc);
   padding: 20px;
   border-radius: 8px;
   text-align: center;
@@ -354,13 +354,13 @@
 .footer-payment-info h4 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-secondary, #475569);
   margin: 0 0 8px 0;
 }
 
 .footer-payment-info p {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   margin: 0;
   line-height: 1.6;
 }
@@ -374,7 +374,7 @@
   }
 
   .invoice-template-header {
-    border-bottom-color: #000;
+    border-bottom-color: var(--text-primary, #000);
   }
 
   .invoice-template-status {
@@ -452,7 +452,7 @@
   .invoice-template-bill-to,
   .invoice-template-details {
     padding: 16px;
-    background: #f8fafc;
+    background: var(--neutral-50, #f8fafc);
     border-radius: 8px;
   }
 
@@ -519,7 +519,7 @@
   position: fixed;
   top: 10px;
   right: 10px;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px solid #ccc;
   padding: 10px;
   z-index: 9999;

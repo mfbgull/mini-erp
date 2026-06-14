@@ -74,18 +74,18 @@
 }
 
 .status-partially-paid {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #d97706;
 }
 
 .status-paid {
-  background: #d1fae5;
+  background: var(--success-bg, #d1fae5);
   color: #059669;
 }
 
 .status-overdue {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }
 
 .status-cancelled {

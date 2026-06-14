@@ -16,7 +16,7 @@
 }
 
 .purchase-return-container {
-  background: white;
+  background: var(--card-bg, #ffffff);
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
@@ -52,7 +52,7 @@
   width: 40px;
   height: 40px;
   padding: 8px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, var(--warning, #f59e0b) 0%, #d97706 100%);
   border-radius: 10px;
   color: white;
 }
@@ -66,7 +66,7 @@
 
 .purchase-return-subtitle {
   font-size: 13px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin: 4px 0 0 0;
 }
 
@@ -76,7 +76,7 @@
   border-radius: 10px;
   background: #f1f3f5;
   border: none;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,7 +86,7 @@
 }
 
 .purchase-return-close:hover {
-  background: #e9ecef;
+  background: var(--neutral-200, #e9ecef);
 }
 
 /* Content */
@@ -105,7 +105,7 @@
 }
 
 .purchase-return-info-item {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   border-radius: 10px;
   padding: 12px;
 }
@@ -113,7 +113,7 @@
 .purchase-return-info-label {
   display: block;
   font-size: 11px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin-bottom: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -128,7 +128,7 @@
 
 /* Item List */
 .purchase-return-item-list {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--neutral-200, #e9ecef);
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 16px;
@@ -144,17 +144,17 @@
 }
 
 .purchase-return-item-row.header-row {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   font-weight: 600;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--neutral-200, #e9ecef);
 }
 
 .purchase-return-item-row:not(.header-row) {
-  background: white;
+  background: var(--card-bg, #ffffff);
 }
 
 .purchase-return-item-field {
@@ -169,7 +169,7 @@
 
 .item-name-col .item-name-label {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
 }
 
 .item-qty-col,
@@ -185,7 +185,7 @@
 .purchase-return-qty-input {
   width: 70px;
   padding: 6px 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--neutral-200, #e9ecef);
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
@@ -195,13 +195,13 @@
 
 .purchase-return-qty-input:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--info, #3b82f6);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
 }
 
 .purchase-return-amount {
   font-weight: 600;
-  color: #dc2626;
+  color: var(--error, #dc2626);
 }
 
 /* Return Reason */
@@ -213,14 +213,14 @@
   display: block;
   font-size: 13px;
   font-weight: 500;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   margin-bottom: 8px;
 }
 
 .purchase-return-reason-input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--neutral-200, #e9ecef);
   border-radius: 10px;
   font-size: 14px;
   resize: none;
@@ -230,17 +230,17 @@
 
 .purchase-return-reason-input:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--info, #3b82f6);
 }
 
 /* Error */
 .purchase-return-error {
-  background: #fef2f2;
+  background: var(--error-bg, #fef2f2);
   border: 1px solid #fecaca;
   border-radius: 10px;
   padding: 12px;
   margin-bottom: 16px;
-  color: #dc2626;
+  color: var(--error, #dc2626);
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -249,7 +249,7 @@
 
 /* Summary */
 .purchase-return-summary {
-  background: #fffbeb;
+  background: var(--warning-bg, #fffbeb);
   border: 1px solid #fde68a;
   border-radius: 12px;
   padding: 16px;
@@ -277,7 +277,7 @@
   display: flex;
   gap: 12px;
   padding: 16px 20px 24px 20px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--neutral-200, #e9ecef);
   flex-shrink: 0;
 }
 
@@ -317,13 +317,13 @@
   .item-qty-col::before {
     content: "Qty: ";
     font-weight: 400;
-    color: #6c757d;
+    color: var(--text-secondary, #6c757d);
   }
 
   .item-rate-col::before {
     content: "Rate: ";
     font-weight: 400;
-    color: #6c757d;
+    color: var(--text-secondary, #6c757d);
   }
 
   .item-amount-col {

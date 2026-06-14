@@ -13,7 +13,7 @@
 }
 
 .invoice-wizard-modal {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 16px;
   width: 100%;
   max-width: 480px;

@@ -1,5 +1,5 @@
 .warehouse-card {
-  background-color: #ffffff;
+  background-color: var(--card-bg, #ffffff);
   padding: 16px;
   border-radius: 12px;
   border-left: 4px solid #10b981;
@@ -26,7 +26,7 @@
 
 .card-warehouse-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #333);
   font-size: 16px;
   margin: 0;
   padding-right: 12px;
@@ -43,18 +43,18 @@
   background-color: #f8f9fa;
   border: none;
   cursor: pointer;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   transition: background-color 0.2s;
   flex-shrink: 0;
 }
 
 .menu-trigger-btn:hover {
   background-color: #e9ecef;
-  color: #495057;
+  color: var(--neutral-600, #495057);
 }
 
 .warehouse-row-divider {
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--neutral-200, #e9ecef);
   padding-top: 12px;
   display: flex;
   justify-content: space-between;
@@ -63,14 +63,14 @@
 
 .warehouse-code-text {
   font-size: 14px;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   margin: 0;
 }
 
 .warehouse-location-text {
   font-weight: 600;
   font-size: 14px;
-  color: #212529;
+  color: var(--text-primary, #212529);
   margin: 0;
 }
 
@@ -82,7 +82,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid #eee;
@@ -111,21 +111,21 @@
   background: none;
   text-align: left;
   font-size: 14px;
-  color: #4b5563;
+  color: var(--text-secondary, #4b5563);
   cursor: pointer;
   border-radius: 4px;
 }
 
 .warehouse-card .dropdown-item:hover {
-  background-color: #f3f4f6;
+  background-color: var(--neutral-100, #f3f4f6);
 }
 
 .warehouse-card .dropdown-item.delete {
-  color: #ef4444;
+  color: var(--error, #ef4444);
 }
 
 .warehouse-card .dropdown-item.delete:hover {
-  background-color: #fee2e2;
+  background-color: var(--error-bg, #fee2e2);
 }
 
 .warehouse-card .dropdown-icon {
@@ -149,7 +149,7 @@
 
 /* Modal Container */
 .hero-stock-modal {
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-radius: 24px 24px 0 0;
   width: 100%;
   max-width: 420px;
@@ -172,7 +172,7 @@
 /* Header */
 .modal-header {
   padding: 16px 20px 20px 20px;
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-bottom: 2px solid #f0f0f0;
 }
 
@@ -218,7 +218,7 @@
 .stock-value {
   font-size: 32px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-on-primary, #ffffff);
 }
 
 .stock-unit {
@@ -231,7 +231,7 @@
 /* Content Area */
 .modal-content {
   padding: 20px;
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   flex: 1;
   overflow-y: auto;
 }
@@ -242,7 +242,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
 }
 
 .info-row:last-of-type {
@@ -264,7 +264,7 @@
 
 /* Description Box */
 .description-box {
-  background: #f8f9fa;
+  background: var(--neutral-50, #f8f9fa);
   padding: 16px;
   border-radius: 12px;
   margin: 20px 0;
@@ -282,7 +282,7 @@
 .description-text {
   font-size: 15px;
   font-weight: 400;
-  color: #495057;
+  color: var(--neutral-600, #495057);
   line-height: 1.6;
   margin: 0;
 }
@@ -292,7 +292,7 @@
   padding: 16px 20px 20px 20px;
   display: flex;
   gap: 12px;
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-top: 2px solid #f0f0f0;
 }
 
@@ -308,17 +308,17 @@
 
 .edit-btn {
   background: #667eea;
-  color: #ffffff;
+  color: var(--text-on-primary, #ffffff);
 }
 
 .delete-btn {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }
 
 .view-items-btn {
   background: #10b981;
-  color: #ffffff;
+  color: var(--text-on-primary, #ffffff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -331,7 +331,7 @@
 
 /* Warehouse Items Panel (when expanded) */
 .warehouse-items-panel {
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-radius: 24px 24px 0 0;
   width: 100%;
   max-width: 420px;
@@ -358,7 +358,7 @@
 
 .warehouse-items-header {
   padding: 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
 }
 
 .warehouse-items-back-btn {
@@ -385,7 +385,7 @@
   align-items: center;
   gap: 8px;
   font-size: 16px;
-  color: #666;
+  color: var(--text-secondary, #666);
 }
 
 .warehouse-items-title strong {
@@ -397,8 +397,8 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   padding: 16px 20px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #f0f0f0;
+  background: var(--neutral-50, #f8f9fa);
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
 }
 
 .warehouse-item-stat {
@@ -417,7 +417,7 @@
 
 .warehouse-item-stat .stat-label {
   font-size: 11px;
-  color: #999;
+  color: var(--text-tertiary, #999);
   text-transform: uppercase;
 }
 
@@ -432,8 +432,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--neutral-200, #e9ecef);
   border-radius: 10px;
   margin-bottom: 10px;
 }
@@ -452,7 +452,7 @@
 
 .warehouse-item-code {
   font-size: 12px;
-  color: #999;
+  color: var(--text-tertiary, #999);
 }
 
 .warehouse-item-stock {
@@ -469,7 +469,7 @@
 
 .warehouse-item-stock .stock-unit {
   font-size: 12px;
-  color: #999;
+  color: var(--text-tertiary, #999);
 }
 
 .warehouse-items-loading,
@@ -479,7 +479,7 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  color: #999;
+  color: var(--text-tertiary, #999);
 }
 
 .warehouse-items-empty svg {
@@ -505,7 +505,7 @@
 
 .warehouse-items-fab {
   padding: 16px 20px 24px;
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-top: 1px solid #f0f0f0;
 }
 
@@ -513,7 +513,7 @@
   width: 100%;
   padding: 14px;
   background: #10b981;
-  color: #ffffff;
+  color: var(--text-on-primary, #ffffff);
   border: none;
   border-radius: 12px;
   font-size: 15px;

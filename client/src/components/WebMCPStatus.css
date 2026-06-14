@@ -10,25 +10,25 @@
 }
 
 .webmcp-status-mock {
-  background: #dbeafe;
-  border: 1px solid #3b82f6;
+  background: var(--info-bg, #dbeafe);
+  border: 1px solid var(--info, #3b82f6);
 }
 
 .webmcp-status-not-supported {
-  background: #f3f4f6;
+  background: var(--neutral-100, #f3f4f6);
   padding: 8px 12px;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
+  color: var(--text-secondary, #6b7280);
+  border: 1px solid var(--border-color, #e5e7eb);
 }
 
 .webmcp-status-active {
-  background: #d1fae5;
+  background: var(--success-bg, #d1fae5);
   border: 1px solid #10b981;
 }
 
 .webmcp-status-initializing {
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
+  background: var(--warning-bg, #fef3c7);
+  border: 1px solid var(--warning, #f59e0b);
 }
 
 .webmcp-status-title-mock {
@@ -71,12 +71,12 @@
 .webmcp-status-note {
   margin-top: 8px;
   font-size: 10px;
-  color: #6b7280;
+  color: var(--text-secondary, #6b7280);
 }
 
 .webmcp-status-tools {
   margin-top: 8px;
-  color: #374151;
+  color: var(--text-primary, #374151);
 }
 
 .webmcp-status-tools-title {

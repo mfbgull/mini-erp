@@ -43,7 +43,7 @@
   justify-content: center;
   padding: var(--space-xl);
   text-align: center;
-  background: white;
+  background: var(--card-bg, #ffffff);
   border: 1px dashed var(--neutral-200, #e5e7eb);
   border-radius: var(--radius-md, 8px);
   color: var(--neutral-500, #6c757d);
@@ -225,27 +225,27 @@
 
 /* Type colour variants */
 .movement-type-badge.type-purchase {
-  background: #dcfce7;
+  background: var(--success-bg, #dcfce7);
   color: #15803d;
 }
 
 .movement-type-badge.type-sale {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--error-bg, #fee2e2);
+  color: var(--error, #dc2626);
 }
 
 .movement-type-badge.type-production {
-  background: #ede9fe;
+  background: var(--info-bg, #ede9fe);
   color: #7c3aed;
 }
 
 .movement-type-badge.type-transfer {
-  background: #dbeafe;
-  color: #2563eb;
+  background: var(--info-bg, #dbeafe);
+  color: var(--info, #2563eb);
 }
 
 .movement-type-badge.type-adjustment {
-  background: #fef3c7;
+  background: var(--warning-bg, #fef3c7);
   color: #b45309;
 }
 
