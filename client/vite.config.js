@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  // jspdf-autotable alias removed — package's exports.import field already
+  // maps to dist/jspdf.plugin.autotable.mjs. The alias caused Vite to try
+  // resolving ./dist/jspdf.plugin.autotable.mjs via the exports map,
+  // which doesn't expose that path — producing a 500 on the dev server.
   server: {
     host: true,        // listen on 0.0.0.0 (external access)
     port: 3010,

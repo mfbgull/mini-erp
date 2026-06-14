@@ -251,6 +251,14 @@
   background: var(--success-bg, #ecfdf5);
 }
 
+.action-btn.view-btn {
+  color: var(--primary, #6366f1);
+}
+
+.action-btn.view-btn:hover {
+  background: color-mix(in srgb, var(--primary, #6366f1), transparent 95%);
+}
+
 .action-btn.delete-btn {
   color: var(--error);
 }

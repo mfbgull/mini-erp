@@ -10,11 +10,13 @@ import Modal from '../../components/common/Modal';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import type { Employee, EmployeeDocument } from '../../types';
+import EmployeePreview from './EmployeePreview';
 import './EmployeesPage.css';
 
 export default function EmployeesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [previewEmployee, setPreviewEmployee] = useState<Employee | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('active');
   const [departmentFilter, setDepartmentFilter] = useState('');
@@ -177,6 +179,9 @@ export default function EmployeesPage() {
                 {employee.employment_type && <div className="detail-row"><span className="detail-label">Type:</span><span className="detail-value">{employee.employment_type}</span></div>}
               </div>
               <div className="employee-actions">
+                <button className="action-btn view-btn" onClick={() => setPreviewEmployee(employee)} title="View Details">
+                  <Eye size={16} />
+                </button>
                 <button className="action-btn edit-btn" onClick={() => handleEdit(employee)} title="Edit">
                   <Edit2 size={16} />
                 </button>
@@ -205,6 +210,18 @@ export default function EmployeesPage() {
           }}
         />
       </Modal>
+
+      {/* Employee Preview Dialog */}
+      {previewEmployee && (
+        <EmployeePreview
+          employee={previewEmployee}
+          onClose={() => setPreviewEmployee(null)}
+          onEdit={() => {
+            setPreviewEmployee(null);
+            handleEdit(previewEmployee);
+          }}
+        />
+      )}
     </div>
   );
 }
