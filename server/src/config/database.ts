@@ -1221,7 +1221,7 @@ function runSalaryPaymentsMigration(): void {
       logger.info('Running salary payments migration...');
 
       const salarySQL = fs.readFileSync(
-        path.join(__dirname, '../../migrations/add-salary-payments.sql'),
+        path.join(__dirname, '../migrations/add-salary-payments.sql'),
         'utf8'
       );
 
