@@ -5,6 +5,7 @@ import db from '../config/database';
 import logger from '../utils/logger';
 import { initializeSequenceFromMax, getNextSequenceNumber } from '../utils/sequence';
 import EmployeeModel from '../models/Employee';
+import { AccountingService } from '../services/accountingService';
 import fs from 'fs';
 import path from 'path';
 
@@ -190,6 +191,98 @@ function getNextEmployeeCode(req: Request, res: Response): void {
   }
 }
 
+function paySalary(req: Request, res: Response): void {
+  try {
+    const { id } = req.params;
+    const employeeId = parseInt(Array.isArray(id) ? id[0] : id, 10);
+    const authReq = req as AuthRequest;
+
+    const employee = EmployeeModel.getById(employeeId, db);
+    if (!employee) {
+      res.status(404).json({ success: false, error: 'Employee not found' });
+      return;
+    }
+
+    const { amount, payment_date, payment_method, reference_no, notes } = req.body;
+    if (!amount || amount <= 0) {
+      res.status(422).json({ success: false, error: 'Valid amount is required' });
+      return;
+    }
+    if (!payment_date) {
+      res.status(422).json({ success: false, error: 'Payment date is required' });
+      return;
+    }
+
+    const trx = db.transaction(() => {
+      const paymentId = EmployeeModel.addSalaryPayment({
+        employee_id: employeeId,
+        amount,
+        payment_date,
+        payment_method: payment_method || 'bank',
+        reference_no,
+        notes,
+        paid_by: authReq.user?.id,
+      }, db);
+
+      let journalEntryId: number | null = null;
+      try {
+        const result = AccountingService.postSalaryEntry(db, {
+          salaryPaymentId: paymentId,
+          employeeName: `${employee.first_name} ${employee.last_name}`,
+          employeeCode: employee.employee_code,
+          amount,
+          paymentDate: payment_date,
+          paymentMethod: payment_method,
+          userId: authReq.user?.id,
+        });
+        if (result) journalEntryId = result.journal_entry_id;
+      } catch (glError: any) {
+        throw new Error(`GL posting failed: ${glError.message}`);
+      }
+
+      if (journalEntryId) {
+        db.prepare(`UPDATE salary_payments SET journal_entry_id = ? WHERE id = ?`)
+          .run(journalEntryId, paymentId);
+      }
+
+      logCRUD(ActionType.EMPLOYEE_UPDATE, 'Employee', employeeId,
+        `Salary paid: ${employee.first_name} ${employee.last_name} (amount: ${amount})`, authReq.user?.id);
+      req.activityLogged = true;
+
+      return { paymentId, journalEntryId };
+    });
+
+    const result = trx();
+
+    res.status(201).json({
+      success: true,
+      data: { id: result.paymentId, journal_entry_id: result.journalEntryId },
+    });
+  } catch (error: any) {
+    logger.error('Error paying salary:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to process salary payment' });
+  }
+}
+
+function getSalaryHistory(req: Request, res: Response): void {
+  try {
+    const { id } = req.params;
+    const employeeId = parseInt(Array.isArray(id) ? id[0] : id, 10);
+
+    const employee = EmployeeModel.getById(employeeId, db);
+    if (!employee) {
+      res.status(404).json({ success: false, error: 'Employee not found' });
+      return;
+    }
+
+    const history = EmployeeModel.getSalaryHistory(employeeId, db);
+    res.json({ success: true, data: history });
+  } catch (error) {
+    logger.error('Error fetching salary history:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch salary history' });
+  }
+}
+
 function getEmployeeDocuments(req: Request, res: Response): void {
   try {
     const { id } = req.params;
@@ -285,6 +378,8 @@ export default {
   updateEmployee,
   deleteEmployee,
   getNextEmployeeCode,
+  paySalary,
+  getSalaryHistory,
   getEmployeeDocuments,
   addEmployeeDocument,
   removeEmployeeDocument

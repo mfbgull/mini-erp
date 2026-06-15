@@ -752,6 +752,49 @@ export class AccountingService {
   }
 
   // ------------------------------------------------------------------
+  // Salary payment posting
+  // ------------------------------------------------------------------
+
+  /**
+   * Post a salary payment. Dr Wages & Salaries (6100), Cr Cash/Bank.
+   */
+  static postSalaryEntry(
+    db: Database.Database,
+    args: {
+      salaryPaymentId: number;
+      employeeName: string;
+      employeeCode: string;
+      amount: number;
+      paymentDate: string;
+      paymentMethod?: string;
+      userId?: number;
+    }
+  ): PostedEntry | null {
+    if (!args.amount || args.amount <= 0) return null;
+
+    const wageAcct = AccountingService.getAccountByCode(db, '6100');
+    const cashCode = AccountingService._cashOrBankAccountCode(args.paymentMethod);
+    const cashAcct = AccountingService.getAccountByCode(db, cashCode);
+    if (!wageAcct || !cashAcct) {
+      throw new Error(
+        `Chart of accounts is missing: 6100 (Wages & Salaries) or ${cashCode}`
+      );
+    }
+
+    return AccountingService.postEntry(db, {
+      entry_date: args.paymentDate,
+      description: `Salary payment to ${args.employeeName} (${args.employeeCode}) — ${args.amount.toFixed(2)}`,
+      reference_type: 'SALARY_PAYMENT',
+      reference_id: args.salaryPaymentId,
+      created_by: args.userId,
+      lines: [
+        { account_id: wageAcct.id, debit: args.amount, description: `Salary for ${args.employeeCode}` },
+        { account_id: cashAcct.id, credit: args.amount, description: `Salary paid to ${args.employeeCode}` },
+      ],
+    });
+  }
+
+  // ------------------------------------------------------------------
   // Report helpers
   // ------------------------------------------------------------------
 

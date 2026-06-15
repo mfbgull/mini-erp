@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Edit2, Trash2, FileText, Upload, Download, Paperclip, Eye, X } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, FileText, Upload, Download, Paperclip, Eye, X, DollarSign } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
@@ -11,12 +11,14 @@ import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import type { Employee, EmployeeDocument } from '../../types';
 import EmployeePreview from './EmployeePreview';
+import SalaryPayModal from './SalaryPayModal';
 import './EmployeesPage.css';
 
 export default function EmployeesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [previewEmployee, setPreviewEmployee] = useState<Employee | null>(null);
+  const [payingEmployee, setPayingEmployee] = useState<Employee | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('active');
   const [departmentFilter, setDepartmentFilter] = useState('');
@@ -182,6 +184,9 @@ export default function EmployeesPage() {
                 <button className="action-btn view-btn" onClick={() => setPreviewEmployee(employee)} title="View Details">
                   <Eye size={16} />
                 </button>
+                <button className="action-btn pay-btn" onClick={() => setPayingEmployee(employee)} title="Pay Salary">
+                  <DollarSign size={16} />
+                </button>
                 <button className="action-btn edit-btn" onClick={() => handleEdit(employee)} title="Edit">
                   <Edit2 size={16} />
                 </button>
@@ -216,9 +221,24 @@ export default function EmployeesPage() {
         <EmployeePreview
           employee={previewEmployee}
           onClose={() => setPreviewEmployee(null)}
-          onEdit={() => {
+          onEdit={(emp) => {
             setPreviewEmployee(null);
-            handleEdit(previewEmployee);
+            handleEdit(emp);
+          }}
+          onPay={(emp) => {
+            setPreviewEmployee(null);
+            setPayingEmployee(emp);
+          }}
+        />
+      )}
+
+      {/* Pay Salary Modal */}
+      {payingEmployee && (
+        <SalaryPayModal
+          employee={payingEmployee}
+          onClose={() => setPayingEmployee(null)}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['employees'] });
           }}
         />
       )}

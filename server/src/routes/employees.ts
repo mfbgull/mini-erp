@@ -16,6 +16,10 @@ router.post('/', employeeController.createEmployee);
 router.put('/:id', employeeController.updateEmployee);
 router.delete('/:id', employeeController.deleteEmployee);
 
+// Salary payment routes
+router.post('/:id/salary/pay', employeeController.paySalary);
+router.get('/:id/salary/history', employeeController.getSalaryHistory);
+
 // Document sub-routes
 router.get('/:id/documents', employeeController.getEmployeeDocuments);
 router.post('/:id/documents', uploadEmployeeDoc.single('file'), employeeController.addEmployeeDocument);

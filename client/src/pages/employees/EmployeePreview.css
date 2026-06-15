@@ -228,6 +228,16 @@
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
+.preview-action-btn.success {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: none;
+  color: white;
+}
+
+.preview-action-btn.success:hover {
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+}
+
 .preview-action-btn.secondary {
   background: var(--surface-alt, #f9fafb);
   border: 1px solid var(--border-color, #e5e7eb);

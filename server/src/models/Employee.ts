@@ -307,6 +307,44 @@ class EmployeeModel {
   static removeDocument(id: number, db: Database.Database): Database.RunResult {
     return db.prepare('DELETE FROM employee_documents WHERE id = ?').run(id);
   }
+
+  // ------------------------------------------------------------------
+  // Salary payments
+  // ------------------------------------------------------------------
+
+  static getSalaryHistory(employeeId: number, db: Database.Database): any[] {
+    return db.prepare(
+      `SELECT * FROM salary_payments WHERE employee_id = ? ORDER BY payment_date DESC`
+    ).all(employeeId);
+  }
+
+  static addSalaryPayment(data: {
+    employee_id: number;
+    amount: number;
+    payment_date: string;
+    payment_method: string;
+    reference_no?: string;
+    notes?: string;
+    journal_entry_id?: number;
+    paid_by?: number;
+  }, db: Database.Database): number {
+    const result = db.prepare(`
+      INSERT INTO salary_payments (
+        employee_id, amount, payment_date, payment_method,
+        reference_no, notes, journal_entry_id, paid_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      data.employee_id,
+      data.amount,
+      data.payment_date,
+      data.payment_method || 'bank',
+      data.reference_no || null,
+      data.notes || null,
+      data.journal_entry_id || null,
+      data.paid_by || null
+    );
+    return result.lastInsertRowid as number;
+  }
 }
 
 export default EmployeeModel;

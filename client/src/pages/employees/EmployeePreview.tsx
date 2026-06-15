@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { X, Edit2, User, Calendar, Briefcase, CreditCard, Phone as PhoneIcon } from 'lucide-react';
+import { X, Edit2, User, Calendar, Briefcase, CreditCard, Phone as PhoneIcon, DollarSign } from 'lucide-react';
 
 import { formatCurrency } from '../../utils/formatters';
 import './EmployeePreview.css';
@@ -41,7 +41,8 @@ interface Employee {
 interface EmployeePreviewProps {
   employee: Employee;
   onClose: () => void;
-  onEdit?: () => void;
+  onEdit: (employee: Employee) => void;
+  onPay?: (employee: Employee) => void;
 }
 
 function formatDate(dateStr?: string): string {
@@ -54,7 +55,8 @@ function formatDate(dateStr?: string): string {
 export default function EmployeePreview({
   employee,
   onClose,
-  onEdit
+  onEdit,
+  onPay
 }: EmployeePreviewProps) {
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -268,9 +270,15 @@ export default function EmployeePreview({
         {/* Actions */}
         <div className="mobile-preview-actions">
           {onEdit && (
-            <button className="preview-action-btn primary" onClick={onEdit}>
+            <button className="preview-action-btn primary" onClick={() => onEdit(employee)}>
               <Edit2 size={18} />
               <span>Edit Employee</span>
+            </button>
+          )}
+          {onPay && (
+            <button className="preview-action-btn success" onClick={() => onPay?.(employee)}>
+              <DollarSign size={18} />
+              <span>Pay Salary</span>
             </button>
           )}
         </div>

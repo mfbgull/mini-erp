@@ -754,6 +754,7 @@ runForecastsMigration();
 runMissingFKIndexesMigration();
 runBatchCostingMigration();
 runGLFoundationMigration();
+runSalaryPaymentsMigration();
 runCreditBalanceMigration();
 runEmployeesMigration();
 
@@ -1206,6 +1207,30 @@ function runEmployeesMigration(): void {
     }
   } catch (error: any) {
     logger.error('Employees migration error:', error.message);
+  }
+}
+
+function runSalaryPaymentsMigration(): void {
+  try {
+    const salaryTableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='salary_payments'
+    `).get() as { name: string } | undefined;
+
+    if (!salaryTableCheck) {
+      logger.info('Running salary payments migration...');
+
+      const salarySQL = fs.readFileSync(
+        path.join(__dirname, '../../migrations/add-salary-payments.sql'),
+        'utf8'
+      );
+
+      db.exec(salarySQL);
+
+      logger.info('✅ Salary payments migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Salary payments migration error:', error.message);
   }
 }
 
