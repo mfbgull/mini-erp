@@ -741,55 +741,6 @@
   }
 }
 
-/* Action Buttons in Grid */
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.action-btn.view-btn {
-  background: var(--success-bg, #f0fdf4);
-  color: var(--success, #16a34a);
-}
-
-.action-btn.view-btn:hover {
-  background: var(--success, #16a34a);
-  color: white;
-}
-
-.action-btn.edit-btn {
-  background: var(--info-bg, #e0f2fe);
-  color: #0284c7;
-}
-
-.action-btn.edit-btn:hover {
-  background: #0284c7;
-  color: white;
-}
-
-.action-btn.delete-btn {
-  background: var(--error-bg, #fee2e2);
-  color: var(--error, #dc2626);
-}
-
-.action-btn.delete-btn:hover {
-  background: var(--error, #dc2626);
-  color: white;
-}
-
 /* Delete Confirmation Modal */
 .delete-confirmation {
   padding: 1rem 0;

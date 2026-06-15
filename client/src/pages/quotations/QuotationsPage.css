@@ -94,33 +94,6 @@
   color: #f57c00;
 }
 
-.quotations-page .action-buttons {
-  display: flex;
-  gap: 4px;
-}
-
-.quotations-page .icon-btn {
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.quotations-page .icon-btn:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.quotations-page .icon-btn.danger:hover {
-  background: #ffebee;
-  color: #d32f2f;
-}
-
 @media (max-width: 768px) {
   .quotations-page {
     padding: 12px;

@@ -157,45 +157,6 @@
   color: var(--neutral-700);
 }
 
-.action-buttons {
-  display: flex;
-  gap: var(--space-xs);
-}
-
-.action-btn {
-  padding: var(--space-xs);
-  border: 1px solid var(--neutral-200);
-  border-radius: var(--radius-sm);
-  background: var(--card-bg, #ffffff);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary), transparent 95%);
-}
-
-.action-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.view-btn {
-  color: var(--primary);
-}
-
-.edit-btn {
-  color: var(--warning);
-}
-
-.delete-btn {
-  color: var(--error);
-}
-
 .balance-outstanding {
   color: var(--error);
   font-weight: 500;
@@ -286,7 +247,4 @@
     grid-template-columns: 1fr;
   }
   
-  .action-buttons {
-    justify-content: flex-end;
-  }
 }

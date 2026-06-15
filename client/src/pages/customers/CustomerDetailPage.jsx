@@ -26,11 +26,12 @@ import {
   Printer,
   Image,
   FileSpreadsheet,
-  Ban
+  Ban,
+  MoreVertical
 } from 'lucide-react';
 
-
 import Button from '../../components/common/Button';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
 import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
 import CompactLedgerCardView from '../../components/common/CompactLedgerCard';
@@ -363,11 +364,12 @@ export default function CustomerDetailPage() {
               </div>
             ) : (
               <InvoicesTab
-                invoices={invoices}
-                loading={invoicesLoading}
-                onViewInvoice={(invoiceId) => navigate(`/sales/invoice/${invoiceId}?mode=view`)}
-                onDeleteInvoice={handleDeleteInvoice}
-              />
+              invoices={invoices}
+              loading={invoicesLoading}
+              onViewInvoice={(invoiceId) => navigate(`/sales/invoice/${invoiceId}?mode=view`)}
+              onDeleteInvoice={handleDeleteInvoice}
+              onCancelInvoice={handleCancelInvoice}
+            />
             )
           )}
 
@@ -802,7 +804,7 @@ function OverviewTab({ customer, invoices, ledger, payments }) {
 }
 
 // Invoices Tab Component
-function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice }) {
+function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice, onCancelInvoice }) {
   const columnDefs = [
     {
       headerName: 'Invoice No',
@@ -870,44 +872,28 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice }) {
     {
       headerName: 'Actions',
       field: 'actions',
-      width: 120,
+      width: 70,
       sortable: false,
       filter: false,
       cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            className="action-btn view-btn"
-            onClick={() => window.location.href = `/sales/invoice/${params.data.id}/view`}
-            title="View Invoice"
-          >
-            <Eye size={14} />
-          </button>
-          <button
-            className="action-btn edit-btn"
-            onClick={() => onViewInvoice(params.data.id)}
-            title="Edit Invoice"
-          >
-            <Edit2 size={14} />
-          </button>
-          {((params.data.paid_amount || 0) === 0 && (params.data.returned_amount || 0) === 0 && ['Draft', 'Unpaid'].includes(params.data.status)) && (
-            <button
-              className="action-btn delete-btn"
-              onClick={() => onDeleteInvoice(params.data)}
-              title="Delete Invoice"
-            >
-              <Trash2 size={14} />
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
             </button>
-          )}
-          {params.data.status !== 'Cancelled' && (
-            <button
-              className="action-btn cancel-btn"
-              onClick={() => handleCancelInvoice(params.data)}
-              title="Cancel Invoice"
-            >
-              <Ban size={14} />
-            </button>
-          )}
-        </div>
+          }
+          items={[
+            { label: 'View', icon: <Eye size={16} />, onClick: () => window.location.href = `/sales/invoice/${params.data.id}/view` },
+            { label: 'Edit', icon: <Edit2 size={16} />, onClick: () => onViewInvoice(params.data.id) },
+            ...(((params.data.paid_amount || 0) === 0 && (params.data.returned_amount || 0) === 0 && ['Draft', 'Unpaid'].includes(params.data.status))
+              ? [{ label: 'Delete', icon: <Trash2 size={16} />, onClick: () => onDeleteInvoice(params.data), destructive: true }]
+              : []),
+            ...(params.data.status !== 'Cancelled'
+              ? [{ label: 'Cancel', icon: <Ban size={16} />, onClick: () => onCancelInvoice(params.data), destructive: true }]
+              : [])
+          ]}
+          align="end"
+        />
       )
     }
   ];
@@ -1378,26 +1364,22 @@ function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }) {
     {
       headerName: 'Actions',
       field: 'actions',
-      width: 100,
+      width: 70,
       sortable: false,
       filter: false,
       cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            className="action-btn edit-btn"
-            onClick={() => onEditPayment(params.data)}
-            title="Edit Payment"
-          >
-            <Edit2 size={14} />
-          </button>
-          <button
-            className="action-btn delete-btn"
-            onClick={() => onDeletePayment(params.data)}
-            title="Delete Payment"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: 'Edit', icon: <Edit2 size={16} />, onClick: () => onEditPayment(params.data) },
+            { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => onDeletePayment(params.data), destructive: true },
+          ]}
+          align="end"
+        />
       )
     }
   ];

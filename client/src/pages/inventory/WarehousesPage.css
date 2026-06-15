@@ -195,13 +195,7 @@
   }
 }
 
-/* Table actions */
-.table-actions {
-  display: flex;
-  gap: var(--space-sm);
-}
 
-/* Loading spinner */
 .loading {
   display: flex;
   justify-content: center;

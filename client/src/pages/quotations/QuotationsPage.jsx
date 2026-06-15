@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { FileText, Send, CheckCircle, ArrowRight, Plus, Eye, Edit2, Trash2 } from 'lucide-react';
+import { FileText, Send, CheckCircle, ArrowRight, Plus, Eye, Edit2, Trash2, MoreVertical } from 'lucide-react';
 
 import Button from '../../components/common/Button';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
@@ -132,44 +133,24 @@ export default function QuotationsPage() {
     {
       headerName: t('quotations.actions'),
       field: 'actions',
-      width: 160,
+      width: 70,
       cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            type="button"
-            className="icon-btn"
-            title={t('quotations.viewDetails')}
-            onClick={() => navigate(`/quotations/${params.data.id}`)}
-          >
-            <Eye size={16} />
-          </button>
-          <button
-            type="button"
-            className="icon-btn"
-            title={t('quotations.edit')}
-            onClick={() => navigate(`/quotations/${params.data.id}/edit`)}
-          >
-            <Edit2 size={16} />
-          </button>
-          {params.data.status !== 'Converted' && (
-            <button
-              type="button"
-              className="icon-btn"
-              title={t('quotations.convertToSo')}
-              onClick={() => navigate(`/quotations/${params.data.id}/convert`)}
-            >
-              <ArrowRight size={16} />
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title={t('quotations.actions')}>
+              <MoreVertical size={16} />
             </button>
-          )}
-          <button
-            type="button"
-            className="icon-btn danger"
-            title={t('quotations.delete')}
-            onClick={() => handleDelete(params.data)}
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+          }
+          items={[
+            { label: t('quotations.viewDetails'), icon: <Eye size={16} />, onClick: () => navigate(`/quotations/${params.data.id}`) },
+            { label: t('quotations.edit'), icon: <Edit2 size={16} />, onClick: () => navigate(`/quotations/${params.data.id}/edit`) },
+            ...(params.data.status !== 'Converted'
+              ? [{ label: t('quotations.convertToSo'), icon: <ArrowRight size={16} />, onClick: () => navigate(`/quotations/${params.data.id}/convert`) }]
+              : []),
+            { label: t('quotations.delete'), icon: <Trash2 size={16} />, onClick: () => handleDelete(params.data), destructive: true },
+          ]}
+          align="end"
+        />
       ),
       sortable: false,
       filter: false

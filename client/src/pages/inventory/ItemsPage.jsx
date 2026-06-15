@@ -4,10 +4,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
-import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet, Plus } from 'lucide-react';
+import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet, Plus, MoreVertical, Edit2, Trash2 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import CompactItemCardView from '../../components/common/CompactItemCard';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
@@ -328,34 +329,23 @@ export default function ItemsPage() {
     {
       headerName: t('inventory.actions'),
       field: 'actions',
-      flex: 1,
-      minWidth: 120,
+      width: 70,
+      sortable: false,
+      filter: false,
       cellRenderer: (params) => {
         return (
-          <div className="table-actions">
-            <Button
-              variant="primary"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                setEditingItem(params.data);
-                setIsModalOpen(true);
-              }}
-            >
-              {t('inventory.edit')}
-            </Button>
-            <Button
-              variant="danger"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteItem(params.data);
-              }}
-              disabled={deleteItemMutation.isPending}
-            >
-              {deleteItemMutation.isPending ? t('inventory.deleting') : t('inventory.delete')}
-            </Button>
-          </div>
+          <DropdownMenu
+            trigger={
+              <button className="action-menu-trigger" title="Actions">
+                <MoreVertical size={16} />
+              </button>
+            }
+            items={[
+              { label: t('inventory.edit'), icon: <Edit2 size={16} />, onClick: () => { setEditingItem(params.data); setIsModalOpen(true); } },
+              { label: t('inventory.delete'), icon: <Trash2 size={16} />, onClick: () => handleDeleteItem(params.data), destructive: true },
+            ]}
+            align="end"
+          />
         );
       }
     }

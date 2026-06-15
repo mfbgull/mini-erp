@@ -10,9 +10,12 @@ import {
   Factory,
   ClipboardList,
   Calendar,
+  MoreVertical,
+  Trash2,
 } from "lucide-react";
 
 import Button from "../../components/common/Button";
+import DropdownMenu from "../../components/common/DropdownMenu";
 import { CompactProductionCardView } from "../../components/common/CompactProductionCard";
 import FormInput from "../../components/common/FormInput";
 import Modal from "../../components/common/Modal";
@@ -165,21 +168,21 @@ export default function ProductionPage() {
     {
       headerName: "Actions",
       field: "actions",
-      flex: 1,
+      width: 70,
+      sortable: false,
+      filter: false,
       cellRenderer: (params) => (
-        <div className="table-actions">
-          <Button
-            variant="danger"
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDeleteProduction(params.data);
-            }}
-            disabled={deleteProductionMutation.isPending}
-          >
-            {deleteProductionMutation.isPending ? "Deleting..." : "Delete"}
-          </Button>
-        </div>
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDeleteProduction(params.data), destructive: true },
+          ]}
+          align="end"
+        />
       ),
     },
   ];

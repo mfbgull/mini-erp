@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { ShoppingCart, FileText, Clock, CheckCircle, Send, Plus, Eye, Edit2, Trash2, ArrowRight } from 'lucide-react';
+import { ShoppingCart, FileText, Clock, CheckCircle, Send, Plus, Eye, Edit2, Trash2, ArrowRight, MoreVertical } from 'lucide-react';
 
 import Button from '../../components/common/Button';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
@@ -131,44 +132,24 @@ export default function SalesOrdersPage() {
     {
       headerName: t('salesOrders.actions'),
       field: 'actions',
-      width: 160,
+      width: 70,
       cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            type="button"
-            className="icon-btn"
-            title={t('salesOrders.viewDetails')}
-            onClick={() => navigate(`/sales-orders/${params.data.id}`)}
-          >
-            <Eye size={16} />
-          </button>
-          <button
-            type="button"
-            className="icon-btn"
-            title={t('salesOrders.edit')}
-            onClick={() => navigate(`/sales-orders/${params.data.id}/edit`)}
-          >
-            <Edit2 size={16} />
-          </button>
-          {params.data.status !== 'Invoiced' && params.data.status !== 'Completed' && (
-            <button
-              type="button"
-              className="icon-btn"
-              title={t('salesOrders.convertToInvoice')}
-              onClick={() => navigate(`/sales-orders/${params.data.id}/convert`)}
-            >
-              <ArrowRight size={16} />
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title={t('salesOrders.actions')}>
+              <MoreVertical size={16} />
             </button>
-          )}
-          <button
-            type="button"
-            className="icon-btn danger"
-            title={t('salesOrders.delete')}
-            onClick={() => handleDelete(params.data)}
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+          }
+          items={[
+            { label: t('salesOrders.viewDetails'), icon: <Eye size={16} />, onClick: () => navigate(`/sales-orders/${params.data.id}`) },
+            { label: t('salesOrders.edit'), icon: <Edit2 size={16} />, onClick: () => navigate(`/sales-orders/${params.data.id}/edit`) },
+            ...(params.data.status !== 'Invoiced' && params.data.status !== 'Completed'
+              ? [{ label: t('salesOrders.convertToInvoice'), icon: <ArrowRight size={16} />, onClick: () => navigate(`/sales-orders/${params.data.id}/convert`) }]
+              : []),
+            { label: t('salesOrders.delete'), icon: <Trash2 size={16} />, onClick: () => handleDelete(params.data), destructive: true },
+          ]}
+          align="end"
+        />
       ),
       sortable: false,
       filter: false

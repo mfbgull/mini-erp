@@ -13,9 +13,14 @@ import {
   Package,
   X,
   BarChart3,
+  MoreVertical,
+  Eye,
+  Edit2,
+  Trash2,
 } from "lucide-react";
 
 import Button from "../../components/common/Button";
+import DropdownMenu from "../../components/common/DropdownMenu";
 import { CompactBOMCardView } from "../../components/common/CompactBOMCard";
 import FormInput from "../../components/common/FormInput";
 import Modal from "../../components/common/Modal";
@@ -131,47 +136,31 @@ export default function BOMPage() {
     {
       headerName: "Actions",
       field: "actions",
-      flex: 3,
-      minWidth: 280,
+      width: 70,
+      sortable: false,
+      filter: false,
       cellRenderer: (params) => (
-        <div className="table-actions">
-          <Button
-            variant={params.data.is_active ? "warning" : "secondary"}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleBomStatus(params.data);
-            }}
-            disabled={toggleBomStatusMutation.isPending}
-          >
-            {params.data.is_active ? "Deactivate" : "Activate"}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={async (e) => {
-              e.stopPropagation();
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: params.data.is_active ? 'Deactivate' : 'Activate', icon: <Eye size={16} />, onClick: () => handleToggleBomStatus(params.data) },
+            { label: 'Edit', icon: <Edit2 size={16} />, onClick: async () => {
               try {
-                // Fetch full BOM details including items
                 const response = await api.get(`/boms/${params.data.id}`);
                 setEditingBOM(response.data);
                 setIsModalOpen(true);
               } catch (error) {
                 toast.error("Failed to load BOM details");
               }
-            }}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="danger"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDeleteBom(params.data);
-            }}
-            disabled={deleteBomMutation.isPending}
-          >
-            Delete
-          </Button>
-        </div>
+            }},
+            { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDeleteBom(params.data), destructive: true },
+          ]}
+          align="end"
+        />
       ),
     },
   ];

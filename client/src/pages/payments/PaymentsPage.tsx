@@ -3,10 +3,11 @@ import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
-import { Search, X, CreditCard } from 'lucide-react';
+import { Search, X, CreditCard, MoreVertical, Trash2 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import CompactPaymentCardView from '../../components/common/CompactPaymentCard';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import Modal from '../../components/common/Modal';
 import PaymentModal from '../../components/customers/PaymentModal';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
@@ -175,23 +176,21 @@ export default function PaymentsPage() {
     {
       headerName: 'Actions',
       field: 'actions',
-      flex: 1,
-      minWidth: 110,
+      width: 70,
       sortable: false,
       filter: false,
       cellRenderer: (params: any) => (
-        <div className="table-actions">
-          <Button
-            variant="danger"
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handleDeletePayment(params.data);
-            }}
-            disabled={deleteMutation.isPending}
-          >
-            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-          </Button>
-        </div>
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDeletePayment(params.data), destructive: true },
+          ]}
+          align="end"
+        />
       ),
     }
   ], [deleteMutation.isPending]);

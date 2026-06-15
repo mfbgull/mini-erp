@@ -389,35 +389,6 @@
   border-top: 1px solid var(--border-color);
 }
 
-/* Action buttons in grid */
-.action-buttons {
-  display: flex;
-  gap: 5px;
-}
-
-.action-btn {
-  border: none;
-  background: none;
-  padding: 5px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-btn:hover {
-  background: var(--hover-bg);
-}
-
-.edit-btn {
-  color: var(--primary);
-}
-
-.delete-btn {
-  color: var(--error);
-}
-
 /* Responsive */
 @media (max-width: 992px) {
   .expenses-controls {

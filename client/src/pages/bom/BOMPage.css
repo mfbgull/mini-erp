@@ -48,12 +48,6 @@
   font-size: 0.9rem;
 }
 
-.bom-page .table-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: nowrap;
-}
-
 .status-badge {
   padding: 4px 12px;
   border-radius: 12px;
@@ -361,13 +355,4 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
 
-  .bom-page .table-actions {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .bom-page .table-actions .btn {
-    width: 100%;
-    margin: 2px 0;
-  }
 }

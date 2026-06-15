@@ -6,6 +6,7 @@ import { Plus, Search, Edit, Trash2, UserCheck, UserX, MoreVertical, Shield, Mai
 import toast from 'react-hot-toast';
 
 import Button from '../../components/common/Button';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
@@ -159,39 +160,24 @@ export default function UsersPage() {
     {
       headerName: 'Actions',
       field: 'actions',
-      flex: 1.2,
+      width: 70,
+      sortable: false,
+      filter: false,
       cellRenderer: (params) => (
-        <div className="table-actions">
-          <button
-            className="action-btn"
-            onClick={() => handleToggleStatus(params.data)}
-            title={params.data.is_active ? 'Deactivate' : 'Activate'}
-          >
-            {params.data.is_active ? <UserCheck size={16} /> : <UserX size={16} />}
-          </button>
-          <button
-            className="action-btn"
-            onClick={() => handleResetPassword(params.data)}
-            title="Reset Password"
-          >
-            <Shield size={16} />
-          </button>
-          <button
-            className="action-btn"
-            onClick={() => handleEditUser(params.data)}
-            title="Edit"
-          >
-            <Edit size={16} />
-          </button>
-          <button
-            className="action-btn danger"
-            onClick={() => handleDeleteUser(params.data)}
-            title="Delete"
-            disabled={deleteUserMutation.isPending}
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: params.data.is_active ? 'Deactivate' : 'Activate', icon: params.data.is_active ? <UserCheck size={16} /> : <UserX size={16} />, onClick: () => handleToggleStatus(params.data) },
+            { label: 'Reset Password', icon: <Shield size={16} />, onClick: () => handleResetPassword(params.data) },
+            { label: 'Edit', icon: <Edit size={16} />, onClick: () => handleEditUser(params.data) },
+            { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDeleteUser(params.data), destructive: true },
+          ]}
+          align="end"
+        />
       ),
     },
   ];

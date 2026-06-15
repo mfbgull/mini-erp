@@ -3,10 +3,11 @@ import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
-import { Search, X, Factory } from 'lucide-react';
+import { Search, X, Factory, MoreVertical, Edit2, Trash2 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import { CompactWarehouseCard } from '../../components/common/CompactWarehouseCard';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import { useFormValidation } from '../../hooks/useFormValidation';
@@ -88,33 +89,23 @@ export default function WarehousesPage() {
     {
       headerName: 'Actions',
       field: 'actions',
-      flex: 1,
-      minWidth: 140,
+      width: 70,
+      sortable: false,
+      filter: false,
       cellRenderer: (params) => {
         return (
-          <div className="table-actions">
-            <Button
-              variant="primary"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRowClick(params.data);
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="danger"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteWarehouse(params.data);
-              }}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-            </Button>
-          </div>
+          <DropdownMenu
+            trigger={
+              <button className="action-menu-trigger" title="Actions">
+                <MoreVertical size={16} />
+              </button>
+            }
+            items={[
+              { label: 'Edit', icon: <Edit2 size={16} />, onClick: () => handleRowClick(params.data) },
+              { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDeleteWarehouse(params.data), destructive: true },
+            ]}
+            align="end"
+          />
         );
       }
     }

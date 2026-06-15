@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { Plus, Shield, Edit, Trash2, Key, Save, X } from 'lucide-react';
+import { Plus, Shield, Edit, Trash2, Key, Save, X, MoreVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import Button from '../../components/common/Button';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import Modal from '../../components/common/Modal';
 import FormInput from '../../components/common/FormInput';
 import CompactRoleCard from '../../components/common/CompactRoleCard';
@@ -89,23 +90,27 @@ export default function RolesPage() {
     {
       headerName: 'Actions',
       field: 'actions',
-      flex: 1.5,
+      width: 70,
+      sortable: false,
+      filter: false,
       cellRenderer: (params) => (
-        <div className="table-actions">
-          <button className="action-btn" onClick={() => handleEditPermissions(params.data)} title="Edit Permissions">
-            <Key size={16} />
-          </button>
-          {!params.data.is_system_role && (
-            <>
-              <button className="action-btn" onClick={() => { setEditingRole(params.data); setIsModalOpen(true); }} title="Edit">
-                <Edit size={16} />
-              </button>
-              <button className="action-btn danger" onClick={() => handleDeleteRole(params.data)} title="Delete">
-                <Trash2 size={16} />
-              </button>
-            </>
-          )}
-        </div>
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: 'Edit Permissions', icon: <Key size={16} />, onClick: () => handleEditPermissions(params.data) },
+            ...(!params.data.is_system_role
+              ? [
+                  { label: 'Edit', icon: <Edit size={16} />, onClick: () => { setEditingRole(params.data); setIsModalOpen(true); } },
+                  { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDeleteRole(params.data), destructive: true },
+                ]
+              : [])
+          ]}
+          align="end"
+        />
       ),
     },
   ];

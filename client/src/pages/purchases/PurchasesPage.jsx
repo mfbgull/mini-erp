@@ -19,8 +19,10 @@ import {
   ClipboardList,
   Wallet,
   RotateCcw,
+  MoreVertical,
 } from "lucide-react";
 
+import DropdownMenu from "../../components/common/DropdownMenu";
 import PurchasePreview from "./PurchasePreview";
 import PurchaseReturn from "./PurchaseReturn";
 import Button from "../../components/common/Button";
@@ -237,20 +239,21 @@ export default function PurchasesPage() {
     {
       headerName: 'Actions',
       field: 'actions',
-      width: 100,
+      width: 70,
       sortable: false,
       filter: false,
       cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            className="action-btn return-btn"
-            onClick={() => handleOpenReturn(params.data)}
-            title="Return to Supplier"
-            style={{ color: '#f59e0b' }}
-          >
-            <RotateCcw size={14} />
-          </button>
-        </div>
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: 'Return to Supplier', icon: <RotateCcw size={16} />, onClick: () => handleOpenReturn(params.data) },
+          ]}
+          align="end"
+        />
       ),
     },
   ];

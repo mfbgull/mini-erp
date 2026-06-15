@@ -5,11 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ClientSideRowModelModule , ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { Plus, Edit2, Trash2, Eye, Search, RefreshCw } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Search, RefreshCw, MoreVertical } from 'lucide-react';
 
 import CustomerPreview from './CustomerPreview';
 import Button from '../../components/common/Button';
 import CompactCustomerCardView from '../../components/common/CompactCustomerCard';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import PaymentModal from '../../components/customers/PaymentModal';
@@ -223,32 +224,21 @@ export default function CustomersPage() {
     {
       headerName: 'Actions',
       field: 'actions',
-      width: 150,
+      width: 70,
       cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            className="action-btn view-btn"
-            onClick={() => handleView(params.data)}
-            title="View Details"
-          >
-            <Eye size={16} />
-          </button>
-          <button
-            className="action-btn edit-btn"
-            onClick={() => handleEdit(params.data)}
-            title="Edit"
-          >
-            <Edit2 size={16} />
-          </button>
-          <button
-            className="action-btn delete-btn"
-            onClick={() => handleDelete(params.data.id, params.data.customer_name)}
-            title="Delete"
-            disabled={deleteMutation.isPending}
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: 'View', icon: <Eye size={16} />, onClick: () => handleView(params.data) },
+            { label: 'Edit', icon: <Edit2 size={16} />, onClick: () => handleEdit(params.data) },
+            { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDelete(params.data.id, params.data.customer_name), destructive: true },
+          ]}
+          align="end"
+        />
       ),
       sortable: false,
       filter: false,

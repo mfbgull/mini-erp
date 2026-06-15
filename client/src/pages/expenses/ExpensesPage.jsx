@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 import Button from "../../components/common/Button";
+import DropdownMenu from "../../components/common/DropdownMenu";
 import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import { useTranslation } from "../../hooks/useTranslation";
 import { CompactExpenseCardView } from "../../components/common/CompactExpenseCard";
@@ -388,24 +389,20 @@ export default function ExpensesPage() {
     {
       headerName: "Actions",
       field: "actions",
-      width: 120,
+      width: 70,
       cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            className="action-btn edit-btn"
-            onClick={() => handleEdit(params.data)}
-            title="Edit Expense"
-          >
-            <Edit size={16} />
-          </button>
-          <button
-            className="action-btn delete-btn"
-            onClick={() => handleDelete(params.data.id)}
-            title="Delete Expense"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title="Actions">
+              <MoreVertical size={16} />
+            </button>
+          }
+          items={[
+            { label: 'Edit', icon: <Edit size={16} />, onClick: () => handleEdit(params.data) },
+            { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDelete(params.data.id), destructive: true },
+          ]}
+          align="end"
+        />
       ),
       sortable: false,
       filter: false,
