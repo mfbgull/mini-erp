@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ClientSideRowModelModule , ModuleRegistry } from 'ag-grid-community';
@@ -16,6 +16,7 @@ import Modal from '../../components/common/Modal';
 import PaymentModal from '../../components/customers/PaymentModal';
 import { useSettings } from '../../context/SettingsContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useTranslation } from '../../hooks/useTranslation';
 import { customerSchema } from '../../schemas';
@@ -27,6 +28,7 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function CustomersPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const { formatCurrency } = useSettings();
@@ -37,6 +39,10 @@ export default function CustomersPage() {
   const { isMobile } = useMobileDetection();
 
   const queryClient = useQueryClient();
+
+  useKeyboardShortcut('Alt+N', () => {
+    navigate('/customers?action=create');
+  }, { context: 'customers', id: 'customers-new', label: 'New customer' });
 
   // Fetch customers
   const { data: customers = [], isLoading, refetch } = useQuery({
@@ -50,6 +56,14 @@ export default function CustomersPage() {
       return response.data.data;
     }
   });
+
+  // Auto-open create modal when ?action=create is present
+  useEffect(() => {
+    if (searchParams.get('action') === 'create') {
+      setSelectedCustomer(null);
+      setIsModalOpen(true);
+    }
+  }, [searchParams]);
 
   // Delete customer mutation
   const deleteMutation = useMutation({
@@ -83,11 +97,6 @@ export default function CustomersPage() {
     if (window.confirm(`Are you sure you want to delete customer "${customerName}"?`)) {
       deleteMutation.mutate(id);
     }
-  };
-
-  const handleView = (customer) => {
-    // Navigate to customer detail page
-    navigate(`/customers/${customer.id}`);
   };
 
   const handleEdit = (customer) => {
@@ -233,7 +242,7 @@ export default function CustomersPage() {
             </button>
           }
           items={[
-            { label: 'View', icon: <Eye size={16} />, onClick: () => handleView(params.data) },
+            { label: 'View', icon: <Eye size={16} />, onClick: () => navigate(`/customers/${params.data.id}`) },
             { label: 'Edit', icon: <Edit2 size={16} />, onClick: () => handleEdit(params.data) },
             { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDelete(params.data.id, params.data.customer_name), destructive: true },
           ]}
@@ -342,6 +351,7 @@ export default function CustomersPage() {
                 columnLimits: []
               });
             }}
+            onRowDoubleClicked={(params) => navigate(`/customers/${params.data.id}`)}
           />
         </div>
       )}

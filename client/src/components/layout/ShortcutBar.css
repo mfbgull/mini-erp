@@ -1,0 +1,166 @@
+/* ShortcutBar — Fixed bottom bar showing keyboard shortcuts */
+.shortcut-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  background: var(--card-bg, #ffffff);
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  z-index: 100;
+  font-size: 12px;
+  user-select: none;
+  transition: background-color 0.2s, border-color 0.2s;
+  /* Only show on desktop */
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .shortcut-bar {
+    display: flex;
+  }
+}
+
+/* Left section — Quick Actions button + page shortcuts */
+.shortcut-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.shortcut-bar-left::-webkit-scrollbar {
+  display: none;
+}
+
+/* Quick Actions trigger button */
+.shortcut-bar-qa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: var(--primary-500, #3b82f6);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 6px;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.15s;
+  position: relative;
+}
+
+.shortcut-bar-qa-btn:hover {
+  background: var(--primary-700, #1d4ed8);
+  transform: scale(1.05);
+}
+
+.shortcut-bar-qa-btn:active {
+  transform: scale(0.95);
+}
+
+.shortcut-bar-qa-btn:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+/* Divider between left and right sections */
+.shortcut-bar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-color, #e5e7eb);
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+/* Right section — global shortcuts + dismiss */
+.shortcut-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Shortcut pill */
+.shortcut-bar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: var(--text-secondary, #6b7280);
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.shortcut-bar-pill:hover {
+  background: var(--neutral-100, #f3f4f6);
+}
+
+.shortcut-bar-pill kbd {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--neutral-100, #f3f4f6);
+  color: var(--text-primary, #1f2937);
+  line-height: 1.4;
+  border: 1px solid var(--border-color, #e5e7eb);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.shortcut-bar-pill:hover kbd {
+  background: var(--neutral-200, #e5e7eb);
+}
+
+.shortcut-bar-pill .shortcut-label {
+  font-size: 11px;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* Dismiss button */
+.shortcut-bar-dismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  border-radius: 4px;
+  margin-left: 4px;
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.15s, background 0.15s;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.shortcut-bar-dismiss:hover {
+  opacity: 1;
+  background: var(--neutral-100, #f3f4f6);
+}
+
+.shortcut-bar-dismiss:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+  opacity: 1;
+}

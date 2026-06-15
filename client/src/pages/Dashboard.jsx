@@ -53,12 +53,12 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useKeyboardShortcut('Alt+N', () => {
-    navigate('/inventory/items/create');
-  }, { context: 'dashboard', id: 'dashboard-quick-add' });
+    navigate('/inventory/items?action=create');
+  }, { context: 'dashboard', id: 'dashboard-quick-add', label: 'New item' });
 
   useKeyboardShortcut('Alt+R', () => {
     window.location.reload();
-  }, { context: 'dashboard', id: 'dashboard-refresh' });
+  }, { context: 'dashboard', id: 'dashboard-refresh', label: 'Refresh' });
 
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard-summary'],

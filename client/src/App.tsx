@@ -8,6 +8,7 @@ import PageLoader from './components/common/PageLoader';
 import SearchModal from './components/common/SearchModal';
 import ErrorBoundary from './components/ErrorBoundary';
 import FloatingActionButton from './components/layout/FloatingActionButton';
+import ShortcutBar from './components/layout/ShortcutBar';
 import Sidebar from './components/layout/Sidebar';
 import TopMenu from './components/layout/TopMenu';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -252,6 +253,7 @@ function AppLayout() {
             </ErrorBoundary>
             <FloatingActionButton />
           </div>
+          <ShortcutBar />
         </div>
         <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       </div>

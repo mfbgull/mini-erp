@@ -4,11 +4,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
-import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet, Plus, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet, Plus, MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import CompactItemCardView from '../../components/common/CompactItemCard';
 import DropdownMenu from '../../components/common/DropdownMenu';
+import ItemPreview from './ItemPreview';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
@@ -26,6 +27,7 @@ export default function ItemsPage() {
   const gridWrapperRef = useRef(null);
   const [gridHeight, setGridHeight] = useState(600);
   const [editingItem, setEditingItem] = useState(null);
+  const [previewItem, setPreviewItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
@@ -36,17 +38,17 @@ export default function ItemsPage() {
   const queryClient = useQueryClient();
 
   useKeyboardShortcut('Alt+N', () => {
-    navigate('/inventory/items/create');
-  }, { context: 'inventory', id: 'inventory-new-item' });
+    navigate('/inventory/items?action=create');
+  }, { context: 'inventory', id: 'inventory-new-item', label: 'New item' });
 
   useKeyboardShortcut('Alt+I', () => {
     const searchInput = document.querySelector('input[type="search"]') || document.querySelector('input[placeholder*="Search"]');
     if (searchInput) searchInput.focus();
-  }, { context: 'inventory', id: 'inventory-focus-items' });
+  }, { context: 'inventory', id: 'inventory-focus-items', label: 'Search items' });
 
   useKeyboardShortcut('Alt+W', () => {
     navigate('/inventory/warehouses');
-  }, { context: 'inventory', id: 'inventory-go-warehouses' });
+  }, { context: 'inventory', id: 'inventory-go-warehouses', label: 'Warehouses' });
 
   // Get warehouse filter from URL
   const warehouseId = searchParams.get('warehouse');
@@ -77,6 +79,14 @@ export default function ItemsPage() {
       return response.data.data;
     }
   });
+
+  // Auto-open create modal when ?action=create is present
+  useEffect(() => {
+    if (searchParams.get('action') === 'create' && !isLoading) {
+      setEditingItem(null);
+      setIsModalOpen(true);
+    }
+  }, [searchParams, isLoading]);
 
   // Filter items by warehouse if specified
   const filteredItems = items.filter(item => {
@@ -341,6 +351,7 @@ export default function ItemsPage() {
               </button>
             }
             items={[
+              { label: t('common.view'), icon: <Eye size={16} />, onClick: () => setPreviewItem(params.data) },
               { label: t('inventory.edit'), icon: <Edit2 size={16} />, onClick: () => { setEditingItem(params.data); setIsModalOpen(true); } },
               { label: t('inventory.delete'), icon: <Trash2 size={16} />, onClick: () => handleDeleteItem(params.data), destructive: true },
             ]}
@@ -350,11 +361,6 @@ export default function ItemsPage() {
       }
     }
   ];
-
-  const handleRowClick = (item) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
-  };
 
   const handleNewItem = () => {
     setEditingItem(null);
@@ -508,11 +514,18 @@ export default function ItemsPage() {
             pagination={true}
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}
-            onRowClicked={(params) => handleRowClick(params.data)}
             rowSelection={{ mode: 'singleRow' }}
+            onRowDoubleClicked={(params) => setPreviewItem(params.data)}
           />
           </div>
         </div>
+      )}
+
+      {previewItem && (
+        <ItemPreview
+          item={previewItem}
+          onClose={() => setPreviewItem(null)}
+        />
       )}
 
       <Modal

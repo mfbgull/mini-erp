@@ -38,6 +38,10 @@ import "./BOMPage.css";
 export default function BOMPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBOM, setEditingBOM] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailBOM, setDetailBOM] = useState(null);
+  const [detailBOMData, setDetailBOMData] = useState(null);
+  const [loadingBOMDetail, setLoadingBOMDetail] = useState(false);
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
   const { t } = useTranslation();
@@ -250,6 +254,21 @@ export default function BOMPage() {
     }
   };
 
+  const handleViewBOM = async (bom) => {
+    setLoadingBOMDetail(true);
+    setIsDetailModalOpen(true);
+    try {
+      const response = await api.get(`/boms/${bom.id}`);
+      setDetailBOM(bom);
+      setDetailBOMData(response.data);
+    } catch (error) {
+      toast.error("Failed to load BOM details");
+      setIsDetailModalOpen(false);
+    } finally {
+      setLoadingBOMDetail(false);
+    }
+  };
+
   const handleNew = () => {
     setIsModalOpen(true);
   };
@@ -346,8 +365,27 @@ export default function BOMPage() {
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}
             rowSelection={{ mode: "singleRow" }}
+            onRowDoubleClicked={(params) => handleViewBOM(params.data)}
           />
         </div>
+      )}
+
+      {/* BOM Details Modal */}
+      {isDetailModalOpen && (
+        <Modal
+          isOpen={isDetailModalOpen}
+          onClose={() => { setIsDetailModalOpen(false); setDetailBOM(null); setDetailBOMData(null); }}
+          title={detailBOM ? `BOM: ${detailBOM.bom_name}` : 'BOM Details'}
+          size="medium"
+        >
+          {loadingBOMDetail ? (
+            <div className="loading"><div className="spinner"></div><p>Loading BOM details...</p></div>
+          ) : detailBOMData ? (
+            <BOMDetails bom={detailBOMData} />
+          ) : (
+            <p>Failed to load BOM details.</p>
+          )}
+        </Modal>
       )}
 
       <Modal

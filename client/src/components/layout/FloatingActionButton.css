@@ -1,6 +1,6 @@
 /* Floating Action Button for Quick Actions */
 .fab {
-  position: absolute;
+  position: fixed;
   bottom: 12px;
   right: 12px;
   width: 56px;
@@ -41,11 +41,10 @@
   }
 }
 
-/* Desktop positioning */
+/* Desktop positioning — hidden; ShortcutBar replaces the FAB */
 @media (min-width: 769px) {
   .fab {
-    bottom: 12px;
-    right: 12px;
+    display: none;
   }
 }
 

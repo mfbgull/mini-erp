@@ -243,6 +243,7 @@ export default function UsersPage() {
             loading={isLoading}
             overlayLoadingTemplate='<div class="ag-overlay-loading-center">Loading users...</div>'
             overlayNoRowsTemplate='<div class="ag-overlay-no-rows-center">No users found</div>'
+            onRowDoubleClicked={() => {}}
           />
         </div>
       )}

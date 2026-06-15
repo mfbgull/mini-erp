@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DollarSign, Building2, Palette, Lightbulb, Eye } from 'lucide-react';
+import { DollarSign, Building2, Palette, Lightbulb, Eye, Keyboard } from 'lucide-react';
 
 import Button from '../components/common/Button';
 import FormInput from '../components/common/FormInput';
@@ -23,6 +23,11 @@ export default function SettingsPage() {
     date_format: 'MM/DD/YYYY',
     decimal_places: '2',
     tooltip_timeout: '1'
+  });
+
+  // Shortcut bar visibility — local preference, not a server setting
+  const [showShortcutBar, setShowShortcutBar] = useState(() => {
+    return localStorage.getItem('shortcutBarDismissed') !== 'true';
   });
 
   // Fetch settings
@@ -199,6 +204,43 @@ export default function SettingsPage() {
               required
               helpText="Preferred date format for reports"
             />
+          </div>
+        </div>
+
+        {/* Keyboard Shortcuts */}
+        <div className="settings-section">
+          <div className="section-header">
+            <h2><Keyboard size={24} className="icon-valign-middle icon-mr-sm" />Keyboard Shortcuts</h2>
+            <p className="section-description">Configure the shortcut bar at the bottom of the screen</p>
+          </div>
+          <div className="settings-grid">
+            <div className="toggle-field">
+              <div className="toggle-field-info">
+                <label className="toggle-field-label">Show shortcut bar</label>
+                <span className="toggle-field-description">Display available keyboard shortcuts at the bottom of every page on desktop</span>
+              </div>
+              <label className="toggle-switch">
+                <input
+                  type="checkbox"
+                  checked={showShortcutBar}
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    setShowShortcutBar(isChecked);
+                    // Persist and notify the ShortcutBar component
+                    const newValue = isChecked ? 'false' : 'true';
+                    const oldValue = isChecked ? 'true' : 'false';
+                    localStorage.setItem('shortcutBarDismissed', newValue);
+                    window.dispatchEvent(new StorageEvent('storage', {
+                      key: 'shortcutBarDismissed',
+                      newValue,
+                      oldValue,
+                      storageArea: localStorage,
+                    }));
+                  }}
+                />
+                <span className="toggle-slider"></span>
+              </label>
+            </div>
           </div>
         </div>
 

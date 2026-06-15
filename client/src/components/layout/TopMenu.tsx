@@ -3,8 +3,9 @@ import { NavLink } from 'react-router-dom';
 
 import { 
   LayoutDashboard, Package, DollarSign, BarChart3, ShoppingCart,
-  ClipboardList, Factory, Receipt, FileText, Link2, Settings, Moon, Sun, 
-  TrendingUp, ChevronDown, LogOut, PanelLeft, CreditCard, Briefcase
+  Factory, Settings, Moon, Sun, 
+  TrendingUp, ChevronDown, LogOut, PanelLeft, Briefcase,
+  Shield, Users
 } from 'lucide-react';
 
 import './TopMenu.css';
@@ -35,6 +36,26 @@ const getNavItems = (): NavItem[] => [
     ]
   },
   {
+    labelKey: 'nav.purchases',
+    icon: <ShoppingCart size={18} strokeWidth={1.5} />,
+    children: [
+      { path: '/purchases', labelKey: 'nav.purchases' },
+      { path: '/purchase-orders', labelKey: 'nav.purchaseOrders' },
+      { path: '/suppliers', labelKey: 'nav.suppliers' },
+      { path: '/purchases/returns', labelKey: 'nav.purchaseReturns' }
+    ]
+  },
+  {
+    labelKey: 'nav.manufacturing',
+    icon: <Factory size={18} strokeWidth={1.5} />,
+    children: [
+      { path: '/bom', labelKey: 'nav.bom' },
+      { path: '/production', labelKey: 'nav.production' },
+      { path: '/reports/production-summary', labelKey: 'nav.productionSummary' },
+      { path: '/reports/bom-usage', labelKey: 'nav.bomUsage' }
+    ]
+  },
+  {
     labelKey: 'nav.sales',
     icon: <DollarSign size={18} strokeWidth={1.5} />,
     children: [
@@ -42,8 +63,15 @@ const getNavItems = (): NavItem[] => [
       { path: '/sales', labelKey: 'nav.invoices' },
       { path: '/quotations', labelKey: 'nav.quotations' },
       { path: '/sales-orders', labelKey: 'nav.salesOrders' },
-      { path: '/sales/invoice', labelKey: 'actions.create' },
-      { path: '/customers', labelKey: 'nav.customers' }
+      { path: '/sales/returns', labelKey: 'nav.invoiceReturns' }
+    ]
+  },
+  {
+    labelKey: 'nav.customers',
+    icon: <Users size={18} strokeWidth={1.5} />,
+    children: [
+      { path: '/customers', labelKey: 'nav.customers' },
+      { path: '/payments', labelKey: 'nav.payments' }
     ]
   },
   {
@@ -54,10 +82,12 @@ const getNavItems = (): NavItem[] => [
       { path: '/reports/accounts-receivable', labelKey: 'nav.arReports' },
       { path: '/reports/sales-summary', labelKey: 'nav.salesSummary' },
       { path: '/reports/stock-level', labelKey: 'nav.stockLevel' },
+      { path: '/reports/stock-valuation', labelKey: 'nav.stockValuation' },
       { path: '/reports/low-stock', labelKey: 'nav.lowStock' },
+      { path: '/reports/inventory-movement', labelKey: 'nav.inventoryMovement' },
       { path: '/reports/profit-loss', labelKey: 'nav.profitLoss' },
       { path: '/reports/cash-flow', labelKey: 'nav.cashFlow' },
-      { path: '/reports/expenses', labelKey: 'nav.expensesReport' }
+      { path: '/expenses', labelKey: 'nav.manageExpenses' }
     ]
   },
   {
@@ -70,18 +100,6 @@ const getNavItems = (): NavItem[] => [
     ]
   },
   {
-    labelKey: 'nav.purchases',
-    icon: <ShoppingCart size={18} strokeWidth={1.5} />,
-    children: [
-      { path: '/purchases', labelKey: 'nav.purchases' },
-      { path: '/purchase-orders', labelKey: 'nav.purchaseOrders' },
-      { path: '/suppliers', labelKey: 'nav.suppliers' }
-    ]
-  },
-  { path: '/bom', labelKey: 'nav.bom', icon: <ClipboardList size={18} strokeWidth={1.5} /> },
-  { path: '/production', labelKey: 'nav.production', icon: <Factory size={18} strokeWidth={1.5} /> },
-  { path: '/expenses', labelKey: 'nav.expenses', icon: <Receipt size={18} strokeWidth={1.5} /> },
-  {
     labelKey: 'nav.hr',
     icon: <Briefcase size={18} strokeWidth={1.5} />,
     children: [
@@ -90,15 +108,14 @@ const getNavItems = (): NavItem[] => [
   },
   {
     labelKey: 'nav.administrator',
-    icon: <Settings size={18} strokeWidth={1.5} />,
+    icon: <Shield size={18} strokeWidth={1.5} />,
     children: [
       { path: '/users', labelKey: 'nav.users' },
-      { path: '/roles', labelKey: 'nav.roles' }
+      { path: '/roles', labelKey: 'nav.roles' },
+      { path: '/activity-log', labelKey: 'nav.activityLog' },
+      { path: '/integrations', labelKey: 'nav.integrations' }
     ]
   },
-  { path: '/payments', labelKey: 'nav.payments', icon: <CreditCard size={18} strokeWidth={1.5} /> },
-  { path: '/activity-log', labelKey: 'nav.activityLog', icon: <FileText size={18} strokeWidth={1.5} /> },
-  { path: '/integrations', labelKey: 'nav.integrations', icon: <Link2 size={18} strokeWidth={1.5} /> },
   { path: '/settings', labelKey: 'nav.settings', icon: <Settings size={18} strokeWidth={1.5} /> }
 ];
 

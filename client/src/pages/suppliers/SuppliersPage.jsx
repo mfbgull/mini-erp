@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
@@ -8,11 +9,14 @@ import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import { SupplierCard } from '../../components/common/SupplierCard';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import './SuppliersPage.css';
 
 export default function SuppliersPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +24,18 @@ export default function SuppliersPage() {
   const { t } = useTranslation();
 
   const queryClient = useQueryClient();
+
+  // Auto-open create modal when ?action=create is present
+  useEffect(() => {
+    if (searchParams.get('action') === 'create') {
+      setSelectedSupplier(null);
+      setIsModalOpen(true);
+    }
+  }, [searchParams]);
+
+  useKeyboardShortcut('Alt+N', () => {
+    navigate('/suppliers?action=create');
+  }, { context: 'suppliers', id: 'suppliers-new', label: 'New supplier' });
 
   // Fetch suppliers
   const { data: suppliers = [], isLoading } = useQuery({

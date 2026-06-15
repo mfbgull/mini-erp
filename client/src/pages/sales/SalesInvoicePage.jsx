@@ -14,6 +14,7 @@ import Modal from '../../components/common/Modal';
 import InvoiceTemplate from '../../components/invoice/InvoiceTemplate';
 import { useSettings } from '../../context/SettingsContext';
 import { useFormValidation } from '../../hooks/useFormValidation';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
@@ -1599,6 +1600,25 @@ export default function SalesInvoicePage() {
 
     mutation.mutate(invoiceData);
   };
+
+  // Keyboard shortcuts
+  useKeyboardShortcut('Alt+I', () => {
+    const newItemId = addNewItem();
+    setNewItemId(newItemId);
+  }, { context: 'sales', id: 'sales-invoice-add-item', label: 'Add line item' });
+
+  useKeyboardShortcut('Alt+C', () => {
+    const customerInput = document.querySelector('[name="customer_name"] input');
+    if (customerInput) {
+      customerInput.focus();
+      if (customerInput.select) customerInput.select();
+    }
+  }, { context: 'sales', id: 'sales-invoice-focus-customer', label: 'Focus customer field' });
+
+  useKeyboardShortcut('Ctrl+S', (e) => {
+    e.preventDefault();
+    handleSubmit(e);
+  }, { context: 'sales', id: 'sales-invoice-save', label: 'Save invoice' });
 
   return (
     <div className="sales-invoice-page-modern">

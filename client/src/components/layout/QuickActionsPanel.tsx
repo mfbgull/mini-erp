@@ -10,7 +10,10 @@ import {
   PackagePlus,
   BarChart3,
   CreditCard,
-  Scale
+  Scale,
+  FileOutput,
+  ClipboardCheck,
+  Truck
 } from 'lucide-react';
 import './QuickActionsPanel.css';
 
@@ -50,7 +53,7 @@ export default function QuickActionsPanel({ isOpen, onClose }: QuickActionsPanel
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Define the 9 quick actions
+  // Define the 12 quick actions
   const quickActions: QuickActionItem[] = [
     {
       id: 'create-invoice',
@@ -71,22 +74,40 @@ export default function QuickActionsPanel({ isOpen, onClose }: QuickActionsPanel
       path: '/purchase-orders/create'
     },
     {
+      id: 'create-quotation',
+      label: 'Create Quotation',
+      icon: <FileOutput size={24} />,
+      path: '/quotations/create'
+    },
+    {
+      id: 'create-sales-order',
+      label: 'Create Sales Order',
+      icon: <ClipboardCheck size={24} />,
+      path: '/sales-orders/create'
+    },
+    {
       id: 'create-warehouse',
       label: 'Create Warehouse',
       icon: <Warehouse size={24} />,
-      path: '/inventory/warehouses'
+      path: '/inventory/warehouses?action=create'
     },
     {
       id: 'create-customer',
       label: 'Create Customer',
       icon: <UserPlus size={24} />,
-      path: '/customers'
+      path: '/customers?action=create'
+    },
+    {
+      id: 'create-supplier',
+      label: 'Create Supplier',
+      icon: <Truck size={24} />,
+      path: '/suppliers/create'
     },
     {
       id: 'create-product',
       label: 'Create Product',
       icon: <PackagePlus size={24} />,
-      path: '/inventory/items'
+      path: '/inventory/items?action=create'
     },
     {
       id: 'reports',
@@ -98,13 +119,13 @@ export default function QuickActionsPanel({ isOpen, onClose }: QuickActionsPanel
       id: 'create-payment',
       label: 'Create Payment',
       icon: <CreditCard size={24} />,
-      path: '/sales'
+      path: '/payments?action=create'
     },
     {
       id: 'stock-adjustment',
       label: 'Stock Adj.',
       icon: <Scale size={24} />,
-      path: '/inventory/stock-movements'
+      path: '/inventory/stock-movements?action=create'
     }
   ];
 

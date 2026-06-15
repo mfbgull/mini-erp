@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
+import { useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
@@ -46,6 +47,7 @@ export default function PaymentsPage() {
   const { isMobile } = useMobileDetection();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
 
   // Fetch payments
   const { data: payments = [], isLoading } = useQuery({
@@ -111,6 +113,15 @@ export default function PaymentsPage() {
       deleteMutation.mutate(paymentToDelete.id);
     }
   };
+
+  // Auto-open create modal when ?action=create is present
+  useEffect(() => {
+    if (searchParams.get('action') === 'create') {
+      setIsRecordPaymentOpen(true);
+      setSelectedCustomerForPayment(null);
+      setCustomerSearchTerm('');
+    }
+  }, [searchParams]);
 
   // Defer Ag-Grid mount until after initial paint
   useEffect(() => {
@@ -275,6 +286,7 @@ export default function PaymentsPage() {
             paginationPageSizeSelector={[10, 20, 50, 100]}
             rowSelection={{ mode: 'singleRow' }}
             suppressMaxRenderedRowRestriction={true}
+            onRowDoubleClicked={() => {}}
           />
         </div>
       ) : (

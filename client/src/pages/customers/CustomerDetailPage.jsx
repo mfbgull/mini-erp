@@ -803,7 +803,6 @@ function OverviewTab({ customer, invoices, ledger, payments }) {
   );
 }
 
-// Invoices Tab Component
 function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice, onCancelInvoice }) {
   const columnDefs = [
     {
@@ -919,6 +918,7 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice, onCanc
             paginationPageSize={15}
             paginationPageSizeSelector={[10, 15, 25, 50]}
             rowSelection={{ mode: 'singleRow' }}
+            onRowDoubleClicked={(params) => onViewInvoice(params.data.id)}
           />
         </div>
       )}

@@ -7,6 +7,7 @@ import { Plus, Search, FileText, Clock, CheckCircle, Package, Truck, DollarSign,
 import { PurchaseOrderCard } from '../../components/common/PurchaseOrderCard';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
 import './PurchaseOrdersPage.css';
@@ -17,6 +18,10 @@ export default function PurchaseOrdersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const { isMobile } = useMobileDetection();
+
+  useKeyboardShortcut('Alt+N', () => {
+    navigate('/purchase-orders/create');
+  }, { context: 'purchase-orders', id: 'purchase-orders-new', label: 'New purchase order' });
 
   const { data: pos = [], isLoading } = useQuery({
     queryKey: ['purchaseOrders', statusFilter],

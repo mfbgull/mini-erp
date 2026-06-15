@@ -6,6 +6,14 @@ interface UseKeyboardShortcutOptions {
   context?: string;
   enabled?: boolean;
   id?: string;
+  label?: string;
+}
+
+function idToLabel(id: string): string {
+  return id
+    .replace(/^[a-z]+-/i, '')
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export function useKeyboardShortcut(
@@ -27,6 +35,7 @@ export function useKeyboardShortcut(
     const shortcut = {
       id: shortcutId,
       key,
+      label: options.label || idToLabel(shortcutId),
       action: handler.toString(),
       context: options.context || currentContext,
       handler: () => handlerRef.current(),

@@ -504,7 +504,13 @@
     "purchaseOrders": "Purchase Orders",
     "supplierAnalysis": "Supplier Analysis",
     "stockValuation": "Stock Valuation",
-    "inventoryMovement": "Inventory Movement"
+    "inventoryMovement": "Inventory Movement",
+    "manufacturing": "Manufacturing",
+    "purchaseReturns": "Purchase Returns",
+    "invoiceReturns": "Invoice Returns",
+    "productionSummary": "Production Summary",
+    "bomUsage": "BOM Usage",
+    "manageExpenses": "Manage Expenses"
   },
   "actions": {
     "save": "Save",
@@ -662,6 +668,11 @@
     "price": "Price",
     "cost": "Cost",
     "units": "units"
+  },
+  "shortcuts": {
+    "quickActions": "Quick actions",
+    "dismissBar": "Hide shortcut bar",
+    "noShortcuts": "No shortcuts"
   },
   "errors": {
     "notFound": "Not found",

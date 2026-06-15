@@ -36,15 +36,15 @@ export default function SalesPage() {
 
   useKeyboardShortcut('Alt+N', () => {
     navigate('/sales/invoice');
-  }, { context: 'sales', id: 'sales-new-invoice' });
+  }, { context: 'sales', id: 'sales-new-invoice', label: 'New invoice' });
 
   useKeyboardShortcut('Alt+O', () => {
     navigate('/pos');
-  }, { context: 'sales', id: 'sales-open-pos' });
+  }, { context: 'sales', id: 'sales-open-pos', label: 'POS terminal' });
 
   useKeyboardShortcut('Alt+C', () => {
     navigate('/customers');
-  }, { context: 'sales', id: 'sales-open-customers' });
+  }, { context: 'sales', id: 'sales-open-customers', label: 'Customers' });
 
   // Fetch invoices
   const { data: invoices = [], isLoading: invoicesLoading } = useQuery({

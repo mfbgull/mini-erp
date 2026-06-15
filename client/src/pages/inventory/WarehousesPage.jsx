@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
-import { Search, X, Factory, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { Search, X, Factory, MoreVertical, Edit2, Trash2, Eye } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import { CompactWarehouseCard } from '../../components/common/CompactWarehouseCard';
@@ -11,6 +12,8 @@ import DropdownMenu from '../../components/common/DropdownMenu';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import { useFormValidation } from '../../hooks/useFormValidation';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
+import WarehousePreview from './WarehousePreview';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useTranslation } from '../../hooks/useTranslation';
 import { warehouseSchema } from '../../schemas';
@@ -22,9 +25,16 @@ export default function WarehousesPage() {
   const [editingWarehouse, setEditingWarehouse] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [gridReady, setGridReady] = useState(false);
+  const [previewWarehouse, setPreviewWarehouse] = useState(null);
   const { isMobile } = useMobileDetection();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useKeyboardShortcut('Alt+N', () => {
+    navigate('/inventory/warehouses?action=create');
+  }, { context: 'warehouses', id: 'warehouses-new', label: 'New warehouse' });
 
   const { data: warehouses = [], isLoading } = useQuery({
     queryKey: ['warehouses'],
@@ -101,6 +111,7 @@ export default function WarehousesPage() {
               </button>
             }
             items={[
+              { label: 'View', icon: <Eye size={16} />, onClick: () => setPreviewWarehouse(params.data) },
               { label: 'Edit', icon: <Edit2 size={16} />, onClick: () => handleRowClick(params.data) },
               { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDeleteWarehouse(params.data), destructive: true },
             ]}
@@ -110,6 +121,14 @@ export default function WarehousesPage() {
       }
     }
   ], [deleteMutation.isPending, handleRowClick, handleDeleteWarehouse]);
+
+  // Auto-open create modal when ?action=create is present
+  useEffect(() => {
+    if (searchParams.get('action') === 'create') {
+      setEditingWarehouse(null);
+      setIsModalOpen(true);
+    }
+  }, [searchParams]);
 
   // Defer Ag-Grid mount until after initial paint to avoid blocking interactivity
   useEffect(() => {
@@ -200,7 +219,7 @@ export default function WarehousesPage() {
             pagination={true}
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}
-            onRowClicked={(params) => handleRowClick(params.data)}
+            onRowDoubleClicked={(params) => setPreviewWarehouse(params.data)}
             rowSelection={{ mode: 'singleRow' }}
             suppressMaxRenderedRowRestriction={true}
           />
@@ -218,6 +237,22 @@ export default function WarehousesPage() {
             ))}
           </div>
         </div>
+      )}
+
+      {previewWarehouse && (
+        <WarehousePreview
+          warehouse={previewWarehouse}
+          onClose={() => setPreviewWarehouse(null)}
+          onEdit={() => {
+            setPreviewWarehouse(null);
+            setEditingWarehouse(previewWarehouse);
+            setIsModalOpen(true);
+          }}
+          onDelete={() => {
+            handleDeleteWarehouse(previewWarehouse);
+            setPreviewWarehouse(null);
+          }}
+        />
       )}
 
       <Modal

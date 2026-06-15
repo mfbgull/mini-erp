@@ -146,8 +146,8 @@
 
 .header-grid-modern {
   display: grid;
-  grid-template-columns: 140px 1fr auto;
-  gap: 0.5rem;
+  grid-template-columns: 140px 1fr 1fr auto;
+  gap: 1.5rem;
   flex: 1;
   align-items: start;
 }

@@ -75,6 +75,13 @@ h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: 
   transition: margin-left 0.3s ease;
 }
 
+/* Account for the fixed ShortcutBar at the bottom on desktop */
+@media (min-width: 769px) {
+  .main-content {
+    padding-bottom: 36px;
+  }
+}
+
 .main-content.topmenu-active {
   margin-left: 0;
 }

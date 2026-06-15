@@ -26,7 +26,7 @@ export default function SalesOrdersPage() {
 
   useKeyboardShortcut('Alt+N', () => {
     navigate('/sales-orders/create');
-  }, { context: 'sales-orders', id: 'sales-orders-new' });
+  }, { context: 'sales-orders', id: 'sales-orders-new', label: 'New sales order' });
 
   const { data: salesOrders = [], isLoading } = useQuery({
     queryKey: ['sales-orders'],

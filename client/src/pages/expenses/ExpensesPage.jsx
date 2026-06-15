@@ -574,6 +574,7 @@ export default function ExpensesPage() {
               paginationPageSize={20}
               paginationPageSizeSelector={[10, 20, 50, 100]}
               rowSelection={{ mode: "singleRow" }}
+              onRowDoubleClicked={() => {}}
               onGridReady={(params) => {
                 setTimeout(() => {
                   if (params.api && params.columnApi) {

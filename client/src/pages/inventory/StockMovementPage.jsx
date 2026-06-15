@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AgGridReact } from "ag-grid-react";
@@ -33,6 +33,7 @@ import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import QuickActionsPanel from "../../components/layout/QuickActionsPanel";
 import { useSettings } from "../../context/SettingsContext";
 import { useFormValidation } from "../../hooks/useFormValidation";
+import StockMovementPreview from "./StockMovementPreview";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { useTranslation } from "../../hooks/useTranslation";
 import { stockMovementSchema } from "../../schemas";
@@ -42,9 +43,17 @@ import "./StockMovementPage.css";
 export default function StockMovementPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [previewMovement, setPreviewMovement] = useState(null);
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
+
+  // Auto-open create modal when ?action=create is present
+  useEffect(() => {
+    if (searchParams.get('action') === 'create') {
+      setIsModalOpen(true);
+    }
+  }, [searchParams]);
 
   // Hide the global FAB on mobile — its Quick Actions functionality is
   // available from the mobile action bar instead.
@@ -57,6 +66,7 @@ export default function StockMovementPage() {
   }, [isMobile]);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const { data: movements = [], isLoading } = useQuery({
     queryKey: ["stock-movements"],
@@ -247,10 +257,6 @@ export default function StockMovementPage() {
     },
    ];
 
-  const handleRowClick = (movement) => {
-    setIsModalOpen(true);
-  };
-
   return (
     <div className="items-page">
       <div className="page-header">
@@ -378,10 +384,17 @@ export default function StockMovementPage() {
             pagination={true}
             paginationPageSize={20}
             paginationPageSizeSelector={[10, 20, 50, 100]}
-            onRowClicked={(params) => setIsModalOpen(true, params.data)}
+            onRowDoubleClicked={(params) => setPreviewMovement(params.data)}
             rowSelection={{ mode: 'singleRow' }}
           />
         </div>
+      )}
+
+      {previewMovement && (
+        <StockMovementPreview
+          movement={previewMovement}
+          onClose={() => setPreviewMovement(null)}
+        />
       )}
 
       <Modal

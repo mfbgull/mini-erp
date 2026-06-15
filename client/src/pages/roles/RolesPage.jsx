@@ -171,6 +171,7 @@ export default function RolesPage() {
             paginationPageSizeSelector={[10, 15, 25, 50]}
             rowSelection={{ mode: 'singleRow' }}
             loading={isLoading}
+            onRowDoubleClicked={(params) => handleEditPermissions(params.data)}
           />
         </div>
       )}

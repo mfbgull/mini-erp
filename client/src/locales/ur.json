@@ -499,6 +499,12 @@
     "supplierAnalysis": "سپلائر تجزیہ",
     "stockValuation": "اسٹاک ویلیویشن",
     "inventoryMovement": "انوینٹری موومنٹ",
+    "manufacturing": "مینوفیکچرنگ",
+    "purchaseReturns": "خریداری واپسیاں",
+    "invoiceReturns": "بل واپسیاں",
+    "productionSummary": "پروڈکشن خلاصہ",
+    "bomUsage": "BOM استعمال",
+    "manageExpenses": "خرچے کا نظم کریں",
     "roles": "ردز",
     "users": "یوزرز",
     "payments": "ادائیگیاں",
@@ -662,6 +668,11 @@
     "price": "قیمت",
     "cost": "لاگت",
     "units": "یونٹس"
+  },
+  "shortcuts": {
+    "quickActions": "فوری ایکشنز",
+    "dismissBar": "شارٹ کٹ بار چھپائیں",
+    "noShortcuts": "کوئی شارٹ کٹ نہیں"
   },
   "errors": {
     "notFound": "نہیں ملی",

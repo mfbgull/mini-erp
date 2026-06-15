@@ -26,7 +26,7 @@ export default function QuotationsPage() {
 
   useKeyboardShortcut('Alt+N', () => {
     navigate('/quotations/create');
-  }, { context: 'quotations', id: 'quotations-new' });
+  }, { context: 'quotations', id: 'quotations-new', label: 'New quotation' });
 
   const { data: quotations = [], isLoading } = useQuery({
     queryKey: ['quotations'],

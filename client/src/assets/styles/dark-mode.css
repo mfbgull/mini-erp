@@ -141,15 +141,83 @@ html.dark .modal-container {
   border-color: #374151 !important;
 }
 
+/* Shortcut Bar */
+html.dark .shortcut-bar {
+  background: var(--card-bg) !important;
+  border-top-color: var(--border-color) !important;
+}
+
+html.dark .shortcut-bar-pill kbd {
+  background: var(--neutral-700) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .shortcut-bar-pill:hover kbd {
+  background: var(--neutral-600) !important;
+}
+
+html.dark .shortcut-bar-pill .shortcut-label {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .shortcut-bar-divider {
+  background: var(--border-color) !important;
+}
+
+html.dark .shortcut-bar-dismiss {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark .shortcut-bar-dismiss:hover {
+  background: var(--neutral-700) !important;
+}
+
 /* Quick Actions Panel */
 html.dark .quick-actions-backdrop.mobile-layout {
   background: rgba(0, 0, 0, 0.5) !important;
 }
 
+html.dark .quick-actions-backdrop.desktop-layout {
+  background: var(--card-bg) !important;
+}
+
 html.dark .quick-actions-panel.mobile-layout,
 html.dark .quick-actions-panel.desktop-layout {
-  background-color: #1F2937 !important;
-  color: #F9FAFB !important;
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .quick-actions-panel .panel-header {
+  border-bottom-color: var(--border-color) !important;
+}
+
+html.dark .quick-actions-panel .panel-header h3 {
+  color: var(--text-primary) !important;
+}
+
+html.dark .quick-actions-panel .close-button {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .quick-actions-panel .close-button:hover {
+  background-color: var(--neutral-700) !important;
+}
+
+html.dark .quick-actions-panel .action-item {
+  background: var(--neutral-700) !important;
+}
+
+html.dark .quick-actions-panel .action-item:hover {
+  background: var(--neutral-600) !important;
+}
+
+html.dark .quick-actions-panel .action-icon {
+  color: var(--primary) !important;
+}
+
+html.dark .quick-actions-panel .action-label {
+  color: var(--text-primary) !important;
 }
 
 /* Search Modal */
