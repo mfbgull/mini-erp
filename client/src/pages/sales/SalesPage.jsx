@@ -5,12 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
-import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2, Search, X, Download, BarChart3, Wallet, RotateCcw, Ban } from 'lucide-react';
+import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2, Search, X, Download, BarChart3, Wallet, RotateCcw, Ban, MoreVertical } from 'lucide-react';
 
 import InvoicePreview from './InvoicePreview';
 import InvoiceReturn from './InvoiceReturn';
 import Button from '../../components/common/Button';
 import CompactInvoiceCardView from '../../components/common/CompactInvoiceCard';
+import DropdownMenu from '../../components/common/DropdownMenu';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
 import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
@@ -266,45 +267,28 @@ export default function SalesPage() {
     {
       headerName: t('common.actions'),
       field: 'actions',
-      width: 160,
+      width: 70,
       sortable: false,
       filter: false,
       cellRenderer: (params) => (
-        <div className="action-buttons">
-          <button
-            className="action-btn view-btn"
-            onClick={() => navigate(`/sales/invoice/${params.data.id}/view`)}
-            title="View Invoice"
-          >
-            <Eye size={14} />
-          </button>
-          <button
-            className="action-btn edit-btn"
-            onClick={() => navigate(`/sales/invoice/${params.data.id}?mode=edit`)}
-            title="Edit Invoice"
-          >
-            <Edit2 size={14} />
-          </button>
-          {params.data?.status !== 'Cancelled' && (
-            <button
-              className="action-btn return-btn"
-              onClick={() => handleOpenReturn(params.data)}
-              title="Return Items"
-              style={{ color: '#f59e0b' }}
-            >
-              <RotateCcw size={14} />
+        <DropdownMenu
+          trigger={
+            <button className="action-menu-trigger" title={t('common.actions')}>
+              <MoreVertical size={16} />
             </button>
-          )}
-          {params.data?.status !== 'Cancelled' && (
-            <button
-              className="action-btn cancel-btn"
-              onClick={() => handleCancelInvoice(params.data)}
-              title="Cancel Invoice"
-            >
-              <Ban size={14} />
-            </button>
-          )}
-        </div>
+          }
+          items={[
+            { label: 'View', icon: <Eye size={16} />, onClick: () => navigate(`/sales/invoice/${params.data.id}/view`) },
+            { label: 'Edit', icon: <Edit2 size={16} />, onClick: () => navigate(`/sales/invoice/${params.data.id}?mode=edit`) },
+            ...(params.data?.status !== 'Cancelled'
+              ? [
+                  { label: 'Return', icon: <RotateCcw size={16} />, onClick: () => handleOpenReturn(params.data) },
+                  { label: 'Cancel', icon: <Ban size={16} />, onClick: () => handleCancelInvoice(params.data), destructive: true }
+                ]
+              : [])
+          ]}
+          align="end"
+        />
       )
     }
   ];

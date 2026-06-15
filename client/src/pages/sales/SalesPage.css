@@ -192,47 +192,6 @@
   color: var(--neutral-500);
 }
 
-/* Action Buttons */
-.action-buttons {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.action-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: 1px solid var(--neutral-200);
-  background: var(--card-bg);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-  background: var(--neutral-50);
-}
-
-.action-btn.view-btn {
-  color: var(--primary-600);
-}
-
-.action-btn.view-btn:hover {
-  background: var(--primary-50);
-  border-color: var(--primary-200);
-}
-
-.action-btn.edit-btn {
-  color: var(--warning, #f59e0b);
-}
-
-.action-btn.edit-btn:hover {
-  background: var(--warning-bg, #fffbeb);
-  border-color: #fcd34d;
-}
 
 /* Text Colors */
 .text-success {
@@ -510,4 +469,21 @@
   .compact-mobile-cards-wrapper {
     padding: 8px;
   }
+}
+
+/* Menu trigger button inside grid */
+.action-menu-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neutral-500);
+  transition: color 0.2s ease;
+}
+
+.action-menu-trigger:hover {
+  color: var(--neutral-700);
 }
