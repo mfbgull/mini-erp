@@ -8,7 +8,7 @@ interface SelectOption {
   label: string;
 }
 
-type InputType = 'text' | 'number' | 'email' | 'password' | 'date' | 'textarea' | 'select' | 'searchable-select' | 'checkbox';
+type InputType = 'text' | 'number' | 'email' | 'password' | 'date' | 'tel' | 'textarea' | 'select' | 'searchable-select' | 'checkbox';
 
 interface FormInputProps {
   label?: string;
@@ -19,6 +19,7 @@ interface FormInputProps {
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
+  error?: string;
   options?: SelectOption[];
   rows?: number;
   tooltip?: string;

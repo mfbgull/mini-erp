@@ -36,8 +36,10 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn
   const getStatusClass = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'paid': return 'stock-normal';
+      case 'returned': return 'stock-normal';
       case 'partial':
-      case 'partially paid': return 'stock-low';
+      case 'partially paid':
+      case 'partially returned': return 'stock-low';
       case 'overdue': return 'stock-out-of-stock';
       case 'cancelled': return 'stock-out-of-stock';
       default: return 'stock-low';
@@ -104,7 +106,7 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn
                   )}
                   {onDelete && (() => {
                     const paidAmt = parseFloat(String(invoice.paid_amount || '0'));
-                    const returnedAmt = parseFloat(String((invoice as Record<string, unknown>).returned_amount || '0'));
+                    const returnedAmt = parseFloat(String((invoice as unknown as Record<string, unknown>).returned_amount || '0'));
                     const isDeletable = ['Draft', 'Unpaid'].includes(invoice.status) && paidAmt === 0 && returnedAmt === 0;
                     return isDeletable ? (
                       <button type="button" className="dropdown-item delete" onClick={() => { setShowMenu(false); onDelete(invoice); }}>
@@ -170,6 +172,14 @@ export function CompactInvoiceCard({ invoice, onView, onEdit, onDelete, onReturn
                     {formatCurrency(parseFloat(String(invoice.balance_amount || 0)))}
                   </span>
                 </div>
+                {parseFloat(String((invoice as unknown as Record<string, unknown>).returned_amount || '0')) > 0 && (
+                  <div className="preview-stat">
+                    <span className="preview-stat-label">Returned</span>
+                    <span className="preview-stat-value stock-warning">
+                      {formatCurrency(parseFloat(String((invoice as unknown as Record<string, unknown>).returned_amount || '0')))}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="preview-details-grid">

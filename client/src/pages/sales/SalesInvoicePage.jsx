@@ -485,11 +485,6 @@ export default function SalesInvoicePage() {
       navigate(`/customers/${invoice.customer_id}`);
     },
     onError: (error) => {
-      console.error('=== INVOICE ERROR ===');
-      console.error('Status:', error.response?.status);
-      console.error('Error message:', error.response?.data?.error);
-      console.error('Full error response:', error.response?.data);
-      console.error('Error stack:', error.stack);
       toast.error(error.response?.data?.error || `Failed to ${invoiceId ? 'update' : 'create'} invoice`);
     }
   });
