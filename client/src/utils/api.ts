@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import toast from 'react-hot-toast';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
@@ -31,14 +32,19 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response: AxiosResponse): AxiosResponse => response,
   (error: AxiosError): Promise<never> => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      // Unauthorized or forbidden - clear local user data and redirect
+    if (error.response?.status === 401) {
+      // Unauthorized - session expired or not logged in
       localStorage.removeItem('miniERP-user');
       
       // Only redirect if not already on login page to prevent loops
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }
+    } else if (error.response?.status === 403) {
+      // Forbidden - insufficient permissions
+      const errorMsg = (error.response?.data as { error?: string })?.error
+        || 'Access denied. You do not have permission to perform this action.';
+      toast.error(errorMsg, { id: 'permission-denied', duration: 5000 });
     }
     return Promise.reject(error);
   }

@@ -29,7 +29,8 @@ const getNavItems = (): NavItem[] => [
       { path: '/inventory/items', labelKey: 'nav.items' },
       { path: '/inventory/warehouses', labelKey: 'nav.warehouses' },
       { path: '/inventory/stock-movements', labelKey: 'nav.stockMovements' },
-      { path: '/inventory/stock-by-warehouse', labelKey: 'nav.stockByWarehouse' }
+      { path: '/inventory/stock-by-warehouse', labelKey: 'nav.stockByWarehouse' },
+      { path: '/inventory/physical-counts', labelKey: 'nav.physicalCounts' }
     ]
   },
   {
@@ -134,10 +135,6 @@ const Sidebar = memo(function Sidebar({ onToggleNav, isCompact = false }: { onTo
     checkIsMobile();
     window.addEventListener('resize', checkIsMobile);
     return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
-
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
   }, []);
 
   const toggleMobileMenu = () => {

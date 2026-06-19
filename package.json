@@ -14,7 +14,10 @@
     "dist": "npm run build-all && electron-builder",
     "dist-win": "npm run build-all && electron-builder --win --x64",
     "dist-all": "npm run build-all && electron-builder -wlm",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck": "cd server && npx tsc --noEmit && cd ../client && npx tsc --noEmit",
+    "typecheck:server": "cd server && npx tsc --noEmit",
+    "typecheck:client": "cd client && npx tsc --noEmit"
   },
   "dependencies": {
     "@playwright/test": "^1.58.1",

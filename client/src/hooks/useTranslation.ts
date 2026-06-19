@@ -13,7 +13,7 @@ const locales = {
 type TranslationKey = string;
 
 interface UseTranslationReturn {
-  t: (key: TranslationKey, params?: Record<string, string | number>) => string;
+  t: (key: TranslationKey, params?: Record<string, string | number> | string) => string;
   locale: string;
   setLocale: (locale: string) => void;
   isRTL: boolean;
@@ -54,7 +54,7 @@ export const useTranslation = (): UseTranslationReturn => {
   const dir = locale === 'ur' ? 'rtl' : 'ltr';
 
   const t = useCallback(
-    (key: TranslationKey, params?: Record<string, string | number>): string => {
+    (key: TranslationKey, params?: Record<string, string | number> | string): string => {
       const keys = key.split('.');
       let value: unknown = locales[locale];
 
@@ -62,15 +62,15 @@ export const useTranslation = (): UseTranslationReturn => {
         if (value && typeof value === 'object' && k in value) {
           value = (value as Record<string, unknown>)[k];
         } else {
-          return key;
+          return typeof params === 'string' ? params : key;
         }
       }
 
       if (typeof value !== 'string') {
-        return key;
+        return typeof params === 'string' ? params : key;
       }
 
-      if (params) {
+      if (params && typeof params === 'object') {
         return value.replace(/\{(\w+)\}/g, (_, paramKey) => {
           return params[paramKey]?.toString() ?? `{${paramKey}}`;
         });

@@ -1,4 +1,5 @@
 import { memo, ReactNode } from 'react';
+
 import type { LucideIcon } from 'lucide-react';
 import '../../styles/components/summary-card.css';
 

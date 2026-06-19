@@ -14,6 +14,7 @@ import PaymentModal from '../../components/customers/PaymentModal';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
+import { createActionColDef } from '../../utils/agGridIntegration';
 import './PaymentsPage.css';
 
 interface Payment {
@@ -184,12 +185,7 @@ export default function PaymentsPage() {
       flex: 1,
       minWidth: 120,
     },
-    {
-      headerName: 'Actions',
-      field: 'actions',
-      width: 70,
-      sortable: false,
-      filter: false,
+    createActionColDef({
       cellRenderer: (params: any) => (
         <DropdownMenu
           trigger={
@@ -203,7 +199,7 @@ export default function PaymentsPage() {
           align="end"
         />
       ),
-    }
+    }),
   ], [deleteMutation.isPending]);
 
   const openRecordPayment = () => {
@@ -275,7 +271,7 @@ export default function PaymentsPage() {
         />
       ) : gridReady ? (
         <div className="ag-theme-quartz payments-grid-wrapper">
-          <AgGridReact theme="legacy"
+          <AgGridReact
             rowData={filteredPayments}
             columnDefs={columnDefs}
             defaultColDef={{

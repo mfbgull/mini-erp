@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Search, X, Command } from 'lucide-react';
+import './SearchModal.css';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const PAGES: Page[] = [
   { name: 'Warehouses', path: '/inventory/warehouses', category: 'Inventory' },
   { name: 'Stock Movements', path: '/inventory/stock-movements', category: 'Inventory' },
   { name: 'Stock by Warehouse', path: '/inventory/stock-by-warehouse', category: 'Inventory' },
+  { name: 'Physical Counts', path: '/inventory/physical-counts', category: 'Inventory' },
   { name: 'Purchases', path: '/purchases', category: 'Purchasing' },
   { name: 'Purchase Returns', path: '/purchases/returns', category: 'Purchasing' },
   { name: 'Purchase Orders', path: '/purchase-orders', category: 'Purchasing' },

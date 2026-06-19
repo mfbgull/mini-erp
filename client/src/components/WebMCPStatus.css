@@ -23,7 +23,7 @@
 
 .webmcp-status-active {
   background: var(--success-bg, #d1fae5);
-  border: 1px solid #10b981;
+  border: 1px solid var(--success, #10b981);
 }
 
 .webmcp-status-initializing {
@@ -33,17 +33,17 @@
 
 .webmcp-status-title-mock {
   font-weight: 600;
-  color: #1e40af;
+  color: var(--accent-info, #1e40af);
 }
 
 .webmcp-status-title-active {
   font-weight: 600;
-  color: #065f46;
+  color: var(--accent-success, #065f46);
 }
 
 .webmcp-status-title-initializing {
   font-weight: 600;
-  color: #92400e;
+  color: var(--accent-warning, #92400e);
 }
 
 .webmcp-status-subtitle {
@@ -51,7 +51,7 @@
 }
 
 .webmcp-status-subtitle-mock {
-  color: #1e3a8a;
+  color: var(--accent-info-deep, #1e3a8a);
 }
 
 .webmcp-status-test {

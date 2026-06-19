@@ -97,20 +97,21 @@ function updateInvoiceStatus(invoiceId: number): string {
 
   if (currentStatus === 'Cancelled') {
     newStatus = 'Cancelled';
-  } else if (currentStatus === 'Returned') {
-    newStatus = 'Returned';
   } else if (returned >= total && total > 0) {
-    // All items returned — mark as Returned
+    // All items returned
     newStatus = 'Returned';
+  } else if (returned > 0 && total > 0) {
+    // Some items returned, some remain
+    newStatus = 'Partially Returned';
   } else if (balance <= 0 && total > 0) {
     newStatus = 'Paid';
   } else if (balance < total && balance > 0) {
     newStatus = 'Partially Paid';
-  } else if (balance === total && total > 0) {
+  } else if (balance >= total && total > 0) {
     newStatus = 'Unpaid';
   }
 
-  if (newStatus !== 'Paid' && invoice.due_date && new Date(invoice.due_date) < new Date()) {
+  if (newStatus !== 'Paid' && newStatus !== 'Returned' && newStatus !== 'Partially Returned' && invoice.due_date && new Date(invoice.due_date) < new Date()) {
     newStatus = 'Overdue';
   }
 

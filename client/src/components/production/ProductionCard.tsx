@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-import { MoreVertical, Edit, X, CheckCircle, Trash2, Loader2 } from 'lucide-react';
+import { MoreVertical, Edit, X, Trash2, Loader2 } from 'lucide-react';
 
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';

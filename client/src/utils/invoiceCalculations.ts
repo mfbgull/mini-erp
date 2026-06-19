@@ -1,0 +1,211 @@
+/**
+ * Invoice calculations — all pure functions, no React imports.
+ * Extracted from SalesInvoicePage.jsx for testability.
+ */
+
+import type { InvoiceFormItem, Discount, InvoiceFormState } from './invoiceTypes';
+
+/* ── Item-level calculations ────────────────────────────────────── */
+
+/**
+ * Calculate the discount amount for a single item, given the discountScope.
+ */
+export function calculateItemDiscount(item: InvoiceFormItem): number {
+  const subtotal = (item.quantity || 0) * (item.rate || 0);
+  if (item.discount?.type === 'percentage') {
+    return (subtotal * (item.discount.value || 0)) / 100;
+  }
+  return item.discount?.value || 0;
+}
+
+/**
+ * Calculate the total for a single item (subtotal − discount + tax).
+ */
+export function calculateItemTotal(item: InvoiceFormItem, discountScope: 'item' | 'invoice' = 'item'): number {
+  const subtotal = (item.quantity || 0) * (item.rate || 0);
+  const discount = discountScope === 'item' ? calculateItemDiscount(item) : 0;
+  const afterDiscount = subtotal - discount;
+  const taxAmount = (afterDiscount * (item.tax || 0)) / 100;
+  return afterDiscount + taxAmount;
+}
+
+/* ── Aggregate calculations ─────────────────────────────────────── */
+
+/**
+ * Calculate the subtotal (sum of qty × rate for all items).
+ */
+export function calculateSubtotal(items: InvoiceFormItem[]): number {
+  return items.reduce((sum, item) => sum + (item.quantity || 0) * (item.rate || 0), 0);
+}
+
+/**
+ * Calculate total tax across all items.
+ */
+export function calculateTax(items: InvoiceFormItem[], discountScope: 'item' | 'invoice' = 'item'): number {
+  return items.reduce((sum, item) => {
+    const subtotal = (item.quantity || 0) * (item.rate || 0);
+    const discount = discountScope === 'item' ? calculateItemDiscount(item) : 0;
+    const afterDiscount = subtotal - discount;
+    return sum + (afterDiscount * (item.tax || 0)) / 100;
+  }, 0);
+}
+
+/**
+ * Calculate total discount across all items (or invoice-level discount).
+ */
+export function calculateDiscount(
+  items: InvoiceFormItem[],
+  discountScope: 'item' | 'invoice',
+  invoiceDiscount: Discount,
+): number {
+  if (discountScope === 'item') {
+    return items.reduce((sum, item) => sum + calculateItemDiscount(item), 0);
+  }
+  const subtotal = calculateSubtotal(items);
+  if (invoiceDiscount.type === 'percentage') {
+    return (subtotal * (invoiceDiscount.value || 0)) / 100;
+  }
+  return invoiceDiscount.value || 0;
+}
+
+/**
+ * Calculate the grand total (subtotal + tax − discount).
+ */
+export function calculateTotal(
+  items: InvoiceFormItem[],
+  discountScope: 'item' | 'invoice',
+  invoiceDiscount: Discount,
+): number {
+  return calculateSubtotal(items) + calculateTax(items, discountScope) - calculateDiscount(items, discountScope, invoiceDiscount);
+}
+
+/* ── Field navigation ───────────────────────────────────────────── */
+
+const FIELD_ORDER_ITEM = ['description', 'quantity', 'rate', 'discountValue', 'tax'] as const;
+const FIELD_ORDER_INVOICE = ['description', 'quantity', 'rate', 'tax'] as const;
+
+export function getFieldOrder(discountScope: 'item' | 'invoice'): readonly string[] {
+  return discountScope === 'item' ? FIELD_ORDER_ITEM : FIELD_ORDER_INVOICE;
+}
+
+export function getNextField(field: string, discountScope: 'item' | 'invoice'): string | undefined {
+  const order = getFieldOrder(discountScope);
+  const currentIndex = order.indexOf(field);
+  return order[currentIndex + 1];
+}
+
+export function isLastField(field: string): boolean {
+  return field === 'tax';
+}
+
+/* ── Item helpers ───────────────────────────────────────────────── */
+
+export function createEmptyItemRow(index: number): InvoiceFormItem {
+  return {
+    id: Date.now() + index,
+    item_id: '',
+    description: '',
+    quantity: 1,
+    rate: 0,
+    tax: 0,
+    discount: { type: 'flat', value: 0 },
+  };
+}
+
+export function padItemsToMinimum(items: InvoiceFormItem[], min = 1): InvoiceFormItem[] {
+  if (items.length >= min) return items;
+  const padded = [...items];
+  const now = Date.now();
+  for (let i = items.length; i < min; i++) {
+    padded.push({
+      id: now + i + 1000,
+      item_id: '',
+      description: '',
+      quantity: 0,
+      rate: 0,
+      tax: 0,
+      discount: { type: 'flat', value: 0 },
+    });
+  }
+  return padded;
+}
+
+/* ── Status helpers ─────────────────────────────────────────────── */
+
+export function getStatusColor(status: string): string {
+  const colors: Record<string, string> = {
+    Draft: 'bg-gray-100 text-gray-700',
+    Sent: 'bg-blue-100 text-blue-700',
+    Unpaid: 'bg-gray-100 text-gray-700',
+    'Partially Paid': 'bg-yellow-100 text-yellow-700',
+    Paid: 'bg-green-100 text-green-700',
+    Overdue: 'bg-red-100 text-red-700',
+    Cancelled: 'bg-gray-100 text-gray-500',
+  };
+  return colors[status] || 'bg-gray-100 text-gray-700';
+}
+
+export function getExpectedStatus(
+  invoiceId: string | undefined,
+  recordPayment: boolean,
+  paymentMethods: Array<{ amount: number }>,
+  items: InvoiceFormItem[],
+  discountScope: 'item' | 'invoice',
+  invoiceDiscount: Discount,
+  currentStatus?: string,
+): string {
+  if (!invoiceId) {
+    if (recordPayment) {
+      const total = calculateTotal(items, discountScope, invoiceDiscount);
+      const paymentAmount = paymentMethods.reduce((sum, m) => sum + (parseFloat(String(m.amount)) || 0), 0);
+      if (paymentAmount >= total) return 'Paid';
+      if (paymentAmount > 0) return 'Partially Paid';
+    }
+    return 'Unpaid';
+  }
+  return currentStatus || 'Unpaid';
+}
+
+/* ── Invoice number generation ──────────────────────────────────── */
+
+export function generateInvoiceNo(): string {
+  return `INV-${new Date().getFullYear()}-${String(Date.now() % 1000000).padStart(6, '0')}`;
+}
+
+/* ── Default invoice state ──────────────────────────────────────── */
+
+export function createDefaultInvoice(): InvoiceFormState {
+  return {
+    invoice_no: generateInvoiceNo(),
+    status: 'Unpaid',
+    invoice_date: new Date().toISOString().split('T')[0],
+    due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    customer_id: '',
+    customer_name: '',
+    customer_email: '',
+    customer_phone: '',
+    customer_address: '',
+    discountScope: 'invoice',
+    discount: { type: 'flat', value: 0 },
+    items: Array.from({ length: 1 }, (_, i) => createEmptyItemRow(i)),
+    notes: 'Thank you for your business. Payment is due within 14 days.',
+    terms: 'Net 14 days. Late payments subject to 1.5% monthly interest.',
+    created_by: null,
+    company: {
+      name: 'Mini ERP',
+      email: 'support@minierp.com',
+      phone: '+1 123 456 7890',
+      address: '456 Enterprise Ave, BC 12345',
+      taxId: 'TAX-123456789',
+    },
+    payment: {
+      record_payment: true,
+      payment_date: new Date().toISOString().split('T')[0],
+      payment_amount: 0,
+      payment_method: 'Cash',
+      reference_no: '',
+      payment_notes: '',
+    },
+    paymentMethods: [{ id: Date.now(), method: 'Cash', amount: 0, reference_no: '' }],
+  };
+}

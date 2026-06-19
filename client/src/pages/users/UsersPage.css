@@ -133,27 +133,6 @@
   color: #0369a1;
 }
 
-/* Status Badge */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-active {
-  background: var(--success-bg, #dcfce7);
-  color: var(--success, #16a34a);
-}
-
-.status-inactive {
-  background: var(--error-bg, #fee2e2);
-  color: var(--error, #dc2626);
-}
-
 /* User Form */
 .user-form {
   display: flex;

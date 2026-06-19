@@ -140,46 +140,6 @@
   line-height: 1.4;
 }
 
-.status {
-  padding: var(--space-xs-sm) var(--space-sm);
-  border-radius: var(--radius-full);
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.status-active {
-  background: color-mix(in srgb, var(--success), transparent 85%);
-  color: var(--success-dark);
-}
-
-.status-inactive {
-  background: color-mix(in srgb, var(--neutral-400), transparent 85%);
-  color: var(--neutral-700);
-}
-
-.balance-outstanding {
-  color: var(--error);
-  font-weight: 500;
-}
-
-.balance-paid {
-  color: var(--success);
-}
-
-.credit-limit-exceeded {
-  color: var(--error);
-  background: color-mix(in srgb, var(--error), transparent 90%);
-  padding: var(--space-xs-sm);
-  border-radius: var(--radius-sm);
-}
-
-.credit-limit-warning {
-  color: var(--warning);
-  background: color-mix(in srgb, var(--warning), transparent 90%);
-  padding: var(--space-xs-sm);
-  border-radius: var(--radius-sm);
-}
-
 .credit-utilization {
   padding: var(--space-xs-sm) var(--space-sm);
   border-radius: var(--radius-full);

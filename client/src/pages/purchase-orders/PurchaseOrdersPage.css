@@ -81,7 +81,7 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-md);
 }
-VQ|
+
 /* Search Box */
 .purchase-orders-page .search-box {
   position: relative;
@@ -1112,7 +1112,9 @@ VQ|
   .purchase-orders-page .filters-bar select {
     width: 100%;
     background: var(--input-bg);
-  RY|  .purchase-orders-page .filters-bar select {
+  }
+
+  .purchase-orders-page .filters-bar select {
     width: 100%;
     background: var(--input-bg);
   }
@@ -1221,4 +1223,3 @@ VQ|
   color: white;
 }
 
-JY|}

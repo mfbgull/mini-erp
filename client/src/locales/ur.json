@@ -60,6 +60,13 @@
     "salesByCustomerReport": "گاہک کے حساب سے فروخت رپورٹ",
     "customerStatementsReport": "گاہک بیانات رپورٹ",
     "dsoReport": "DSO رپورٹ",
+    "AR_Reports": "اے آر رپورٹس",
+    "tabs": {
+      "AR_Aging": "AR ایجنگ",
+      "Receivables_Summary": "وصولیوں کا خلاصہ",
+      "Top_Debtors": "بڑے مقروض",
+      "DSO": "فروخت کے بقایا دن"
+    },
     "accountsReceivableReports": "اے آر رپورٹس"
   },
   "quotations": {
@@ -396,7 +403,9 @@
     "createInvoice": "بل بنائیں",
     "pos": "POS",
     "salesReport": "فروخت کا خلاصہ",
-    "stockValuation": "اسٹاک ویلیو"
+    "stockValuation": "اسٹاک ویلیو",
+    "printA4": "A4 پرنٹ کریں",
+    "receipt": "رسید"
   },
   "inventory": {
     "items": "مصنوعات",
@@ -479,6 +488,7 @@
     "warehouses": "گودام",
     "stockMovements": "اسٹاک موومنٹس",
     "stockByWarehouse": "گودام کے حساب سے اسٹاک",
+    "physicalCounts": "فیزیکل کاؤنٹ",
     "quotations": "کوٹیشنز",
     "salesOrders": "سیلز آرڈرز",
     "reportsDashboard": "رپورٹس ڈیش باورڈ",
@@ -571,6 +581,7 @@
     "email": "ای میل",
     "amount": "رقم",
     "balance": "بقیہ",
+    "returned": "واپس کیا گیا",
     "discount": "چھوٹ",
     "tax": "ٹیکس",
     "subtotal": "ذیری کل",
@@ -656,6 +667,7 @@
     "noData": "کوئی ڈیٹا نہیں",
     "loading": "لوڈ ہو رہا ہے...",
     "sales": "فروخت",
+    "receiptPrinting": "رسید پرنٹ ہو رہی ہے...",
     "purchases": "خریداری",
     "production": "پروڈکشن",
     "transfers": "ٹرانسفر",
@@ -672,7 +684,11 @@
   "shortcuts": {
     "quickActions": "فوری ایکشنز",
     "dismissBar": "شارٹ کٹ بار چھپائیں",
-    "noShortcuts": "کوئی شارٹ کٹ نہیں"
+    "noShortcuts": "کوئی شارٹ کٹ نہیں",
+    "printA4": "A4 انوائس پرنٹ کریں",
+    "printReceipt": "رسید پرنٹ کریں (تھرمل)",
+    "printPO": "پرچیز آرڈر پرنٹ کریں",
+    "printQuotation": "کوٹیشن پرنٹ کریں"
   },
   "errors": {
     "notFound": "نہیں ملی",
@@ -680,6 +696,7 @@
     "serverError": "سرور خرطی",
     "badRequest": "غلط درخواست",
     "comingSoon": "جلد آرہا ہے",
-    "failed": "ناکام"
+    "failed": "ناکام",
+    "allowPopups": "براہ کرم رسید پرنٹ کرنے کے لیے پاپ اپس کی اجازت دیں"
   }
 }

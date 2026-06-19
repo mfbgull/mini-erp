@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import './WebMCPStatus.css';
 
+interface WindowWithWebMCPStatus extends Window {
+  WebMCP?: {
+    discoverTools?: () => Promise<string[]>;
+    callTool?: (name: string, params: Record<string, unknown>) => Promise<unknown>;
+  };
+  mockWebMCP?: unknown;
+}
+
 export default function WebMCPStatus() {
   const [isSupported, setIsSupported] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -8,7 +16,7 @@ export default function WebMCPStatus() {
 
   useEffect(() => {
     const checkWebMCP = () => {
-      const win = window as any;
+      const win = window as unknown as WindowWithWebMCPStatus;
       if (win.WebMCP) {
         setIsSupported(true);
         if (win.WebMCP.discoverTools) {
@@ -26,9 +34,9 @@ export default function WebMCPStatus() {
   }, []);
 
   if (!isSupported) {
-    const win = window as any;
+    const win = window as unknown as WindowWithWebMCPStatus;
     const isMock = win.WebMCP && win.mockWebMCP;
-    
+
     if (isMock) {
       return (
         <div className="webmcp-status webmcp-status-mock">

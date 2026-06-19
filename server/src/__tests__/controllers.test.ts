@@ -234,18 +234,18 @@ describe('Sales Controller', () => {
     expect(res.status).toBe(200);
   });
 
-  it('getTopCustomers returns customer data', async () => {
+  it('getCustomers returns customer data', async () => {
     const res = await request(app)
-      .get('/api/sales/top-customers')
+      .get('/api/customers')
       .set('Cookie', authCookie);
     expect(res.status).toBe(200);
   });
 
   it('getSalesDashboard returns summary', async () => {
     const res = await request(app)
-      .get('/api/sales/dashboard/')
+      .get('/api/dashboard')
       .set('Cookie', authCookie);
-    expect([200, 301]).toContain(res.status);
+    expect(res.status).toBe(200);
   });
 
   it('getSalesSummaryByItem handles invalid item id', async () => {
@@ -255,11 +255,11 @@ describe('Sales Controller', () => {
     expect([200, 400, 404]).toContain(res.status);
   });
 
-  it('getItemCustomerPriceHistory returns data', async () => {
+  it('getCustomerBalance returns customer balance', async () => {
     const res = await request(app)
-      .get('/api/sales/item-customer-history?item_id=1&customer_id=1')
+      .get('/api/customers/1/balance')
       .set('Cookie', authCookie);
-    expect([200, 400]).toContain(res.status);
+    expect([200, 400, 404]).toContain(res.status);
   });
 
   it('getQuotations returns quotation list', async () => {

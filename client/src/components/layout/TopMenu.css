@@ -338,18 +338,18 @@ html.dark .top-menu-dropdown.active .top-menu-dropdown-trigger {
 
 html.dark .top-menu-dropdown-menu,
 html.dark .top-menu-user-menu {
-  background: var(--neutral-800);
-  border-color: var(--neutral-700);
+  background: #1F2937;
+  border-color: #374151;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 html.dark .top-menu-dropdown-item {
-  color: var(--neutral-300);
+  color: #D1D5DB;
 }
 
 html.dark .top-menu-dropdown-item:hover {
-  background: var(--neutral-700);
-  color: var(--neutral-100);
+  background: #374151;
+  color: #F9FAFB;
 }
 
 html.dark .top-menu-theme-toggle {

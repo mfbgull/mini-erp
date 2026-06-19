@@ -148,12 +148,12 @@
 
 .log-level.info {
   background: var(--info-bg, #e0f2fe);
-  color: #0369a1;
+  color: var(--accent-log-info, #0369a1);
 }
 
 .log-level.warning {
   background: var(--warning-bg, #fef3c7);
-  color: #b45309;
+  color: var(--accent-log-warning, #b45309);
 }
 
 .log-level.error {

@@ -10,16 +10,17 @@ import {
   deleteBOM
 } from '../controllers/bomController';
 import { authenticateToken } from '../middleware/auth';
+import { requirePermission } from '../middleware/requirePermission';
 
 // All BOM routes require authentication
 router.use(authenticateToken);
 
-router.get('/', getAllBOMs);
-router.get('/:id', getBOMById);
-router.get('/by-item/:itemId', getBOMsByFinishedItem);
-router.post('/', createBOM);
-router.put('/:id', updateBOM);
-router.patch('/:id/toggle-active', toggleBOMActive);
-router.delete('/:id', deleteBOM);
+router.get('/', requirePermission('bom', 'read'), getAllBOMs);
+router.get('/:id', requirePermission('bom', 'read'), getBOMById);
+router.get('/by-item/:itemId', requirePermission('bom', 'read'), getBOMsByFinishedItem);
+router.post('/', requirePermission('bom', 'create'), createBOM);
+router.put('/:id', requirePermission('bom', 'update'), updateBOM);
+router.patch('/:id/toggle-active', requirePermission('bom', 'update'), toggleBOMActive);
+router.delete('/:id', requirePermission('bom', 'delete'), deleteBOM);
 
 export default router;

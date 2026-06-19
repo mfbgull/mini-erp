@@ -1,0 +1,469 @@
+src/components/customer/InvoicesTab.tsx(152,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<Invoice>): AgGridReact<Invoice>', gave the following error.
+    Type 'InvoiceColDef[]' is not assignable to type '(ColDef<Invoice, any> | ColGroupDef<Invoice>)[]'.
+      Type 'InvoiceColDef' is not assignable to type 'ColDef<Invoice, any> | ColGroupDef<Invoice>'.
+        Type 'InvoiceColDef' is not assignable to type 'ColDef<Invoice, any>'.
+          Types of property 'field' are incompatible.
+            Type 'string' is not assignable to type 'NestedFieldPaths<Invoice, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Invoice>, context: any): AgGridReact<Invoice>', gave the following error.
+    Type 'InvoiceColDef[]' is not assignable to type '(ColDef<Invoice, any> | ColGroupDef<Invoice>)[]'.
+      Type 'InvoiceColDef' is not assignable to type 'ColDef<Invoice, any> | ColGroupDef<Invoice>'.
+        Type 'InvoiceColDef' is not assignable to type 'ColDef<Invoice, any>'.
+          Types of property 'field' are incompatible.
+            Type 'string' is not assignable to type 'NestedFieldPaths<Invoice, any, []>'.
+src/components/customer/LedgerTab.tsx(154,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<LedgerEntry>): AgGridReact<LedgerEntry>', gave the following error.
+    Type 'LedgerColDef[]' is not assignable to type '(ColDef<LedgerEntry, any> | ColGroupDef<LedgerEntry>)[]'.
+      Type 'LedgerColDef' is not assignable to type 'ColDef<LedgerEntry, any> | ColGroupDef<LedgerEntry>'.
+        Type 'LedgerColDef' is not assignable to type 'ColDef<LedgerEntry, any>'.
+          Types of property 'field' are incompatible.
+            Type 'string' is not assignable to type 'NestedFieldPaths<LedgerEntry, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<LedgerEntry>, context: any): AgGridReact<LedgerEntry>', gave the following error.
+    Type 'LedgerColDef[]' is not assignable to type '(ColDef<LedgerEntry, any> | ColGroupDef<LedgerEntry>)[]'.
+      Type 'LedgerColDef' is not assignable to type 'ColDef<LedgerEntry, any> | ColGroupDef<LedgerEntry>'.
+        Type 'LedgerColDef' is not assignable to type 'ColDef<LedgerEntry, any>'.
+          Types of property 'field' are incompatible.
+            Type 'string' is not assignable to type 'NestedFieldPaths<LedgerEntry, any, []>'.
+src/components/customer/PaymentsTab.tsx(115,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<Payment>): AgGridReact<Payment>', gave the following error.
+    Type 'PaymentColDef[]' is not assignable to type '(ColDef<Payment, any> | ColGroupDef<Payment>)[]'.
+      Type 'PaymentColDef' is not assignable to type 'ColDef<Payment, any> | ColGroupDef<Payment>'.
+        Type 'PaymentColDef' is not assignable to type 'ColDef<Payment, any>'.
+          Types of property 'field' are incompatible.
+            Type 'string' is not assignable to type 'NestedFieldPaths<Payment, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Payment>, context: any): AgGridReact<Payment>', gave the following error.
+    Type 'PaymentColDef[]' is not assignable to type '(ColDef<Payment, any> | ColGroupDef<Payment>)[]'.
+      Type 'PaymentColDef' is not assignable to type 'ColDef<Payment, any> | ColGroupDef<Payment>'.
+        Type 'PaymentColDef' is not assignable to type 'ColDef<Payment, any>'.
+          Types of property 'field' are incompatible.
+            Type 'string' is not assignable to type 'NestedFieldPaths<Payment, any, []>'.
+src/components/quotation/QuotationSearchableCell.tsx(41,42): error TS2345: Argument of type 'InventoryItemOption[]' is not assignable to parameter of type '{ is_raw_material?: boolean; is_finished_good?: number; is_purchased?: number; }[]'.
+  Type 'InventoryItemOption' has no properties in common with type '{ is_raw_material?: boolean; is_finished_good?: number; is_purchased?: number; }'.
+src/components/quotation/QuotationSearchableCell.tsx(93,39): error TS2345: Argument of type 'InventoryItemOption[]' is not assignable to parameter of type '{ is_raw_material?: boolean; is_finished_good?: number; is_purchased?: number; }[]'.
+  Type 'InventoryItemOption' has no properties in common with type '{ is_raw_material?: boolean; is_finished_good?: number; is_purchased?: number; }'.
+src/components/quotation/QuotationSearchableCell.tsx(94,27): error TS2345: Argument of type '{ id: number; item_name: string; item_code: string; current_stock?: number; standard_selling_price?: number; }[]' is not assignable to parameter of type 'SetStateAction<InventoryItemOption[]>'.
+  Type '{ id: number; item_name: string; item_code: string; current_stock?: number; standard_selling_price?: number; }[]' is not assignable to type 'InventoryItemOption[]'.
+    Type '{ id: number; item_name: string; item_code: string; current_stock?: number; standard_selling_price?: number; }' is not assignable to type 'InventoryItemOption'.
+      Property 'current_stock' is optional in type '{ id: number; item_name: string; item_code: string; current_stock?: number; standard_selling_price?: number; }' but required in type 'InventoryItemOption'.
+src/pages/SettingsPage.tsx(273,55): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'.
+src/pages/bom/BOMPage.tsx(73,5): error TS2322: Type '(bomId: number) => Promise<AxiosResponse<any, any, {}>>' is not assignable to type 'MutationFunction<{ is_active?: number | boolean; }, number>'.
+  Type 'Promise<AxiosResponse<any, any, {}>>' is not assignable to type 'Promise<{ is_active?: number | boolean; }>'.
+    Type 'AxiosResponse<any, any, {}>' has no properties in common with type '{ is_active?: number | boolean; }'.
+src/pages/bom/BOMPage.tsx(359,12): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<BOMListItem>, context: any): AgGridReact<BOMListItem>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; ... 7 more ...; width?: undefined; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<BOMListItem, any> | ColGroupDef<BOMListItem>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; ... 7 more ...; width?: undefined; } | { ...; } | { ...; }' is not assignable to type 'ColDef<BOMListItem, any> | ColGroupDef<BOMListItem>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<BOMListItem, any> | ColGroupDef<BOMListItem>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<BOMListItem, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<BOMListItem, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<BOMListItem>, context: any): AgGridReact<BOMListItem>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<BOMListItem, any>'.
+src/pages/customers/CustomersPage.tsx(323,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<Customer>): AgGridReact<Customer>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; width: number; cellRenderer: (params: { value: string; }) => Element; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; pinned?: undefined; } | ... 6 more ... | { ...; })[]' is not assignable to type '(ColDef<Customer, any> | ColGroupDef<Customer>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; width: number; cellRenderer: (params: { value: string; }) => Element; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; pinned?: undefined; } | ... 6 more ... | { ...; }' is not assignable to type 'ColDef<Customer, any> | ColGroupDef<Customer>'.
+        Type '{ headerName: string; field: string; filter: boolean; width: number; cellRenderer: (params: { value: string; }) => JSX.Element; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; pinned?: undefined; }' is not assignable to type 'ColDef<Customer, any> | ColGroupDef<Customer>'.
+          Type '{ headerName: string; field: string; filter: boolean; width: number; cellRenderer: (params: { value: string; }) => JSX.Element; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; pinned?: undefined; }' is not assignable to type 'ColDef<Customer, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Customer, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Customer>, context: any): AgGridReact<Customer>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; width: number; cellRenderer: (params: { value: string; }) => Element; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; pinned?: undefined; } | ... 6 more ... | { ...; })[]' is not assignable to type '(ColDef<Customer, any> | ColGroupDef<Customer>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; width: number; cellRenderer: (params: { value: string; }) => Element; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; pinned?: undefined; } | ... 6 more ... | { ...; }' is not assignable to type 'ColDef<Customer, any> | ColGroupDef<Customer>'.
+        Type '{ headerName: string; field: string; filter: boolean; width: number; cellRenderer: (params: { value: string; }) => JSX.Element; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; pinned?: undefined; }' is not assignable to type 'ColDef<Customer, any> | ColGroupDef<Customer>'.
+          Type '{ headerName: string; field: string; filter: boolean; width: number; cellRenderer: (params: { value: string; }) => JSX.Element; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; pinned?: undefined; }' is not assignable to type 'ColDef<Customer, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Customer, any, []>'.
+src/pages/expenses/ExpensesPage.tsx(368,14): error TS2741: Property 'name' is missing in type '{ label: string; value: string; onChange: (e: ChangeEvent<HTMLSelectElement, Element>) => void; options: { value: string; label: string; }[]; className: string; }' but required in type 'SearchableSelectProps'.
+src/pages/expenses/ExpensesPage.tsx(438,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<Expense>, context: any): AgGridReact<Expense>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; cellRenderer?: undefined; } | { headerName: string; ... 7 more ...; cellRenderer?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<Expense, any> | ColGroupDef<Expense>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; cellRenderer?: undefined; } | { headerName: string; ... 7 more ...; cellRenderer?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<Expense, any> | ColGroupDef<Expense>'.
+        Type '{ headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<Expense, any> | ColGroupDef<Expense>'.
+          Type '{ headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; sortable?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<Expense, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Expense, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Expense>, context: any): AgGridReact<Expense>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<Expense, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<Expense, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/inventory/ItemsPage.tsx(496,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<InventoryItem>): AgGridReact<InventoryItem>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; width?: undefined; cellRenderer?: undefined; } | { headerName: string; ... 7 more ...; cellRenderer?: undefined; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<InventoryItem, any> | ColGroupDef<InventoryItem>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; width?: undefined; cellRenderer?: undefined; } | { headerName: string; ... 7 more ...; cellRenderer?: undefined; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<InventoryItem, any> | ColGroupDef<InventoryItem>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; width?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<InventoryItem, any> | ColGroupDef<InventoryItem>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; width?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<InventoryItem, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<InventoryItem, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<InventoryItem>, context: any): AgGridReact<InventoryItem>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; width?: undefined; cellRenderer?: undefined; } | { headerName: string; ... 7 more ...; cellRenderer?: undefined; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<InventoryItem, any> | ColGroupDef<InventoryItem>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; width?: undefined; cellRenderer?: undefined; } | { headerName: string; ... 7 more ...; cellRenderer?: undefined; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<InventoryItem, any> | ColGroupDef<InventoryItem>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; width?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<InventoryItem, any> | ColGroupDef<InventoryItem>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellClass?: undefined; width?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<InventoryItem, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<InventoryItem, any, []>'.
+src/pages/inventory/ItemsPage.tsx(514,11): error TS2322: Type 'InventoryItem' is not assignable to type '{ id: number; item_code: string; item_name: string; description?: string; category?: string; unit_of_measure?: string; current_stock: number; standard_cost: number; standard_selling_price: number; ... 4 more ...; is_manufactured?: boolean; }'.
+  Types of property 'is_raw_material' are incompatible.
+    Type 'number | boolean' is not assignable to type 'boolean'.
+      Type 'number' is not assignable to type 'boolean'.
+src/pages/inventory/StockMovementPage.tsx(236,113): error TS2367: This comparison appears to be unintentional because the types 'Record<string, number>' and 'string' have no overlap.
+src/pages/inventory/StockMovementPage.tsx(308,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<StockMovement>): AgGridReact<StockMovement>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; cellStyle?: undefined; } | { headerName: string; field: string; ... 5 more ...; cellStyle?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<StockMovement, any> | ColGroupDef<StockMovement>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; cellStyle?: undefined; } | { headerName: string; field: string; ... 5 more ...; cellStyle?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<StockMovement, any> | ColGroupDef<StockMovement>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; cellStyle?: undefined; }' is not assignable to type 'ColDef<StockMovement, any> | ColGroupDef<StockMovement>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; cellStyle?: undefined; }' is not assignable to type 'ColDef<StockMovement, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<StockMovement, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<StockMovement>, context: any): AgGridReact<StockMovement>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; cellStyle?: undefined; } | { headerName: string; field: string; ... 5 more ...; cellStyle?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<StockMovement, any> | ColGroupDef<StockMovement>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; cellStyle?: undefined; } | { headerName: string; field: string; ... 5 more ...; cellStyle?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<StockMovement, any> | ColGroupDef<StockMovement>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; cellStyle?: undefined; }' is not assignable to type 'ColDef<StockMovement, any> | ColGroupDef<StockMovement>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; cellStyle?: undefined; }' is not assignable to type 'ColDef<StockMovement, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<StockMovement, any, []>'.
+src/pages/inventory/StockMovementPage.tsx(321,11): error TS2322: Type 'StockMovement' is not assignable to type '{ id: number; movement_no: string; movement_date: string; item_code: string; item_name: string; warehouse_name: string; movement_type: string; quantity: number; unit_of_measure: string; remarks?: string; financial_value?: number; financial_posted?: number | boolean; unit_cost?: number; }'.
+  Property 'item_code' is optional in type 'StockMovement' but required in type '{ id: number; movement_no: string; movement_date: string; item_code: string; item_name: string; warehouse_name: string; movement_type: string; quantity: number; unit_of_measure: string; remarks?: string; financial_value?: number; financial_posted?: number | boolean; unit_cost?: number; }'.
+src/pages/inventory/WarehousesPage.tsx(199,15): error TS2322: Type 'import("/home/fawad/ai/minierp/client/src/utils/warehouseTypes").Warehouse' is not assignable to type 'import("/home/fawad/ai/minierp/client/src/types").Warehouse'.
+  Property 'is_active' is optional in type 'Warehouse' but required in type 'Warehouse'.
+src/pages/inventory/WarehousesPage.tsx(212,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<Warehouse>): AgGridReact<Warehouse>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; width?: undefined; cellRenderer?: undefined; } | { headerName: string; field: string; filter: boolean; flex: number; sortable?: undefined; width?: undefined; cellRenderer?: undefined; } | { ...; })[]' is not assignable to type '(ColDef<Warehouse, any> | ColGroupDef<Warehouse>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; width?: undefined; cellRenderer?: undefined; } | { headerName: string; field: string; filter: boolean; flex: number; sortable?: undefined; width?: undefined; cellRenderer?: undefined; } | { ...; }' is not assignable to type 'ColDef<Warehouse, any> | ColGroupDef<Warehouse>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; width?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<Warehouse, any> | ColGroupDef<Warehouse>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; width?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<Warehouse, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Warehouse, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Warehouse>, context: any): AgGridReact<Warehouse>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; width?: undefined; cellRenderer?: undefined; } | { headerName: string; field: string; filter: boolean; flex: number; sortable?: undefined; width?: undefined; cellRenderer?: undefined; } | { ...; })[]' is not assignable to type '(ColDef<Warehouse, any> | ColGroupDef<Warehouse>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; width?: undefined; cellRenderer?: undefined; } | { headerName: string; field: string; filter: boolean; flex: number; sortable?: undefined; width?: undefined; cellRenderer?: undefined; } | { ...; }' is not assignable to type 'ColDef<Warehouse, any> | ColGroupDef<Warehouse>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; width?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<Warehouse, any> | ColGroupDef<Warehouse>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; width?: undefined; cellRenderer?: undefined; }' is not assignable to type 'ColDef<Warehouse, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Warehouse, any, []>'.
+src/pages/production/ProductionPage.tsx(174,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<ProductionStub>): AgGridReact<ProductionStub>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<ProductionStub, any> | ColGroupDef<ProductionStub>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<ProductionStub, any> | ColGroupDef<ProductionStub>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<ProductionStub, any> | ColGroupDef<ProductionStub>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<ProductionStub, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<ProductionStub, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<ProductionStub>, context: any): AgGridReact<ProductionStub>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<ProductionStub, any> | ColGroupDef<ProductionStub>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<ProductionStub, any> | ColGroupDef<ProductionStub>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<ProductionStub, any> | ColGroupDef<ProductionStub>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<ProductionStub, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<ProductionStub, any, []>'.
+src/pages/production/ProductionPage.tsx(229,11): error TS2322: Type 'ProductionRecord' is not assignable to type 'Record<string, unknown>'.
+  Index signature for type 'string' is missing in type 'ProductionRecord'.
+src/pages/purchase-orders/PurchaseOrderDetailPage.tsx(297,9): error TS2322: Type '{ po_no: string; status: string; po_date: string; expected_delivery_date: string; supplier_name: string; supplier_address: string; supplier_phone: string; supplier_email: string; warehouse_name: string; notes: string; total_amount: string | number; items: PrintPOItem[]; }' is not assignable to type 'PurchaseOrder'.
+  Types of property 'total_amount' are incompatible.
+    Type 'string | number' is not assignable to type 'number'.
+      Type 'string' is not assignable to type 'number'.
+src/pages/purchase-orders/PurchaseOrderFormPage.tsx(254,7): error TS2322: Type '{ item_id: string | number; quantity: number; unit_price: number; }[]' is not assignable to type '{ item_id: number; quantity: number; unit_price: number; }[]'.
+  Type '{ item_id: string | number; quantity: number; unit_price: number; }' is not assignable to type '{ item_id: number; quantity: number; unit_price: number; }'.
+    Types of property 'item_id' are incompatible.
+      Type 'string | number' is not assignable to type 'number'.
+        Type 'string' is not assignable to type 'number'.
+src/pages/purchase-orders/PurchaseOrderFormPage.tsx(284,9): error TS2322: Type 'string' is not assignable to type 'number'.
+src/pages/purchases/PurchasesPage.tsx(255,11): error TS2322: Type '{ purchases: any[]; onView: (purchase: any) => void; onEdit: () => string; onNew: () => void; onReturn: (purchase: any) => void; }' is not assignable to type 'IntrinsicAttributes & { purchases: Purchase[]; onView: (purchase: Purchase) => void; onEdit: (purchase: Purchase) => void; onReturn?: (purchase: Purchase) => void; }'.
+  Property 'onNew' does not exist on type 'IntrinsicAttributes & { purchases: Purchase[]; onView: (purchase: Purchase) => void; onEdit: (purchase: Purchase) => void; onReturn?: (purchase: Purchase) => void; }'.
+src/pages/purchases/PurchasesPage.tsx(262,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<Purchase>): AgGridReact<Purchase>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<Purchase, any> | ColGroupDef<Purchase>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<Purchase, any> | ColGroupDef<Purchase>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<Purchase, any> | ColGroupDef<Purchase>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<Purchase, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Purchase, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Purchase>, context: any): AgGridReact<Purchase>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<Purchase, any> | ColGroupDef<Purchase>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<Purchase, any> | ColGroupDef<Purchase>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<Purchase, any> | ColGroupDef<Purchase>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; valueFormatter?: undefined; cellRenderer?: undefined; width?: undefined; }' is not assignable to type 'ColDef<Purchase, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Purchase, any, []>'.
+src/pages/purchases/PurchasesPage.tsx(274,11): error TS2741: Property 'warehouse_id' is missing in type 'import("/home/fawad/ai/minierp/client/src/utils/purchaseTypes").Purchase' but required in type 'Purchase'.
+src/pages/quotations/QuotationFormPage.tsx(175,7): error TS2322: Type 'string' is not assignable to type 'number'.
+src/pages/quotations/QuotationFormPage.tsx(235,7): error TS2322: Type '{ item_id: number; description: string; quantity: number; unit_price: number; tax_rate: number; discount_type: "flat" | "percentage"; discount_value: number; }[]' is not assignable to type '{ item_id: number; description: string; quantity: number; rate: number; tax: number; discount_type: string; discount_value: number; }[]'.
+  Type '{ item_id: number; description: string; quantity: number; unit_price: number; tax_rate: number; discount_type: "flat" | "percentage"; discount_value: number; }' is missing the following properties from type '{ item_id: number; description: string; quantity: number; rate: number; tax: number; discount_type: string; discount_value: number; }': rate, tax
+src/pages/quotations/QuotationFormPage.tsx(269,9): error TS2322: Type 'string' is not assignable to type 'number'.
+src/pages/quotations/QuotationsPage.tsx(173,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<Quotation>): AgGridReact<Quotation>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { value: string; data: Quotation; }) => Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; } | ... 4 more ... | { ...; })[]' is not assignable to type '(ColDef<Quotation, any> | ColGroupDef<Quotation>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { value: string; data: Quotation; }) => Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; } | ... 4 more ... | { ...; }' is not assignable to type 'ColDef<Quotation, any> | ColGroupDef<Quotation>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { value: string; data: Quotation; }) => JSX.Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<Quotation, any> | ColGroupDef<Quotation>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { value: string; data: Quotation; }) => JSX.Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<Quotation, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Quotation, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Quotation>, context: any): AgGridReact<Quotation>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { value: string; data: Quotation; }) => Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; } | ... 4 more ... | { ...; })[]' is not assignable to type '(ColDef<Quotation, any> | ColGroupDef<Quotation>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { value: string; data: Quotation; }) => Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; } | ... 4 more ... | { ...; }' is not assignable to type 'ColDef<Quotation, any> | ColGroupDef<Quotation>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { value: string; data: Quotation; }) => JSX.Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<Quotation, any> | ColGroupDef<Quotation>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { value: string; data: Quotation; }) => JSX.Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<Quotation, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Quotation, any, []>'.
+src/pages/reports/BOMUsageReport.tsx(138,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<BOMRecord>, context: any): AgGridReact<BOMRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<BOMRecord, any> | ColGroupDef<BOMRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; }' is not assignable to type 'ColDef<BOMRecord, any> | ColGroupDef<BOMRecord>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<BOMRecord, any> | ColGroupDef<BOMRecord>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<BOMRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<BOMRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<BOMRecord>, context: any): AgGridReact<BOMRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<BOMRecord, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<BOMRecord>, context: any): AgGridReact<BOMRecord>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<BOMRecord, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<BOMRecord, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/CustomerStatementsReport.tsx(142,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<StatementRecord>, context: any): AgGridReact<StatementRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { ...; })[]' is not assignable to type '(ColDef<StatementRecord, any> | ColGroupDef<StatementRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { ...; }' is not assignable to type 'ColDef<StatementRecord, any> | ColGroupDef<StatementRecord>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<StatementRecord, any> | ColGroupDef<StatementRecord>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<StatementRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<StatementRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<StatementRecord>, context: any): AgGridReact<StatementRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<StatementRecord, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<StatementRecord>, context: any): AgGridReact<StatementRecord>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<StatementRecord, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<StatementRecord, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/ExpensesReport.tsx(189,15): error TS2322: Type '(e: { target: { value: string; }; }) => void' is not assignable to type '(e: { target: { name: string; value: string | number | string[] | (string | number)[]; }; }) => void'.
+  Types of parameters 'e' and 'e' are incompatible.
+    Type '{ target: { name: string; value: string | number | string[] | (string | number)[]; }; }' is not assignable to type '{ target: { value: string; }; }'.
+      The types of 'target.value' are incompatible between these types.
+        Type 'string | number | string[] | (string | number)[]' is not assignable to type 'string'.
+          Type 'number' is not assignable to type 'string'.
+src/pages/reports/ExpensesReport.tsx(223,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<ExpenseRecord>, context: any): AgGridReact<ExpenseRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<ExpenseRecord, any> | ColGroupDef<ExpenseRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<ExpenseRecord, any> | ColGroupDef<ExpenseRecord>'.
+        Type '{ headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<ExpenseRecord, any> | ColGroupDef<ExpenseRecord>'.
+          Type '{ headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<ExpenseRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<ExpenseRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<ExpenseRecord>, context: any): AgGridReact<ExpenseRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<ExpenseRecord, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<ExpenseRecord>, context: any): AgGridReact<ExpenseRecord>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<ExpenseRecord, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<ExpenseRecord, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/InventoryMovementReport.tsx(208,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<MovementRecord>, context: any): AgGridReact<MovementRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; } | { headerName: string; field: string; ... 4 more ...; cellClass?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<MovementRecord, any> | ColGroupDef<MovementRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; } | { headerName: string; field: string; ... 4 more ...; cellClass?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<MovementRecord, any> | ColGroupDef<MovementRecord>'.
+        Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<MovementRecord, any> | ColGroupDef<MovementRecord>'.
+          Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<MovementRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<MovementRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<MovementRecord>, context: any): AgGridReact<MovementRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<MovementRecord, any>'.
+src/pages/reports/LowStockReport.tsx(75,73): error TS2339: Property 'sizeColumnsToFit' does not exist on type 'unknown'.
+src/pages/reports/LowStockReport.tsx(140,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<LowStockItem>, context: any): AgGridReact<LowStockItem>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; } | { ...; })[]' is not assignable to type '(ColDef<LowStockItem, any> | ColGroupDef<LowStockItem>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; } | { ...; }' is not assignable to type 'ColDef<LowStockItem, any> | ColGroupDef<LowStockItem>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<LowStockItem, any> | ColGroupDef<LowStockItem>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<LowStockItem, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<LowStockItem, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<LowStockItem>, context: any): AgGridReact<LowStockItem>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<LowStockItem, any>'.
+src/pages/reports/ProductionSummaryReport.tsx(145,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<ProductionRecord>, context: any): AgGridReact<ProductionRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; } | { headerName: string; field: string; ... 4 more ...; cellClass?: undefined; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<ProductionRecord, any> | ColGroupDef<ProductionRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; } | { headerName: string; field: string; ... 4 more ...; cellClass?: undefined; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<ProductionRecord, any> | ColGroupDef<ProductionRecord>'.
+        Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<ProductionRecord, any> | ColGroupDef<ProductionRecord>'.
+          Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<ProductionRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<ProductionRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<ProductionRecord>, context: any): AgGridReact<ProductionRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<ProductionRecord, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<ProductionRecord>, context: any): AgGridReact<ProductionRecord>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<ProductionRecord, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<ProductionRecord, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/PurchaseSummaryReport.tsx(46,3): error TS2300: Duplicate identifier 'supplier_name'.
+src/pages/reports/PurchaseSummaryReport.tsx(54,3): error TS2300: Duplicate identifier 'supplier_name'.
+src/pages/reports/PurchaseSummaryReport.tsx(217,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<PurchaseRecord>, context: any): AgGridReact<PurchaseRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; } | { headerName: string; field: string; ... 4 more ...; cellClass?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<PurchaseRecord, any> | ColGroupDef<PurchaseRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; } | { headerName: string; field: string; ... 4 more ...; cellClass?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<PurchaseRecord, any> | ColGroupDef<PurchaseRecord>'.
+        Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<PurchaseRecord, any> | ColGroupDef<PurchaseRecord>'.
+          Type '{ headerName: string; field: string; filter: string; width: number; valueFormatter: (p: { value: string; }) => string; flex?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<PurchaseRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<PurchaseRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<PurchaseRecord>, context: any): AgGridReact<PurchaseRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<PurchaseRecord, any>'.
+src/pages/reports/SalesByCustomerReport.tsx(86,39): error TS2345: Argument of type 'CustomerSalesRecord[]' is not assignable to parameter of type 'Record<string, unknown>[]'.
+  Type 'CustomerSalesRecord' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'CustomerSalesRecord'.
+src/pages/reports/SalesByCustomerReport.tsx(87,24): error TS2345: Argument of type 'CustomerSalesRecord[]' is not assignable to parameter of type 'Record<string, unknown>[]'.
+  Type 'CustomerSalesRecord' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'CustomerSalesRecord'.
+src/pages/reports/SalesByCustomerReport.tsx(128,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<CustomerSalesRecord>, context: any): AgGridReact<CustomerSalesRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<CustomerSalesRecord, any> | ColGroupDef<CustomerSalesRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<CustomerSalesRecord, any> | ColGroupDef<CustomerSalesRecord>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<CustomerSalesRecord, any> | ColGroupDef<CustomerSalesRecord>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<CustomerSalesRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<CustomerSalesRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<CustomerSalesRecord>, context: any): AgGridReact<CustomerSalesRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<CustomerSalesRecord, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<CustomerSalesRecord>, context: any): AgGridReact<CustomerSalesRecord>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<CustomerSalesRecord, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<CustomerSalesRecord, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/SalesByItemReport.tsx(117,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<ItemSalesRecord>, context: any): AgGridReact<ItemSalesRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<ItemSalesRecord, any> | ColGroupDef<ItemSalesRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; }' is not assignable to type 'ColDef<ItemSalesRecord, any> | ColGroupDef<ItemSalesRecord>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<ItemSalesRecord, any> | ColGroupDef<ItemSalesRecord>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<ItemSalesRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<ItemSalesRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<ItemSalesRecord>, context: any): AgGridReact<ItemSalesRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<ItemSalesRecord, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<ItemSalesRecord>, context: any): AgGridReact<ItemSalesRecord>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<ItemSalesRecord, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<ItemSalesRecord, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/SalesSummaryReport.tsx(206,15): error TS2322: Type '(e: { target: { value: number[]; }; }) => void' is not assignable to type '(e: { target: { name: string; value: string | number | string[] | (string | number)[]; }; }) => void'.
+  Types of parameters 'e' and 'e' are incompatible.
+    Type '{ target: { name: string; value: string | number | string[] | (string | number)[]; }; }' is not assignable to type '{ target: { value: number[]; }; }'.
+      The types of 'target.value' are incompatible between these types.
+        Type 'string | number | string[] | (string | number)[]' is not assignable to type 'number[]'.
+          Type 'string' is not assignable to type 'number[]'.
+src/pages/reports/SalesSummaryReport.tsx(210,15): error TS2322: Type '(e: { target: { value: number[]; }; }) => void' is not assignable to type '(e: { target: { name: string; value: string | number | string[] | (string | number)[]; }; }) => void'.
+  Types of parameters 'e' and 'e' are incompatible.
+    Type '{ target: { name: string; value: string | number | string[] | (string | number)[]; }; }' is not assignable to type '{ target: { value: number[]; }; }'.
+      The types of 'target.value' are incompatible between these types.
+        Type 'string | number | string[] | (string | number)[]' is not assignable to type 'number[]'.
+          Type 'string' is not assignable to type 'number[]'.
+src/pages/reports/SalesSummaryReport.tsx(232,42): error TS2322: Type 'Record<string, unknown>[]' is not assignable to type 'SalesSummaryItem[]'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'SalesSummaryItem': invoice_date, invoice_no, customer_id, customer_name, and 5 more.
+src/pages/reports/SalesSummaryReport.tsx(236,34): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<Record<string, unknown>>): AgGridReact<Record<string, unknown>>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<Record<string, unknown>, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Record<string, unknown>>, context: any): AgGridReact<Record<string, unknown>>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<Record<string, unknown>, any>'.
+src/pages/reports/StockLevelReport.tsx(177,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<StockLevelItem>, context: any): AgGridReact<StockLevelItem>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<StockLevelItem, any> | ColGroupDef<StockLevelItem>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<StockLevelItem, any> | ColGroupDef<StockLevelItem>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<StockLevelItem, any> | ColGroupDef<StockLevelItem>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<StockLevelItem, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<StockLevelItem, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<StockLevelItem>, context: any): AgGridReact<StockLevelItem>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<StockLevelItem, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<StockLevelItem>, context: any): AgGridReact<StockLevelItem>', gave the following error.
+    Type '(params: { data: { id?: number; item_code?: string; }; node: { rowIndex: number; }; }) => string | number' is not assignable to type 'GetRowIdFunc<StockLevelItem, any>'.
+      Types of parameters 'params' and 'params' are incompatible.
+        Property 'node' is missing in type 'GetRowIdParams<StockLevelItem, any>' but required in type '{ data: { id?: number; item_code?: string; }; node: { rowIndex: number; }; }'.
+  Overload 2 of 2, '(props: AgGridReactProps<StockLevelItem>, context: any): AgGridReact<StockLevelItem>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<StockLevelItem, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<StockLevelItem, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/StockValuationReport.tsx(100,73): error TS2339: Property 'sizeColumnsToFit' does not exist on type 'unknown'.
+src/pages/reports/StockValuationReport.tsx(186,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<StockValuationItem>, context: any): AgGridReact<StockValuationItem>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<StockValuationItem, any> | ColGroupDef<StockValuationItem>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; }' is not assignable to type 'ColDef<StockValuationItem, any> | ColGroupDef<StockValuationItem>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<StockValuationItem, any> | ColGroupDef<StockValuationItem>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<StockValuationItem, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<StockValuationItem, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<StockValuationItem>, context: any): AgGridReact<StockValuationItem>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<StockValuationItem, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<StockValuationItem>, context: any): AgGridReact<StockValuationItem>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<StockValuationItem, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<StockValuationItem, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/SupplierAnalysisReport.tsx(132,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<SupplierRecord>, context: any): AgGridReact<SupplierRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; } | { ...; } |...' is not assignable to type '(ColDef<SupplierRecord, any> | ColGroupDef<SupplierRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; cellClass?: undefined; valueFormatter?: undefined; } | { ...; } | { ...; } | { ...; } | ...' is not assignable to type 'ColDef<SupplierRecord, any> | ColGroupDef<SupplierRecord>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<SupplierRecord, any> | ColGroupDef<SupplierRecord>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; cellClass?: undefined; valueFormatter?: undefined; }' is not assignable to type 'ColDef<SupplierRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<SupplierRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<SupplierRecord>, context: any): AgGridReact<SupplierRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<SupplierRecord, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<SupplierRecord>, context: any): AgGridReact<SupplierRecord>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<SupplierRecord, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<SupplierRecord, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/TopDebtorsReport.tsx(124,14): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<DebtorRecord>, context: any): AgGridReact<DebtorRecord>', gave the following error.
+    Type '({ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<DebtorRecord, any> | ColGroupDef<DebtorRecord>)[]'.
+      Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { headerName: string; field: string; filter: boolean; width: number; flex?: undefined; valueFormatter?: undefined; cellClass?: undefined; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<DebtorRecord, any> | ColGroupDef<DebtorRecord>'.
+        Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<DebtorRecord, any> | ColGroupDef<DebtorRecord>'.
+          Type '{ headerName: string; field: string; filter: boolean; flex: number; width?: undefined; valueFormatter?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<DebtorRecord, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<DebtorRecord, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<DebtorRecord>, context: any): AgGridReact<DebtorRecord>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<DebtorRecord, any>'.
+  Overload 2 of 2, '(props: AgGridReactProps<DebtorRecord>, context: any): AgGridReact<DebtorRecord>', gave the following error.
+    Type '(params: { api: any; columnApi: any; }) => void' is not assignable to type '(event: GridReadyEvent<DebtorRecord, any>) => void'.
+      Types of parameters 'params' and 'event' are incompatible.
+        Property 'columnApi' is missing in type 'GridReadyEvent<DebtorRecord, any>' but required in type '{ api: any; columnApi: any; }'.
+src/pages/reports/TopDebtorsReport.tsx(155,190): error TS2551: Property 'total_invoices' does not exist on type 'DebtorRecord'. Did you mean 'total_invoiced'?
+src/pages/roles/RolesPage.tsx(159,12): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<Role>, context: any): AgGridReact<Role>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; cellRenderer?: undefined; cellClass?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<Role, any> | ColGroupDef<Role>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; cellRenderer?: undefined; cellClass?: undefined; width?: undefined; } | { headerName: string; field: string; ... 5 more ...; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<Role, any> | ColGroupDef<Role>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; cellRenderer?: undefined; cellClass?: undefined; width?: undefined; }' is not assignable to type 'ColDef<Role, any> | ColGroupDef<Role>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; cellRenderer?: undefined; cellClass?: undefined; width?: undefined; }' is not assignable to type 'ColDef<Role, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Role, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Role>, context: any): AgGridReact<Role>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<Role, any>'.
+src/pages/sales-orders/SalesOrdersPage.tsx(191,13): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<SalesOrder>): AgGridReact<SalesOrder>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: SalesOrder; value: string; }) => Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; } | ... 4 more ... | { ...; })[]' is not assignable to type '(ColDef<SalesOrder, any> | ColGroupDef<SalesOrder>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: SalesOrder; value: string; }) => Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; } | ... 4 more ... | { ...; }' is not assignable to type 'ColDef<SalesOrder, any> | ColGroupDef<SalesOrder>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: SalesOrder; value: string; }) => JSX.Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<SalesOrder, any> | ColGroupDef<SalesOrder>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: SalesOrder; value: string; }) => JSX.Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<SalesOrder, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<SalesOrder, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<SalesOrder>, context: any): AgGridReact<SalesOrder>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: SalesOrder; value: string; }) => Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; } | ... 4 more ... | { ...; })[]' is not assignable to type '(ColDef<SalesOrder, any> | ColGroupDef<SalesOrder>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: SalesOrder; value: string; }) => Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; } | ... 4 more ... | { ...; }' is not assignable to type 'ColDef<SalesOrder, any> | ColGroupDef<SalesOrder>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: SalesOrder; value: string; }) => JSX.Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<SalesOrder, any> | ColGroupDef<SalesOrder>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: SalesOrder; value: string; }) => JSX.Element; valueFormatter?: undefined; type?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<SalesOrder, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<SalesOrder, any, []>'.
+src/pages/sales/SalesPage.tsx(428,15): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: AgGridReactProps<Invoice>): AgGridReact<Invoice>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: Invoice; value: string; }) => Element; valueFormatter?: undefined; flex?: undefined; minWidth?: undefined; cellClass?: undefined; } | ... 6 more ... | { ...; })[]' is not assignable to type '(ColDef<Invoice, any> | ColGroupDef<Invoice>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: Invoice; value: string; }) => Element; valueFormatter?: undefined; flex?: undefined; minWidth?: undefined; cellClass?: undefined; } | ... 6 more ... | { ...; }' is not assignable to type 'ColDef<Invoice, any> | ColGroupDef<Invoice>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: Invoice; value: string; }) => JSX.Element; valueFormatter?: undefined; flex?: undefined; minWidth?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<Invoice, any> | ColGroupDef<Invoice>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: Invoice; value: string; }) => JSX.Element; valueFormatter?: undefined; flex?: undefined; minWidth?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<Invoice, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Invoice, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<Invoice>, context: any): AgGridReact<Invoice>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: Invoice; value: string; }) => Element; valueFormatter?: undefined; flex?: undefined; minWidth?: undefined; cellClass?: undefined; } | ... 6 more ... | { ...; })[]' is not assignable to type '(ColDef<Invoice, any> | ColGroupDef<Invoice>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: Invoice; value: string; }) => Element; valueFormatter?: undefined; flex?: undefined; minWidth?: undefined; cellClass?: undefined; } | ... 6 more ... | { ...; }' is not assignable to type 'ColDef<Invoice, any> | ColGroupDef<Invoice>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: Invoice; value: string; }) => JSX.Element; valueFormatter?: undefined; flex?: undefined; minWidth?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<Invoice, any> | ColGroupDef<Invoice>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; width: number; cellRenderer: (params: { data: Invoice; value: string; }) => JSX.Element; valueFormatter?: undefined; flex?: undefined; minWidth?: undefined; cellClass?: undefined; }' is not assignable to type 'ColDef<Invoice, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<Invoice, any, []>'.
+src/pages/suppliers/SuppliersPage.tsx(152,14): error TS2741: Property 'onView' is missing in type '{ key: number; supplier: Supplier; onEdit: (supplier: Supplier) => void; onDelete: (supplier: Supplier) => void; }' but required in type 'SupplierCardProps'.
+src/pages/users/UsersPage.tsx(222,12): error TS2769: No overload matches this call.
+  Overload 2 of 2, '(props: AgGridReactProps<User>, context: any): AgGridReact<User>', gave the following error.
+    Type '({ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; cellRenderer: (params: { value: string; data: User; }) => Element; cellClass?: undefined; valueFormatter?: undefined; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; })[]' is not assignable to type '(ColDef<User, any> | ColGroupDef<User>)[]'.
+      Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; cellRenderer: (params: { value: string; data: User; }) => Element; cellClass?: undefined; valueFormatter?: undefined; width?: undefined; } | { ...; } | { ...; } | { ...; } | { ...; }' is not assignable to type 'ColDef<User, any> | ColGroupDef<User>'.
+        Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; cellRenderer: (params: { value: string; data: User; }) => JSX.Element; cellClass?: undefined; valueFormatter?: undefined; width?: undefined; }' is not assignable to type 'ColDef<User, any> | ColGroupDef<User>'.
+          Type '{ headerName: string; field: string; sortable: boolean; filter: boolean; flex: number; cellRenderer: (params: { value: string; data: User; }) => JSX.Element; cellClass?: undefined; valueFormatter?: undefined; width?: undefined; }' is not assignable to type 'ColDef<User, any>'.
+            Types of property 'field' are incompatible.
+              Type 'string' is not assignable to type 'NestedFieldPaths<User, any, []>'.
+  Overload 2 of 2, '(props: AgGridReactProps<User>, context: any): AgGridReact<User>', gave the following error.
+    Object literal may only specify known properties, and 'theme' does not exist in type 'ColDef<User, any>'.
+src/utils/quotationCalculations.ts(24,7): error TS2322: Type 'string' is not assignable to type 'number'.

@@ -56,44 +56,6 @@
   text-decoration: underline;
 }
 
-.quotations-page .status-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.quotations-page .status-draft {
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-}
-
-.quotations-page .status-sent {
-  background: var(--info-bg, #e3f2fd);
-  color: var(--info, #1976d2);
-}
-
-.quotations-page .status-accepted {
-  background: var(--success-bg, #e8f5e9);
-  color: #388e3c;
-}
-
-.quotations-page .status-rejected {
-  background: #ffebee;
-  color: #d32f2f;
-}
-
-.quotations-page .status-converted {
-  background: var(--info-bg, #f3e5f5);
-  color: #7b1fa2;
-}
-
-.quotations-page .status-expired {
-  background: var(--warning-bg, #fff3e0);
-  color: #f57c00;
-}
-
 @media (max-width: 768px) {
   .quotations-page {
     padding: 12px;

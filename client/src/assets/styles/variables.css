@@ -39,6 +39,23 @@
   --info: #3B82F6;
   --info-light: rgba(59, 130, 246, 0.1);
 
+  /* Status Badge Colors — used in accordion and theme-default status badges */
+  --badge-draft-bg: #E9ECEF;
+  --badge-info-bg: #D1ECF1;
+  --badge-info-text: #0C5460;
+  --badge-success-bg: #D4EDDA;
+  --badge-error-bg: #F8D7DA;
+  --badge-warning-bg: #FFF3CD;
+  --badge-warning-text: #856404;
+
+  /* Accent Text Colors — darker semantic variants for titles and log badges */
+  --accent-info: #1e40af;
+  --accent-info-deep: #1e3a8a;
+  --accent-success: #065f46;
+  --accent-warning: #92400e;
+  --accent-log-info: #0369a1;
+  --accent-log-warning: #b45309;
+
   /* Text Colors */
   --text-primary: #1E293B;
   --text-secondary: #334155;

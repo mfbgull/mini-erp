@@ -353,7 +353,8 @@ describe('StockMovementModel', () => {
     });
 
     afterAll(() => {
-      // Clean up
+      // Clean up - must delete stock_movements first to avoid FK constraints on batch_id
+      db.prepare(`DELETE FROM stock_movements WHERE item_id = ?`).run(testItemId);
       db.prepare(`DELETE FROM stock_balances WHERE item_id = ?`).run(testItemId);
       db.prepare(`DELETE FROM stock_batches WHERE item_id = ?`).run(testItemId);
       ItemModel.delete(testItemId, db);
@@ -398,35 +399,29 @@ describe('StockMovementModel', () => {
       expect(batch2.quantity_remaining).toBe(40);
     });
 
-    it('falls back to standard_cost when batch stock is insufficient', () => {
+    it('throws error when batch stock is insufficient', () => {
       // Clean up old test data
       db.prepare(`DELETE FROM stock_batches WHERE item_id = ?`).run(testItemId);
-      db.prepare(`UPDATE stock_balances SET quantity = 0 WHERE item_id = ?`).run(testItemId);
+      db.prepare(`UPDATE stock_balances SET quantity = 10 WHERE item_id = ?`).run(testItemId);
 
       // Create just 1 batch with 10 units
       db.prepare(`INSERT INTO stock_batches (item_id, warehouse_id, batch_no, source_type, source_id, quantity_original, quantity_remaining, unit_cost, received_date)
         VALUES (?, ?, 'BATCH-TEST-3', 'PURCHASE', 0, 10, 10, 15, '2025-01-01')`).run(testItemId, testWhId);
 
-      // Consume 15 units (more than available in batches)
-      const consumption = StockMovementModel.consumeFromOldestBatches(
-        testItemId, testWhId, 15, db
-      );
-
-      expect(consumption).toHaveLength(2);
-      expect(consumption[0].batchId).not.toBeNull();
-      expect(consumption[0].consumed).toBe(10);
-
-      // Fallback entry should have null batchId and use standard_cost (10)
-      expect(consumption[1].batchId).toBeNull();
-      expect(consumption[1].consumed).toBeCloseTo(5, 2);
-      expect(consumption[1].unitCost).toBe(10); // standard_cost from item creation
+      // Attempting to consume more than available should throw
+      expect(() => {
+        StockMovementModel.consumeFromOldestBatches(
+          testItemId, testWhId, 15, db
+        );
+      }).toThrow('Insufficient stock');
     });
 
-    it('handles zero quantity gracefully', () => {
-      const consumption = StockMovementModel.consumeFromOldestBatches(
-        testItemId, testWhId, 0, db
-      );
-      expect(consumption).toHaveLength(0);
+    it('throws error for zero quantity', () => {
+      expect(() => {
+        StockMovementModel.consumeFromOldestBatches(
+          testItemId, testWhId, 0, db
+        );
+      }).toThrow('consumeFromOldestBatches: quantity must be positive, got 0');
     });
   });
 
@@ -452,6 +447,7 @@ describe('StockMovementModel', () => {
     });
 
     afterAll(() => {
+      db.prepare(`DELETE FROM stock_movements WHERE item_id = ?`).run(testItemId2);
       db.prepare(`DELETE FROM stock_balances WHERE item_id = ?`).run(testItemId2);
       db.prepare(`DELETE FROM stock_batches WHERE item_id = ?`).run(testItemId2);
       ItemModel.delete(testItemId2, db);

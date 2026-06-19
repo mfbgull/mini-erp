@@ -88,7 +88,7 @@ h4 { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; color: 
 
 .main-content.sidebar-active {
   margin-left: var(--sidebar-width);
-  background-color: #fafafa !important;
+  background-color: var(--neutral-50, #f8fafc) !important;
 }
 
 .main-content.sidebar-collapsed {

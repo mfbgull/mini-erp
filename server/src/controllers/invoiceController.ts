@@ -297,7 +297,7 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
       customer_id: parsedCustomerId,
       invoice_date,
       due_date,
-      status: initialStatus as 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled',
+      status: initialStatus as InvoiceStatus,
       total_amount: totalAmountNum,
       paid_amount: initialPaidAmount,
       balance_amount: initialBalanceAmount,
@@ -522,21 +522,11 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
                 PaymentModel.deleteAllocationsByPaymentId(db, deletedPaymentId);
                 PaymentModel.delete(db, deletedPaymentId);
 
-                    // Update paid/balance amounts for each affected invoice
+                    // Recalculate balance for each affected invoice using
+                    // the common helper (which accounts for returned_amount)
                     for (const alloc of allocations) {
-                        const paidResult = PaymentModel.getTotalPaidByInvoiceId(db, alloc.invoice_id);
-
-                        const invoiceForBalance = InvoiceModel.getInvoiceForBalance(db, alloc.invoice_id);
-
-                        const totalPaid = parseCurrency(paidResult);
-                        const totalAmt = parseCurrency(invoiceForBalance?.total_amount);
-                        const newBalance = subtractCurrency(totalAmt, totalPaid);
-
-                        InvoiceModel.updateInvoice(db, alloc.invoice_id, {
-                            paid_amount: totalPaid,
-                            balance_amount: newBalance,
-                            status: (invoiceForBalance?.status || 'Unpaid') as 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled'
-                        });
+                        calculateInvoiceBalance(alloc.invoice_id);
+                        updateInvoiceStatus(alloc.invoice_id);
                     }
             }
         }
@@ -560,16 +550,20 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
             InvoiceModel.createLedgerEntry(db, parsedCustomerId, newPaymentNo, 0, newPaymentAmount, `Payment ${newPaymentNo} for Invoice ${resolvedInvoiceNo}`);
         }
 
-        // === Recalculate paid/balance ===
+        // === Recalculate paid/balance (accounting for returned_amount) ===
         const paidResult = PaymentModel.getTotalPaidByInvoiceId(db, invoiceId);
 
         const totalPaid = parseCurrency(paidResult);
         const totalAmountNum = parseCurrency(total_amount);
-        const newBalanceAmount = subtractCurrency(totalAmountNum, totalPaid);
+        const returnedAmt = parseCurrency(originalInvoice?.returned_amount || 0);
+        const newBalanceAmount = Math.max(0, subtractCurrency(subtractCurrency(totalAmountNum, totalPaid), returnedAmt));
 
-        // Determine status
+        // Determine status (considering returned amount)
         let newStatus: InvoiceStatus;
-        if (newBalanceAmount <= 0 && totalAmountNum > 0) {
+        const fullyReturned = returnedAmt >= totalAmountNum && totalAmountNum > 0;
+        if (fullyReturned) {
+            newStatus = 'Returned';
+        } else if (newBalanceAmount <= 0 && totalAmountNum > 0) {
             newStatus = 'Paid';
         } else if (newBalanceAmount > 0 && newBalanceAmount < totalAmountNum) {
             newStatus = 'Partially Paid';
@@ -994,6 +988,18 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
       }
 
       // Update returned_amount on the invoice
+      // Guard: prevent monetary over-return (defense in depth beyond item-level check)
+      const currentReturned = Number(invoice.returned_amount || 0);
+      const newReturnedTotal = currentReturned + returnAmount;
+      if (newReturnedTotal > Number(invoice.total_amount)) {
+        throw new Error(
+          `Cannot return more than the invoice total. ` +
+          `Already returned: ${parseCurrency(currentReturned)}, ` +
+          `this return: ${parseCurrency(returnAmount)}, ` +
+          `invoice total: ${parseCurrency(invoice.total_amount)}.`
+        );
+      }
+      // Update returned_amount on the invoice (second copy kept for minimal diff)
       db.prepare(
         `UPDATE invoices SET returned_amount = returned_amount + ? WHERE id = ?`
       ).run(returnAmount.toFixed(2), invoiceId);

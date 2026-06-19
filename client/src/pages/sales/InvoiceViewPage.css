@@ -108,25 +108,32 @@
   margin: 0 0 16px 0;
 }
 
-/* Print Styles */
+/* Print Styles - invoice only */
 @media print {
-  .no-print {
-    display: none !important;
+  body * {
+    visibility: hidden;
+  }
+
+  .invoice-preview-wrapper,
+  .invoice-preview-wrapper * {
+    visibility: visible;
+  }
+
+  .invoice-preview-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
   }
 
   .invoice-view-page {
-    background: var(--card-bg, #ffffff);
-    min-height: auto;
+    background: white;
   }
 
   .invoice-view-container {
     padding: 0;
-  }
-
-  .invoice-preview-wrapper {
-    box-shadow: none;
-    border-radius: 0;
-    overflow-x: hidden;
   }
 }
 
@@ -261,4 +268,3 @@
 .returned-amount-banner strong {
   color: var(--error, #dc2626);
 }
-

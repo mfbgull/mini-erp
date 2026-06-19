@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+
 import { useCurrentContext } from '../utils/contextDetection';
 import { shouldIgnoreShortcut } from '../utils/inputGuard';
 
@@ -6,7 +7,6 @@ interface KeyboardShortcut {
   id: string;
   key: string;
   label: string;
-  action: string;
   context: string;
   handler: () => void;
   enabled?: boolean;

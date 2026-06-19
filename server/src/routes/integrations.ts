@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requirePermission } from '../middleware/requirePermission';
 import settingsController from '../controllers/settingsController';
 import emailService from '../services/integrations/emailService';
 import notificationService from '../services/integrations/notificationService';
@@ -11,14 +12,14 @@ import logger from '../utils/logger';
 
 const router = Router();
 
-// All integration routes require authentication and admin role
+// All integration routes require authentication and at least read permission
 router.use(authenticateToken);
-router.use(requireAdmin);
+router.use(requirePermission('integrations', 'read'));
 
 /**
  * Get all integration settings
  */
-router.get('/settings', (_req: Request, res: Response): void => {
+router.get('/settings', requirePermission('integrations', 'read'), (_req: Request, res: Response): void => {
   try {
     const integrationSettings = settingsController.getIntegrationSettings();
     res.json(integrationSettings);
@@ -31,7 +32,7 @@ router.get('/settings', (_req: Request, res: Response): void => {
 /**
  * Update integration setting
  */
-router.put('/settings/:service', (req: Request, res: Response): void => {
+router.put('/settings/:service', requirePermission('integrations', 'update'), (req: Request, res: Response): void => {
   try {
     const { service } = req.params;
 

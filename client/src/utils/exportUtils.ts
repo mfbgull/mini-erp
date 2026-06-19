@@ -16,7 +16,7 @@ interface Summary {
 
 interface Metadata {
   dateRange?: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
 }
 
 interface ExportOptions {
@@ -118,7 +118,7 @@ export const exportToPDF = (
       });
   });
 
-  const columnStyles: Record<number, any> = {};
+  const columnStyles: Record<number, Record<string, string | number>> = {};
   columns
     .filter(col => col.headerName && col.field !== 'actions')
     .forEach((col, index) => {
@@ -164,7 +164,8 @@ export const exportToPDF = (
     showHead: 'everyPage',
     margin: { top: margin, left: margin, right: margin, bottom: 15 },
     didDrawPage: (data: { cursor: { y: number }; pageNumber: number }) => {
-      const pageCount = (doc.internal as any).getNumberOfPages?.() || 1;
+      const internal = doc.internal as { getNumberOfPages?: () => number };
+      const pageCount = internal.getNumberOfPages?.() || 1;
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 150);
       doc.text(

@@ -24,8 +24,6 @@ interface SalesPreviewProps {
 }
 
 export default function SalesPreview({ invoice, onClose, onView, onEdit }: SalesPreviewProps) {
-  const isPaid = parseFloat(String(invoice.balance_amount || 0)) === 0;
-
   const getStatusInfo = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'paid': return { icon: Check, color: '#15803d', bg: '#dcfce7' };

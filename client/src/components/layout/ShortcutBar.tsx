@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useTranslation } from '../../hooks/useTranslation';
+
 import { LayoutGrid, X } from 'lucide-react';
 
-import { useCurrentContext } from '../../utils/contextDetection';
+import QuickActionsPanel from './QuickActionsPanel';
 import { useKeyboardShortcuts } from '../../context/KeyboardShortcutsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
-import QuickActionsPanel from './QuickActionsPanel';
+import { useTranslation } from '../../hooks/useTranslation';
+import { useCurrentContext } from '../../utils/contextDetection';
 import './ShortcutBar.css';
 
 /** Shortcut entry for display in the bar */
@@ -61,6 +62,7 @@ export default function ShortcutBar() {
       newValue,
       oldValue,
       storageArea: localStorage,
+      url: window.location.href,
     }));
   };
 
@@ -137,6 +139,13 @@ export default function ShortcutBar() {
             onClick={() => {
               setIsDismissed(true);
               localStorage.setItem('shortcutBarDismissed', 'true');
+              window.dispatchEvent(new StorageEvent('storage', {
+                key: 'shortcutBarDismissed',
+                newValue: 'true',
+                oldValue: 'false',
+                storageArea: localStorage,
+                url: window.location.href,
+              }));
             }}
             title={t('shortcuts.dismissBar') || 'Hide shortcut bar'}
             aria-label={t('shortcuts.dismissBar') || 'Hide shortcut bar'}

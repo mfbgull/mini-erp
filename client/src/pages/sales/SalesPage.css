@@ -6,6 +6,14 @@
   min-height: 0;
 }
 
+/* Returned indicator inline text (status cell has full background from shared CSS) */
+.returned-indicator {
+  color: var(--info, #1d4ed8);
+  font-weight: 500;
+  font-size: 11px;
+  margin-left: 4px;
+}
+
 /* Page header styles inherited from global.css */
 
 .sale-form .form-row {
@@ -130,68 +138,6 @@
   color: var(--primary-700);
   text-decoration: underline;
 }
-
-/* Status Badges */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: capitalize;
-}
-
-.status-paid {
-  background: var(--success-bg, #dcfce7);
-  color: #15803d;
-}
-
-.status-unpaid {
-  background: var(--error-bg, #fee2e2);
-  color: var(--error, #dc2626);
-}
-
-.status-partial {
-  background: var(--warning-bg, #fef3c7);
-  color: #d97706;
-}
-
-.status-partially-paid {
-  background: var(--warning-bg, #fef3c7);
-  color: #d97706;
-}
-
-.status-overdue {
-  background: var(--error-bg, #fee2e2);
-  color: var(--error, #dc2626);
-}
-
-.status-draft {
-  background: var(--neutral-100);
-  color: var(--neutral-600);
-}
-
-.status-returned {
-  background: var(--info-bg, #ede9fe);
-  color: #7c3aed;
-  margin-left: 4px;
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-
-.status-cell {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-.status-unknown {
-  background: var(--neutral-100);
-  color: var(--neutral-500);
-}
-
 
 /* Text Colors */
 .text-success {

@@ -1,3 +1,49 @@
+// Types for WebMCP tool definitions and API
+interface ToolParameterProperty {
+  type: string;
+  description?: string;
+  default?: unknown;
+  optional?: boolean;
+  format?: string;
+  enum?: string[];
+  items?: Record<string, unknown>;
+  minimum?: number;
+}
+
+interface ErpToolDefinition {
+  name: string;
+  description: string;
+  parameters: {
+    type: "object";
+    properties: Record<string, ToolParameterProperty>;
+    required?: string[];
+  };
+}
+
+interface WebMCPApi {
+  registerTool: (tool: {
+    name: string;
+    description: string;
+    parameters: Record<string, unknown>;
+    handler: (params: Record<string, unknown>) => Promise<unknown>;
+  }) => void;
+}
+
+interface WindowWithWebMCP extends Window {
+  WebMCP?: WebMCPApi;
+  mockWebMCP?: {
+    enable: () => void;
+    registerTool: (tool: {
+      name: string;
+      description: string;
+      parameters: Record<string, unknown>;
+      handler: (params: Record<string, unknown>) => Promise<unknown>;
+    }) => void;
+  };
+}
+
+type ToolParams = Record<string, unknown>;
+
 const erpTools = {
   searchCustomers: {
     name: "search_customers",
@@ -247,7 +293,7 @@ class MiniERPWebMCP {
       return;
     }
 
-    const win = window as any;
+    const win = window as unknown as WindowWithWebMCP;
     if (!win.WebMCP) {
       console.log('WebMCP: Browser does not support WebMCP yet');
       console.log('WebMCP: Requires Chrome Canary 146+ with --enable-features=WebMCP flag');
@@ -258,19 +304,19 @@ class MiniERPWebMCP {
     console.log('WebMCP: Mini ERP tools registered successfully');
   }
 
-  registerTools(WebMCP: any) {
+  registerTools(WebMCP: WebMCPApi) {
     Object.values(this.tools).forEach(tool => {
       WebMCP.registerTool({
-        name: (tool as any).name,
-        description: (tool as any).description,
-        parameters: (tool as any).parameters,
-        handler: this.createHandler(tool as any)
+        name: tool.name,
+        description: tool.description,
+        parameters: tool.parameters as unknown as Record<string, unknown>,
+        handler: this.createHandler(tool as unknown as ErpToolDefinition)
       });
     });
   }
 
-  createHandler(toolDefinition: any) {
-    return async (params: any) => {
+  createHandler(toolDefinition: ErpToolDefinition) {
+    return async (params: ToolParams) => {
       console.log(`WebMCP: Executing ${toolDefinition.name}`, params);
       
       try {
@@ -301,25 +347,25 @@ class MiniERPWebMCP {
     };
   }
 
-  async handleSearchCustomers(params: any) {
+  async handleSearchCustomers(params: ToolParams) {
     const response = await fetch(
-      `/api/mobile-invoices/customers/search?q=${encodeURIComponent(params.query)}&limit=${params.limit || 10}`
+      `/api/mobile-invoices/customers/search?q=${encodeURIComponent(String(params.query))}&limit=${params.limit || 10}`
     );
     return response.json();
   }
 
-  async handleGetCustomer(params: any) {
+  async handleGetCustomer(params: ToolParams) {
     const response = await fetch(`/api/customers/${params.customer_id}`);
     return response.json();
   }
 
-  async handleSearchItems(params: any) {
-    const url = `/api/mobile-invoices/items/search?q=${encodeURIComponent(params.query)}`;
+  async handleSearchItems(params: ToolParams) {
+    const url = `/api/mobile-invoices/items/search?q=${encodeURIComponent(String(params.query))}`;
     const response = await fetch(url);
     return response.json();
   }
 
-  async handleCheckStock(params: any) {
+  async handleCheckStock(params: ToolParams) {
     const response = await fetch('/api/inventory/check-stock', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -328,7 +374,7 @@ class MiniERPWebMCP {
     return response.json();
   }
 
-  async handleCreateInvoice(params: any) {
+  async handleCreateInvoice(params: ToolParams) {
     const invoiceData = {
       customer_id: params.customer_id,
       invoice_date: params.invoice_date || new Date().toISOString().split('T')[0],
@@ -348,12 +394,12 @@ class MiniERPWebMCP {
     return response.json();
   }
 
-  async handleGetInvoice(params: any) {
+  async handleGetInvoice(params: ToolParams) {
     const response = await fetch(`/api/invoices/${params.invoice_id}`);
     return response.json();
   }
 
-  async handleRecordPayment(params: any) {
+  async handleRecordPayment(params: ToolParams) {
     const paymentData = {
       invoice_id: params.invoice_id,
       amount: params.amount,
@@ -371,7 +417,7 @@ class MiniERPWebMCP {
     return response.json();
   }
 
-  async handleGetSalesReport(params: any) {
+  async handleGetSalesReport(params: ToolParams) {
     const response = await fetch(
       `/api/reports/sales?start=${params.start_date}&end=${params.end_date}&group_by=${params.group_by || 'day'}`
     );
@@ -394,17 +440,17 @@ if (typeof window !== 'undefined') {
 }
 
 function setupMockFallback() {
-  const win = window as any;
+  const win = window as unknown as WindowWithWebMCP;
   if (!win.WebMCP && win.mockWebMCP) {
     console.log('WebMCP: Real WebMCP not found, using mock fallback for testing');
     win.mockWebMCP.enable();
     
     Object.values(erpTools).forEach(tool => {
-      win.mockWebMCP.registerTool({
-        name: (tool as any).name,
-        description: (tool as any).description,
-        parameters: (tool as any).parameters,
-        handler: createMockHandler(tool as any)
+      win.mockWebMCP!.registerTool({
+        name: tool.name,
+        description: tool.description,
+        parameters: tool.parameters as unknown as Record<string, unknown>,
+        handler: createMockHandler(tool as unknown as ErpToolDefinition)
       });
     });
     
@@ -414,8 +460,8 @@ function setupMockFallback() {
   }
 }
 
-function createMockHandler(toolDefinition: any) {
-  return async (params: any) => {
+function createMockHandler(toolDefinition: ErpToolDefinition) {
+  return async (params: ToolParams) => {
     console.log(`WebMCP Mock: Executing ${toolDefinition.name}`, params);
     
     switch (toolDefinition.name) {
@@ -441,13 +487,13 @@ function createMockHandler(toolDefinition: any) {
   };
 }
 
-async function mockSearchCustomers(params: any) {
+async function mockSearchCustomers(params: ToolParams) {
   try {
     const response = await fetch(
-      `/api/mobile-invoices/customers/search?q=${encodeURIComponent(params.query)}&limit=${params.limit || 10}`
+      `/api/mobile-invoices/customers/search?q=${encodeURIComponent(String(params.query))}&limit=${params.limit || 10}`
     );
     return response.json();
-  } catch (e) {
+  } catch (_e) {
     return {
       success: true,
       data: [
@@ -458,7 +504,7 @@ async function mockSearchCustomers(params: any) {
   }
 }
 
-async function mockGetCustomer(params: any) {
+async function mockGetCustomer(params: ToolParams) {
   return {
     success: true,
     data: {
@@ -471,12 +517,12 @@ async function mockGetCustomer(params: any) {
   };
 }
 
-async function mockSearchItems(params: any) {
+async function mockSearchItems(params: ToolParams) {
   try {
-    const url = `/api/mobile-invoices/items/search?q=${encodeURIComponent(params.query)}`;
+    const url = `/api/mobile-invoices/items/search?q=${encodeURIComponent(String(params.query))}`;
     const response = await fetch(url);
     return response.json();
-  } catch (e) {
+  } catch (_e) {
     return {
       success: true,
       data: [
@@ -487,11 +533,11 @@ async function mockSearchItems(params: any) {
   }
 }
 
-async function mockCheckStock(params: any) {
+async function mockCheckStock(params: ToolParams) {
   return {
     success: true,
     available: true,
-    items: params.items.map((item: any) => ({
+    items: (params.items as Array<{ quantity: number; unit_price: number }>).map((item: { quantity: number; unit_price: number }) => ({
       ...item,
       available: 100,
       sufficient: true
@@ -499,8 +545,8 @@ async function mockCheckStock(params: any) {
   };
 }
 
-async function mockCreateInvoice(params: any) {
-  const total = params.items.reduce((sum: number, item: any) => 
+async function mockCreateInvoice(params: ToolParams) {
+  const total = (params.items as Array<{ quantity: number; unit_price: number }>).reduce((sum: number, item) => 
     sum + (item.quantity * item.unit_price), 0
   );
   
@@ -517,7 +563,7 @@ async function mockCreateInvoice(params: any) {
   };
 }
 
-async function mockGetInvoice(params: any) {
+async function mockGetInvoice(params: ToolParams) {
   return {
     success: true,
     data: {
@@ -531,7 +577,7 @@ async function mockGetInvoice(params: any) {
   };
 }
 
-async function mockRecordPayment(params: any) {
+async function mockRecordPayment(params: ToolParams) {
   return {
     success: true,
     data: {
@@ -544,7 +590,7 @@ async function mockRecordPayment(params: any) {
   };
 }
 
-async function mockGetSalesReport(params: any) {
+async function mockGetSalesReport(params: ToolParams) {
   return {
     success: true,
     data: {

@@ -8,7 +8,7 @@
     min-height: calc(100vh - 56px);
     padding: var(--space-lg);
     margin-left: 0;
-    background-color: #efefef !important;
+    background-color: var(--neutral-50, #f8fafc) !important;
   }
   
   .main-content.topmenu-active .content {
@@ -21,7 +21,7 @@
     min-height: 100vh;
     padding: 0;
     margin-left: var(--sidebar-width);
-    background-color: #efefef !important;
+    background-color: var(--neutral-50, #f8fafc) !important;
   }
   
   .main-content.sidebar-active .content {
@@ -691,31 +691,31 @@
      ============================================ */
   
   .accordion-detail-value.status-draft {
-    background: #E9ECEF !important;
+    background: var(--badge-draft-bg, #E9ECEF) !important;
     color: var(--neutral-700) !important;
   }
   
   .accordion-detail-value.status-submitted,
   .accordion-detail-value.status-confirmed {
-    background: #D1ECF1 !important;
-    color: #0C5460 !important;
+    background: var(--badge-info-bg, #D1ECF1) !important;
+    color: var(--badge-info-text, #0C5460) !important;
   }
   
   .accordion-detail-value.status-completed,
   .accordion-detail-value.status-paid {
-    background: #D4EDDA !important;
+    background: var(--badge-success-bg, #D4EDDA) !important;
     color: var(--success) !important;
   }
   
   .accordion-detail-value.status-cancelled,
   .accordion-detail-value.status-rejected {
-    background: #F8D7DA !important;
+    background: var(--badge-error-bg, #F8D7DA) !important;
     color: var(--error) !important;
   }
   
   .accordion-detail-value.status-overdue {
-    background: #FFF3CD !important;
-    color: #856404 !important;
+    background: var(--badge-warning-bg, #FFF3CD) !important;
+    color: var(--badge-warning-text, #856404) !important;
   }
   
   /* ============================================
@@ -781,40 +781,40 @@
   /* ============================================
      RESPONSIVE ADJUSTMENTS
      ============================================ */
-  
-  @media (max-width: 413px) {
-    .accordion-summary {
-      padding: var(--space-sm) !important;
-      min-height: 56px !important;
-    }
-    
-    .accordion-detail-grid {
-      grid-template-columns: 1fr !important;
-      gap: var(--space-sm) !important;
-    }
-    
-    .accordion-actions {
-      flex-direction: column !important;
-    }
-    
-    .accordion-actions .btn {
-      width: 100% !important;
-    }
-    
-    .accordion-value {
-      font-size: 13px !important;
-      min-width: 80px !important;
-    }
+}
+
+@media (max-width: 413px) {
+  .accordion-summary {
+    padding: var(--space-sm) !important;
+    min-height: 56px !important;
   }
   
-  @media (min-width: 414px) and (max-width: 768px) {
-    .accordion-actions {
-      flex-wrap: wrap !important;
-    }
-    
-    .accordion-actions .btn {
-      flex: 1 1 45% !important;
-    }
+  .accordion-detail-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  .accordion-actions {
+    flex-direction: column !important;
+  }
+  
+  .accordion-actions .btn {
+    width: 100% !important;
+  }
+  
+  .accordion-value {
+    font-size: 13px !important;
+    min-width: 80px !important;
+  }
+}
+
+@media (min-width: 414px) and (max-width: 768px) {
+  .accordion-actions {
+    flex-wrap: wrap !important;
+  }
+  
+  .accordion-actions .btn {
+    flex: 1 1 45% !important;
   }
 }
 
@@ -1018,14 +1018,13 @@
   html {
     scroll-behavior: smooth !important;
   }
-  
-  /* Respect user's motion preferences */
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

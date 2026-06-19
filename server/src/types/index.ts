@@ -61,7 +61,9 @@ export type InvoiceStatus =
   | 'Partially Paid'
   | 'Paid'
   | 'Overdue'
-  | 'Cancelled';
+  | 'Cancelled'
+  | 'Returned'
+  | 'Partially Returned';
 
 export interface InvoiceItemDTO {
   item_id: number;

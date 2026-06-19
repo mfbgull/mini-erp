@@ -303,35 +303,6 @@
   color: var(--error);
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: capitalize;
-}
-
-.status-paid {
-  background: #D4EDDA;
-  color: #155724;
-}
-
-.status-partially-paid {
-  background: #D1ECF1;
-  color: #0C5460;
-}
-
-.status-unpaid {
-  background: #F8D7DA;
-  color: #721C24;
-}
-
-.status-cancelled {
-  background: #F8F9FA;
-  color: #6C757D;
-}
-
 .expense-actions {
   display: flex;
   justify-content: flex-end;

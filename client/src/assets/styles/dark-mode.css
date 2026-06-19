@@ -35,6 +35,7 @@ html.dark {
   --input-bg: #111916;
   --bg-light: #0A0F0D;
   --bg-subtle: #1A2820;
+  --hover-bg: #1A2820;
   --border-color: #2D3D36;
   --border-color-light: #1A2820;
   --text-primary: #ECFEED;
@@ -52,6 +53,14 @@ html.dark {
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
   --focus-ring: 0 0 0 3px rgba(16, 185, 129, 0.3);
+
+  /* Accent Text Colors — lighter variants for dark mode */
+  --accent-info: #60A5FA;
+  --accent-info-deep: #93C5FD;
+  --accent-success: #34D399;
+  --accent-warning: #FBBF24;
+  --accent-log-info: #60A5FA;
+  --accent-log-warning: #FBBF24;
 }
 
 /* App container and main content */
@@ -552,10 +561,6 @@ html.dark .stat-card {
   color: var(--text-primary) !important;
 }
 
-html.dark .stat-card .stat-label {
-  color: var(--neutral-500) !important;
-}
-
 html.dark .stat-card .stat-value {
   color: var(--neutral-900) !important;
 }
@@ -653,10 +658,6 @@ html.dark .item-preview-content {
 html.dark .item-preview-stats {
   background: var(--neutral-50) !important;
   border-radius: var(--radius-md) !important;
-}
-
-html.dark .preview-stat-label {
-  color: var(--text-tertiary) !important;
 }
 
 html.dark .preview-stat-value {
@@ -762,9 +763,6 @@ html.dark .amount-card {
   background: #1F2937 !important;
   border-color: var(--border-color) !important;
 }
-html.dark .amount-label {
-  color: var(--neutral-400) !important;
-}
 html.dark .amount-value {
   color: var(--neutral-900) !important;
 }
@@ -777,9 +775,6 @@ html.dark .preview-details-grid {
 html.dark .preview-detail-item {
   background: #1F2937 !important;
   border-color: var(--border-color) !important;
-}
-html.dark .preview-detail-label {
-  color: var(--neutral-400) !important;
 }
 html.dark .preview-detail-value {
   color: var(--neutral-900) !important;
@@ -829,9 +824,6 @@ html.dark .preview-stat-card {
   background: var(--neutral-50) !important;
   border-color: var(--border-color) !important;
 }
-html.dark .stat-label {
-  color: var(--neutral-400) !important;
-}
 html.dark .stat-value {
   color: var(--neutral-900) !important;
 }
@@ -847,9 +839,6 @@ html.dark .preview-section-title {
 html.dark .preview-detail-item {
   background: var(--neutral-50) !important;
   border-color: var(--border-color) !important;
-}
-html.dark .detail-label {
-  color: var(--neutral-400) !important;
 }
 html.dark .detail-value {
   color: var(--neutral-900) !important;
@@ -890,10 +879,6 @@ html.dark .summary-card.warning {
   border-color: var(--warning) !important;
 }
 
-html.dark .summary-label {
-  color: var(--neutral-400) !important;
-}
-
 html.dark .summary-value {
   color: var(--neutral-900) !important;
 }
@@ -924,10 +909,6 @@ html.dark .invoice-preview-stats {
 html.dark .preview-stat {
   background: #1F2937 !important;
   border-color: var(--border-color) !important;
-}
-
-html.dark .preview-stat-label {
-  color: var(--neutral-400) !important;
 }
 
 html.dark .preview-stat-value {
@@ -1345,10 +1326,6 @@ html.dark .details-actions {
 
 
 
-html.dark .kpi-label {
-  color: var(--text-secondary) !important;
-}
-
 html.dark .kpi-value {
   color: var(--text-primary) !important;
 }
@@ -1526,9 +1503,9 @@ html.dark .btn-primary {
 }
 
 html.dark .btn-secondary {
-  background: var(--neutral-700) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
+  background: #374151 !important;
+  color: #F9FAFB !important;
+  border-color: #4B5563 !important;
 }
 
 html.dark .btn-success {
@@ -1652,10 +1629,6 @@ html.dark .page-subtitle {
 html.dark .stat-card {
   background: var(--card-bg) !important;
   border-color: var(--border-color) !important;
-}
-
-html.dark .stat-label {
-  color: var(--text-secondary) !important;
 }
 
 html.dark .stat-value {
@@ -2057,9 +2030,7 @@ html.dark .invoice-number-modern {
   color: var(--text-secondary) !important;
 }
 
-html.dark .section-label-modern {
-  color: var(--text-secondary) !important;
-}
+
 
 html.dark .company-name-modern {
   color: var(--text-primary) !important;
@@ -2095,9 +2066,7 @@ html.dark .items-title-modern {
   color: var(--text-primary) !important;
 }
 
-html.dark .discount-label-modern {
-  color: var(--text-secondary) !important;
-}
+
 
 html.dark .add-item-btn-modern {
   background: var(--primary) !important;
@@ -2199,9 +2168,7 @@ html.dark .invoice-footer-modern {
   border-color: var(--border-color) !important;
 }
 
-html.dark .footer-label {
-  color: var(--text-secondary) !important;
-}
+
 
 html.dark .footer-textarea {
   background: var(--input-bg) !important;
@@ -2218,9 +2185,7 @@ html.dark .payment-title {
   color: var(--text-primary) !important;
 }
 
-html.dark .payment-summary-item {
-  color: var(--text-secondary) !important;
-}
+
 
 html.dark .payment-checkbox {
   background: var(--bg-subtle) !important;
@@ -2793,6 +2758,73 @@ html.dark .sales-order-form-page .item-dropdown-item .item-dropdown-price {
 }
 
 /* ============================================
+   AG-GRID CELL STATUS COLORS — DARK MODE
+   Full-cell background tints for status columns
+   ============================================ */
+
+/* Success / Active / Paid group */
+html.dark .ag-cell.cell-status-active,
+html.dark .ag-cell.cell-status-paid,
+html.dark .ag-cell.cell-status-completed,
+html.dark .ag-cell.cell-status-accepted,
+html.dark .ag-cell.cell-status-invoiced,
+html.dark .ag-cell.cell-status-converted,
+html.dark .ag-cell.cell-balance-clear,
+html.dark .ag-cell.cell-movement-in,
+html.dark .ag-cell.cell-rate-excellent,
+html.dark .ag-cell.cell-rec-adequate {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  color: #34D399 !important;
+}
+
+/* Warning / Pending / Partial group */
+html.dark .ag-cell.cell-status-partial,
+html.dark .ag-cell.cell-status-partially-paid,
+html.dark .ag-cell.cell-status-pending,
+html.dark .ag-cell.cell-status-approved,
+html.dark .ag-cell.cell-status-sent,
+html.dark .ag-cell.cell-status-confirmed,
+html.dark .ag-cell.cell-stock-low,
+html.dark .ag-cell.cell-credit-warn,
+html.dark .ag-cell.cell-balance-due,
+html.dark .ag-cell.cell-rate-fair,
+html.dark .ag-cell.cell-rec-order-soon {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #FBBF24 !important;
+}
+
+/* Draft / Inactive / Neutral group */
+html.dark .ag-cell.cell-status-draft,
+html.dark .ag-cell.cell-status-expired,
+html.dark .ag-cell.cell-status-inactive,
+html.dark .ag-cell.cell-type-custom {
+  background-color: rgba(107, 114, 128, 0.2) !important;
+  color: #9CA3AF !important;
+}
+
+/* Error / Cancelled / Rejected group */
+html.dark .ag-cell.cell-status-cancelled,
+html.dark .ag-cell.cell-status-rejected,
+html.dark .ag-cell.cell-stock-out,
+html.dark .ag-cell.cell-credit-high,
+html.dark .ag-cell.cell-movement-out,
+html.dark .ag-cell.cell-rate-poor,
+html.dark .ag-cell.cell-rec-order-now {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  color: #FB7185 !important;
+}
+
+/* Info / Overdue / Unpaid / System group */
+html.dark .ag-cell.cell-status-overdue,
+html.dark .ag-cell.cell-status-unpaid,
+html.dark .ag-cell.cell-type-system,
+html.dark .ag-cell.cell-rate-good,
+html.dark .ag-cell.cell-rec-monitor {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+  color: #60A5FA !important;
+}
+
+/* ============================================
    AG-GRID FILTER INPUTS & MORE FORM FIXES
    ============================================ */
 html.dark .ag-theme-quartz .ag-filter-toolbar-search,
@@ -2849,15 +2881,6 @@ html.dark .ag-filter-select.active {
   color: white !important;
 }
 
-/* More button styles */
-html.dark .btn,
-html.dark .button,
-html.dark button[class*="btn"] {
-  background: var(--neutral-700) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
-}
-
 /* BOM Page stat-card fix - override page-specific white background */
 html.dark .bom-page .stat-card,
 html.dark body .bom-page .stat-card {
@@ -2872,14 +2895,7 @@ html.dark body .production-page .stat-card {
   background: var(--card-bg) !important;
 }
 
-/* All pages with stat-card - highest specificity */
-html.dark .stat-card,
-html.dark body .stat-card,
-html.dark [class*="stat-card"],
-html.dark [class*="summary-card"] {
-  background-color: var(--card-bg) !important;
-  background: var(--card-bg) !important;
-}
+
 
 /* POS Page comprehensive dark mode fixes */
 html.dark .pos-page,
@@ -2948,41 +2964,79 @@ html.dark .pos-page .qty-btn {
   border-color: var(--border-color) !important;
 }
 
-/* All page action buttons - Create New, Save, Cancel, etc */
-html.dark .bom-page .bom-actions .btn,
-html.dark .production-page .production-actions .btn,
-html.dark .page-header .header-actions .btn,
-html.dark .page-header-actions,
-html.dark .form-actions .btn,
-html.dark .action-buttons,
-html.dark .action-buttons .btn,
-html.dark .btn,
-html.dark .btn-primary,
-html.dark .btn-secondary,
-html.dark .btn-success,
-html.dark .btn-danger,
-html.dark .quick-action-btn,
-html.dark .btn-small {
-  background-color: var(--neutral-700) !important;
-  background: var(--neutral-700) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
+/* ============================================
+   LABEL & STAT TEXT DARK MODE — CONSOLIDATED
+   All label color overrides in one place
+   ============================================ */
+
+/* VALUES — most prominent, off-white */
+html.dark .stat-value,
+html.dark .summary-value,
+html.dark .preview-stat-value,
+html.dark .kpi-value {
+  color: #F9FAFB !important;
 }
 
-/* Primary action buttons (Create, Save, etc) */
-html.dark .btn-primary,
-html.dark .form-actions .btn-primary,
-html.dark .action-buttons .primary {
-  background-color: var(--primary) !important;
-  background: var(--primary) !important;
-  color: white !important;
+/* LABELS — secondary info, medium gray */
+html.dark .stat-label,
+html.dark .summary-label,
+html.dark .preview-stat-label,
+html.dark .kpi-label,
+html.dark .quick-stat-label,
+html.dark .section-label-modern,
+html.dark .discount-label-modern,
+html.dark .footer-label,
+html.dark .payment-summary-item,
+html.dark .miw-label,
+html.dark .miw-step-label,
+html.dark .miw-footer-label,
+html.dark .miw-summary-label,
+html.dark .miw-sheet-section-title,
+html.dark .status-card .status-label,
+html.dark .info-text .info-label,
+html.dark .setting-label,
+html.dark .total-label,
+html.dark .quick-access-label {
+  color: #9CA3AF !important;
 }
 
-/* Secondary/Cancel buttons */
-html.dark .btn-secondary,
-html.dark .form-actions .btn-secondary,
-html.dark .action-buttons .secondary {
-  background-color: var(--neutral-600) !important;
-  background: var(--neutral-600) !important;
+/* FORM LABELS — lighter gray for readability */
+html.dark .form-label,
+html.dark .checkbox-label,
+html.dark .payment-method-field label,
+html.dark .edit-payment-form .form-group label,
+html.dark .login-page .form-group label {
+  color: #D1D5DB !important;
+}
+
+/* LOGIN PAGE SPECIFIC LABELS */
+html.dark .login-footer strong {
+  color: #D1D5DB !important;
+}
+
+/* GENERIC label element */
+html.dark label {
+  color: #D1D5DB !important;
+}
+
+/* HARDCODED COLOR OVERRIDES */
+html.dark .balance-label {
+  color: #93C5FD !important;
+}
+
+html.dark .miw-customer-info-label {
+  color: #93C5FD !important;
+}
+
+/* WAREHOUSE & EMPTY STATE LABELS */
+html.dark .warehouse-label,
+html.dark .no-results p {
+  color: #9CA3AF !important;
+}
+
+/* SEARCH MODAL — close button hover fix */
+html.dark .search-modal-close-btn:hover {
+  background: var(--hover-bg, #1A2820) !important;
   color: var(--text-primary) !important;
 }
+

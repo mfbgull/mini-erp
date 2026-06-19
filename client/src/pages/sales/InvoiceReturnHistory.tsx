@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
@@ -15,7 +16,9 @@ import FormInput from '../../components/common/FormInput';
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
+import { getStatusCellClass } from '../../utils/statusCellUtils';
 import './SalesPage.css';
+import '../../styles/ag-grid-status-cells.css';
 
 interface ReturnRecord {
   id: number;
@@ -128,7 +131,8 @@ export default function InvoiceReturnHistory() {
       flex: 1,
       valueGetter: (params: any) => Math.abs(Number(params.data?.quantity || 0)) * Number(params.data?.unit_cost || 0),
       valueFormatter: (params: any) => fmtCurrency(params.value || 0),
-      cellStyle: { fontWeight: 600, color: '#dc2626' },
+      cellClass: 'cell-status-cancelled',
+      cellStyle: { fontWeight: 600 },
     },
     {
       headerName: 'Reason',
@@ -235,7 +239,7 @@ export default function InvoiceReturnHistory() {
       ) : (
         <div className="ag-theme-quartz ag-grid-container">
           <AgGridReact
-            theme="legacy"
+           
             rowData={returns}
             columnDefs={columnDefs}
             defaultColDef={{

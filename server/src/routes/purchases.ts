@@ -1,19 +1,20 @@
 import express from 'express';
 const router = express.Router();
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requirePermission } from '../middleware/requirePermission';
 import { sensitiveOperationLimiter } from '../middleware/rateLimiter';
 import purchaseController from '../controllers/purchaseController';
 
 router.use(authenticateToken);
 
-router.post('/purchases', sensitiveOperationLimiter, purchaseController.recordPurchase);
-router.get('/purchases', purchaseController.getPurchases);
-router.get('/purchases/returns', purchaseController.getReturnHistory);
-router.get('/purchases/:id', purchaseController.getPurchase);
-router.delete('/purchases/:id', requireAdmin, sensitiveOperationLimiter, purchaseController.deletePurchase);
-router.post('/purchases/:id/return', requireAdmin, sensitiveOperationLimiter, purchaseController.returnPurchaseItems);
-router.get('/purchases/summary/item/:item_id', purchaseController.getPurchaseSummaryByItem);
-router.get('/purchases/summary/daterange', purchaseController.getPurchaseSummaryByDateRange);
-router.get('/purchases/top-suppliers', purchaseController.getTopSuppliers);
+router.post('/purchases', requirePermission('purchases', 'create'), sensitiveOperationLimiter, purchaseController.recordPurchase);
+router.get('/purchases', requirePermission('purchases', 'read'), purchaseController.getPurchases);
+router.get('/purchases/returns', requirePermission('purchases', 'read'), purchaseController.getReturnHistory);
+router.get('/purchases/:id', requirePermission('purchases', 'read'), purchaseController.getPurchase);
+router.delete('/purchases/:id', requirePermission('purchases', 'delete'), sensitiveOperationLimiter, purchaseController.deletePurchase);
+router.post('/purchases/:id/return', requirePermission('purchases', 'update'), sensitiveOperationLimiter, purchaseController.returnPurchaseItems);
+router.get('/purchases/summary/item/:item_id', requirePermission('purchases', 'read'), purchaseController.getPurchaseSummaryByItem);
+router.get('/purchases/summary/daterange', requirePermission('purchases', 'read'), purchaseController.getPurchaseSummaryByDateRange);
+router.get('/purchases/top-suppliers', requirePermission('purchases', 'read'), purchaseController.getTopSuppliers);
 
 export default router;

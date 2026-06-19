@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 
 import { X, User, Package, DollarSign, Check, ChevronRight, ChevronLeft } from 'lucide-react';
 
-import type { Invoice, Customer, Item } from '../../types';
+import type { Customer, Item } from '../../types';
 import api from '../../utils/api';
 import { handleError } from '../../utils/errors';
 import Button from '../common/Button';
@@ -28,13 +28,13 @@ export function InvoiceWizard({ isOpen, onClose }: InvoiceWizardProps) {
   const [loading, setLoading] = useState(false);
 
   // Form data
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [items, setItems] = useState<any[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [invoiceItems, setInvoiceItems] = useState<LocalInvoiceItem[]>([]);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [taxPercent, setTaxPercent] = useState(10);
-  const [createdInvoice, setCreatedInvoice] = useState<any>(null);
+  const [createdInvoice, setCreatedInvoice] = useState<{ invoice_no: string } | null>(null);
 
   // Fetch data on mount
   const fetchCustomers = async () => {

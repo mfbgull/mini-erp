@@ -32,17 +32,14 @@ interface QuickActionsPanelProps {
 
 // Hook to detect screen size
 function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
 
   useEffect(() => {
     const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
-    const listener = () => setMatches(media.matches);
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
     media.addEventListener('change', listener);
     return () => media.removeEventListener('change', listener);
-  }, [matches, query]);
+  }, [query]);
 
   return matches;
 }
@@ -51,7 +48,6 @@ export default function QuickActionsPanel({ isOpen, onClose }: QuickActionsPanel
   const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const [isAnimating, setIsAnimating] = useState(false);
 
   // Define the 12 quick actions
   const quickActions: QuickActionItem[] = [

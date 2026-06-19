@@ -4,14 +4,14 @@ import toast from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Edit2, Trash2, FileText, Upload, Download, Paperclip, Eye, X, DollarSign } from 'lucide-react';
 
+import EmployeePreview from './EmployeePreview';
+import SalaryPayModal from './SalaryPayModal';
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
 import { useTranslation } from '../../hooks/useTranslation';
-import api from '../../utils/api';
 import type { Employee, EmployeeDocument } from '../../types';
-import EmployeePreview from './EmployeePreview';
-import SalaryPayModal from './SalaryPayModal';
+import api from '../../utils/api';
 import './EmployeesPage.css';
 
 export default function EmployeesPage() {

@@ -21,6 +21,7 @@ interface SearchableSelectProps {
   filterOption?: (option: SelectOption, query: string) => boolean;
   multiple?: boolean;
   loading?: boolean;
+  className?: string;
 }
 
 export default function SearchableSelect({
@@ -84,10 +85,6 @@ export default function SearchableSelect({
     }
   };
 
-  const toggleOption = (option: SelectOption) => {
-    handleSelect(option);
-  };
-
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     setSearchQuery(inputValue);
@@ -149,7 +146,7 @@ export default function SearchableSelect({
         setSearchQuery(selectedOption.label);
       }
     }
-  }, [value, options, multiple]);
+  }, [value, options, multiple, isOpen, searchQuery]);
 
   // Filter options to show available options
   const availableOptions = useMemo(() =>

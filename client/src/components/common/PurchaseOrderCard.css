@@ -35,7 +35,7 @@
   min-width: 0;
 }
 
-TH|.po-card-name {
+.po-card-name {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary, #164e63);
@@ -53,21 +53,13 @@ TH|.po-card-name {
   text-overflow: ellipsis;
 }
 
-MY|.po-card-status {
+.po-card-status {
   font-size: 0.7rem;
   font-weight: 500;
   padding: 4px 10px;
   border-radius: var(--radius-sm, 4px);
   width: fit-content;
   text-transform: uppercase;
-}
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary, #164e63);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .po-card-status {
@@ -258,14 +250,7 @@ MY|.po-card-status {
   text-overflow: ellipsis;
 }
 
-ZP|.po-modal-status {
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 4px 12px;
-  border-radius: var(--radius-sm, 4px);
-  width: fit-content;
-  text-transform: uppercase;
-}
+.po-modal-status {
   font-size: 0.75rem;
   font-weight: 500;
   padding: 4px 12px;
@@ -479,7 +464,7 @@ ZP|.po-modal-status {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-md, 16px);
-XV|}
+}
 
 /* Items List in Modal */
 .po-items-list {
@@ -541,8 +526,6 @@ XV|}
   color: var(--text-primary, #164e63);
   font-weight: 500;
 }
-
-JH|@media (max-width: 640px) {
 
 @media (max-width: 640px) {
   .po-cards-grid {

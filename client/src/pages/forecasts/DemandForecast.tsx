@@ -10,10 +10,12 @@ import {
 
 import SearchableSelect from '../../components/common/SearchableSelect';
 import { useSettings } from '../../context/SettingsContext';
-import { useTranslation } from '../../hooks/useTranslation';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
+import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
+import { getStockCellClass, getForecastRecommendationClass } from '../../utils/statusCellUtils';
 import './DemandForecast.css';
+import '../../styles/ag-grid-status-cells.css';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -71,14 +73,14 @@ function ConfidenceCellRenderer(props: { data: ForecastItem }) {
 
 function RecommendationCellRenderer(props: { data: ForecastItem }) {
   const { recommendation } = props.data;
-  const labels: Record<string, { text: string; className: string }> = {
-    order_now: { text: 'Order Now', className: 'rec-critical' },
-    order_soon: { text: 'Order Soon', className: 'rec-warning' },
-    monitor: { text: 'Monitor', className: 'rec-monitor' },
-    adequate: { text: 'Adequate', className: 'rec-adequate' }
+  const labels: Record<string, { text: string }> = {
+    order_now: { text: 'Order Now' },
+    order_soon: { text: 'Order Soon' },
+    monitor: { text: 'Monitor' },
+    adequate: { text: 'Adequate' }
   };
   const label = labels[recommendation] || labels.monitor;
-  return <span className={`recommendation-badge ${label.className}`}>{label.text}</span>;
+  return <span>{label.text}</span>;
 }
 
 function CompactForecastCard({ item, formatCurrency }: { item: ForecastItem; formatCurrency: (v: number) => string }) {
@@ -193,11 +195,9 @@ export default function DemandForecast() {
       field: 'currentStock',
       headerName: 'Stock',
       width: 90,
-      cellStyle: (params: CellStyleParams) => {
+      cellClass: (params: CellStyleParams) => {
         const predicted = params.data?.predictedDemand?.nextMonth || 0;
-        if (params.value < predicted * 0.5) return { color: '#dc2626', fontWeight: '600' as const };
-        if (params.value < predicted) return { color: '#d97706' };
-        return {};
+        return getStockCellClass(params.value, predicted > 0 ? predicted : 0);
       }
     },
     { field: 'predictedDemand.nextWeek', headerName: 'Predicted (Week)', width: 130 },
@@ -219,7 +219,8 @@ export default function DemandForecast() {
       field: 'recommendation',
       headerName: 'Recommendation',
       width: 140,
-      cellRenderer: RecommendationCellRenderer as any
+      cellRenderer: RecommendationCellRenderer as any,
+      cellClass: (params: any) => getForecastRecommendationClass(params.value)
     }
   ] as any, []);
 
@@ -325,7 +326,7 @@ export default function DemandForecast() {
         <GridSkeleton />
       ) : (
         <div className="forecast-grid ag-theme-quartz">
-          <AgGridReact theme="legacy"
+          <AgGridReact
             rowData={forecasts}
             columnDefs={columns}
             defaultColDef={{
@@ -335,7 +336,7 @@ export default function DemandForecast() {
             }}
             pagination={true}
             paginationPageSize={20}
-            rowSelection="single"
+            rowSelection={{ mode: 'singleRow' }}
           />
         </div>
       )}

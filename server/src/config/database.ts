@@ -24,6 +24,12 @@ db.pragma('foreign_keys = ON');
 // Enable WAL mode for better concurrency
 db.pragma('journal_mode = WAL');
 
+// Performance + safety: balance durability vs speed
+db.pragma('synchronous = NORMAL');
+
+// Wait up to 5s instead of failing immediately when locked
+db.pragma('busy_timeout = 5000');
+
 // Initialize database with schema if tables don't exist
 function initializeDatabase(): void {
   logger.info('Checking database initialization...');
@@ -189,6 +195,8 @@ function runCustomerARMigrations(): void {
     logger.info('✅ Customer ID type fix completed!');
 
     logger.info('Recalculating invoice balances from payment allocations...');
+    // Cap returned_amount at total_amount to prevent over-returns
+    db.exec(`UPDATE invoices SET returned_amount = total_amount WHERE returned_amount > total_amount AND total_amount > 0;`);
     db.exec(`
       UPDATE invoices SET
         paid_amount = COALESCE((
@@ -196,17 +204,19 @@ function runCustomerARMigrations(): void {
           FROM payment_allocations pa
           WHERE pa.invoice_id = invoices.id
         ), 0),
-        balance_amount = total_amount - COALESCE((
+        balance_amount = MAX(0, total_amount - COALESCE((
           SELECT SUM(pa.amount)
           FROM payment_allocations pa
           WHERE pa.invoice_id = invoices.id
-        ), 0)
-    `);
+        ), 0) - COALESCE(returned_amount, 0))
+        `);
 
-    db.exec(`
-      UPDATE invoices SET status = 'Paid' WHERE balance_amount = 0 AND total_amount > 0;
-      UPDATE invoices SET status = 'Partially Paid' WHERE balance_amount > 0 AND balance_amount < total_amount AND paid_amount > 0;
-      UPDATE invoices SET status = 'Unpaid' WHERE paid_amount = 0 OR paid_amount IS NULL;
+        db.exec(`
+      UPDATE invoices SET status = 'Returned' WHERE returned_amount >= total_amount AND total_amount > 0;
+      UPDATE invoices SET status = 'Partially Returned' WHERE returned_amount > 0 AND returned_amount < total_amount AND total_amount > 0;
+      UPDATE invoices SET status = 'Paid' WHERE balance_amount <= 0 AND total_amount > 0 AND (returned_amount IS NULL OR returned_amount = 0);
+      UPDATE invoices SET status = 'Partially Paid' WHERE balance_amount > 0 AND balance_amount < total_amount AND paid_amount > 0 AND (returned_amount IS NULL OR returned_amount = 0);
+      UPDATE invoices SET status = 'Unpaid' WHERE (paid_amount = 0 OR paid_amount IS NULL) AND (returned_amount IS NULL OR returned_amount = 0) AND total_amount > 0;
     `);
     logger.info('✅ Invoice balance recalculation completed!');
 
@@ -757,6 +767,7 @@ runGLFoundationMigration();
 runSalaryPaymentsMigration();
 runCreditBalanceMigration();
 runEmployeesMigration();
+runPhysicalCountsMigration();
 
 // Rollback support: run if --rollback flag is passed
 if (process.argv.includes('--rollback')) {
@@ -933,6 +944,30 @@ function seedDefaultPermissions(): void {
       { name: 'roles:create', module: 'roles', action: 'create', description: 'Create roles' },
       { name: 'roles:update', module: 'roles', action: 'update', description: 'Update roles' },
       { name: 'roles:delete', module: 'roles', action: 'delete', description: 'Delete roles' },
+
+      // Employees
+      { name: 'employees:read', module: 'employees', action: 'read', description: 'View employees' },
+      { name: 'employees:create', module: 'employees', action: 'create', description: 'Create employees' },
+      { name: 'employees:update', module: 'employees', action: 'update', description: 'Update employees' },
+      { name: 'employees:delete', module: 'employees', action: 'delete', description: 'Delete employees' },
+
+      // Forecasts
+      { name: 'forecasts:read', module: 'forecasts', action: 'read', description: 'View forecasts' },
+      { name: 'forecasts:create', module: 'forecasts', action: 'create', description: 'Generate forecasts' },
+
+      // Point of Sale (POS)
+      { name: 'pos:read', module: 'pos', action: 'read', description: 'View POS transactions' },
+      { name: 'pos:create', module: 'pos', action: 'create', description: 'Create POS sales' },
+
+      // Activity Log
+      { name: 'activity_log:read', module: 'activity_log', action: 'read', description: 'View activity logs' },
+
+      // Integrations
+      { name: 'integrations:read', module: 'integrations', action: 'read', description: 'View integration settings' },
+      { name: 'integrations:update', module: 'integrations', action: 'update', description: 'Update integration settings' },
+
+      // Accounting
+      { name: 'accounting:read', module: 'accounting', action: 'read', description: 'View accounting data' },
     ];
 
     // Insert permissions
@@ -1231,6 +1266,30 @@ function runSalaryPaymentsMigration(): void {
     }
   } catch (error: any) {
     logger.error('Salary payments migration error:', error.message);
+  }
+}
+
+function runPhysicalCountsMigration(): void {
+  try {
+    const physicalCountsTableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='physical_counts'
+    `).get() as { name: string } | undefined;
+
+    if (!physicalCountsTableCheck) {
+      logger.info('Running physical counts migration...');
+
+      const physicalCountsSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-physical-counts.sql'),
+        'utf8'
+      );
+
+      db.exec(physicalCountsSQL);
+
+      logger.info('✅ Physical counts migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Physical counts migration error:', error.message);
   }
 }
 

@@ -3,6 +3,7 @@ import Database from 'better-sqlite3';
 import ItemModel from '../models/Item';
 import WarehouseModel from '../models/Warehouse';
 import StockMovementModel from '../models/StockMovement';
+import PhysicalCountModel from '../models/PhysicalCount';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
@@ -394,6 +395,138 @@ function getStockBalances(req: Request, res: Response): void {
   }
 }
 
+function getPhysicalCounts(req: Request, res: Response): void {
+  try {
+    const counts = PhysicalCountModel.getAll(db);
+    res.json({
+      success: true,
+      data: counts
+    });
+  } catch (error) {
+    logger.error('Get physical counts error:', error);
+    res.status(500).json({ error: 'Failed to fetch physical counts' });
+  }
+}
+
+function getPhysicalCount(req: Request, res: Response): void {
+  try {
+    const count = PhysicalCountModel.getById(Number(req.params.id), db);
+
+    if (!count) {
+      res.status(404).json({ error: 'Physical count not found' });
+      return;
+    }
+
+    const items = PhysicalCountModel.getItems(count.id, db);
+
+    res.json({
+      ...count,
+      items
+    });
+  } catch (error) {
+    logger.error('Get physical count error:', error);
+    res.status(500).json({ error: 'Failed to fetch physical count' });
+  }
+}
+
+function createPhysicalCount(req: AuthRequest, res: Response): void {
+  try {
+    const { warehouse_id, count_date, notes } = req.body;
+
+    if (!warehouse_id) {
+      res.status(400).json({ error: 'Warehouse is required' });
+      return;
+    }
+
+    const warehouse = WarehouseModel.getById(db, warehouse_id);
+    if (!warehouse) {
+      res.status(400).json({ error: 'Warehouse not found' });
+      return;
+    }
+
+    const countId = PhysicalCountModel.create({ warehouse_id, count_date, notes }, req.user!.id, db);
+
+    logCRUD(ActionType.ITEM_CREATE, 'PhysicalCount', countId, `Created physical count for ${warehouse.warehouse_name}`, req.user!.id, {
+      warehouse_id,
+      warehouse_name: warehouse.warehouse_name
+    });
+    req.activityLogged = true;
+
+    const newCount = PhysicalCountModel.getById(countId, db);
+    res.status(201).json(newCount);
+  } catch (error) {
+    logger.error('Create physical count error:', error);
+    res.status(500).json({ error: 'Failed to create physical count' });
+  }
+}
+
+function recordPhysicalCountItem(req: AuthRequest, res: Response): void {
+  try {
+    const countId = Number(req.params.id);
+    const { item_id, counted_quantity, notes } = req.body;
+
+    if (item_id === undefined || counted_quantity === undefined) {
+      res.status(400).json({ error: 'Item ID and counted quantity are required' });
+      return;
+    }
+
+    PhysicalCountModel.recordCount(countId, item_id, counted_quantity, req.user!.id, notes || null, db);
+
+    const item = PhysicalCountModel.getItems(countId, db).find(i => i.item_id === item_id);
+    res.json(item);
+  } catch (error: any) {
+    logger.error('Record physical count item error:', error);
+    res.status(500).json({ error: error.message || 'Failed to record count' });
+  }
+}
+
+function completePhysicalCount(req: AuthRequest, res: Response): void {
+  try {
+    const countId = Number(req.params.id);
+    PhysicalCountModel.completeCount(countId, req.user!.id, db);
+
+    logCRUD(ActionType.ITEM_UPDATE, 'PhysicalCount', countId, `Completed physical count`, req.user!.id);
+    req.activityLogged = true;
+
+    const count = PhysicalCountModel.getById(countId, db);
+    res.json(count);
+  } catch (error: any) {
+    logger.error('Complete physical count error:', error);
+    res.status(500).json({ error: error.message || 'Failed to complete count' });
+  }
+}
+
+function cancelPhysicalCount(req: AuthRequest, res: Response): void {
+  try {
+    const countId = Number(req.params.id);
+    PhysicalCountModel.cancelCount(countId, req.user!.id, db);
+
+    logCRUD(ActionType.ITEM_UPDATE, 'PhysicalCount', countId, `Cancelled physical count`, req.user!.id);
+    req.activityLogged = true;
+
+    const count = PhysicalCountModel.getById(countId, db);
+    res.json(count);
+  } catch (error: any) {
+    logger.error('Cancel physical count error:', error);
+    res.status(500).json({ error: error.message || 'Failed to cancel count' });
+  }
+}
+
+function deletePhysicalCount(req: AuthRequest, res: Response): void {
+  try {
+    const countId = Number(req.params.id);
+    PhysicalCountModel.deleteCount(countId, db);
+
+    logCRUD(ActionType.ITEM_DELETE, 'PhysicalCount', countId, `Deleted physical count`, req.user!.id);
+    req.activityLogged = true;
+
+    res.json({ success: true, message: 'Physical count deleted' });
+  } catch (error: any) {
+    logger.error('Delete physical count error:', error);
+    res.status(500).json({ error: error.message || 'Failed to delete count' });
+  }
+}
+
 export default {
   getItems,
   getItem,
@@ -412,5 +545,12 @@ export default {
   createStockMovement,
   getStockSummary,
   getItemLedger,
-  getStockBalances
+  getStockBalances,
+  getPhysicalCounts,
+  getPhysicalCount,
+  createPhysicalCount,
+  recordPhysicalCountItem,
+  completePhysicalCount,
+  cancelPhysicalCount,
+  deletePhysicalCount
 };

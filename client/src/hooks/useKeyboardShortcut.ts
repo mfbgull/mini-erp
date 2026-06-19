@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+
 import { useKeyboardShortcuts } from '../context/KeyboardShortcutsContext';
 import { useCurrentContext } from '../utils/contextDetection';
 
@@ -36,7 +37,6 @@ export function useKeyboardShortcut(
       id: shortcutId,
       key,
       label: options.label || idToLabel(shortcutId),
-      action: handler.toString(),
       context: options.context || currentContext,
       handler: () => handlerRef.current(),
       enabled: options.enabled !== false,

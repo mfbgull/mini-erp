@@ -60,6 +60,13 @@
     "salesByCustomerReport": "Sales by Customer Report",
     "customerStatementsReport": "Customer Statements Report",
     "dsoReport": "Days Sales Outstanding (DSO) Report",
+    "AR_Reports": "Accounts Receivable Reports",
+    "tabs": {
+      "AR_Aging": "AR Aging",
+      "Receivables_Summary": "Receivables Summary",
+      "Top_Debtors": "Top Debtors",
+      "DSO": "Days Sales Outstanding"
+    },
     "accountsReceivableReports": "Accounts Receivable Reports"
   },
   "quotations": {
@@ -396,7 +403,9 @@
     "createInvoice": "Create Invoice",
     "pos": "POS",
     "salesReport": "Sales Summary",
-    "stockValuation": "Stock Valuation"
+    "stockValuation": "Stock Valuation",
+    "printA4": "Print A4",
+    "receipt": "Receipt"
   },
   "inventory": {
     "items": "Items",
@@ -479,6 +488,7 @@
     "warehouses": "Warehouses",
     "stockMovements": "Stock Movements",
     "stockByWarehouse": "Stock by Warehouse",
+    "physicalCounts": "Physical Counts",
     "quotations": "Quotations",
     "salesOrders": "Sales Orders",
     "reportsDashboard": "Reports Dashboard",
@@ -571,6 +581,7 @@
     "email": "Email",
     "amount": "Amount",
     "balance": "Balance",
+    "returned": "Returned",
     "discount": "Discount",
     "tax": "Tax",
     "subtotal": "Subtotal",
@@ -656,6 +667,7 @@
     "noData": "No data found",
     "loading": "Loading...",
     "sales": "Sales",
+    "receiptPrinting": "Receipt printing...",
     "purchases": "Purchases",
     "production": "Production",
     "transfers": "Transfers",
@@ -672,7 +684,11 @@
   "shortcuts": {
     "quickActions": "Quick actions",
     "dismissBar": "Hide shortcut bar",
-    "noShortcuts": "No shortcuts"
+    "noShortcuts": "No shortcuts",
+    "printA4": "Print A4 Invoice",
+    "printReceipt": "Print Receipt (Thermal)",
+    "printPO": "Print Purchase Order",
+    "printQuotation": "Print Quotation"
   },
   "errors": {
     "notFound": "Not found",
@@ -680,6 +696,7 @@
     "serverError": "Server error",
     "badRequest": "Bad request",
     "comingSoon": "Coming soon",
-    "failed": "Failed"
+    "failed": "Failed",
+    "allowPopups": "Please allow popups to print receipts"
   }
 }

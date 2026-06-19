@@ -76,7 +76,7 @@ export interface SalesOrder {
 export interface SalesCycleChain {
   quotation?: Quotation;
   salesOrder?: SalesOrder;
-  invoice?: any;
+  invoice?: Record<string, unknown>;
 }
 
 // ============================================

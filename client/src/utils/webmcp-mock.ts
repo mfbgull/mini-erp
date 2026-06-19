@@ -1,8 +1,13 @@
 interface ToolDefinition {
   name: string;
   description: string;
-  parameters: any;
-  handler: (params: any) => Promise<any>;
+  parameters: Record<string, unknown>;
+  handler: (params: Record<string, unknown>) => Promise<unknown>;
+}
+
+interface WindowWithMock extends Window {
+  mockWebMCP: MockWebMCP;
+  WebMCP?: unknown;
 }
 
 class MockWebMCP {
@@ -30,7 +35,7 @@ class MockWebMCP {
     return Array.from(this.tools.keys());
   }
 
-  async callTool(name: string, params: any): Promise<any> {
+  async callTool(name: string, params: Record<string, unknown>): Promise<unknown> {
     if (!this.isEnabled) {
       throw new Error('Mock WebMCP not enabled');
     }
@@ -41,7 +46,7 @@ class MockWebMCP {
     }
 
     console.log(`🚀 Mock WebMCP: Calling ${name}`, params);
-    
+
     try {
       const result = await tool.handler(params);
       console.log(`✅ Mock WebMCP: ${name} succeeded`, result);
@@ -60,9 +65,9 @@ class MockWebMCP {
 const mockWebMCP = new MockWebMCP();
 
 if (typeof window !== 'undefined') {
-  (window as any).mockWebMCP = mockWebMCP;
-  
-  if (!(window as any).WebMCP) {
+  (window as unknown as WindowWithMock).mockWebMCP = mockWebMCP;
+
+  if (!(window as unknown as WindowWithMock).WebMCP) {
     console.log('Mock WebMCP available as window.mockWebMCP');
     console.log('Enable with: window.mockWebMCP.enable()');
     console.log('Or use real Chrome Canary with --enable-features=WebMCP');

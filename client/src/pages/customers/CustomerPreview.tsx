@@ -3,8 +3,8 @@ import React from 'react';
 import { format } from 'date-fns';
 import { X, Eye, Edit2, CreditCard, FileText } from 'lucide-react';
 
-import { formatCurrency } from '../../utils/formatters';
 import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
+import { formatCurrency } from '../../utils/formatters';
 import './CustomerPreview.css';
 
 interface Customer {

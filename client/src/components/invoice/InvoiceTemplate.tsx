@@ -44,9 +44,18 @@ interface Company {
   taxId?: string | null;
 }
 
+interface Payment {
+  id: number;
+  payment_date: string;
+  payment_method: string;
+  reference_no?: string | null;
+  amount: number;
+}
+
 interface InvoiceTemplateProps {
   invoice: Invoice;
   company?: Company;
+  payments?: Payment[];
 }
 
 // Helper function to safely convert any value to string for number parsing
@@ -62,7 +71,7 @@ const safeParseFloat = (value: unknown): number => {
   return isNaN(result) ? 0 : result;
 };
 
-const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invoice, company }, ref) => {
+const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invoice, company, payments = [] }, ref) => {
   // Ensure invoice exists and has required fields
   if (!invoice) {
     return (
@@ -359,10 +368,37 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
               <p>{invoice.notes}</p>
             </div>
           )}
-          {invoice.terms && (
-            <div className="terms-section">
-              <h4>Terms & Conditions</h4>
-              <p>{invoice.terms}</p>
+          {payments.length > 0 && (
+            <div className="payment-history-section">
+              <h4>Payment History</h4>
+              <table className="template-payments-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Method</th>
+                    <th>Reference</th>
+                    <th className="text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map(payment => (
+                    <tr key={payment.id}>
+                      <td>{formatDate(payment.payment_date)}</td>
+                      <td>{payment.payment_method}</td>
+                      <td>{payment.reference_no || '-'}</td>
+                      <td className="text-right">{formatCurrency(payment.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="payment-total-row">
+                    <td colSpan={3}>Total Paid</td>
+                    <td className="text-right">
+                      {formatCurrency(payments.reduce((sum, p) => sum + Number(p.amount || 0), 0))}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           )}
         </div>
@@ -391,12 +427,12 @@ const InvoiceTemplate = forwardRef<HTMLDivElement, InvoiceTemplateProps>(({ invo
             <>
               <div className="summary-row paid">
                 <span>Paid</span>
-                <span>-{formatCurrency(safeParseFloat(invoice.paid_amount || 0))}</span>
+                <span>{formatCurrency(safeParseFloat(invoice.paid_amount || 0))}</span>
               </div>
               {safeParseFloat(invoice.returned_amount) > 0 && (
                 <div className="summary-row returned">
                   <span>Returned</span>
-                  <span>-{formatCurrency(safeParseFloat(invoice.returned_amount))}</span>
+                  <span>{formatCurrency(safeParseFloat(invoice.returned_amount))}</span>
                 </div>
               )}
               <div className="summary-row balance">

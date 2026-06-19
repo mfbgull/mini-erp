@@ -24,7 +24,11 @@ interface PriceHistoryHintProps {
 export default function PriceHistoryHint({ history, currentPrice, onClose }: PriceHistoryHintProps) {
   const { formatCurrency, settings } = useSettings();
   const [isHovering, setIsHovering] = useState(false);
-  const [countdown, setCountdown] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(() => {
+    const value = settings?.tooltip_timeout?.value;
+    const parsed = parseInt(value || '10', 10);
+    return isNaN(parsed) || parsed < 1 ? 10 : parsed;
+  });
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -73,24 +77,44 @@ export default function PriceHistoryHint({ history, currentPrice, onClose }: Pri
     setCountdown(null);
   };
 
-  // Start timer on mount
+  // Start timer on mount — countdown initialized in useState
   useEffect(() => {
-    startTimer();
+    const timeoutSeconds = getTimeoutSeconds();
+    
+    // Clear any existing timers
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    // Start countdown interval
+    intervalRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev !== null && prev > 1) {
+          return prev - 1;
+        }
+        return prev;
+      });
+    }, 1000);
+
+    // Set timeout to close
+    timeoutRef.current = setTimeout(() => {
+      onClose();
+    }, timeoutSeconds * 1000);
 
     // Cleanup on unmount
     return () => {
       stopTimer();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle mouse enter - pause timer and keep tooltip open
-  const handleMouseEnter = (e: React.MouseEvent) => {
+  const handleMouseEnter = (_e: React.MouseEvent) => {
     setIsHovering(true);
     stopTimer(); // Stop the countdown - keep open while hovering
   };
 
   // Handle mouse leave - close immediately
-  const handleMouseLeave = (e: React.MouseEvent) => {
+  const handleMouseLeave = (_e: React.MouseEvent) => {
     setIsHovering(false);
     stopTimer();
     onClose(); // Close immediately when mouse leaves

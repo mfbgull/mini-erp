@@ -1,18 +1,19 @@
 import express from 'express';
 const router = express.Router();
 import invoiceController from '../controllers/invoiceController';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requirePermission } from '../middleware/requirePermission';
 
 router.use(authenticateToken);
 
-router.get('/', invoiceController.getInvoices);
-router.get('/returns', invoiceController.getInvoiceReturnHistory);
-router.get('/:id', invoiceController.getInvoice);
-router.get('/:id/payments', invoiceController.getInvoicePayments);
-router.post('/', invoiceController.createInvoice);
-router.put('/:id', invoiceController.updateInvoice);
-router.delete('/:id', requireAdmin, invoiceController.deleteInvoice);
-router.put('/:id/cancel', requireAdmin, invoiceController.cancelInvoice);
-router.post('/:id/return', requireAdmin, invoiceController.returnInvoiceItems);
+router.get('/', requirePermission('invoices', 'read'), invoiceController.getInvoices);
+router.get('/returns', requirePermission('invoices', 'read'), invoiceController.getInvoiceReturnHistory);
+router.get('/:id', requirePermission('invoices', 'read'), invoiceController.getInvoice);
+router.get('/:id/payments', requirePermission('invoices', 'read'), invoiceController.getInvoicePayments);
+router.post('/', requirePermission('invoices', 'create'), invoiceController.createInvoice);
+router.put('/:id', requirePermission('invoices', 'update'), invoiceController.updateInvoice);
+router.delete('/:id', requirePermission('invoices', 'delete'), invoiceController.deleteInvoice);
+router.put('/:id/cancel', requirePermission('invoices', 'update'), invoiceController.cancelInvoice);
+router.post('/:id/return', requirePermission('invoices', 'update'), invoiceController.returnInvoiceItems);
 
 export default router;

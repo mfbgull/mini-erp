@@ -12,6 +12,7 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const Button = memo(function Button({

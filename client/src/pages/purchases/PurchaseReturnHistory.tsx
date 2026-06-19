@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
 import { AgGridReact } from 'ag-grid-react';
 import { format } from 'date-fns';
@@ -16,6 +17,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import './PurchasesPage.css';
+import '../../styles/ag-grid-status-cells.css';
 
 interface ReturnRecord {
   id: number;
@@ -86,13 +88,9 @@ export default function PurchaseReturnHistory() {
       flex: 1,
       cellRenderer: (params: any) => {
         const type = params.value;
-        const label = type === 'PURCHASE_RETURN' ? 'Purchase Return' : 'PO Return';
-        return (
-          <span className={`return-type-badge ${type === 'PO_RETURN' ? 'po-return' : 'purchase-return'}`}>
-            {label}
-          </span>
-        );
+        return type === 'PURCHASE_RETURN' ? 'Purchase Return' : 'PO Return';
       },
+      cellClass: 'cell-status-cancelled',
     },
     {
       headerName: 'Reference',
@@ -134,7 +132,8 @@ export default function PurchaseReturnHistory() {
       flex: 1,
       valueGetter: (params: any) => Math.abs(Number(params.data?.quantity || 0)) * Number(params.data?.unit_cost || 0),
       valueFormatter: (params: any) => formatCurrency(params.value || 0),
-      cellStyle: { fontWeight: 600, color: '#dc2626' },
+      cellClass: 'cell-status-cancelled',
+      cellStyle: { fontWeight: 600 },
     },
     {
       headerName: 'Warehouse',
@@ -236,7 +235,7 @@ export default function PurchaseReturnHistory() {
       ) : (
         <div className="ag-theme-quartz ag-grid-container">
           <AgGridReact
-            theme="legacy"
+           
             rowData={returns}
             columnDefs={columnDefs}
             defaultColDef={{

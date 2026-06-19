@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
-import api from '../../utils/api';
 import { useTranslation } from '../../hooks/useTranslation';
+import api from '../../utils/api';
 import './ForecastDashboard.css';
 
 interface ForecastResult {

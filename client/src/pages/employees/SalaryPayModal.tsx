@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+
 import { useMutation } from '@tanstack/react-query';
 import { DollarSign } from 'lucide-react';
+
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
 import Modal from '../../components/common/Modal';
-import api from '../../utils/api';
 import type { Employee } from '../../types';
+import api from '../../utils/api';
 import './SalaryPayModal.css';
 
 interface SalaryPayModalProps {

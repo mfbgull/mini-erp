@@ -277,6 +277,55 @@
   line-height: 1.6;
 }
 
+/* Payment History inside invoice template */
+.payment-history-section {
+  margin-top: 20px;
+}
+
+.payment-history-section h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  margin: 0 0 12px 0;
+}
+
+.template-payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.template-payments-table th,
+.template-payments-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.template-payments-table th {
+  background: var(--neutral-50, #f8fafc);
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+}
+
+.template-payments-table .text-right {
+  text-align: right;
+}
+
+.template-payments-table tbody tr:hover {
+  background: var(--neutral-50, #f8fafc);
+}
+
+.template-payments-table .payment-total-row td {
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  border-bottom: none;
+  background: var(--neutral-50, #f8fafc);
+}
+
 .summary-totals {
   background: var(--neutral-50, #f8fafc);
   border-radius: 8px;
@@ -405,6 +454,18 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  .template-payments-table th {
+    background: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .template-payments-table .payment-total-row td {
+    background: #f9f9f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 
 /* Responsive */
@@ -464,6 +525,15 @@
 
   .summary-notes {
     padding-right: 0;
+  }
+
+  .template-payments-table {
+    font-size: 0.75rem;
+  }
+
+  .template-payments-table th,
+  .template-payments-table td {
+    padding: 6px 8px;
   }
 
   .summary-totals {

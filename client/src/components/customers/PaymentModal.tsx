@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -55,13 +55,10 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [outstandingInvoices, setOutstandingInvoices] = useState<Invoice[]>([]);
-  const [allocationTotal, setAllocationTotal] = useState(0);
-  const [unallocatedAmount, setUnallocatedAmount] = useState(0);
   const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery({
-    queryKey: ['outstandingInvoices', customerId],
+    queryKey: ['invoices', customerId],
     queryFn: async () => {
       const response = await api.get(`/invoices?customerId=${customerId}&status=Unpaid,Partially Paid,Overdue`);
       return response.data.data.filter((inv: Invoice) => (inv.balance_amount || 0) > 0);
@@ -69,23 +66,18 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
     enabled: !!customerId
   });
 
-  useEffect(() => {
-    if (invoices.length > 0) {
-      setOutstandingInvoices(invoices);
-    }
-  }, [invoices]);
-
-  useEffect(() => {
-    const totalAllocated = formData.invoice_allocations.reduce((sum, alloc) =>
+  const allocationTotal = useMemo(() => {
+    return formData.invoice_allocations.reduce((sum, alloc) =>
       sum + parseFloat(alloc.amount?.toString() || '0'), 0
     );
+  }, [formData.invoice_allocations]);
 
-    setAllocationTotal(totalAllocated);
-    setUnallocatedAmount(parseFloat(formData.amount || '0') - totalAllocated);
-  }, [formData.invoice_allocations, formData.amount]);
+  const unallocatedAmount = useMemo(() => {
+    return parseFloat(formData.amount || '0') - allocationTotal;
+  }, [formData.amount, allocationTotal]);
 
   const handleAddAllocation = (invoiceId: string | number) => {
-    const invoice = outstandingInvoices.find(inv => inv.id === invoiceId);
+    const invoice = invoices.find(inv => inv.id === invoiceId);
     if (!invoice) return;
 
     if (formData.invoice_allocations.some(alloc => alloc.invoice_id === invoiceId)) {
@@ -113,7 +105,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
   };
 
   const handleAllocationAmountChange = (invoiceId: string | number, amount: string) => {
-    const invoice = outstandingInvoices.find(inv => inv.id === invoiceId);
+    const invoice = invoices.find(inv => inv.id === invoiceId);
     if (!invoice) return;
 
     const newAmount = Math.min(parseFloat(amount || '0'), invoice.balance_amount);
@@ -131,7 +123,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
     const newAllocations: InvoiceAllocation[] = [];
     let amountLeft = remainingAmount;
 
-    outstandingInvoices.forEach(invoice => {
+    invoices.forEach(invoice => {
       if (amountLeft <= 0) return;
 
       const existingAllocation = formData.invoice_allocations.find(alloc => alloc.invoice_id === invoice.id);
@@ -213,7 +205,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
     }
 
     const invoiceNos = formData.invoice_allocations.map(alloc => {
-      const invoice = outstandingInvoices.find(inv => inv.id === alloc.invoice_id);
+      const invoice = invoices.find(inv => inv.id === alloc.invoice_id);
       return invoice?.invoice_no;
     }).filter(Boolean);
 
@@ -323,7 +315,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
           <>
             <div className="available-invoices">
               <label className="form-label">Available Invoices</label>
-              {outstandingInvoices
+              {invoices
                 .filter(inv => !formData.invoice_allocations.some(alloc => alloc.invoice_id === inv.id))
                 .map(invoice => (
                   <div key={invoice.id} className="invoice-item">
@@ -344,7 +336,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
                   </div>
                 ))}
 
-              {outstandingInvoices.filter(inv =>
+              {invoices.filter(inv =>
                 !formData.invoice_allocations.some(alloc => alloc.invoice_id === inv.id)
               ).length === 0 && (
                 <p className="no-invoices">No outstanding invoices</p>
@@ -355,7 +347,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
               <div className="allocated-invoices">
                 <label className="form-label">Allocated Invoices</label>
                 {formData.invoice_allocations.map(allocation => {
-                  const invoice = outstandingInvoices.find(inv => inv.id === allocation.invoice_id);
+                  const _invoice = invoices.find(inv => inv.id === allocation.invoice_id);
                   return (
                     <div key={allocation.invoice_id.toString()} className="allocation-item">
                       <div className="allocation-info">

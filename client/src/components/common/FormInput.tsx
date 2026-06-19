@@ -14,7 +14,8 @@ interface FormInputProps {
   label?: string;
   name?: string;
   type?: InputType;
-  value: string | number | boolean;
+  value?: string | number | boolean;
+  checked?: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   placeholder?: string;
   required?: boolean;
@@ -22,9 +23,16 @@ interface FormInputProps {
   error?: string;
   options?: SelectOption[];
   rows?: number;
+  helpText?: string;
+  help?: string;
   tooltip?: string;
   step?: string;
+  min?: string;
+  max?: string;
   className?: string;
+  style?: React.CSSProperties;
+  autoFocus?: boolean;
+  readOnly?: boolean;
   inputRef?: RefObject<HTMLInputElement>;
 }
 
@@ -33,15 +41,24 @@ export default function FormInput({
   name,
   type = 'text',
   value,
+  checked,
   onChange,
   placeholder,
   required = false,
   disabled = false,
+  error,
   options = [],
   rows = 3,
+  helpText,
+  help,
   tooltip,
   step,
+  min,
+  max,
   className,
+  style,
+  autoFocus,
+  readOnly,
   inputRef
 }: FormInputProps) {
   const inputId = `input-${name || 'default'}`;
@@ -117,7 +134,7 @@ export default function FormInput({
             id={inputId}
             type="checkbox"
             name={name}
-            checked={value as boolean}
+            checked={checked ?? (value as boolean)}
             onChange={onChange}
             disabled={disabled}
           />
@@ -136,10 +153,18 @@ export default function FormInput({
           placeholder={placeholder}
           required={required}
           disabled={disabled}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
           step={step || (type === 'number' ? '0.01' : undefined)}
+          min={min}
+          max={max}
           className={className ? `${className} form-input` : "form-input"}
+          style={style}
         />
       )}
+      {helpText && !error && <div className="form-help-text">{helpText}</div>}
+      {help && !error && <div className="form-help-text">{help}</div>}
+      {error && <div className="form-error">{error}</div>}
     </div>
   );
 }

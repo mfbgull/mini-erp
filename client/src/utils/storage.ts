@@ -15,7 +15,7 @@ export const storage = {
         return null;
       }
       return JSON.parse(user);
-    } catch (error) {
+    } catch {
       localStorage.removeItem(STORAGE_KEYS.USER);
       return null;
     }
@@ -24,7 +24,7 @@ export const storage = {
   setUser: (user: User): void => {
     try {
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-    } catch (error) {
+    } catch {
       // Silent fail - don't expose internal errors
     }
   },
@@ -32,7 +32,7 @@ export const storage = {
   removeUser: (): void => {
     try {
       localStorage.removeItem(STORAGE_KEYS.USER);
-    } catch (error) {
+    } catch {
       // Silent fail
     }
   },
@@ -41,7 +41,7 @@ export const storage = {
     try {
       // Only clear user - token is cleared server-side via cookie
       localStorage.removeItem(STORAGE_KEYS.USER);
-    } catch (error) {
+    } catch {
       // Silent fail
     }
   },
@@ -57,7 +57,7 @@ export const storage = {
   setTheme: (theme: string): void => {
     try {
       localStorage.setItem(STORAGE_KEYS.THEME, theme);
-    } catch (error) {
+    } catch {
       // Silent fail
     }
   },
@@ -73,7 +73,7 @@ export const storage = {
   setSidebarCollapsed: (collapsed: boolean): void => {
     try {
       localStorage.setItem(STORAGE_KEYS.SIDEBAR_COLLAPSED, String(collapsed));
-    } catch (error) {
+    } catch {
       // Silent fail
     }
   },

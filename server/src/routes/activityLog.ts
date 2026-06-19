@@ -4,7 +4,8 @@
  */
 
 import { Router } from 'express';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requirePermission } from '../middleware/requirePermission';
 import activityLogController from '../controllers/activityLogController';
 
 const router: Router = Router();
@@ -13,33 +14,33 @@ const router: Router = Router();
 router.use(authenticateToken);
 
 // Get activity logs with filters and pagination
-router.get('/', activityLogController.getActivityLogs);
+router.get('/', requirePermission('activity_log', 'read'), activityLogController.getActivityLogs);
 
 // Get activity statistics
-router.get('/stats', activityLogController.getActivityStats);
+router.get('/stats', requirePermission('activity_log', 'read'), activityLogController.getActivityStats);
 
 // Get recent activity (for dashboard)
-router.get('/recent', activityLogController.getRecentActivity);
+router.get('/recent', requirePermission('activity_log', 'read'), activityLogController.getRecentActivity);
 
 // Get available entity types for filtering
-router.get('/entity-types', activityLogController.getEntityTypes);
+router.get('/entity-types', requirePermission('activity_log', 'read'), activityLogController.getEntityTypes);
 
 // Get available actions for filtering
-router.get('/actions', activityLogController.getActions);
+router.get('/actions', requirePermission('activity_log', 'read'), activityLogController.getActions);
 
 // Get all users for filtering dropdown
-router.get('/users', activityLogController.getUsers);
+router.get('/users', requirePermission('activity_log', 'read'), activityLogController.getUsers);
 
 // Get activity logs for a specific user
-router.get('/user/:id', activityLogController.getUserActivity);
+router.get('/user/:id', requirePermission('activity_log', 'read'), activityLogController.getUserActivity);
 
 // Get activity logs for a specific entity
-router.get('/entity/:type/:id', activityLogController.getEntityActivity);
+router.get('/entity/:type/:id', requirePermission('activity_log', 'read'), activityLogController.getEntityActivity);
 
 // Export activity logs to CSV
-router.get('/export', activityLogController.exportLogs);
+router.get('/export', requirePermission('activity_log', 'read'), activityLogController.exportLogs);
 
 // Cleanup old logs (admin only)
-router.post('/cleanup', requireAdmin, activityLogController.cleanupLogs);
+router.post('/cleanup', requirePermission('activity_log', 'read'), activityLogController.cleanupLogs);
 
 export default router;

@@ -2,9 +2,8 @@ import React from 'react'
 
 import ReactDOM from 'react-dom/client'
 
-// AG-Grid CSS must be loaded upfront (all pages may use grids)
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-quartz.css'
+// AG-Grid Theming API (v33+) — no CSS file imports needed
+// AG Grid uses the Theming API by default (themeQuartz)
 import './utils/registerAgGrid'
 
 import App from './App'
@@ -45,14 +44,14 @@ if (import.meta.env.PROD) {
 } else if ('serviceWorker' in navigator) {
   // Unregister any stale service worker left from production build
   navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    for (let registration of registrations) {
+    for (const registration of registrations) {
       registration.unregister();
       console.log('Unregistered stale service worker');
     }
   });
   // Also clear any cached responses
   caches.keys().then(function(names) {
-    for (let name of names) {
+    for (const name of names) {
       caches.delete(name);
     }
   });

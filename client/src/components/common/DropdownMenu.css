@@ -98,6 +98,24 @@
   flex: 1;
 }
 
+/* Dark mode support */
+html.dark .dropdown-menu-content {
+  background: #1F2937;
+  border-color: #374151;
+}
+
+html.dark .dropdown-menu-item {
+  color: #D1D5DB;
+}
+
+html.dark .dropdown-menu-item:hover {
+  background: #374151;
+}
+
+html.dark .dropdown-menu-item.destructive:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
 /* Mobile-specific adjustments */
 @media (max-width: 768px) {
   .dropdown-menu-content {

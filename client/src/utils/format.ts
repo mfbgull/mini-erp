@@ -13,7 +13,6 @@ declare global {
 export const formatCurrency = (amount: number | string, settings: CurrencySettings | null = null): string => {
   try {
     const currencySymbol = settings?.currency_symbol || (typeof window !== 'undefined' ? window.defaultCurrency : 'Rs.');
-    const currencyCode = settings?.currency_code || 'PKR';
     const decimalPlaces = parseInt(settings?.decimal_places?.toString() || '2');
 
     const numAmount = parseFloat(amount.toString());

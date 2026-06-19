@@ -1,6 +1,9 @@
-import { useKeyboardShortcuts } from '../../context/KeyboardShortcutsContext';
-import { X, Search } from 'lucide-react';
 import { useState } from 'react';
+
+import { X, Search } from 'lucide-react';
+
+import { useKeyboardShortcuts } from '../../context/KeyboardShortcutsContext';
+import './KeyboardShortcutsHelp.css';
 
 export function KeyboardShortcutsHelp() {
   const { isHelpOpen, hideHelp, getShortcutsForContext } = useKeyboardShortcuts();
@@ -10,13 +13,6 @@ export function KeyboardShortcutsHelp() {
 
   const contexts = ['global', 'dashboard', 'inventory', 'sales', 'reports', 'purchases', 'forecasts'];
   
-  const filteredShortcuts = contexts.flatMap(context => 
-    getShortcutsForContext(context).map(shortcut => ({ ...shortcut, context }))
-  ).filter(shortcut => 
-    shortcut.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shortcut.key.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="keyboard-shortcuts-help-overlay" onClick={hideHelp}>
       <div className="keyboard-shortcuts-help-modal" onClick={e => e.stopPropagation()}>
@@ -48,7 +44,7 @@ export function KeyboardShortcutsHelp() {
                 <div className="shortcuts-list">
                   {contextShortcuts.map(shortcut => (
                     <div key={shortcut.id} className="shortcut-item">
-                      <span className="shortcut-action">{shortcut.action}</span>
+                      <span className="shortcut-label">{shortcut.label}</span>
                       <kbd className="shortcut-key">{shortcut.key}</kbd>
                     </div>
                   ))}

@@ -1,7 +1,8 @@
 import express from 'express';
 const router = express.Router();
 import paymentsController from '../controllers/paymentsController';
-import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { authenticateToken } from '../middleware/auth';
+import { requirePermission } from '../middleware/requirePermission';
 import { validateZodQuery, validateZodParams, zodSchemas } from '../middleware/validation';
 import { sensitiveOperationLimiter } from '../middleware/rateLimiter';
 import { z } from 'zod';
@@ -16,11 +17,11 @@ const paymentListQuery = z.object({
   customerId: z.string().regex(/^\d+$/).optional(),
 });
 
-router.get('/', validateZodQuery(paymentListQuery), paymentsController.getPayments);
-router.get('/:id', validateZodParams(zodSchemas.id), paymentsController.getPayment);
-router.post('/', sensitiveOperationLimiter, paymentsController.createPayment);
-router.put('/:id', sensitiveOperationLimiter, paymentsController.updatePayment);
-router.delete('/:id', requireAdmin, sensitiveOperationLimiter, paymentsController.deletePayment);
-router.post('/:id/allocate', sensitiveOperationLimiter, paymentsController.allocatePaymentToInvoice);
+router.get('/', requirePermission('payments', 'read'), validateZodQuery(paymentListQuery), paymentsController.getPayments);
+router.get('/:id', requirePermission('payments', 'read'), validateZodParams(zodSchemas.id), paymentsController.getPayment);
+router.post('/', requirePermission('payments', 'create'), sensitiveOperationLimiter, paymentsController.createPayment);
+router.put('/:id', requirePermission('payments', 'update'), sensitiveOperationLimiter, paymentsController.updatePayment);
+router.delete('/:id', requirePermission('payments', 'delete'), sensitiveOperationLimiter, paymentsController.deletePayment);
+router.post('/:id/allocate', requirePermission('payments', 'update'), sensitiveOperationLimiter, paymentsController.allocatePaymentToInvoice);
 
 export default router;

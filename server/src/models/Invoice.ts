@@ -13,7 +13,7 @@ export interface Invoice {
   quotation_id?: number; // Direct link to quotation (if created via SO from quotation)
   invoice_date: string;
   due_date?: string;
-  status: 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled';
+  status: 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled' | 'Returned' | 'Partially Returned';
   total_amount: number;
   paid_amount: number;
   balance_amount: number;
@@ -56,7 +56,7 @@ export interface CreateInvoiceDTO {
   quotation_id?: number;
   invoice_date: string;
   due_date?: string;
-  status?: 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled';
+  status?: 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled' | 'Returned' | 'Partially Returned';
   notes?: string;
   terms?: string;
   warehouse_id?: number;
@@ -88,7 +88,7 @@ export interface UpdateInvoiceDTO {
   customer_name?: string;
   invoice_date?: string;
   due_date?: string;
-  status?: 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled';
+  status?: 'Draft' | 'Sent' | 'Unpaid' | 'Partially Paid' | 'Paid' | 'Overdue' | 'Cancelled' | 'Returned' | 'Partially Returned';
   notes?: string;
   terms?: string;
   warehouse_id?: number;

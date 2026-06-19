@@ -2,6 +2,7 @@ import express from 'express';
 const router = express.Router();
 import customersController from '../controllers/customersController';
 import { authenticateToken } from '../middleware/auth';
+import { requirePermission } from '../middleware/requirePermission';
 import { validateZodQuery, validateZodParams, zodSchemas } from '../middleware/validation';
 import { z } from 'zod';
 
@@ -15,14 +16,14 @@ const customerListQuery = z.object({
   status: z.enum(['active', 'inactive', 'all']).optional().default('all'),
 });
 
-router.get('/', validateZodQuery(customerListQuery), customersController.getCustomers);
-router.get('/:id', validateZodParams(zodSchemas.id), customersController.getCustomer);
-router.post('/', customersController.createCustomer);
-router.put('/:id', customersController.updateCustomer);
-router.delete('/:id', customersController.deleteCustomer);
-router.get('/:id/ledger', customersController.getCustomerLedger);
-router.get('/:id/statement', customersController.getCustomerStatement);
-router.get('/:id/balance', customersController.getCustomerBalance);
-router.post('/recalculate-balances', customersController.recalculateAllBalances);
+router.get('/', requirePermission('customers', 'read'), validateZodQuery(customerListQuery), customersController.getCustomers);
+router.get('/:id', requirePermission('customers', 'read'), validateZodParams(zodSchemas.id), customersController.getCustomer);
+router.post('/', requirePermission('customers', 'create'), customersController.createCustomer);
+router.put('/:id', requirePermission('customers', 'update'), customersController.updateCustomer);
+router.delete('/:id', requirePermission('customers', 'delete'), customersController.deleteCustomer);
+router.get('/:id/ledger', requirePermission('customers', 'read'), customersController.getCustomerLedger);
+router.get('/:id/statement', requirePermission('customers', 'read'), customersController.getCustomerStatement);
+router.get('/:id/balance', requirePermission('customers', 'read'), customersController.getCustomerBalance);
+router.post('/recalculate-balances', requirePermission('customers', 'update'), customersController.recalculateAllBalances);
 
 export default router;

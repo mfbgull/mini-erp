@@ -1,0 +1,315 @@
+/* ============================================================
+   QuotationTemplateA4.css — Professional A4 Print Styles
+   ============================================================ */
+
+.quotation-a4 {
+  width: 100%;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 10mm 15mm;
+  background: #ffffff;
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1e293b;
+  line-height: 1.4;
+  font-size: 9.5pt;
+  box-sizing: border-box;
+}
+
+/* ── Header ── */
+.q-a4-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 5mm;
+  border-bottom: 2px solid #8b5cf6;
+  margin-bottom: 5mm;
+}
+
+.q-a4-header-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 4mm;
+}
+
+.q-a4-logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.q-a4-company-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.q-a4-company-name {
+  font-size: 14pt;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.q-a4-company-detail {
+  font-size: 8pt;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.q-a4-header-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.q-a4-title {
+  font-size: 22pt;
+  font-weight: 800;
+  color: #8b5cf6;
+  margin: 0;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.q-a4-no {
+  font-size: 9pt;
+  color: #64748b;
+  margin-top: 2mm;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  letter-spacing: 0.3px;
+}
+
+.q-a4-status {
+  display: inline-block;
+  margin-top: 2mm;
+  padding: 1.5mm 4mm;
+  border-radius: 3px;
+  font-size: 7pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.q-a4-status.q-status-draft { background: #f1f5f9; color: #475569; }
+.q-a4-status.q-status-sent { background: #dbeafe; color: #1d4ed8; }
+.q-a4-status.q-status-accepted { background: #dcfce7; color: #166534; }
+.q-a4-status.q-status-rejected { background: #fee2e2; color: #991b1b; }
+.q-a4-status.q-status-converted { background: #ede9fe; color: #6d28d9; }
+.q-a4-status.q-status-expired { background: #fef3c7; color: #92400e; }
+
+/* ── Info Section ── */
+.q-a4-info-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5mm;
+  margin-bottom: 5mm;
+}
+
+.q-a4-bill-to,
+.q-a4-details {
+  padding: 3mm 4mm;
+  background: #f8fafc;
+  border-radius: 4px;
+}
+
+.q-a4-section-label {
+  font-size: 7pt;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 2mm 0;
+}
+
+.q-a4-customer-name {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 1.5mm 0;
+}
+
+.q-a4-customer-detail {
+  font-size: 8pt;
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.q-a4-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5mm 0;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 8pt;
+}
+
+.q-a4-detail-row:last-child { border-bottom: none; }
+.q-a4-detail-label { color: #64748b; }
+.q-a4-detail-value { font-weight: 600; color: #0f172a; }
+
+/* ── Items Table ── */
+.q-a4-items-section { margin-bottom: 5mm; }
+
+.q-a4-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+}
+
+.q-a4-items-table thead tr { background: #1e293b; }
+
+.q-a4-items-table th {
+  padding: 2.5mm 3mm;
+  font-size: 7pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-align: left;
+}
+
+.q-a4-items-table th.q-col-qty,
+.q-a4-items-table th.q-col-rate,
+.q-a4-items-table th.q-col-discount,
+.q-a4-items-table th.q-col-tax,
+.q-a4-items-table th.q-col-amount { text-align: right; }
+
+.q-a4-items-table tbody tr { border-bottom: 1px solid #e2e8f0; }
+
+.q-a4-items-table td {
+  padding: 2mm 3mm;
+  color: #334155;
+  vertical-align: top;
+}
+
+.q-a4-items-table td.q-col-qty,
+.q-a4-items-table td.q-col-rate,
+.q-a4-items-table td.q-col-discount,
+.q-a4-items-table td.q-col-tax,
+.q-a4-items-table td.q-col-amount {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.q-item-name { font-weight: 500; color: #0f172a; }
+.q-item-code { font-size: 7pt; color: #94a3b8; margin-top: 1px; font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; }
+.q-a4-items-table td.q-col-amount { font-weight: 600; color: #0f172a; }
+.q-no-items { text-align: center; padding: 5mm; color: #94a3b8; font-style: italic; }
+
+/* ── Summary ── */
+.q-a4-summary-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5mm;
+  margin-bottom: 5mm;
+}
+
+.q-a4-summary-label {
+  font-size: 8pt;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 2mm 0;
+}
+
+.q-a4-notes p,
+.q-a4-terms p {
+  font-size: 8pt;
+  color: #64748b;
+  margin: 0 0 3mm 0;
+  line-height: 1.5;
+}
+
+.q-a4-terms { margin-top: 2mm; }
+
+.q-a4-summary-right { display: flex; justify-content: flex-end; }
+
+.q-a4-totals {
+  width: 100%;
+  background: #f8fafc;
+  border-radius: 4px;
+  padding: 3mm 4mm;
+}
+
+.q-a4-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5mm 0;
+  font-size: 9pt;
+  color: #475569;
+}
+
+.q-a4-total-row-discount { color: #16a34a; }
+
+.q-a4-total-row-grand {
+  border-top: 2px solid #e2e8f0;
+  margin-top: 1.5mm;
+  padding-top: 2.5mm;
+  font-size: 11pt;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ── Footer ── */
+.q-a4-footer {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 3mm;
+  text-align: center;
+}
+
+.q-a4-footer-thanks {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #8b5cf6;
+  margin: 0 0 1.5mm 0;
+}
+
+.q-a4-footer-terms {
+  font-size: 7.5pt;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Print ── */
+@media print {
+  @page { size: A4 portrait; margin: 10mm 15mm; }
+  .quotation-a4 { padding: 0; max-width: none; box-shadow: none; }
+  .q-a4-items-table thead tr { background: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .q-a4-items-table th { color: #ffffff !important; }
+  .q-a4-bill-to, .q-a4-details, .q-a4-totals { background: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .q-a4-logo { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .q-a4-summary-section { page-break-inside: avoid; }
+  .q-a4-footer { page-break-inside: avoid; }
+  .q-a4-items-table tbody tr { page-break-inside: avoid; }
+  .q-a4-items-table thead { display: table-header-group; }
+}
+
+/* ── Screen Preview ── */
+.quotation-a4 { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); border-radius: 4px; min-height: 297mm; }
+
+/* ── Error ── */
+.q-a4-error { padding: 10mm; text-align: center; color: #dc2626; }
+.q-a4-error h3 { margin: 0 0 2mm 0; font-size: 12pt; }
+.q-a4-error p { margin: 0; font-size: 9pt; color: #64748b; }
+
+/* ── Mobile ── */
+@media screen and (max-width: 768px) {
+  .quotation-a4 { padding: 4mm; min-height: auto; box-shadow: none; }
+  .q-a4-header { flex-direction: column; gap: 3mm; }
+  .q-a4-header-right { text-align: left; }
+  .q-a4-info-section { grid-template-columns: 1fr; gap: 3mm; }
+  .q-a4-summary-section { grid-template-columns: 1fr; gap: 3mm; }
+  .q-a4-items-table { font-size: 8pt; }
+  .q-a4-items-table th, .q-a4-items-table td { padding: 1.5mm 2mm; }
+  .q-a4-totals { max-width: 100%; }
+}

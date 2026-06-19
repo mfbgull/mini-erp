@@ -12,9 +12,11 @@ import SearchableSelect from "../../components/common/SearchableSelect";
 import StatCard, { StatsGrid } from "../../components/common/StatCard";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { useTranslation } from "../../hooks/useTranslation";
-import api from "../../utils/api";
 import type { Warehouse } from "../../types";
+import api from "../../utils/api";
+import { getStockCellClass } from "../../utils/statusCellUtils";
 import "./StockByWarehousePage.css";
+import "../../styles/ag-grid-status-cells.css";
 
 export default function StockByWarehousePage() {
   const { isMobile } = useMobileDetection();
@@ -219,10 +221,7 @@ export default function StockByWarehousePage() {
       flex: 1,
       valueFormatter: (params) =>
         `${parseFloat(params.value).toFixed(2)} ${params.data.unit_of_measure}`,
-      cellStyle: (params) => ({
-        fontWeight: "bold",
-        color: params.value > 0 ? "var(--success)" : "var(--neutral-400)",
-      }),
+      cellClass: (params) => getStockCellClass(params.value, 0),
     },
   ];
 
@@ -383,7 +382,7 @@ export default function StockByWarehousePage() {
       ) : (
         <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
           <AgGridReact
-            theme="legacy"
+           
             rowData={searchFilteredBalances}
             columnDefs={columnDefs}
             defaultColDef={{

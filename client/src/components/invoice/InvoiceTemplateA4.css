@@ -1,0 +1,569 @@
+/* ============================================================
+   InvoiceTemplateA4.css — Professional A4 Print Styles
+   Compact header (~12% page height), clean typography,
+   multi-page support with totals only on last page.
+   ============================================================ */
+
+.invoice-a4 {
+  width: 100%;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 10mm 15mm;
+  background: #ffffff;
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1e293b;
+  line-height: 1.4;
+  font-size: 9.5pt;
+  box-sizing: border-box;
+}
+
+/* ── Compact Header (~12% page height, down from ~50%) ── */
+.a4-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 5mm;
+  border-bottom: 2px solid #2563eb;
+  margin-bottom: 5mm;
+}
+
+.a4-header-left {
+  flex: 1;
+}
+
+.a4-header-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 4mm;
+}
+
+.a4-logo-placeholder {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.a4-company-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.a4-company-name {
+  font-size: 14pt;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.a4-company-detail {
+  font-size: 8pt;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.a4-header-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.a4-title {
+  font-size: 22pt;
+  font-weight: 800;
+  color: #2563eb;
+  margin: 0;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.a4-invoice-no {
+  font-size: 9pt;
+  color: #64748b;
+  margin-top: 2mm;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  letter-spacing: 0.3px;
+}
+
+.a4-status {
+  display: inline-block;
+  margin-top: 2mm;
+  padding: 1.5mm 4mm;
+  border-radius: 3px;
+  font-size: 7pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.a4-status.a4-status-paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.a4-status.a4-status-partial {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.a4-status.a4-status-unpaid {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.a4-status.a4-status-overdue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.a4-status.a4-status-draft {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.a4-status.a4-status-cancelled {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* ── Info Section (Bill To + Details) ── */
+.a4-info-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5mm;
+  margin-bottom: 5mm;
+}
+
+.a4-bill-to,
+.a4-details {
+  padding: 3mm 4mm;
+  background: #f8fafc;
+  border-radius: 4px;
+}
+
+.a4-section-label {
+  font-size: 7pt;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 2mm 0;
+}
+
+.a4-customer-name {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 1.5mm 0;
+}
+
+.a4-customer-detail {
+  font-size: 8pt;
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.a4-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5mm 0;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 8pt;
+}
+
+.a4-detail-row:last-child {
+  border-bottom: none;
+}
+
+.a4-detail-label {
+  color: #64748b;
+}
+
+.a4-detail-value {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* ── Items Table ── */
+.a4-items-section {
+  margin-bottom: 5mm;
+}
+
+.a4-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+}
+
+.a4-items-table thead tr {
+  background: #1e293b;
+}
+
+.a4-items-table th {
+  padding: 2.5mm 3mm;
+  font-size: 7pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-align: left;
+}
+
+.a4-items-table th.a4-col-qty,
+.a4-items-table th.a4-col-rate,
+.a4-items-table th.a4-col-discount,
+.a4-items-table th.a4-col-tax,
+.a4-items-table th.a4-col-amount {
+  text-align: right;
+}
+
+.a4-items-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.a4-items-table td {
+  padding: 2mm 3mm;
+  color: #334155;
+  vertical-align: top;
+}
+
+.a4-items-table td.a4-col-qty,
+.a4-items-table td.a4-col-rate,
+.a4-items-table td.a4-col-discount,
+.a4-items-table td.a4-col-tax,
+.a4-items-table td.a4-col-amount {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.a4-item-name {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.a4-item-code {
+  font-size: 7pt;
+  color: #94a3b8;
+  margin-top: 1px;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+}
+
+.a4-items-table td.a4-col-amount {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.a4-no-items {
+  text-align: center;
+  padding: 5mm;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ── Summary Section ── */
+.a4-summary-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5mm;
+  margin-bottom: 5mm;
+}
+
+.a4-summary-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+}
+
+.a4-summary-label {
+  font-size: 8pt;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 2mm 0;
+}
+
+.a4-notes p {
+  font-size: 8pt;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Payment History */
+.a4-payment-history {
+  margin-top: 2mm;
+}
+
+.a4-payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 7.5pt;
+}
+
+.a4-payments-table th,
+.a4-payments-table td {
+  padding: 1.5mm 2mm;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.a4-payments-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 6.5pt;
+  letter-spacing: 0.05em;
+}
+
+.a4-text-right {
+  text-align: right;
+}
+
+.a4-payment-total-row td {
+  font-weight: 700;
+  color: #1e293b;
+  border-bottom: none;
+  background: #f8fafc;
+}
+
+/* Totals Panel */
+.a4-summary-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.a4-totals {
+  width: 100%;
+  max-width: 100%;
+  background: #f8fafc;
+  border-radius: 4px;
+  padding: 3mm 4mm;
+}
+
+.a4-total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5mm 0;
+  font-size: 9pt;
+  color: #475569;
+}
+
+.a4-total-row-discount {
+  color: #16a34a;
+}
+
+.a4-total-row-grand {
+  border-top: 2px solid #e2e8f0;
+  margin-top: 1.5mm;
+  padding-top: 2.5mm;
+  font-size: 11pt;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.a4-total-row-paid {
+  color: #16a34a;
+}
+
+.a4-total-row-returned {
+  color: #dc2626;
+}
+
+.a4-total-row-balance {
+  background: #fef3c7;
+  margin: 1.5mm -4mm -3mm -4mm;
+  padding: 2.5mm 4mm;
+  border-radius: 0 0 4px 4px;
+  font-size: 10pt;
+  font-weight: 700;
+  color: #92400e;
+}
+
+/* ── Footer ── */
+.a4-footer {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 3mm;
+  text-align: center;
+}
+
+.a4-footer-thanks {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #2563eb;
+  margin: 0 0 1.5mm 0;
+}
+
+.a4-footer-terms {
+  font-size: 7.5pt;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   Print-Specific Styles
+   ============================================================ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 15mm;
+  }
+
+  .invoice-a4 {
+    padding: 0;
+    max-width: none;
+    box-shadow: none;
+  }
+
+  .a4-header {
+    border-bottom-color: #2563eb;
+  }
+
+  .a4-status {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .a4-items-table thead tr {
+    background: #1e293b !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .a4-items-table th {
+    color: #ffffff !important;
+  }
+
+  .a4-bill-to,
+  .a4-details,
+  .a4-totals {
+    background: #f8fafc !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .a4-total-row-balance {
+    background: #fef3c7 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .a4-payments-table th {
+    background: #f8fafc !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .a4-payment-total-row td {
+    background: #f8fafc !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .a4-logo-placeholder {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Page break handling — totals stay on last page */
+  .a4-summary-section {
+    page-break-inside: avoid;
+  }
+
+  .a4-footer {
+    page-break-inside: avoid;
+  }
+
+  /* Keep item rows together when possible */
+  .a4-items-table tbody tr {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure at least a header row stays with following rows */
+  .a4-items-table thead {
+    display: table-header-group;
+  }
+}
+
+/* ============================================================
+   Screen Preview Styles (for InvoiceViewPage)
+   ============================================================ */
+.invoice-a4 {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  min-height: 297mm;
+}
+
+/* ── Error States ── */
+.a4-error,
+.invoice-a4-error {
+  padding: 10mm;
+  text-align: center;
+  color: #dc2626;
+}
+
+.a4-error h3 {
+  margin: 0 0 2mm 0;
+  font-size: 12pt;
+}
+
+.a4-error p {
+  margin: 0;
+  font-size: 9pt;
+  color: #64748b;
+}
+
+/* ============================================================
+   Responsive / Mobile (screen only)
+   ============================================================ */
+@media screen and (max-width: 768px) {
+  .invoice-a4 {
+    padding: 4mm;
+    min-height: auto;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .a4-header {
+    flex-direction: column;
+    gap: 3mm;
+  }
+
+  .a4-header-right {
+    text-align: left;
+  }
+
+  .a4-info-section {
+    grid-template-columns: 1fr;
+    gap: 3mm;
+  }
+
+  .a4-summary-section {
+    grid-template-columns: 1fr;
+    gap: 3mm;
+  }
+
+  .a4-items-table {
+    font-size: 8pt;
+  }
+
+  .a4-items-table th,
+  .a4-items-table td {
+    padding: 1.5mm 2mm;
+  }
+
+  .a4-totals {
+    max-width: 100%;
+  }
+}

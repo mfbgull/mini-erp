@@ -11,8 +11,8 @@ import {
 import './TopMenu.css';
 
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
 import { useKeyboardShortcuts } from '../../context/KeyboardShortcutsContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useTranslation, getDir } from '../../hooks/useTranslation';
 import LanguageToggle from '../common/LanguageToggle';
 
@@ -32,7 +32,8 @@ const getNavItems = (): NavItem[] => [
       { path: '/inventory/items', labelKey: 'nav.items' },
       { path: '/inventory/warehouses', labelKey: 'nav.warehouses' },
       { path: '/inventory/stock-movements', labelKey: 'nav.stockMovements' },
-      { path: '/inventory/stock-by-warehouse', labelKey: 'nav.stockByWarehouse' }
+      { path: '/inventory/stock-by-warehouse', labelKey: 'nav.stockByWarehouse' },
+      { path: '/inventory/physical-counts', labelKey: 'nav.physicalCounts' }
     ]
   },
   {

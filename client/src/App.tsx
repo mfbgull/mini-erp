@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import { KeyboardShortcutsHelp } from './components/common/KeyboardShortcutsHelp';
 import PageLoader from './components/common/PageLoader';
 import SearchModal from './components/common/SearchModal';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -13,10 +14,9 @@ import Sidebar from './components/layout/Sidebar';
 import TopMenu from './components/layout/TopMenu';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { InvoiceProvider } from './context/InvoiceContext';
+import { KeyboardShortcutsProvider } from './context/KeyboardShortcutsContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { KeyboardShortcutsProvider } from './context/KeyboardShortcutsContext';
-import { KeyboardShortcutsHelp } from './components/common/KeyboardShortcutsHelp';
 import Dashboard from './pages/Dashboard';
 import LoginPage from './pages/LoginPage';
 
@@ -25,6 +25,7 @@ const ItemsPage = lazy(() => import('./pages/inventory/ItemsPage'));
 const WarehousesPage = lazy(() => import('./pages/inventory/WarehousesPage'));
 const StockMovementPage = lazy(() => import('./pages/inventory/StockMovementPage'));
 const StockByWarehousePage = lazy(() => import('./pages/inventory/StockByWarehousePage'));
+const PhysicalCountsPage = lazy(() => import('./pages/inventory/PhysicalCountsPage'));
 
 // Lazy loaded - Purchase module
 const PurchasesPage = lazy(() => import('./pages/purchases/PurchasesPage'));
@@ -53,6 +54,7 @@ const InvoiceWizardPage = lazy(() => import('./pages/invoice/InvoiceWizardPage')
 // Quotations & Sales Orders
 const QuotationsPage = lazy(() => import('./pages/quotations/QuotationsPage'));
 const QuotationFormPage = lazy(() => import('./pages/quotations/QuotationFormPage'));
+const QuotationViewPage = lazy(() => import('./pages/quotations/QuotationViewPage'));
 const SalesOrdersPage = lazy(() => import('./pages/sales-orders/SalesOrdersPage'));
 const SalesOrderFormPage = lazy(() => import('./pages/sales-orders/SalesOrderFormPage'));
 
@@ -89,7 +91,7 @@ const ExpensesReport = lazy(() => import('./pages/reports/ExpensesReport'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const UsersPage = lazy(() => import('./pages/users/UsersPage'));
 const RolesPage = lazy(() => import('./pages/roles/RolesPage'));
-const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'));
+const IntegrationsPage = lazy(() => import('./pages/integrations/IntegrationsPage'));
 const ExpensesPage = lazy(() => import('./pages/expenses/ExpensesPage'));
 const EmployeesPage = lazy(() => import('./pages/employees/EmployeesPage'));
 const PaymentsPage = lazy(() => import('./pages/payments/PaymentsPage'));
@@ -185,6 +187,7 @@ function AppLayout() {
               <Route path="/inventory/warehouses" element={<WarehousesPage />} />
               <Route path="/inventory/stock-movements" element={<StockMovementPage />} />
               <Route path="/inventory/stock-by-warehouse" element={<StockByWarehousePage />} />
+              <Route path="/inventory/physical-counts" element={<PhysicalCountsPage />} />
               <Route path="/purchases" element={<PurchasesPage />} />
               <Route path="/purchases/returns" element={<PurchaseReturnHistory />} />
               <Route path="/suppliers" element={<SuppliersPage />} />
@@ -225,7 +228,7 @@ function AppLayout() {
 <Route path="/sales" element={<SalesPage />} />
               <Route path="/quotations" element={<QuotationsPage />} />
               <Route path="/quotations/create" element={<QuotationFormPage mode="create" />} />
-              <Route path="/quotations/:id" element={<QuotationFormPage mode="view" />} />
+              <Route path="/quotations/:id" element={<QuotationViewPage />} />
               <Route path="/quotations/:id/edit" element={<QuotationFormPage mode="edit" />} />
               <Route path="/sales-orders" element={<SalesOrdersPage />} />
               <Route path="/sales-orders/create" element={<SalesOrderFormPage mode="create" />} />

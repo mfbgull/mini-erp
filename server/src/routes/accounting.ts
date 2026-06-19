@@ -19,6 +19,7 @@
 
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/auth';
+import { requirePermission } from '../middleware/requirePermission';
 import { sensitiveOperationLimiter } from '../middleware/rateLimiter';
 import accountingController from '../controllers/accountingController';
 
@@ -30,39 +31,41 @@ router.use(authenticateToken);
 // ---- Chart of accounts -----------------------------------------------------
 
 // GET /api/accounting/accounts
-router.get('/accounts', accountingController.listAccounts);
+router.get('/accounts', requirePermission('accounting', 'read'), accountingController.listAccounts);
 
 // GET /api/accounting/accounts/balances  (must come before /:code so it
 // doesn't get captured as a "code" param)
-router.get('/accounts/balances', accountingController.listAccountBalances);
+router.get('/accounts/balances', requirePermission('accounting', 'read'), accountingController.listAccountBalances);
 
 // GET /api/accounting/accounts/:code
-router.get('/accounts/:code', accountingController.getAccount);
+router.get('/accounts/:code', requirePermission('accounting', 'read'), accountingController.getAccount);
 
 // GET /api/accounting/accounts/:code/balance
-router.get('/accounts/:code/balance', accountingController.getAccountBalance);
+router.get('/accounts/:code/balance', requirePermission('accounting', 'read'), accountingController.getAccountBalance);
 
 // ---- Accounting periods ----------------------------------------------------
 
 // GET /api/accounting/periods
-router.get('/periods', accountingController.listPeriods);
+router.get('/periods', requirePermission('accounting', 'read'), accountingController.listPeriods);
 
 // GET /api/accounting/periods/current  (must come before /:id)
-router.get('/periods/current', accountingController.getCurrentPeriod);
+router.get('/periods/current', requirePermission('accounting', 'read'), accountingController.getCurrentPeriod);
 
 // GET /api/accounting/periods/:id
-router.get('/periods/:id', accountingController.getPeriod);
+router.get('/periods/:id', requirePermission('accounting', 'read'), accountingController.getPeriod);
 
-// POST /api/accounting/periods  (admin only; sensitive operation rate limit)
+// POST /api/accounting/periods  (sensitive operation; admin gated inside controller)
 router.post(
   '/periods',
+  requirePermission('accounting', 'update'),
   sensitiveOperationLimiter,
   accountingController.openPeriod
 );
 
-// POST /api/accounting/periods/:id/close  (admin only)
+// POST /api/accounting/periods/:id/close  (sensitive operation)
 router.post(
   '/periods/:id/close',
+  requirePermission('accounting', 'update'),
   sensitiveOperationLimiter,
   accountingController.closePeriod
 );

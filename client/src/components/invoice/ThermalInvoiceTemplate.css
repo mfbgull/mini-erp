@@ -1,0 +1,276 @@
+/* ============================================================
+   ThermalInvoiceTemplate.css — 80mm Thermal Receipt Styles
+   Continuous roll paper, single-column layout, monospace
+   ============================================================ */
+
+.thermal-receipt {
+  width: 72mm;   /* 80mm paper - 4mm margins on each side */
+  margin: 0 auto;
+  padding: 4mm 2mm;
+  background: #ffffff;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+  color: #000000;
+  font-size: 9pt;
+  line-height: 1.35;
+  box-sizing: border-box;
+}
+
+/* ── Header ── */
+.thermal-header {
+  text-align: center;
+  margin-bottom: 2mm;
+}
+
+.thermal-business-name {
+  font-size: 13pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2mm;
+  color: #000000;
+}
+
+.thermal-line {
+  font-size: 8.5pt;
+  color: #333333;
+  line-height: 1.5;
+}
+
+.thermal-divider {
+  font-size: 7pt;
+  color: #666666;
+  letter-spacing: 0;
+  white-space: pre;
+  line-height: 1.2;
+}
+
+/* ── Customer ── */
+.thermal-customer {
+  margin-bottom: 2mm;
+}
+
+/* ── Items Table ── */
+.thermal-items {
+  margin-bottom: 2mm;
+}
+
+.thermal-table-header {
+  display: flex;
+  font-size: 7.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1mm 0;
+  color: #000000;
+}
+
+.th-item {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+  word-break: break-word;
+  padding-right: 2mm;
+}
+
+.th-qty {
+  width: 10mm;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.th-amount {
+  width: 20mm;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.thermal-item-row {
+  display: flex;
+  font-size: 8pt;
+  padding: 0.5mm 0;
+  color: #333333;
+  align-items: flex-start;
+}
+
+.ti-name {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+  word-break: break-word;
+  padding-right: 2mm;
+  line-height: 1.4;
+}
+
+.ti-qty {
+  width: 10mm;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ti-amount {
+  width: 20mm;
+  text-align: right;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+/* ── Totals ── */
+.thermal-totals {
+  margin-bottom: 2mm;
+}
+
+.thermal-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8.5pt;
+  padding: 0.5mm 0;
+  color: #333333;
+}
+
+.thermal-total-grand {
+  font-size: 10pt;
+  font-weight: 700;
+  color: #000000;
+  border-top: 1px dashed #999999;
+  margin-top: 0.5mm;
+  padding-top: 1mm;
+}
+
+.thermal-total-paid {
+  color: #16a34a;
+}
+
+.thermal-total-returned {
+  color: #dc2626;
+}
+
+.thermal-total-balance {
+  font-weight: 700;
+  color: #92400e;
+  background: #fef3c7;
+  margin: 0.5mm -2mm 0 -2mm;
+  padding: 0.5mm 2mm;
+}
+
+.tt-label {
+  text-align: left;
+}
+
+.tt-value {
+  text-align: right;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+  min-width: 20mm;
+}
+
+/* ── QR Code ── */
+.thermal-qr-section {
+  margin-bottom: 2mm;
+  text-align: center;
+}
+
+.thermal-qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2mm 0;
+}
+
+.thermal-qr-code {
+  width: 60px;
+  height: 60px;
+}
+
+.thermal-qr-code svg {
+  width: 60px !important;
+  height: 60px !important;
+}
+
+.thermal-qr-placeholder {
+  width: 60px;
+  height: 60px;
+  border: 1px dashed #999999;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7pt;
+  color: #999999;
+}
+
+.thermal-qr-label {
+  font-size: 6.5pt;
+  color: #666666;
+  margin-top: 0.5mm;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+  letter-spacing: 0.3px;
+}
+
+/* ── Footer ── */
+.thermal-footer {
+  text-align: center;
+  margin-top: 2mm;
+}
+
+.thermal-footer-thanks {
+  font-size: 9pt;
+  font-weight: 600;
+  color: #000000;
+  margin: 1mm 0;
+}
+
+.thermal-footer-contact {
+  font-size: 7.5pt;
+  color: #666666;
+  line-height: 1.4;
+}
+
+.thermal-footer-terms {
+  font-size: 7pt;
+  color: #999999;
+  margin-top: 1mm;
+}
+
+/* ── Error ── */
+.thermal-error {
+  text-align: center;
+  padding: 5mm;
+  color: #dc2626;
+  font-size: 9pt;
+}
+
+/* ============================================================
+   Print-Specific Styles
+   ============================================================ */
+@media print {
+  @page {
+    size: 80mm 297mm;
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    width: 80mm;
+  }
+
+  .thermal-receipt {
+    box-shadow: none;
+    margin: 0 auto;
+    padding: 4mm 2mm;
+    width: 72mm;
+  }
+
+  .thermal-total-balance {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ============================================================
+   Screen Preview Styles
+   ============================================================ */
+.thermal-receipt {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  min-height: 100mm;
+}

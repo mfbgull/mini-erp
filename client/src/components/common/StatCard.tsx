@@ -1,4 +1,5 @@
 import { memo, ReactNode, CSSProperties } from 'react';
+
 import type { LucideIcon } from 'lucide-react';
 import '../../styles/components/stat-card.css';
 
