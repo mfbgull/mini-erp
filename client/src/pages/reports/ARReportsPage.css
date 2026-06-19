@@ -11,7 +11,11 @@
 }
 
 .report-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: var(--space-xl);
+  gap: var(--space-md);
 }
 
 .report-page-title {
@@ -31,6 +35,7 @@
 /* Date Range in Header */
 .report-page-header .date-range-picker {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: var(--space-md);
 }

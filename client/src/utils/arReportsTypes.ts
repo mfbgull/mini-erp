@@ -52,7 +52,7 @@ export interface TopDebtor {
 
 export interface DSOData {
   dso: number;
-  period: number;
+  period: { startDate: string; endDate: string };
   totalSales: number;
   totalAR: number;
   avgInvoiceValue: number;

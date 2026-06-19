@@ -2,35 +2,35 @@ import { useQuery } from '@tanstack/react-query';
 import api from '../utils/api';
 import type { ARAgingData, ReceivablesSummaryData, TopDebtor, DSOData } from '../utils/arReportsTypes';
 
-export function useARReportsData({ dateRange: _dateRange }: { dateRange: { from: string; to: string } }) {
+export function useARReportsData({ dateRange }: { dateRange: { from: string; to: string } }) {
   const aging = useQuery<ARAgingData>({
-    queryKey: ['arAging'],
+    queryKey: ['arAging', dateRange.to],
     queryFn: async () => {
-      const response = await api.get('/reports/ar-aging');
+      const response = await api.get('/reports/ar-aging', { params: { asOfDate: dateRange.to } });
       return response.data.data;
     },
   });
 
   const summary = useQuery<ReceivablesSummaryData>({
-    queryKey: ['arSummary'],
+    queryKey: ['arSummary', dateRange.to],
     queryFn: async () => {
-      const response = await api.get('/reports/ar-summary');
+      const response = await api.get('/reports/ar-summary', { params: { asOfDate: dateRange.to } });
       return response.data.data;
     },
   });
 
   const debtors = useQuery<TopDebtor[]>({
-    queryKey: ['topDebtors'],
+    queryKey: ['topDebtors', dateRange.to],
     queryFn: async () => {
-      const response = await api.get('/reports/top-debtors');
+      const response = await api.get('/reports/top-debtors', { params: { asOfDate: dateRange.to } });
       return response.data.data;
     },
   });
 
   const dso = useQuery<DSOData>({
-    queryKey: ['dso'],
+    queryKey: ['dso', dateRange.from, dateRange.to],
     queryFn: async () => {
-      const response = await api.get('/reports/dso');
+      const response = await api.get('/reports/dso', { params: { fromDate: dateRange.from, toDate: dateRange.to } });
       return response.data.data;
     },
   });

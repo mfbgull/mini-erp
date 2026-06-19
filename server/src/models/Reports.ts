@@ -79,33 +79,31 @@ function getCustomerStatements(db: Database.Database, customerId: number, startD
 }
 
 // Moved from reportsController
-function getTopDebtors(db: Database.Database, limit: number = 10) {
+function getTopDebtors(db: Database.Database, limit: number = 10, asOfDate?: string) {
+  const dateFilter = asOfDate ? ` AND i.invoice_date <= ?` : ``;
+  const params: any[] = [limit];
+  if (asOfDate) params.unshift(asOfDate);
   const rows = db.prepare(`
     SELECT c.customer_name, c.customer_code, SUM(i.balance_amount) as total_outstanding,
       SUM(i.balance_amount) as outstanding_balance,
       SUM(i.total_amount) as total_invoiced,
       COUNT(i.id) as invoice_count
     FROM invoices i JOIN customers c ON i.customer_id = c.id
-    WHERE i.status IN ('Unpaid', 'Partially Paid', 'Overdue') AND i.balance_amount > 0
+    WHERE i.status IN ('Unpaid', 'Partially Paid', 'Overdue') AND i.balance_amount > 0${dateFilter}
     GROUP BY i.customer_id ORDER BY total_outstanding DESC LIMIT ?
-  `).all(limit);
+  `).all(...params);
   return rows;
 }
 
 // Moved from reportsController
-function getDSOMetric(db: Database.Database, period: number = 30) {
-  const endDate = new Date();
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - period);
-  const startDateStr = startDate.toISOString().split('T')[0];
-  const endDateStr = endDate.toISOString().split('T')[0];
+function getDSOMetric(db: Database.Database, startDateStr: string, endDateStr: string) {
+  const days = Math.max(1, Math.ceil((new Date(endDateStr).getTime() - new Date(startDateStr).getTime()) / (1000 * 60 * 60 * 24)));
 
   const avgReceivables = db.prepare(`
     SELECT AVG(balance_amount) as avg_balance FROM invoices WHERE status IN ('Unpaid', 'Partially Paid', 'Overdue') AND invoice_date BETWEEN ? AND ?
   `).get(startDateStr, endDateStr) as { avg_balance: number };
 
   const totalCreditSales = db.prepare(`SELECT SUM(total_amount) as total FROM invoices WHERE invoice_date BETWEEN ? AND ?`).get(startDateStr, endDateStr) as { total: number };
-  const days = period;
   const dso = totalCreditSales.total > 0 ? (avgReceivables.avg_balance / totalCreditSales.total) * days : 0;
   const totalSales = totalCreditSales.total;
   const totalAR = avgReceivables.avg_balance;

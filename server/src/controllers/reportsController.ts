@@ -36,7 +36,8 @@ function getCustomerStatements(req: Request, res: Response): void {
 function getTopDebtors(req: Request, res: Response): void {
   try {
     const { limit = 10 } = req.query;
-    const debtors = ReportsModel.getTopDebtors(db, parseInt(limit as string, 10));
+    const asOfDate = (Array.isArray(req.query.asOfDate) ? req.query.asOfDate[0] : req.query.asOfDate) as string | undefined;
+    const debtors = ReportsModel.getTopDebtors(db, parseInt(limit as string, 10), asOfDate);
     res.json({ success: true, data: debtors });
   } catch (error) {
     logger.error('Error fetching top debtors:', error);
@@ -48,13 +49,17 @@ function getDSOMetric(req: Request, res: Response): void {
   try {
     const fromDate = String((Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
     const toDate = String((Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
-    let period: number;
-    if (fromDate && toDate) {
-      period = Math.ceil((new Date(toDate).getTime() - new Date(fromDate).getTime()) / (1000 * 60 * 60 * 24));
-    } else {
-      period = (req.query as { period?: number }).period ?? 30;
+    if (!fromDate || !toDate) {
+      const defaultEnd = new Date();
+      const defaultStart = new Date();
+      defaultStart.setDate(defaultStart.getDate() - 30);
+      const defaultFrom = defaultStart.toISOString().split('T')[0];
+      const defaultTo = defaultEnd.toISOString().split('T')[0];
+      const dsoData = ReportsModel.getDSOMetric(db, defaultFrom, defaultTo);
+      res.json({ success: true, data: dsoData });
+      return;
     }
-    const dsoData = ReportsModel.getDSOMetric(db, period);
+    const dsoData = ReportsModel.getDSOMetric(db, fromDate, toDate);
     res.json({ success: true, data: dsoData });
   } catch (error) {
     logger.error('Error fetching DSO metric:', error);
