@@ -2,8 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { Plus, Shield, Edit, Trash2, Key, MoreVertical } from 'lucide-react';
 
 import Button from '../../components/common/Button';
@@ -19,8 +18,6 @@ import type { Role } from '../../utils/roleTypes';
 
 import './RolesPage.css';
 import '../../styles/ag-grid-status-cells.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function RolesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -151,23 +148,15 @@ export default function RolesPage() {
           </div>
         </>
       ) : (
-        <div className="ag-theme-quartz grid-fill">
-          <AgGridReact
-            rowData={roles}
-            columnDefs={columnDefs as any}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={15}
-            paginationPageSizeSelector={[10, 15, 25, 50]}
-            rowSelection={{ mode: 'singleRow' } as const}
-            loading={isLoading}
-            onRowDoubleClicked={(params: { data: Role }) => handleEditPermissions(params.data)}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="grid-fill"
+          rowData={roles}
+          columnDefs={columnDefs as any}
+          paginationPageSize={15}
+          paginationPageSizeSelector={[10, 15, 25, 50]}
+          loading={isLoading}
+          onRowDoubleClicked={(params: { data: Role }) => handleEditPermissions(params.data)}
+        />
       )}
 
       {isModalOpen && (

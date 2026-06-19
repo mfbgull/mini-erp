@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   Package,
   AlertTriangle,
@@ -22,8 +21,6 @@ import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './InventoryReports.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 interface Warehouse {
   id: number;
@@ -173,15 +170,14 @@ export default function StockLevelReport() {
       <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData?.stockLevels && reportData.stockLevels.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData.stockLevels} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              getRowId={(params: any) => params.data.id || params.data.item_code || `row-${params.node.rowIndex}`}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params: any) => {
-                setTimeout(() => { if (params.api) { const ge = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0]; if (ge && ge.clientWidth > 0) params.columnApi.autoSizeAllColumns(); } }, 100);
-              }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData.stockLevels}
+            columnDefs={columnDefs as any}
+            getRowId={(params: any) => params.data.id || params.data.item_code || `row-${params.node.rowIndex}`}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-stock-level-list">
             {reportData.stockLevels.map((item, index) => (
               <div key={item.id || item.item_code || `stock-${index}`} className="stock-level-card"

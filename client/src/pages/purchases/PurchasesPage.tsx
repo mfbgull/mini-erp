@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
+import MiniERPGrid from "../../components/common/MiniERPGrid";
 import { format } from "date-fns";
 import {
   Plus,
@@ -254,17 +254,15 @@ export default function PurchasesPage() {
           onReturn={(purchase: any) => handleOpenReturn(purchase)}
         />
       ) : (
-        <div className="ag-theme-quartz ag-grid-container">
-          <AgGridReact
-            rowData={purchases as any[]}
-            columnDefs={columnDefs as any}
-            defaultColDef={{ resizable: true, sortable: false, filter: false }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            onRowDoubleClicked={(params: { data: Purchase }) => setPreviewPurchase(params.data)}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="ag-grid-container"
+          rowData={purchases as any[]}
+          columnDefs={columnDefs as any}
+          defaultColDef={{ resizable: true, sortable: false, filter: false }}
+          paginationPageSize={20}
+          rowSelection={null}
+          onRowDoubleClicked={(params: { data: Purchase }) => setPreviewPurchase(params.data)}
+        />
       )}
 
       {previewPurchase && (

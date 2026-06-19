@@ -1,8 +1,7 @@
 import { useState } from "react";
 
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { ModuleRegistry, ClientSideRowModelModule } from "ag-grid-community";
-import { AgGridReact } from "ag-grid-react";
+import MiniERPGrid from "../../components/common/MiniERPGrid";
 import {
   Plus,
   Search,
@@ -38,8 +37,6 @@ import type { Expense, ExpenseFormData, ExpenseCategory, StatusOption, PaymentMe
 import "../inventory/ItemPreview.css";
 import "./Expenses.css";
 import "../../styles/ag-grid-status-cells.css";
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const emptyForm = {
   expense_category: "",
@@ -435,33 +432,13 @@ export default function ExpensesPage() {
             onDelete={(id: number) => handleDelete(id)}
           />
         ) : expenses.length > 0 ? (
-          <div className="ag-theme-quartz ag-grid-container">
-            <AgGridReact
-              rowData={filteredExpenses}
-              columnDefs={columnDefs as any}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true,
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: "singleRow" }}
-              onGridReady={(params: any) => {
-                setTimeout(() => {
-                  if (params.api) {
-                    try {
-                      const gridElement = params.api.gridCore.ctrl.main.querySelectorAll(".ag-body-viewport")[0];
-                      if (gridElement && gridElement.clientWidth > 0) {
-                        params.columnApi.autoSizeAllColumns();
-                      }
-                    } catch { /* ignore */ }
-                  }
-                }, 100);
-              }}
-            />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="ag-grid-container"
+            rowData={filteredExpenses}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
         ) : (
           <div className="no-data">
             <FileText size={48} />

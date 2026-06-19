@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   Package,
   FileText,
@@ -23,8 +22,6 @@ import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './BOMUsageReport.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 interface InventoryItem {
   id: number;
@@ -134,14 +131,13 @@ export default function BOMUsageReport() {
       <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData?.usage && reportData.usage.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData.usage} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params: any) => {
-                setTimeout(() => { if (params.api) { const ge = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0]; if (ge && ge.clientWidth > 0) params.columnApi.autoSizeAllColumns(); } }, 100);
-              }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData.usage}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-bom-usage-list">
             {reportData.usage.map((bom, index) => (
               <div key={`${bom.bom_id || bom.bom_name}-${index}`} className="bom-usage-card"

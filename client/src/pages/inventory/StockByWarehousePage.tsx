@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
+import MiniERPGrid from "../../components/common/MiniERPGrid";
 import { Package, BarChart3, Building2, TrendingUp, FolderOpen, Activity, Search, X, Download, DollarSign, ArrowLeftRight } from "lucide-react";
 
 import ItemPreview from "./ItemPreview";
@@ -380,23 +380,14 @@ export default function StockByWarehousePage() {
           )}
         </>
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
-           
-            rowData={searchFilteredBalances}
-            columnDefs={columnDefs}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            onRowClicked={(params) => handleRowClick(params.data)}
-            rowSelection={{ mode: 'singleRow' }}
-          />
-        </div>
+        <MiniERPGrid
+          containerStyle={{ height: 600, width: '100%' }}
+          rowData={searchFilteredBalances}
+          columnDefs={columnDefs}
+          paginationPageSize={20}
+          paginationPageSizeSelector={[10, 20, 50, 100]}
+          onRowClicked={(params) => handleRowClick(params.data)}
+        />
       )}
 
       {/* Item Details Overlay - Mobile Only */}

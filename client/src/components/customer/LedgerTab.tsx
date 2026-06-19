@@ -5,7 +5,7 @@
 
 import { useMemo, memo, useRef, useCallback } from 'react';
 
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   FileText,
   FileSpreadsheet,
@@ -17,13 +17,9 @@ import {
 import { calculateLedgerTotals, formatDateString } from '../../utils/customerCalculations';
 import type { LedgerTabProps, LedgerEntry, LedgerColDef } from '../../utils/customerTypes';
 import { exportToCSV, exportToPDF, exportToImage, handlePrint } from '../../utils/ledgerExport';
-import { registerAgGrid } from '../../utils/registerAgGrid';
-
-registerAgGrid();
 
 function LedgerTab({ ledger, loading, customerName, formatCurrency }: LedgerTabProps) {
   const ledgerRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<AgGridReact<LedgerEntry>>(null);
 
   // Memoized totals
   const totals = useMemo(() => calculateLedgerTotals(ledger), [ledger]);
@@ -86,15 +82,6 @@ function LedgerTab({ ledger, loading, customerName, formatCurrency }: LedgerTabP
     [formatCurrency],
   );
 
-  const defaultColDef = useMemo(
-    () => ({
-      resizable: true,
-      sortable: true,
-      filter: true,
-    }),
-    [],
-  );
-
   // Memoized export handlers
   const handleCSV = useCallback(() => {
     exportToCSV(ledger, customerName, formatCurrency);
@@ -147,18 +134,14 @@ function LedgerTab({ ledger, loading, customerName, formatCurrency }: LedgerTabP
       ) : (
         <div ref={ledgerRef}>
           <div className="ledger-content">
-            <div className="ag-theme-quartz ledger-grid" style={{ height: 350 }}>
-              <AgGridReact<LedgerEntry>
-                ref={gridRef}
-                rowData={ledger}
-                columnDefs={columnDefs as any}
-                defaultColDef={defaultColDef}
-                pagination={true}
-                paginationPageSize={10}
-                paginationPageSizeSelector={[10, 15, 25, 50]}
-                rowSelection={{ mode: 'singleRow' }}
-              />
-            </div>
+            <MiniERPGrid
+              wrapperClassName="ledger-grid"
+              containerStyle={{ height: 350 }}
+              rowData={ledger}
+              columnDefs={columnDefs as any}
+              paginationPageSize={10}
+              paginationPageSizeSelector={[10, 15, 25, 50]}
+            />
 
             {/* Totals Sidebar */}
             <div className="ledger-totals">

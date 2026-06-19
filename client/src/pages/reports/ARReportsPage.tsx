@@ -77,7 +77,10 @@ export default function ARReportsPage() {
   return (
     <div className="report-page-modern">
       <div className="report-page-header">
-        <h1 className="report-page-title">{t("reports.AR_Reports")}</h1>
+        <div>
+          <h1 className="report-page-title">{t("reports.AR_Reports")}</h1>
+          <p className="report-page-subtitle">Track customer outstanding balances and payment aging</p>
+        </div>
         <div className="date-range-picker">
           <label>
             <span>{t("common.from")}</span>

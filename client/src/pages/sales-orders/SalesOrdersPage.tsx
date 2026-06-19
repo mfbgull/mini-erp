@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { format } from 'date-fns';
 import { ShoppingCart, FileText, CheckCircle, Send, Plus, Eye, Edit2, Trash2, ArrowRight, MoreVertical } from 'lucide-react';
 
@@ -182,24 +182,15 @@ export default function SalesOrdersPage() {
       </StatsGrid>
 
       <div className="sales-orders-content">
-        <div className="ag-theme-quartz grid-fill">
-          <AgGridReact
-            rowData={salesOrders}
-            columnDefs={columnDefs as any}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={15}
-            paginationPageSizeSelector={[10, 15, 25, 50]}
-            rowSelection={{ mode: 'singleRow' }}
-            animateRows={true}
-            loading={isLoading}
-            onRowDoubleClicked={(params: { data: SalesOrder }) => navigate(`/sales-orders/${params.data.id}`)}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="grid-fill"
+          rowData={salesOrders}
+          columnDefs={columnDefs as any}
+          paginationPageSize={15}
+          paginationPageSizeSelector={[10, 15, 25, 50]}
+          loading={isLoading}
+          onRowDoubleClicked={(params: { data: SalesOrder }) => navigate(`/sales-orders/${params.data.id}`)}
+        />
       </div>
     </div>
   );

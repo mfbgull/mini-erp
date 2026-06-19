@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { Search, X, Factory, MoreVertical, Edit2, Trash2, Eye } from 'lucide-react';
 
 import WarehousePreview from './WarehousePreview';
@@ -202,23 +202,16 @@ export default function WarehousesPage() {
           ))}
         </div>
       ) : gridReady ? (
-        <div className="ag-theme-quartz warehouses-grid-wrapper">
-          <AgGridReact
-            rowData={filteredWarehouses}
-            columnDefs={columnDefs as any}
-            defaultColDef={{
-              resizable: true,
-              sortable: false,
-              filter: false
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            onRowDoubleClicked={(params: { data: Warehouse }) => setPreviewWarehouse(params.data)}
-            rowSelection={{ mode: 'singleRow' } as const}
-            suppressMaxRenderedRowRestriction={true}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="warehouses-grid-wrapper"
+          rowData={filteredWarehouses}
+          columnDefs={columnDefs as any}
+          defaultColDef={{ resizable: true, sortable: false, filter: false }}
+          paginationPageSize={20}
+          paginationPageSizeSelector={[10, 20, 50, 100]}
+          onRowDoubleClicked={(params: { data: Warehouse }) => setPreviewWarehouse(params.data)}
+          suppressMaxRenderedRowRestriction={true}
+        />
       ) : (
         <div className="ag-grid-placeholder">
           <div className="ag-grid-skeleton">

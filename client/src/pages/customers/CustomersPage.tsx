@@ -3,8 +3,7 @@ import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ClientSideRowModelModule, ModuleRegistry } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { Plus, Edit2, Trash2, Eye, Search, RefreshCw, MoreVertical } from 'lucide-react';
 
 import CustomerPreview from './CustomerPreview';
@@ -24,8 +23,6 @@ import { createActionColDef } from '../../utils/agGridIntegration';
 import type { Customer } from '../../utils/customerTypes';
 import './CustomersPage.css';
 import '../../styles/ag-grid-status-cells.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function CustomersPage() {
   const navigate = useNavigate();
@@ -312,28 +309,15 @@ export default function CustomersPage() {
           }}
         />
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
-            rowData={customers}
-            columnDefs={columnDefs as any}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            rowSelection={{ mode: 'singleRow' }}
-            onGridReady={(params: { api: { sizeColumnsToFit: (opts: { defaultMinWidth: number; columnLimits: [] }) => void } }) => {
-              params.api.sizeColumnsToFit({
-                defaultMinWidth: 100,
-                columnLimits: []
-              });
-            }}
-            onRowDoubleClicked={(params: { data: Customer }) => navigate(`/customers/${params.data.id}`)}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="customers-grid"
+          containerStyle={{ height: 600, width: '100%' }}
+          rowData={customers}
+          columnDefs={columnDefs as any}
+          paginationPageSize={20}
+          paginationPageSizeSelector={[10, 20, 50, 100]}
+          onRowDoubleClicked={(params: { data: Customer }) => navigate(`/customers/${params.data.id}`)}
+        />
       )}
 
       <Modal

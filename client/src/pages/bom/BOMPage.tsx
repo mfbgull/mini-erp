@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
+import MiniERPGrid from "../../components/common/MiniERPGrid";
 import {
   ClipboardList,
   CheckCircle,
@@ -354,22 +354,14 @@ export default function BOMPage() {
           onDelete={handleDeleteBom}
         />
       ) : (
-        <div className="ag-theme-quartz ag-grid-container">
-          <AgGridReact
-            rowData={boms}
-            columnDefs={columnDefs as any}
-            defaultColDef={{
-              resizable: true,
-              sortable: false,
-              filter: false,
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            rowSelection={{ mode: "singleRow" } as const}
-            onRowDoubleClicked={(params: { data: BOMListItem }) => handleViewBOM(params.data)}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="ag-grid-container"
+          rowData={boms}
+          columnDefs={columnDefs as any}
+          defaultColDef={{ resizable: true, sortable: false, filter: false }}
+          paginationPageSize={20}
+          onRowDoubleClicked={(params: { data: BOMListItem }) => handleViewBOM(params.data)}
+        />
       )}
 
       {isDetailModalOpen && (

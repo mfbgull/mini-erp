@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   Users,
   FileText,
@@ -22,8 +21,6 @@ import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './CustomerStatementsReport.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 interface Customer {
   id: number;
@@ -138,14 +135,13 @@ export default function CustomerStatementsReport() {
       <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData?.statements && reportData.statements.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData.statements} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params: any) => {
-                setTimeout(() => { if (params.api) { const ge = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0]; if (ge && ge.clientWidth > 0) params.columnApi.autoSizeAllColumns(); } }, 100);
-              }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData.statements}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-statements-list">
             {reportData.statements.map((statement, index) => (
               <div key={`${statement.id || statement.customer_name}-${index}`} className="statement-card"

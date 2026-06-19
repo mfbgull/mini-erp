@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   TrendingUp,
   FileText,
@@ -26,8 +25,6 @@ import './SalesReports.css';
 import '../../styles/ag-grid-status-cells.css';
 import { getStatusCellClass } from '../../utils/statusCellUtils';
 
-ModuleRegistry.registerModules([AllCommunityModule]);
-
 interface Customer {
   id: number;
   customer_name: string;
@@ -49,17 +46,6 @@ interface SalesSummaryData {
   };
 }
 
-interface GridParams {
-  api?: {
-    gridCore: {
-      ctrl: {
-        main: HTMLElement;
-      };
-    };
-    sizeColumnsToFit: (opts: { defaultMinWidth: number; columnLimits: unknown[] }) => void;
-  };
-}
-
 export default function SalesSummaryReport() {
   const [dateRange, setDateRange] = useState<DateRangeFilter>({
     fromDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
@@ -70,7 +56,6 @@ export default function SalesSummaryReport() {
   const [showFilters, setShowFilters] = useState(false);
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
-  const gridRef = useRef<HTMLDivElement>(null);
 
   const { data: customers = [] } = useQuery<Customer[]>({
     queryKey: ['customers'],
@@ -107,34 +92,6 @@ export default function SalesSummaryReport() {
       return response.data.data;
     }
   });
-
-  useEffect(() => {
-    if (isMobile) return;
-    const gridElement = (gridRef.current as HTMLElement | null)?.querySelector('.ag-theme-quartz');
-    if (!gridElement) return;
-
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentRect.width > 0) {
-          const gridApi = (gridRef.current as unknown as GridParams)?.api;
-          if (gridApi) {
-            const viewportElement = gridApi.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0];
-            if (viewportElement && viewportElement.clientWidth > 0) {
-              gridApi.sizeColumnsToFit({
-                defaultMinWidth: 100,
-                columnLimits: []
-              });
-            }
-          }
-          observer.disconnect();
-          break;
-        }
-      }
-    });
-
-    observer.observe(gridElement);
-    return () => observer.disconnect();
-  }, [reportData?.sales, isMobile]);
 
   const handleFilterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,19 +181,20 @@ export default function SalesSummaryReport() {
         </StatsGrid>
       )}
 
-      <div className="report-content" ref={gridRef}>
+      <div className="report-content">
         {isLoading ? (
           <div className="loading"><div className="spinner"></div></div>
         ) : reportData?.sales && reportData.sales.length > 0 ? (
           isMobile ? (
             <CompactSalesSummaryCardView sales={reportData.sales as any} />
           ) : (
-            <div className="ag-theme-quartz" style={{ height: 600, width: '100%' }}>
-              <AgGridReact rowData={reportData.sales as any || []} columnDefs={columnDefs as any}
-                defaultColDef={{ resizable: true, sortable: true, filter: true }}
-                pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]}
-                rowSelection={{ mode: 'singleRow' }} />
-            </div>
+            <MiniERPGrid
+              containerStyle={{ height: 600, width: '100%' }}
+              rowData={reportData.sales as any || []}
+              columnDefs={columnDefs as any}
+              paginationPageSize={20}
+              paginationPageSizeSelector={[10, 20, 50, 100]}
+            />
           )
         ) : (
           <div className="no-data">

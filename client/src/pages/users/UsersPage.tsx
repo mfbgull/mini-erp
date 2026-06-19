@@ -2,8 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { Plus, Search, Edit, Trash2, UserCheck, UserX, MoreVertical, Shield } from 'lucide-react';
 
 import Button from '../../components/common/Button';
@@ -19,8 +18,6 @@ import type { User } from '../../utils/userTypes';
 
 import './UsersPage.css';
 import '../../styles/ag-grid-status-cells.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export default function UsersPage() {
   const { isMobile } = useMobileDetection();
@@ -214,21 +211,15 @@ export default function UsersPage() {
           onResetPassword={handleResetPassword}
         />
       ) : (
-        <div className="ag-theme-quartz users-grid">
-          <AgGridReact
-            rowData={users}
-            columnDefs={columnDefs as any}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-            }}
-            loading={isLoading}
-            overlayLoadingTemplate='<div class="ag-overlay-loading-center">Loading users...</div>'
-            overlayNoRowsTemplate='<div class="ag-overlay-no-rows-center">No users found</div>'
-            onRowDoubleClicked={() => {}}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="users-grid"
+          rowData={users}
+          columnDefs={columnDefs as any}
+          pagination={false}
+          loading={isLoading}
+          overlayLoadingTemplate='<div class="ag-overlay-loading-center">Loading users...</div>'
+          overlayNoRowsTemplate='<div class="ag-overlay-no-rows-center">No users found</div>'
+        />
       )}
 
       {isModalOpen && (

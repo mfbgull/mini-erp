@@ -55,16 +55,19 @@ export function createActionColDef(options: CreateActionColDefOptions): ColDef {
     headerName = 'Actions',
     field = 'actions',
     colId,
-    width = 70,
+    width = 50,
   } = options;
 
   return {
     headerName,
     ...(colId ? { colId } : { field }),
     width,
+    minWidth: 50,
+    maxWidth: 80,
     pinned: 'right' as const,
     sortable: false,
     filter: false,
+    suppressSizeToFit: true,
     cellRenderer,
   };
 }

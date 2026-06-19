@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { Search, X, CreditCard, MoreVertical, Trash2 } from 'lucide-react';
 
 import Button from '../../components/common/Button';
@@ -39,7 +39,6 @@ interface Customer {
 
 export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [gridReady, setGridReady] = useState(false);
   const [isRecordPaymentOpen, setIsRecordPaymentOpen] = useState(false);
   const [selectedCustomerForPayment, setSelectedCustomerForPayment] = useState<Customer | null>(null);
   const [customerSearchTerm, setCustomerSearchTerm] = useState('');
@@ -123,12 +122,6 @@ export default function PaymentsPage() {
       setCustomerSearchTerm('');
     }
   }, [searchParams]);
-
-  // Defer Ag-Grid mount until after initial paint
-  useEffect(() => {
-    const timer = setTimeout(() => setGridReady(true), 0);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Column definitions
   const columnDefs = useMemo(() => [
@@ -269,35 +262,16 @@ export default function PaymentsPage() {
           }}
           onDelete={handleDeletePayment}
         />
-      ) : gridReady ? (
-        <div className="ag-theme-quartz payments-grid-wrapper">
-          <AgGridReact
-            rowData={filteredPayments}
-            columnDefs={columnDefs}
-            defaultColDef={{
-              resizable: true,
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            rowSelection={{ mode: 'singleRow' }}
-            suppressMaxRenderedRowRestriction={true}
-            onRowDoubleClicked={() => {}}
-          />
-        </div>
       ) : (
-        <div className="ag-grid-placeholder">
-          <div className="ag-grid-skeleton">
-            <div className="skeleton-header"></div>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div className="skeleton-row" key={i}>
-                <div className="skeleton-cell"></div>
-                <div className="skeleton-cell"></div>
-                <div className="skeleton-cell"></div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <MiniERPGrid
+          wrapperClassName="payments-grid-wrapper"
+          rowData={filteredPayments}
+          columnDefs={columnDefs}
+          defaultColDef={{ resizable: true }}
+          paginationPageSize={20}
+          paginationPageSizeSelector={[10, 20, 50, 100]}
+          suppressMaxRenderedRowRestriction={true}
+        />
       )}
 
       {/* Record Payment — Customer Selection Modal */}

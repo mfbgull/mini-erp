@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import toast from 'react-hot-toast';
 import { Plus, ClipboardCheck, Eye, Trash2, CheckCircle, XCircle, MoreVertical } from 'lucide-react';
 
@@ -63,8 +63,6 @@ export default function PhysicalCountsPage() {
   const [selectedWarehouse, setSelectedWarehouse] = useState<number | null>(null);
   const [countDate, setCountDate] = useState(new Date().toISOString().split('T')[0]);
   const [countNotes, setCountNotes] = useState('');
-
-  const gridRef = useRef<AgGridReact>(null);
 
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
@@ -363,24 +361,15 @@ export default function PhysicalCountsPage() {
         />
       </StatsGrid>
 
-      <div className="items-grid-container" style={{ height: 'calc(100vh - 320px)' }}>
-        <AgGridReact
-          columnDefs={columnDefs as any}
-          rowData={counts as any[]}
-          defaultColDef={{
-            sortable: true,
-            filter: true,
-            resizable: true,
-          }}
-          autoSizeStrategy={{
-            type: 'fitCellContents'
-          }}
-          onCellClicked={onCellClicked}
-          rowSelection={{ mode: 'singleRow' } as const}
-          animateRows={true}
-          overlayNoRowsTemplate='<span style="padding: 10px;">No physical counts found</span>'
-        />
-      </div>
+      <MiniERPGrid
+        wrapperClassName="items-grid-container"
+        containerStyle={{ height: 'calc(100vh - 320px)' }}
+        columnDefs={columnDefs as any}
+        rowData={counts as any[]}
+        autoSize={{ type: 'fitCellContents' }}
+        onCellClicked={onCellClicked}
+        overlayNoRowsTemplate='<span style="padding: 10px;">No physical counts found</span>'
+      />
 
       {/* Create Modal */}
       <Modal

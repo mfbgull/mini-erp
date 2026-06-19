@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { FileText, Zap, User, Calendar } from 'lucide-react';
 
 import Button from '../components/common/Button';
-import DataTable from '../components/common/DataTable';
+import MiniERPGrid from '../components/common/MiniERPGrid';
 import Modal from '../components/common/Modal';
 import StatCard, { StatsGrid } from '../components/common/StatCard';
 import { useActivityLogs, useEntityTypes, useActions, useUsers, useActivityStats } from '../context/ActivityLogContext';
@@ -65,47 +65,57 @@ export default function ActivityLog() {
     setShowDetailsModal(true);
   };
 
-  const columns = [
+  const columnDefs = [
     {
-      key: 'created_at',
-      label: 'Timestamp',
+      field: 'created_at',
+      headerName: 'Timestamp',
       sortable: true,
-      render: (value: string) => format(new Date(value), 'yyyy-MM-dd HH:mm:ss')
+      filter: true,
+      flex: 1.5,
+      valueFormatter: (params: { value: string }) => format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss')
     },
     {
-      key: 'username',
-      label: 'User',
+      field: 'username',
+      headerName: 'User',
       sortable: true,
-      render: (value: string | null, row: Activity) => value || 'System'
+      filter: true,
+      flex: 1,
+      valueFormatter: (params: { value: string | null }) => params.value || 'System'
     },
     {
-      key: 'action',
-      label: 'Action',
-      sortable: true
+      field: 'action',
+      headerName: 'Action',
+      sortable: true,
+      filter: true,
+      flex: 1
     },
     {
-      key: 'entity_type',
-      label: 'Entity',
-      sortable: true
+      field: 'entity_type',
+      headerName: 'Entity',
+      sortable: true,
+      filter: true,
+      flex: 1
     },
     {
-      key: 'description',
-      label: 'Description',
+      field: 'description',
+      headerName: 'Description',
       sortable: false,
-      render: (value: string, row: Activity) => (
+      flex: 2,
+      cellRenderer: (params: { value: string; data: Activity }) => (
         <div className="mobile-description">
-          <span className="description-text">{value}</span>
-          <span className="view-details">View Details</span>
+          <span className="description-text">{params.value}</span>
         </div>
       )
     },
     {
-      key: 'log_level',
-      label: 'Level',
+      field: 'log_level',
+      headerName: 'Level',
       sortable: true,
-      render: (value: string) => {
-        const levelClass = value?.toLowerCase() || 'info';
-        return <span className={`log-level ${levelClass}`}>{value}</span>;
+      filter: true,
+      flex: 0.7,
+      cellRenderer: (params: { value: string }) => {
+        const levelClass = params.value?.toLowerCase() || 'info';
+        return <span className={`log-level ${levelClass}`}>{params.value}</span>;
       }
     }
   ];
@@ -234,14 +244,14 @@ export default function ActivityLog() {
       </form>
 
       {/* Data Table */}
-      <div className="table-container">
-        <DataTable
-          columns={columns}
-          data={logsData?.data || []}
-          onRowClick={handleRowClick}
-          className="activity-log-table"
-        />
-      </div>
+      <MiniERPGrid
+        wrapperClassName="ag-grid-container"
+        rowData={logsData?.data || []}
+        columnDefs={columnDefs}
+        pagination={false}
+        rowSelection={null}
+        onRowClicked={(params) => params.data && handleRowClick(params.data as Activity)}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   Users,
   TrendingUp as TrendingUpIcon,
@@ -25,8 +24,6 @@ import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './SalesReports.css';
-
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface CustomerSalesRecord {
   customer_code?: string;
@@ -124,14 +121,13 @@ export default function SalesByCustomerReport() {
       <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData && reportData.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params: any) => {
-                setTimeout(() => { if (params.api) { const ge = params.api.gridCore?.ctrl?.main?.querySelectorAll('.ag-body-viewport')[0]; if (ge && ge.clientWidth > 0) params.columnApi.autoSizeAllColumns(); } }, 100);
-              }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-sales-list">
             {reportData.map((customer, index) => (
               <div key={customer.customer_code || customer.customer_name || `customer-${index}`} className="sales-customer-card"

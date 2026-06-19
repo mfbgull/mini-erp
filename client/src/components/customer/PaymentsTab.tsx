@@ -4,16 +4,14 @@
 
 import { useMemo, memo } from 'react';
 
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { MoreVertical, Edit2, Trash2 } from 'lucide-react';
 
 import DropdownMenu from '../../components/common/DropdownMenu';
 import { createActionColDef } from '../../utils/agGridIntegration';
 import { formatAsCurrency, formatDateString } from '../../utils/customerCalculations';
 import type { PaymentsTabProps, Payment, PaymentColDef } from '../../utils/customerTypes';
-import { registerAgGrid } from '../../utils/registerAgGrid';
 
-registerAgGrid();
 
 function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }: PaymentsTabProps) {
   const columnDefs = useMemo<PaymentColDef[]>(
@@ -90,15 +88,6 @@ function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }: Paym
     [onEditPayment, onDeletePayment],
   );
 
-  const defaultColDef = useMemo(
-    () => ({
-      resizable: true,
-      sortable: true,
-      filter: true,
-    }),
-    [],
-  );
-
   return (
     <div className="payments-tab">
       {loading ? (
@@ -106,17 +95,13 @@ function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }: Paym
           <div className="spinner" />
         </div>
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 400, width: '100%' }}>
-          <AgGridReact<Payment>
-            rowData={payments}
-            columnDefs={columnDefs as any}
-            defaultColDef={defaultColDef}
-            pagination={true}
-            paginationPageSize={15}
-            paginationPageSizeSelector={[10, 15, 25, 50]}
-            rowSelection={{ mode: 'singleRow' }}
-          />
-        </div>
+        <MiniERPGrid
+          containerStyle={{ height: 400, width: '100%' }}
+          rowData={payments}
+          columnDefs={columnDefs as any}
+          paginationPageSize={15}
+          paginationPageSizeSelector={[10, 15, 25, 50]}
+        />
       )}
     </div>
   );

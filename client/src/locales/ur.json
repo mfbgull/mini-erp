@@ -679,7 +679,9 @@
     "stock": "اسٹاک",
     "price": "قیمت",
     "cost": "لاگت",
-    "units": "یونٹس"
+    "units": "یونٹس",
+    "from": "سے",
+    "to": "تک"
   },
   "shortcuts": {
     "quickActions": "فوری ایکشنز",

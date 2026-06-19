@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   FileText,
   DollarSign,
@@ -24,8 +23,6 @@ import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './ExpensesReport.css';
 import '../../styles/ag-grid-status-cells.css';
 import { getStatusCellClass } from '../../utils/statusCellUtils';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 interface ExpenseRecord {
   id: number;
@@ -219,19 +216,13 @@ export default function ExpensesReport() {
       <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData?.expenses && reportData.expenses.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData.expenses} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params: any) => {
-                setTimeout(() => {
-                  if (params.api) {
-                    const ge = params.api.gridCore?.ctrl?.main?.querySelectorAll('.ag-body-viewport')[0];
-                    if (ge && ge.clientWidth > 0) params.columnApi.autoSizeAllColumns();
-                  }
-                }, 100);
-              }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData.expenses}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-expenses-list">
             {reportData.expenses.map(expense => <ExpenseCard key={expense.id} expense={expense} formatCurrency={formatCurrency} />)}
           </div>

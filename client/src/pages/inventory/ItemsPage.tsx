@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { Search, X, ArrowLeft, Building2, Package, DollarSign, BarChart3, AlertTriangle, Ban, FolderOpen, Wrench, Factory, Download, Upload, Wallet, Plus, MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
 
 import ItemPreview from './ItemPreview';
@@ -487,22 +487,15 @@ export default function ItemsPage() {
         </>
       ) : (
         <div className="ag-grid-wrapper" ref={gridWrapperRef}>
-          <div className="ag-theme-quartz" style={{ height: gridHeight }}>
-            <AgGridReact
-              rowData={[...filteredItems] as any[]}
-              columnDefs={columnDefs as any}
-              defaultColDef={{
-                resizable: true,
-                sortable: false,
-                filter: false,
-              }}
-              pagination={true}
-              paginationPageSize={20}
-              paginationPageSizeSelector={[10, 20, 50, 100]}
-              rowSelection={{ mode: 'singleRow' }}
-              onRowDoubleClicked={(params: { data: InventoryItem }) => setPreviewItem(params.data)}
-            />
-          </div>
+          <MiniERPGrid
+            containerStyle={{ height: gridHeight }}
+            rowData={[...filteredItems] as any[]}
+            columnDefs={columnDefs as any}
+            defaultColDef={{ resizable: true, sortable: false, filter: false }}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+            onRowDoubleClicked={(params: { data: InventoryItem }) => setPreviewItem(params.data)}
+          />
         </div>
       )}
 

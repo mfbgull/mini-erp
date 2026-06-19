@@ -23,7 +23,7 @@ export function DSOReport({ data, isLoading, formatCurrency }: DSOReportProps) {
       <div className="metric-details">
         <div className="detail-item">
           <span className="detail-label">Period:</span>
-          <span className="detail-value">{data.period} days</span>
+          <span className="detail-value">{data.period?.startDate} to {data.period?.endDate}</span>
         </div>
         <div className="detail-item">
           <span className="detail-label">Total Sales:</span>

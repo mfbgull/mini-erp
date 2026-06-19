@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { format } from 'date-fns';
 import { FileText, Send, CheckCircle, ArrowRight, Plus, Eye, Edit2, Trash2, MoreVertical } from 'lucide-react';
 
@@ -164,24 +164,15 @@ export default function QuotationsPage() {
       </StatsGrid>
 
       <div className="quotations-content">
-        <div className="ag-theme-quartz grid-fill">
-          <AgGridReact
-            rowData={quotations}
-            columnDefs={columnDefs as any}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={15}
-            paginationPageSizeSelector={[10, 15, 25, 50]}
-            rowSelection={{ mode: 'singleRow' } as const}
-            animateRows={true}
-            loading={isLoading}
-            onRowDoubleClicked={(params: { data: Quotation }) => navigate(`/quotations/${params.data.id}`)}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="grid-fill"
+          rowData={quotations}
+          columnDefs={columnDefs as any}
+          paginationPageSize={15}
+          paginationPageSizeSelector={[10, 15, 25, 50]}
+          loading={isLoading}
+          onRowDoubleClicked={(params: { data: Quotation }) => navigate(`/quotations/${params.data.id}`)}
+        />
       </div>
     </div>
   );

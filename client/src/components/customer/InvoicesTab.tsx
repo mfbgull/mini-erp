@@ -5,7 +5,7 @@
 
 import { useMemo, memo } from 'react';
 
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { MoreVertical, Eye, Trash2, Ban } from 'lucide-react';
 
 import DropdownMenu from '../../components/common/DropdownMenu';
@@ -13,10 +13,7 @@ import { createActionColDef } from '../../utils/agGridIntegration';
 import { formatAsCurrency, formatDateString } from '../../utils/customerCalculations';
 import type { InvoicesTabProps, Invoice, InvoiceColDef } from '../../utils/customerTypes';
 import { canShowDeleteAction, canCancelInvoice } from '../../utils/invoiceRules';
-import { registerAgGrid } from '../../utils/registerAgGrid';
 import { getStatusCellClass, getBalanceCellClass } from '../../utils/statusCellUtils';
-
-registerAgGrid();
 
 function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice, onCancelInvoice }: InvoicesTabProps) {
   const columnDefs = useMemo<InvoiceColDef[]>(
@@ -127,15 +124,6 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice, onCanc
     [onViewInvoice, onDeleteInvoice, onCancelInvoice],
   );
 
-  const defaultColDef = useMemo(
-    () => ({
-      resizable: true,
-      sortable: true,
-      filter: true,
-    }),
-    [],
-  );
-
   return (
     <div className="invoices-tab">
       {loading ? (
@@ -143,18 +131,14 @@ function InvoicesTab({ invoices, loading, onViewInvoice, onDeleteInvoice, onCanc
           <div className="spinner" />
         </div>
       ) : (
-        <div className="ag-theme-quartz" style={{ height: 400, width: '100%' }}>
-          <AgGridReact<Invoice>
-            rowData={invoices}
-            columnDefs={columnDefs as any}
-            defaultColDef={defaultColDef}
-            pagination={true}
-            paginationPageSize={15}
-            paginationPageSizeSelector={[10, 15, 25, 50]}
-            rowSelection={{ mode: 'singleRow' }}
-            onRowDoubleClicked={(params) => params.data && onViewInvoice(params.data.id)}
-          />
-        </div>
+        <MiniERPGrid
+          containerStyle={{ height: 400, width: '100%' }}
+          rowData={invoices}
+          columnDefs={columnDefs as any}
+          paginationPageSize={15}
+          paginationPageSizeSelector={[10, 15, 25, 50]}
+          onRowDoubleClicked={(params) => params.data && onViewInvoice(params.data.id)}
+        />
       )}
     </div>
   );

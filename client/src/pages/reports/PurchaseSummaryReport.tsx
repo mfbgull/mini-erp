@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   ShoppingCart,
   TrendingUp,
@@ -25,8 +24,6 @@ import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './PurchaseSummaryReport.css';
 import '../../styles/ag-grid-status-cells.css';
 import { getStatusCellClass } from '../../utils/statusCellUtils';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 interface Supplier {
   id: number;
@@ -78,7 +75,6 @@ export default function PurchaseSummaryReport() {
   const [selectedPurchase, setSelectedPurchase] = useState<PurchaseRecord | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
-  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -114,25 +110,6 @@ export default function PurchaseSummaryReport() {
       return r.data.data;
     }
   });
-
-  useEffect(() => {
-    const gridElement = (gridRef.current as HTMLElement | null)?.querySelector('.ag-theme-quartz');
-    if (!gridElement) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentRect.width > 0) {
-          const gridApi = (gridRef.current as unknown as { api?: { gridCore?: { ctrl?: { main?: HTMLElement } }; sizeColumnsToFit?: (opts: { defaultMinWidth: number; columnLimits: never[] }) => void } });
-          const viewportElement = gridApi?.api?.gridCore?.ctrl?.main?.querySelectorAll('.ag-body-viewport')[0];
-          if (viewportElement && viewportElement.clientWidth > 0) {
-            gridApi?.api?.sizeColumnsToFit?.({ defaultMinWidth: 100, columnLimits: [] });
-          }
-          observer.disconnect(); break;
-        }
-      }
-    });
-    observer.observe(gridElement);
-    return () => observer.disconnect();
-  }, [reportData?.purchases]);
 
   const handleFilterSubmit = (e: React.FormEvent) => { e.preventDefault(); refetch(); };
 
@@ -209,14 +186,16 @@ export default function PurchaseSummaryReport() {
           )}
         </StatsGrid>
       )}
-      <div className="report-content" ref={gridRef}>
+      <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData?.purchases && reportData.purchases.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData.purchases} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData.purchases}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-sales-list">
             {reportData.purchases.map((purchase, index) => (
               <div key={purchase.po_id || purchase.po_number || `purchase-${index}`} className="purchase-card"

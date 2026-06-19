@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   AlertTriangle,
   Package,
@@ -17,8 +16,6 @@ import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './InventoryReports.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 interface Warehouse {
   id: number;
@@ -43,7 +40,6 @@ export default function LowStockReport() {
   const [selectedItem, setSelectedItem] = useState<LowStockItem | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
-  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => { if (event.key === 'Escape') setShowDetailModal(false); };
@@ -65,21 +61,6 @@ export default function LowStockReport() {
       const r = await api.get(`/reports/low-stock?${params}`); return r.data.data;
     }
   });
-
-  useEffect(() => {
-    const ge = (gridRef.current as HTMLElement | null)?.querySelector('.ag-theme-quartz');
-    if (!ge) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentRect.width > 0) {
-          (gridRef.current as unknown as { api?: { sizeColumnsToFit?: (opts: { defaultMinWidth: number; columnLimits: never[] }) => void } })?.api?.sizeColumnsToFit?.({ defaultMinWidth: 100, columnLimits: [] });
-          observer.disconnect(); break;
-        }
-      }
-    });
-    observer.observe(ge);
-    return () => observer.disconnect();
-  }, [reportData]);
 
   const handleFilterSubmit = (e: React.FormEvent) => { e.preventDefault(); refetch(); };
 
@@ -133,14 +114,16 @@ export default function LowStockReport() {
           </div>
         </form>
       )}
-      <div className="report-content" ref={gridRef}>
+      <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData && reportData.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-low-stock-list">
             {reportData.map((item, index) => (
               <div key={item.id || item.item_code || `item-${index}`} className="low-stock-card"

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   Factory,
   Package,
@@ -27,8 +26,6 @@ import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './ProductionSummaryReport.css';
 import '../../styles/ag-grid-status-cells.css';
 import { getStatusCellClass } from '../../utils/statusCellUtils';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 interface ProductionRecord {
   work_order_id?: number;
@@ -141,14 +138,13 @@ export default function ProductionSummaryReport() {
       <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData?.production && reportData.production.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData.production} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }}
-              onGridReady={(params: any) => {
-                setTimeout(() => { if (params.api) { const ge = params.api.gridCore.ctrl.main.querySelectorAll('.ag-body-viewport')[0]; if (ge && ge.clientWidth > 0) params.columnApi.autoSizeAllColumns(); } }, 100);
-              }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData.production}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-sales-list">
             {reportData.production.map((production, index) => (
               <div key={production.work_order_id || production.work_order_number || `production-${index}`} className="production-card"

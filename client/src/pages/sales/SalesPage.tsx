@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { format } from 'date-fns';
 import { FileText, ShoppingCart, DollarSign, AlertTriangle, Plus, Eye, Edit2, Trash2, Search, X, Download, BarChart3, Wallet, RotateCcw, Ban, MoreVertical } from 'lucide-react';
 
@@ -418,23 +418,14 @@ export default function SalesPage() {
             onReturn={handleOpenReturn}
             onCancel={handleCancelInvoice}
           />
-        ) : (
-          <div className="ag-theme-quartz grid-fill">
-            <AgGridReact
-              rowData={filteredInvoices}
-              columnDefs={invoiceColumnDefs as any}
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true,
-              }}
-              pagination={true}
-              paginationPageSize={15}
-              paginationPageSizeSelector={[10, 15, 25, 50]}
-              rowSelection={{ mode: 'singleRow' }}
-              onRowDoubleClicked={(params: { data: Invoice }) => navigate(`/sales/invoice/${params.data.id}/view`)}
-            />
-          </div>
+        ) : (              <MiniERPGrid
+                wrapperClassName="grid-fill"
+                rowData={filteredInvoices}
+                columnDefs={invoiceColumnDefs as any}
+                paginationPageSize={15}
+                paginationPageSizeSelector={[10, 15, 25, 50]}
+                onRowDoubleClicked={(params: { data: Invoice }) => navigate(`/sales/invoice/${params.data.id}/view`)}
+              />
         )}
       </div>
 

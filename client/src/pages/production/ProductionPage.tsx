@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
+import MiniERPGrid from "../../components/common/MiniERPGrid";
 import {
   Search,
   Factory,
@@ -168,22 +168,14 @@ export default function ProductionPage() {
             />
           ) : (
             <>
-              <div className="ag-theme-quartz ag-grid-container">
-                <AgGridReact
-                  rowData={filteredProductions}
-                  columnDefs={columnDefs as any}
-                  defaultColDef={{
-                    resizable: true,
-                    sortable: false,
-                    filter: false,
-                  }}
-                  pagination={true}
-                  paginationPageSize={20}
-                  paginationPageSizeSelector={[10, 20, 50, 100]}
-                  rowSelection={{ mode: "singleRow" }}
-                  onRowDoubleClicked={(params: { data: ProductionStub }) => handleViewProduction(params.data)}
-                />
-              </div>
+              <MiniERPGrid
+                wrapperClassName="ag-grid-container"
+                rowData={filteredProductions}
+                columnDefs={columnDefs as any}
+                defaultColDef={{ resizable: true, sortable: false, filter: false }}
+                paginationPageSize={20}
+                onRowDoubleClicked={(params: { data: ProductionStub }) => handleViewProduction(params.data)}
+              />
 
               {filteredProductions.length === 0 && searchTerm && (
                 <div className="no-results">

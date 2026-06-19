@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { format } from 'date-fns';
 import {
   RotateCcw,
@@ -233,26 +233,21 @@ export default function PurchaseReturnHistory() {
           <p>Loading return history...</p>
         </div>
       ) : (
-        <div className="ag-theme-quartz ag-grid-container">
-          <AgGridReact
-           
-            rowData={returns}
-            columnDefs={columnDefs}
-            defaultColDef={{
-              resizable: true,
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            noRowsOverlayComponent={() => (
-              <div className="no-rows" style={{ textAlign: 'center', padding: '40px', color: '#6c757d' }}>
-                <RotateCcw size={40} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
-                <h3>No Returns Found</h3>
-                <p>No purchase returns match the current filters.</p>
-              </div>
-            )}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="ag-grid-container"
+          rowData={returns}
+          columnDefs={columnDefs}
+          defaultColDef={{ resizable: true }}
+          paginationPageSize={20}
+          rowSelection={null}
+          noRowsOverlayComponent={() => (
+            <div className="no-rows" style={{ textAlign: 'center', padding: '40px', color: '#6c757d' }}>
+              <RotateCcw size={40} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
+              <h3>No Returns Found</h3>
+              <p>No purchase returns match the current filters.</p>
+            </div>
+          )}
+        />
       )}
     </div>
   );

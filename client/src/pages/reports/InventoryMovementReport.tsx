@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   Package,
   Download,
@@ -24,8 +23,6 @@ import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';
 import './InventoryMovementReport.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 interface InventoryItem {
   id: number;
@@ -75,7 +72,6 @@ export default function InventoryMovementReport() {
   const [selectedMovement, setSelectedMovement] = useState<MovementRecord | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const { formatCurrency } = useSettings();
-  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => { if (event.key === 'Escape') setShowDetailModal(false); };
@@ -104,25 +100,6 @@ export default function InventoryMovementReport() {
       const r = await api.get(`/reports/inventory-movement?${params}`); return r.data.data;
     }
   });
-
-  useEffect(() => {
-    const ge = (gridRef.current as HTMLElement | null)?.querySelector('.ag-theme-quartz');
-    if (!ge) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentRect.width > 0) {
-          const gridApi = (gridRef.current as unknown as { api?: { gridCore?: { ctrl?: { main?: HTMLElement } }; sizeColumnsToFit?: (opts: { defaultMinWidth: number; columnLimits: never[] }) => void } });
-          const vp = gridApi?.api?.gridCore?.ctrl?.main?.querySelectorAll('.ag-body-viewport')[0];
-          if (vp && vp.clientWidth > 0) {
-            gridApi?.api?.sizeColumnsToFit?.({ defaultMinWidth: 100, columnLimits: [] });
-          }
-          observer.disconnect(); break;
-        }
-      }
-    });
-    observer.observe(ge);
-    return () => observer.disconnect();
-  }, [reportData?.movements]);
 
   const handleFilterSubmit = (e: React.FormEvent) => { e.preventDefault(); refetch(); };
 
@@ -201,14 +178,16 @@ export default function InventoryMovementReport() {
           <StatCard icon={Package} label="Net Movement" value={reportData.summary.netMovement} />
         </StatsGrid>
       )}
-      <div className="report-content" ref={gridRef}>
+      <div className="report-content">
         {isLoading ? <div className="loading"><div className="spinner"></div></div>
         : reportData?.movements && reportData.movements.length > 0 ? <>
-          <div className="ag-theme-quartz desktop-view ag-grid-container">
-            <AgGridReact rowData={reportData.movements} columnDefs={columnDefs as any}
-              defaultColDef={{ resizable: true, sortable: true, filter: true }}
-              pagination={true} paginationPageSize={20} paginationPageSizeSelector={[10, 20, 50, 100]} rowSelection={{ mode: 'singleRow' }} />
-          </div>
+          <MiniERPGrid
+            wrapperClassName="desktop-view ag-grid-container"
+            rowData={reportData.movements}
+            columnDefs={columnDefs as any}
+            paginationPageSize={20}
+            paginationPageSizeSelector={[10, 20, 50, 100]}
+          />
           <div className="mobile-inventory-movement-list">
             {reportData.movements.map((movement, index) => (
               <div key={`${movement.id || movement.item_code}-${index}`} className="inventory-movement-card"

@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
-import { AgGridReact } from "ag-grid-react";
+import MiniERPGrid from "../../components/common/MiniERPGrid";
 import { format } from "date-fns";
 import {
   Package,
@@ -302,18 +302,14 @@ export default function StockMovementPage() {
           <QuickActionsPanel isOpen={isQuickActionsOpen} onClose={() => setIsQuickActionsOpen(false)} />
         </>
       ) : (
-        <div className="ag-theme-quartz">
-          <AgGridReact
-            rowData={[...filteredMovements] as any[]}
-            columnDefs={columnDefs as any}
-            defaultColDef={{ resizable: true, sortable: false, filter: false }}
-            pagination={true}
-            paginationPageSize={20}
-            paginationPageSizeSelector={[10, 20, 50, 100]}
-            onRowDoubleClicked={(params: { data: StockMovement }) => setPreviewMovement(params.data)}
-            rowSelection={{ mode: 'singleRow' }}
-          />
-        </div>
+        <MiniERPGrid
+          rowData={[...filteredMovements] as any[]}
+          columnDefs={columnDefs as any}
+          defaultColDef={{ resizable: true, sortable: false, filter: false }}
+          paginationPageSize={20}
+          paginationPageSizeSelector={[10, 20, 50, 100]}
+          onRowDoubleClicked={(params: { data: StockMovement }) => setPreviewMovement(params.data)}
+        />
       )}
 
       {previewMovement && (

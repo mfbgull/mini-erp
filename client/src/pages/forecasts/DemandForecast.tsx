@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
-import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import MiniERPGrid from '../../components/common/MiniERPGrid';
 import {
   TrendingUp, TrendingDown, Minus, Package,
   AlertTriangle, RefreshCw
@@ -16,8 +15,6 @@ import api from '../../utils/api';
 import { getStockCellClass, getForecastRecommendationClass } from '../../utils/statusCellUtils';
 import './DemandForecast.css';
 import '../../styles/ag-grid-status-cells.css';
-
-ModuleRegistry.registerModules([AllCommunityModule]);
 
 interface ForecastItem {
   itemId: number;
@@ -150,7 +147,6 @@ export default function DemandForecast() {
   const { formatCurrency } = useSettings();
   const { t } = useTranslation();
   const { isMobile } = useMobileDetection();
-  const [gridReady, setGridReady] = useState(false);
   const [filters, setFilters] = useState({
     category: '',
     trend: '',
@@ -181,11 +177,6 @@ export default function DemandForecast() {
       return response.data.data || [];
     }
   });
-
-  useEffect(() => {
-    const timer = setTimeout(() => setGridReady(true), 0);
-    return () => clearTimeout(timer);
-  }, []);
 
   const columns = useMemo(() => [
     { field: 'itemCode', headerName: 'Code', width: 100 },
@@ -325,20 +316,12 @@ export default function DemandForecast() {
       ) : isLoading ? (
         <GridSkeleton />
       ) : (
-        <div className="forecast-grid ag-theme-quartz">
-          <AgGridReact
-            rowData={forecasts}
-            columnDefs={columns}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={20}
-            rowSelection={{ mode: 'singleRow' }}
-          />
-        </div>
+        <MiniERPGrid
+          wrapperClassName="forecast-grid"
+          rowData={forecasts}
+          columnDefs={columns}
+          paginationPageSize={20}
+        />
       )}
     </div>
   );

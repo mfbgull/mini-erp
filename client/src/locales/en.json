@@ -679,7 +679,9 @@
     "stock": "Stock",
     "price": "Price",
     "cost": "Cost",
-    "units": "units"
+    "units": "units",
+    "from": "From",
+    "to": "To"
   },
   "shortcuts": {
     "quickActions": "Quick actions",
