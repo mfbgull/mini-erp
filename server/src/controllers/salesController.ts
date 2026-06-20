@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
-import SalesService from '../services/salesService';
+import QuotationModel from '../models/Quotation';
+import SalesOrderModel from '../models/SalesOrder';
+import InvoiceModel from '../models/Invoice';
+import db from '../config/database';
 import logger from '../utils/logger';
 
 function parseIdParam(req: Request, res: Response): number | null {
@@ -14,10 +17,6 @@ function parseIdParam(req: Request, res: Response): number | null {
 
 // ============ Quotation Controllers ============
 
-/**
- * POST /api/quotations
- * Create a new quotation
- */
 function createQuotation(req: AuthRequest, res: Response): void {
   try {
     const {
@@ -33,7 +32,6 @@ function createQuotation(req: AuthRequest, res: Response): void {
       items
     } = req.body;
 
-    // Validation
     if (!customer_id) {
       res.status(400).json({ error: 'Customer is required' });
       return;
@@ -49,7 +47,7 @@ function createQuotation(req: AuthRequest, res: Response): void {
       return;
     }
 
-    const quotation = SalesService.createQuotation({
+    const quotation = QuotationModel.create({
       customer_id,
       customer_name,
       quotation_date,
@@ -60,7 +58,7 @@ function createQuotation(req: AuthRequest, res: Response): void {
       terms,
       warehouse_id,
       items
-    }, req.user!.id);
+    }, req.user!.id, db);
 
     res.status(201).json(quotation);
   } catch (error: any) {
@@ -69,10 +67,6 @@ function createQuotation(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * GET /api/quotations
- * Get all quotations with filters
- */
 function getQuotations(req: Request, res: Response): void {
   try {
     const filters = {
@@ -85,7 +79,7 @@ function getQuotations(req: Request, res: Response): void {
       limit: req.query.limit ? parseInt(String(req.query.limit)) : undefined
     };
 
-    const quotations = SalesService.getQuotations(filters);
+    const quotations = QuotationModel.getAll(filters, db);
     res.json(quotations);
   } catch (error: any) {
     logger.error('Get quotations error:', error);
@@ -93,15 +87,11 @@ function getQuotations(req: Request, res: Response): void {
   }
 }
 
-/**
- * GET /api/quotations/:id
- * Get single quotation by ID
- */
 function getQuotation(req: Request, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const quotation = SalesService.getQuotation(id);
+    const quotation = QuotationModel.getById(id, db);
 
     if (!quotation) {
       res.status(404).json({ error: 'Quotation not found' });
@@ -115,16 +105,12 @@ function getQuotation(req: Request, res: Response): void {
   }
 }
 
-/**
- * PUT /api/quotations/:id
- * Update quotation
- */
 function updateQuotation(req: AuthRequest, res: Response): void {
   try {
     const { id } = req.params;
     const data = req.body;
 
-    const quotation = SalesService.updateQuotation(Number(id), data, req.user!.id);
+    const quotation = QuotationModel.update(Number(id), data, req.user!.id, db);
     res.json(quotation);
   } catch (error: any) {
     logger.error('Update quotation error:', error);
@@ -132,15 +118,11 @@ function updateQuotation(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * DELETE /api/quotations/:id
- * Delete quotation
- */
 function deleteQuotation(req: AuthRequest, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const result = SalesService.deleteQuotation(id, req.user!.id);
+    QuotationModel.delete(id, req.user!.id, db);
     res.json({ success: true, message: 'Quotation deleted successfully' });
   } catch (error: any) {
     logger.error('Delete quotation error:', error);
@@ -148,16 +130,31 @@ function deleteQuotation(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * POST /api/quotations/:id/convert
- * Convert quotation to sales order
- */
 function convertQuotationToSalesOrder(req: AuthRequest, res: Response): void {
   try {
     const { id } = req.params;
     const overrides = req.body;
 
-    const result = SalesService.convertQuotationToSalesOrder(Number(id), req.user!.id, overrides);
+    const result = db.transaction(() => {
+      const quotation = QuotationModel.getById(Number(id), db);
+      if (!quotation) {
+        throw new Error('Quotation not found');
+      }
+
+      if (quotation.status === 'Converted') {
+        throw new Error('Quotation already converted to sales order');
+      }
+
+      if (quotation.expiry_date) {
+        const today = new Date().toISOString().split('T')[0];
+        if (quotation.expiry_date < today) {
+          throw new Error('Quotation has expired');
+        }
+      }
+
+      return QuotationModel.convertToSalesOrder(Number(id), req.user!.id, db);
+    })();
+
     res.status(201).json({
       success: true,
       message: 'Quotation converted to sales order',
@@ -169,15 +166,11 @@ function convertQuotationToSalesOrder(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * GET /api/quotations/:id/cycle-chain
- * Get complete sales cycle chain for a quotation
- */
 function getQuotationCycleChain(req: Request, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const chain = SalesService.getQuotationCycleChain(id);
+    const chain = QuotationModel.getSalesCycleChain(id, db);
     res.json(chain);
   } catch (error: any) {
     logger.error('Get quotation cycle chain error:', error);
@@ -187,10 +180,6 @@ function getQuotationCycleChain(req: Request, res: Response): void {
 
 // ============ Sales Order Controllers ============
 
-/**
- * POST /api/sales-orders
- * Create a new sales order
- */
 function createSalesOrder(req: AuthRequest, res: Response): void {
   try {
     const {
@@ -206,7 +195,6 @@ function createSalesOrder(req: AuthRequest, res: Response): void {
       items
     } = req.body;
 
-    // Validation
     if (!customer_id) {
       res.status(400).json({ error: 'Customer is required' });
       return;
@@ -222,7 +210,7 @@ function createSalesOrder(req: AuthRequest, res: Response): void {
       return;
     }
 
-    const salesOrder = SalesService.createSalesOrder({
+    const salesOrder = SalesOrderModel.create({
       customer_id,
       customer_name,
       so_date,
@@ -233,7 +221,7 @@ function createSalesOrder(req: AuthRequest, res: Response): void {
       notes,
       warehouse_id,
       items
-    }, req.user!.id);
+    }, req.user!.id, db);
 
     res.status(201).json(salesOrder);
   } catch (error: any) {
@@ -242,10 +230,6 @@ function createSalesOrder(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * GET /api/sales-orders
- * Get all sales orders with filters
- */
 function getSalesOrders(req: Request, res: Response): void {
   try {
     const filters = {
@@ -259,7 +243,7 @@ function getSalesOrders(req: Request, res: Response): void {
       limit: req.query.limit ? parseInt(String(req.query.limit)) : undefined
     };
 
-    const salesOrders = SalesService.getSalesOrders(filters);
+    const salesOrders = SalesOrderModel.getAll(filters, db);
     res.json(salesOrders);
   } catch (error: any) {
     logger.error('Get sales orders error:', error);
@@ -267,15 +251,11 @@ function getSalesOrders(req: Request, res: Response): void {
   }
 }
 
-/**
- * GET /api/sales-orders/:id
- * Get single sales order by ID
- */
 function getSalesOrder(req: Request, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const salesOrder = SalesService.getSalesOrder(id);
+    const salesOrder = SalesOrderModel.getById(id, db);
 
     if (!salesOrder) {
       res.status(404).json({ error: 'Sales order not found' });
@@ -289,16 +269,12 @@ function getSalesOrder(req: Request, res: Response): void {
   }
 }
 
-/**
- * PUT /api/sales-orders/:id
- * Update sales order
- */
 function updateSalesOrder(req: AuthRequest, res: Response): void {
   try {
     const { id } = req.params;
     const data = req.body;
 
-    const salesOrder = SalesService.updateSalesOrder(Number(id), data, req.user!.id);
+    const salesOrder = SalesOrderModel.update(Number(id), data, req.user!.id, db);
     res.json(salesOrder);
   } catch (error: any) {
     logger.error('Update sales order error:', error);
@@ -306,15 +282,11 @@ function updateSalesOrder(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * DELETE /api/sales-orders/:id
- * Delete sales order
- */
 function deleteSalesOrder(req: AuthRequest, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const result = SalesService.deleteSalesOrder(id, req.user!.id);
+    SalesOrderModel.delete(id, req.user!.id, db);
     res.json({ success: true, message: 'Sales order deleted successfully' });
   } catch (error: any) {
     logger.error('Delete sales order error:', error);
@@ -322,15 +294,11 @@ function deleteSalesOrder(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * POST /api/sales-orders/:id/cancel
- * Cancel a sales order — reverses linked invoice stock and cancels the invoice.
- */
 function cancelSalesOrder(req: AuthRequest, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const result = SalesService.cancelSalesOrder(id, req.user!.id);
+    const result = SalesOrderModel.cancel(id, req.user!.id, db);
     res.json({ success: true, message: 'Sales order cancelled successfully', ...result });
   } catch (error: any) {
     logger.error('Cancel sales order error:', error);
@@ -338,16 +306,32 @@ function cancelSalesOrder(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * POST /api/sales-orders/:id/convert
- * Convert sales order to invoice
- */
 function convertSalesOrderToInvoice(req: AuthRequest, res: Response): void {
   try {
     const { id } = req.params;
     const invoiceData = req.body;
 
-    const result = SalesService.convertSalesOrderToInvoice(Number(id), req.user!.id, invoiceData);
+    const result = db.transaction(() => {
+      const salesOrder = SalesOrderModel.getById(Number(id), db);
+      if (!salesOrder) {
+        throw new Error('Sales order not found');
+      }
+
+      if (salesOrder.status === 'Cancelled') {
+        throw new Error('Cannot convert cancelled sales order');
+      }
+
+      if (salesOrder.status === 'Invoiced' || salesOrder.status === 'Completed') {
+        throw new Error(`Sales order already ${salesOrder.status}`);
+      }
+
+      return SalesOrderModel.convertToInvoice(Number(id), req.user!.id, db, {
+        invoice_date: invoiceData?.invoice_date,
+        due_date: invoiceData?.due_date,
+        notes: invoiceData?.notes,
+      });
+    })();
+
     res.status(201).json({
       success: true,
       message: 'Sales order converted to invoice',
@@ -359,15 +343,11 @@ function convertSalesOrderToInvoice(req: AuthRequest, res: Response): void {
   }
 }
 
-/**
- * GET /api/sales-orders/:id/cycle-chain
- * Get complete sales cycle chain for a sales order
- */
 function getSalesOrderCycleChain(req: Request, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const chain = SalesService.getSalesOrderCycleChain(id);
+    const chain = SalesOrderModel.getSalesCycleChain(id, db);
     res.json(chain);
   } catch (error: any) {
     logger.error('Get sales order cycle chain error:', error);
@@ -377,15 +357,11 @@ function getSalesOrderCycleChain(req: Request, res: Response): void {
 
 // ============ Invoice Controllers (for sales cycle) ============
 
-/**
- * GET /api/sales-orders/:id/invoices
- * Get invoices for a sales order
- */
 function getInvoicesBySalesOrder(req: Request, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const invoices = SalesService.getInvoicesBySalesOrder(id);
+    const invoices = InvoiceModel.getBySalesOrderId(id, db);
     res.json(invoices);
   } catch (error: any) {
     logger.error('Get invoices by SO error:', error);
@@ -393,15 +369,11 @@ function getInvoicesBySalesOrder(req: Request, res: Response): void {
   }
 }
 
-/**
- * GET /api/quotations/:id/invoices
- * Get invoices for a quotation (via SO or direct)
- */
 function getInvoicesByQuotation(req: Request, res: Response): void {
   try {
     const id = parseIdParam(req, res);
     if (!id) return;
-    const invoices = SalesService.getInvoicesByQuotation(id);
+    const invoices = InvoiceModel.getByQuotationId(id, db);
     res.json(invoices);
   } catch (error: any) {
     logger.error('Get invoices by quotation error:', error);
@@ -409,21 +381,73 @@ function getInvoicesByQuotation(req: Request, res: Response): void {
   }
 }
 
-/**
- * GET /api/sales/dashboard
- * Get sales dashboard summary
- */
-function getSalesDashboard(req: Request, res: Response): void {
+function getSalesDashboard(_req: Request, res: Response): void {
   try {
-    const dashboard = SalesService.getDashboardSummary();
+    const quotations = db.prepare(`
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'Draft' THEN 1 ELSE 0 END) as draft,
+        SUM(CASE WHEN status = 'Sent' THEN 1 ELSE 0 END) as sent,
+        SUM(CASE WHEN status = 'Converted' THEN 1 ELSE 0 END) as converted
+      FROM quotations
+    `).get() as { total: number; draft: number; sent: number; converted: number };
+
+    const salesOrders = db.prepare(`
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'Draft' THEN 1 ELSE 0 END) as draft,
+        SUM(CASE WHEN status = 'Confirmed' THEN 1 ELSE 0 END) as confirmed,
+        SUM(CASE WHEN status = 'Invoiced' THEN 1 ELSE 0 END) as invoiced
+      FROM sales_orders
+    `).get() as { total: number; draft: number; confirmed: number; invoiced: number };
+
+    const invoices = db.prepare(`
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'Unpaid' THEN 1 ELSE 0 END) as unpaid,
+        SUM(CASE WHEN status = 'Paid' THEN 1 ELSE 0 END) as paid,
+        SUM(CASE WHEN status = 'Partially Paid' THEN 1 ELSE 0 END) as partially_paid,
+        SUM(total_amount) as total_revenue,
+        SUM(balance_amount) as outstanding_receivables
+      FROM invoices
+    `).get() as {
+      total: number;
+      unpaid: number;
+      paid: number;
+      partially_paid: number;
+      total_revenue: number;
+      outstanding_receivables: number;
+    };
+
+    const dashboard = {
+      quotations: {
+        total: quotations.total,
+        draft: quotations.draft,
+        sent: quotations.sent,
+        pending_conversion: quotations.total - quotations.converted
+      },
+      sales_orders: {
+        total: salesOrders.total,
+        draft: salesOrders.draft,
+        confirmed: salesOrders.confirmed,
+        pending_invoicing: salesOrders.confirmed
+      },
+      invoices: {
+        total: invoices.total,
+        unpaid: invoices.unpaid,
+        paid: invoices.paid,
+        partially_paid: invoices.partially_paid,
+        total_revenue: invoices.total_revenue,
+        outstanding_receivables: invoices.outstanding_receivables
+      }
+    };
+
     res.json(dashboard);
   } catch (error: any) {
     logger.error('Get sales dashboard error:', error);
     res.status(500).json({ error: 'Failed to fetch dashboard' });
   }
 }
-
-// ============ Legacy (migrated to InvoiceModel) ============
 
 function getSalesSummaryByDateRange(req: Request, res: Response): void {
   try {
@@ -434,7 +458,7 @@ function getSalesSummaryByDateRange(req: Request, res: Response): void {
       return;
     }
 
-    const stats = SalesService.getInvoiceStatsByDateRange(start_date as string, end_date as string);
+    const stats = InvoiceModel.getStatsByDateRange(start_date as string, end_date as string, db);
     res.json(stats);
   } catch (error: any) {
     logger.error('Get sales summary by date range error:', error);
@@ -443,7 +467,6 @@ function getSalesSummaryByDateRange(req: Request, res: Response): void {
 }
 
 export default {
-  // Quotations
   createQuotation,
   getQuotations,
   getQuotation,
@@ -451,8 +474,7 @@ export default {
   deleteQuotation,
   convertQuotationToSalesOrder,
   getQuotationCycleChain,
-  
-  // Sales Orders
+
   createSalesOrder,
   getSalesOrders,
   getSalesOrder,
@@ -461,14 +483,11 @@ export default {
   cancelSalesOrder,
   convertSalesOrderToInvoice,
   getSalesOrderCycleChain,
-  
-  // Invoices (for sales cycle)
+
   getInvoicesBySalesOrder,
   getInvoicesByQuotation,
-  
-  // Dashboard
+
   getSalesDashboard,
-  
-  // Legacy (migrated to InvoiceModel)
+
   getSalesSummaryByDateRange
 };
