@@ -449,31 +449,8 @@ class PurchaseModel {
       db.prepare('UPDATE purchases SET returned_quantity = COALESCE(returned_quantity, 0) + ? WHERE id = ?')
         .run(returnQuantity, purchaseId);
 
-      // Update stock_balances
-      const existingBalance = db.prepare(`
-        SELECT * FROM stock_balances
-        WHERE item_id = ? AND warehouse_id = ?
-      `).get(purchase.item_id, purchase.warehouse_id) as Record<string, unknown> | undefined;
-
-      if (existingBalance) {
-        db.prepare(`
-          UPDATE stock_balances
-          SET quantity = quantity - ?,
-              last_updated = CURRENT_TIMESTAMP
-          WHERE item_id = ? AND warehouse_id = ?
-        `).run(returnQuantity, purchase.item_id, purchase.warehouse_id);
-      }
-
-      // Update items.current_stock
-      db.prepare(`
-        UPDATE items
-        SET current_stock = (
-          SELECT COALESCE(SUM(quantity), 0)
-          FROM stock_balances
-          WHERE item_id = ?
-        )
-        WHERE id = ?
-      `).run(purchase.item_id, purchase.item_id);
+      // Note: stock_balances and items.current_stock are already updated
+      // by StockMovementModel.recordMovement() above — no manual update needed.
 
       // Log activity
       db.prepare(`
