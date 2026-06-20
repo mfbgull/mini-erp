@@ -35,38 +35,42 @@ export function activityLoggerMiddleware(req: Request, res: Response, next: Next
 
   // Override end to log after response
   res.end = function (chunk?: any, encoding?: any, callback?: any): Response {
-    // Calculate duration
-    const durationMs = req.startTime ? Date.now() - req.startTime : 0;
+    try {
+      // Calculate duration
+      const durationMs = req.startTime ? Date.now() - req.startTime : 0;
 
-    // Determine log level based on status code
-    let logLevel = LogLevel.INFO;
-    if (res.statusCode >= 400 && res.statusCode < 500) {
-      logLevel = LogLevel.WARNING;
-    } else if (res.statusCode >= 500) {
-      logLevel = LogLevel.ERROR;
-    }
+      // Determine log level based on status code
+      let logLevel = LogLevel.INFO;
+      if (res.statusCode >= 400 && res.statusCode < 500) {
+        logLevel = LogLevel.WARNING;
+      } else if (res.statusCode >= 500) {
+        logLevel = LogLevel.ERROR;
+      }
 
-    // Only log for API requests
-    if (req.path.startsWith('/api/') && !req.activityLogged) {
-      // Get user ID from request (set by auth middleware)
-      const userId = req.user?.id;
+      // Only log for API requests
+      if (req.path.startsWith('/api/') && !req.activityLogged) {
+        // Get user ID from request (set by auth middleware)
+        const userId = req.user?.id;
 
-      // Get entity type and ID from request if available
-      const entityType = getEntityType(req.path);
-      const entityId = getEntityId(req);
+        // Get entity type and ID from request if available
+        const entityType = getEntityType(req.path);
+        const entityId = getEntityId(req);
 
-      // Log the request
-      log({
-        userId,
-        action: getActionFromMethod(req.method, res.statusCode),
-        entityType,
-        entityId,
-        description: `${req.method} ${req.path} - ${res.statusCode}`,
-        logLevel,
-        ipAddress: req.ip || req.get('x-forwarded-for') || req.get('x-real-ip'),
-        userAgent: req.get('user-agent'),
-        durationMs
-      });
+        // Log the request
+        log({
+          userId,
+          action: getActionFromMethod(req.method, res.statusCode),
+          entityType,
+          entityId,
+          description: `${req.method} ${req.path} - ${res.statusCode}`,
+          logLevel,
+          ipAddress: req.ip || req.get('x-forwarded-for') || req.get('x-real-ip'),
+          userAgent: req.get('user-agent'),
+          durationMs
+        });
+      }
+    } catch (_e) {
+      // Swallow logging errors — never let them break the HTTP response
     }
 
     return originalEnd(chunk, encoding, callback);
