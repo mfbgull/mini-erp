@@ -704,9 +704,13 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
       });
     }
 
-    const invoiceItems = InvoiceModel.getItemsForStockReverse(invoiceId, db);
-
     const transaction = db.transaction(() => {
+      // Re-read invoice INSIDE transaction for fresh data
+      const freshInvoice = InvoiceModel.getById(invoiceId, db);
+      if (!freshInvoice) throw new Error('Invoice not found');
+
+      const invoiceItems = InvoiceModel.getItemsForStockReverse(invoiceId, db);
+
       // Clean up payment allocations and orphaned payments
       const allocations = PaymentModel.getAllocationsByInvoiceId(db, invoiceId);
 
@@ -727,7 +731,7 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
       }
 
       // Reverse stock movements (before deleting invoice items — reversal looks up SALE movements by invoice_no)
-      InvoiceModel.reverseStockForItems(db, invoiceItems, invoice.invoice_no, userId, 'INVOICE_DELETE');
+      InvoiceModel.reverseStockForItems(db, invoiceItems, freshInvoice.invoice_no, userId, 'INVOICE_DELETE');
 
       // Void the invoice's journal_lines entries (Dr AR / Cr Sales Revenue / Cr Tax Payable)
       AccountingService.voidJournalLinesByReference(db, 'INVOICE', invoiceId);
@@ -739,16 +743,16 @@ function deleteInvoice(req: AuthRequest, res: Response): Response | void {
       InvoiceModel.deleteInvoiceItems(db, invoiceId);
 
       // Delete related ledger entries
-      InvoiceModel.deleteLedgerEntryByReference(db, invoice.invoice_no);
+      InvoiceModel.deleteLedgerEntryByReference(db, freshInvoice.invoice_no);
 
       // Rebuild running balances so remaining ledger rows are consistent
-      ledgerUtils.rebuildLedgerBalances(invoice.customer_id);
+      ledgerUtils.rebuildLedgerBalances(freshInvoice.customer_id);
 
       // Delete invoice
       InvoiceModel.deleteInvoice(db, invoiceId);
 
       // Recalculate customer's current_balance now that the invoice is gone
-      ledgerUtils.updateCustomerBalance(invoice.customer_id);
+      ledgerUtils.updateCustomerBalance(freshInvoice.customer_id);
     });
 
     transaction();
