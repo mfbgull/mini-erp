@@ -156,6 +156,41 @@ export class PaymentModel {
    */
   static create(db: Database.Database, data: CreatePaymentDTO): number {
     return db.transaction(() => {
+      // Input validation
+      if (!data.customer_id || data.customer_id <= 0) {
+        throw new Error('Valid customer_id is required');
+      }
+      if (!data.amount || data.amount <= 0) {
+        throw new Error('Payment amount must be greater than 0');
+      }
+      if (!data.payment_date) {
+        throw new Error('Payment date is required');
+      }
+      if (!data.invoice_allocations || data.invoice_allocations.length === 0) {
+        throw new Error('At least one invoice allocation is required');
+      }
+
+      // Validate customer exists
+      const customer = db.prepare('SELECT id FROM customers WHERE id = ?').get(data.customer_id);
+      if (!customer) {
+        throw new Error(`Customer ${data.customer_id} not found`);
+      }
+
+      // Validate each allocated invoice exists
+      for (const alloc of data.invoice_allocations) {
+        const invoiceId = parseInt(alloc.invoice_id, 10);
+        const invoice = db.prepare('SELECT id, customer_id FROM invoices WHERE id = ?').get(invoiceId) as { id: number; customer_id: number } | undefined;
+        if (!invoice) {
+          throw new Error(`Invoice ${invoiceId} not found`);
+        }
+        if (invoice.customer_id !== data.customer_id) {
+          throw new Error(`Invoice ${invoiceId} does not belong to customer ${data.customer_id}`);
+        }
+        if (!alloc.amount || alloc.amount <= 0) {
+          throw new Error(`Allocation amount for invoice ${invoiceId} must be greater than 0`);
+        }
+      }
+
       const paymentNo = this.generatePaymentNo(db);
 
       const paymentResult = db.prepare(`
