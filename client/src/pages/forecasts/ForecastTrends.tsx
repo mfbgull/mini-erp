@@ -1,18 +1,37 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, TrendingDown, Minus, AlertTriangle, RefreshCw
 } from 'lucide-react';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer, Legend
-} from 'recharts';
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend,
+} from 'chart.js';
+import { Line, Bar } from 'react-chartjs-2';
 
 import SearchableSelect from '../../components/common/SearchableSelect';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import './ForecastTrends.css';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  ChartTooltip,
+  ChartLegend,
+);
 
 interface TrendMonth {
   month: string;
@@ -77,10 +96,85 @@ export default function ForecastTrends() {
   const historicalTrends: TrendMonth[] = trendData?.historicalTrends || [];
   const itemBreakdown: BreakdownItem[] = trendData?.itemBreakdown || [];
 
-  // Colors for the trend lines
   const actualColor = '#3b82f6';
   const movingAvgColor = '#8b5cf6';
   const forecastColor = '#10b981';
+
+  const lineChartData = {
+    labels: historicalTrends.map(d => d.month),
+    datasets: [
+      {
+        label: t('forecasts.actualSales'),
+        data: historicalTrends.map(d => d.actual),
+        borderColor: actualColor,
+        backgroundColor: actualColor,
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: actualColor,
+        tension: 0,
+        spanGaps: false,
+      },
+      {
+        label: t('forecasts.trendLine'),
+        data: historicalTrends.map(d => d.movingAvg),
+        borderColor: movingAvgColor,
+        borderWidth: 2,
+        borderDash: [4, 4],
+        pointRadius: 0,
+        tension: 0,
+        spanGaps: true,
+      },
+      {
+        label: t('forecasts.forecast'),
+        data: historicalTrends.map(d => d.predicted),
+        borderColor: forecastColor,
+        borderWidth: 2,
+        borderDash: [8, 4],
+        pointRadius: 6,
+        pointBackgroundColor: forecastColor,
+        pointBorderColor: forecastColor,
+        tension: 0,
+        spanGaps: true,
+      },
+    ],
+  };
+
+  const lineChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom' as const },
+    },
+    scales: {
+      x: { ticks: { font: { size: 12 } } },
+      y: { ticks: { font: { size: 12 } } },
+    },
+  };
+
+  const topItems = itemBreakdown.slice(0, 10);
+  const barChartData = {
+    labels: topItems.map(d => d.itemName.length > 15 ? d.itemName.substring(0, 15) + '...' : d.itemName),
+    datasets: [
+      {
+        label: t('forecasts.totalSold'),
+        data: topItems.map(d => d.totalSold),
+        backgroundColor: actualColor,
+      },
+    ],
+  };
+
+  const barChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y' as const,
+    plugins: {
+      legend: { display: false },
+    },
+    scales: {
+      x: { ticks: { font: { size: 12 } } },
+      y: { ticks: { font: { size: 11 } } },
+    },
+  };
 
   if (error) {
     return (
@@ -129,65 +223,14 @@ export default function ForecastTrends() {
             <div className="chart-card">
               <h3>{t('forecasts.monthlyTrend')}</h3>
               <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={historicalTrends}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" fontSize={12} />
-                    <YAxis fontSize={12} />
-                    <Tooltip />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="actual"
-                      stroke={actualColor}
-                      name={t('forecasts.actualSales')}
-                      strokeWidth={2}
-                      dot={{ fill: actualColor, r: 4 }}
-                      connectNulls={false}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="movingAvg"
-                      stroke={movingAvgColor}
-                      name={t('forecasts.trendLine')}
-                      strokeWidth={2}
-                      strokeDasharray="4 4"
-                      dot={false}
-                      connectNulls={true}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="predicted"
-                      stroke={forecastColor}
-                      name={t('forecasts.forecast')}
-                      strokeWidth={2}
-                      strokeDasharray="8 4"
-                      dot={{ fill: forecastColor, r: 6, stroke: forecastColor }}
-                      connectNulls={true}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <Line data={lineChartData} options={lineChartOptions} />
               </div>
             </div>
 
             <div className="chart-card">
               <h3>{t('forecasts.topItemsByVolume')}</h3>
               <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={itemBreakdown.slice(0, 10)} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" fontSize={12} />
-                    <YAxis
-                      type="category"
-                      dataKey="itemName"
-                      fontSize={11}
-                      width={120}
-                      tickFormatter={(val: string) => val.length > 15 ? val.substring(0, 15) + '...' : val}
-                    />
-                    <Tooltip />
-                    <Bar dataKey="totalSold" fill="#3b82f6" name={t('forecasts.totalSold')} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <Bar data={barChartData} options={barChartOptions} />
               </div>
             </div>
           </div>
