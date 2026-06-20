@@ -472,12 +472,25 @@ class InvoiceModel {
 
       const warehouseId = saleMovements[0].warehouse_id;
 
-      // Calculate total sold vs returned to handle partial returns proportionally.
-      // For a full return, ratio = 1 (restore everything).
-      // For a partial return, ratio < 1 (restore proportionally per batch).
+      // Calculate how much was ALREADY returned for this item on this invoice
+      const alreadyReturned = db.prepare(`
+        SELECT COALESCE(SUM(quantity), 0) as total_returned
+        FROM stock_movements
+        WHERE item_id = ? AND reference_docno = ? AND movement_type = 'ADJUSTMENT' AND reference_doctype = 'RETURN'
+      `).get(item.item_id, invoiceNo) as { total_returned: number };
+
       const totalSold = saleMovements.reduce((sum, m) => sum + Math.abs(m.quantity), 0);
-      const returnQty = Math.abs(item.quantity);
-      const ratio = Math.abs(totalSold) < 0.001 ? 1 : Math.min(returnQty / totalSold, 1);
+      const totalToReturn = Math.abs(item.quantity);
+      const alreadyReturnedQty = Math.abs(alreadyReturned.total_returned);
+      const remainingToReturn = Math.max(0, totalToReturn - alreadyReturnedQty);
+
+      if (remainingToReturn <= 0) {
+        logger.warn(`[BatchReversal] Item ${item.item_id} already fully returned on invoice ${invoiceNo}`);
+        continue;
+      }
+
+      // Ratio based on remaining-to-return vs total sold
+      const ratio = Math.abs(totalSold) < 0.001 ? 1 : Math.min(remainingToReturn / totalSold, 1);
 
       // Restore quantity_remaining on each consumed batch (except legacy/fallback entries)
       for (const movement of saleMovements) {
@@ -501,13 +514,13 @@ class InvoiceModel {
       }
       const avgUnitCost = totalQty > 0 ? totalActualCost / totalQty : item.unit_price;
 
-      // Add stock back (positive quantity to reverse the sale)
+      // Add stock back (positive quantity to reverse the sale) — only the remaining qty
       StockMovementModel.recordMovement(
         {
           item_id: item.item_id,
           warehouse_id: warehouseId,
           movement_type: 'ADJUSTMENT',
-          quantity: item.quantity, // Positive to add back stock
+          quantity: remainingToReturn, // Only the remaining qty to return
           unit_cost: avgUnitCost,
           reference_doctype: referenceDoctype,
           reference_docno: invoiceNo,
