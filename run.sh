@@ -32,8 +32,8 @@ check_port() {
 kill_port_with_confirmation() {
   local port=$1
   if check_port "$port"; then
-    read -r -p "  Kill process(es) on port $port? (y/N): " confirm
-    if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
+    read -r -p "  Kill process(es) on port $port? (Y/n): " confirm
+    if [ -z "$confirm" ] || [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
       echo "  → Killing process(es) on port $port..."
       fuser -k "$port/tcp" > /dev/null 2>&1 || true
       sleep 1
@@ -69,6 +69,12 @@ echo "Backend:  http://localhost:3011"
 echo "Frontend: http://localhost:3010"
 echo "===================================="
 echo ""
+echo "Opening browser..."
+if command -v xdg-open &>/dev/null; then
+  xdg-open "http://localhost:3010"
+elif command -v open &>/dev/null; then
+  open "http://localhost:3010"
+fi
 echo "Press Ctrl+C to stop both servers"
 
 # Wait for both processes
