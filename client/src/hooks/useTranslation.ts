@@ -50,8 +50,8 @@ export const useTranslation = (): UseTranslationReturn => {
     () => currentLocale,
     () => 'en'
   );
-  const isRTL = locale === 'ur';
-  const dir = locale === 'ur' ? 'rtl' : 'ltr';
+  const isRTL = false;
+  const dir = 'ltr' as const;
 
   const t = useCallback(
     (key: TranslationKey, params?: Record<string, string | number> | string): string => {
@@ -116,9 +116,9 @@ export const getTranslation = (key: TranslationKey, locale?: string): string => 
   return typeof value === 'string' ? value : key;
 };
 
-export const isRTL = (): boolean => currentLocale === 'ur';
+export const isRTL = (): boolean => false;
 
-export const getDir = (): 'ltr' | 'rtl' => currentLocale === 'ur' ? 'rtl' : 'ltr';
+export const getDir = (): 'ltr' | 'rtl' => 'ltr';
 
 export const initLocale = (locale: string) => {
   if (locales[locale]) {

@@ -135,7 +135,7 @@ const TopMenu = memo(function TopMenu({ onToggleNav }: TopMenuProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
-    document.documentElement.dir = getDir();
+    document.documentElement.dir = 'ltr';
   }, [locale]);
 
   const navItems = getNavItems();

@@ -33,7 +33,7 @@ import './utils/webmcp-mock'
 const savedLocale = localStorage.getItem('minierp_locale');
 if (savedLocale && typeof document !== 'undefined') {
   document.documentElement.lang = savedLocale;
-  document.documentElement.dir = savedLocale === 'ur' ? 'rtl' : 'ltr';
+  document.documentElement.dir = 'ltr';
 }
 
 // Register service worker for PWA support (production only)
