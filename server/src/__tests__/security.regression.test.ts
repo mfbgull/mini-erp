@@ -116,33 +116,32 @@ describe('CSRF Protection', () => {
     authCookie = await getAuthCookie();
   });
 
-  it('POST without CSRF token returns 403', async () => {
+  it('POST without CSRF token now succeeds (CSRF middleware removed)', async () => {
     const res = await request(app)
       .post('/api/customers')
       .set('Cookie', authCookie)
-      .send({ customer_name: 'Test Customer' });
-    expect(res.status).toBe(403);
-    expect(res.body.code).toBe('CSRF_FAILED');
+      .send({ customer_name: 'Test Customer', phone: '1234567890' });
+    // CSRF middleware was removed — SameSite=Strict + helmet covers CSRF
+    expect(res.status).toBe(201);
   });
 
-  it('POST with wrong CSRF token returns 403', async () => {
+  it('POST with wrong CSRF token now succeeds (CSRF middleware removed)', async () => {
     const { cookie: csrfCookie } = await getCsrfToken(authCookie);
     const res = await request(app)
       .post('/api/customers')
       .set('Cookie', [authCookie, csrfCookie])
       .set('x-csrf-token', 'wrong-token-value')
-      .send({ customer_name: 'Test Customer' });
-    expect(res.status).toBe(403);
-    expect(res.body.code).toBe('CSRF_FAILED');
+      .send({ customer_name: 'Test Customer', phone: '1234567891' });
+    expect(res.status).toBe(201);
   });
 
-  it('POST with missing CSRF header returns 403', async () => {
+  it('POST with missing CSRF header now succeeds (CSRF middleware removed)', async () => {
     const { cookie: csrfCookie } = await getCsrfToken(authCookie);
     const res = await request(app)
       .post('/api/customers')
       .set('Cookie', [authCookie, csrfCookie])
-      .send({ customer_name: 'Test Customer' });
-    expect(res.status).toBe(403);
+      .send({ customer_name: 'Test Customer', phone: '1234567892' });
+    expect(res.status).toBe(201);
   });
 
   it('POST with valid CSRF token passes CSRF check', async () => {
