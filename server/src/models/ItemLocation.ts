@@ -116,19 +116,21 @@ class ItemLocationModel {
     const location = this.getById(id, db);
     if (!location) throw new Error('Location not found');
 
-    // Unset primary for all other locations of this item
-    db.prepare(`
-      UPDATE item_locations
-      SET is_primary = 0
-      WHERE item_id = ?
-    `).run(location.item_id);
+    return db.transaction(() => {
+      // Unset primary for all other locations of this item
+      db.prepare(`
+        UPDATE item_locations
+        SET is_primary = 0
+        WHERE item_id = ?
+      `).run(location.item_id);
 
-    // Set this one as primary
-    return db.prepare(`
-      UPDATE item_locations
-      SET is_primary = 1
-      WHERE id = ?
-    `).run(id);
+      // Set this one as primary
+      return db.prepare(`
+        UPDATE item_locations
+        SET is_primary = 1
+        WHERE id = ?
+      `).run(id);
+    })();
   }
 
   static getRackCodesForWarehouse(warehouseId: number, db: Database.Database): string[] {
