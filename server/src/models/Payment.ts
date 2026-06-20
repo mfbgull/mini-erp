@@ -213,20 +213,50 @@ export class PaymentModel {
     const existing = this.getById(db, id);
     if (!existing) throw new Error('Payment not found');
 
-    db.prepare(`
-      UPDATE payments SET
-        payment_date = COALESCE(?, payment_date), amount = COALESCE(?, amount),
-        payment_method = COALESCE(?, payment_method), reference_no = COALESCE(?, reference_no),
-        notes = COALESCE(?, notes) WHERE id = ?
-    `).run(data.payment_date, data.amount, data.payment_method, data.reference_no, data.notes, id);
+    const amountChanged = data.amount !== undefined && data.amount !== existing.amount;
 
-    ledgerUtils.updateCustomerBalance(existing.customer_id);
+    db.transaction(() => {
+      db.prepare(`
+        UPDATE payments SET
+          payment_date = COALESCE(?, payment_date), amount = COALESCE(?, amount),
+          payment_method = COALESCE(?, payment_method), reference_no = COALESCE(?, reference_no),
+          notes = COALESCE(?, notes) WHERE id = ?
+      `).run(data.payment_date, data.amount, data.payment_method, data.reference_no, data.notes, id);
 
-    const allocations = db.prepare('SELECT invoice_id FROM payment_allocations WHERE payment_id = ?').all(id) as { invoice_id: number }[];
-    for (const alloc of allocations) {
-      ledgerUtils.calculateInvoiceBalance(alloc.invoice_id);
-      ledgerUtils.updateInvoiceStatus(alloc.invoice_id);
-    }
+      // If amount changed, recalculate allocations proportionally
+      if (amountChanged) {
+        const newAmount = data.amount!;
+        const allocations = db.prepare('SELECT id, invoice_id, amount FROM payment_allocations WHERE payment_id = ?').all(id) as { id: number; invoice_id: number; amount: number }[];
+        const totalAllocated = allocations.reduce((sum, a) => sum + a.amount, 0);
+
+        if (totalAllocated > 0 && allocations.length > 0) {
+          const ratio = newAmount / totalAllocated;
+          let distributed = 0;
+          for (let i = 0; i < allocations.length; i++) {
+            const alloc = allocations[i];
+            if (i === allocations.length - 1) {
+              // Last allocation gets the remainder to avoid rounding issues
+              db.prepare('UPDATE payment_allocations SET amount = ? WHERE id = ?')
+                .run(newAmount - distributed, alloc.id);
+            } else {
+              const newAllocAmount = Math.round(alloc.amount * ratio * 100) / 100;
+              distributed += newAllocAmount;
+              db.prepare('UPDATE payment_allocations SET amount = ? WHERE id = ?')
+                .run(newAllocAmount, alloc.id);
+            }
+          }
+        }
+      }
+
+      // Recalculate affected invoice balances
+      const allocations = db.prepare('SELECT invoice_id FROM payment_allocations WHERE payment_id = ?').all(id) as { invoice_id: number }[];
+      for (const alloc of allocations) {
+        ledgerUtils.calculateInvoiceBalance(alloc.invoice_id);
+        ledgerUtils.updateInvoiceStatus(alloc.invoice_id);
+      }
+
+      ledgerUtils.updateCustomerBalance(existing.customer_id);
+    })();
   }
 
   /**
