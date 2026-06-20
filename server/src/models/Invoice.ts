@@ -621,7 +621,7 @@ class InvoiceModel {
   /**
    * Create a ledger entry
    */
-  static createLedgerEntry(db: Database.Database, customerId: number, referenceNo: string, debit: number, credit: number, description: string): void {
+  static createLedgerEntry(db: Database.Database, customerId: number, type: string, referenceNo: string, debit: number, credit: number, description: string): void {
     // Calculate running balance from last entry for this customer
     const lastBalanceResult = db.prepare(`
       SELECT balance FROM customer_ledger
@@ -641,7 +641,7 @@ class InvoiceModel {
         debit, credit, balance, description
       )
       VALUES (?, DATE('now'), ?, ?, ?, ?, ?, ?)
-    `).run(customerId, referenceNo, 'INVOICE', debit, credit, newBalance, description);
+    `).run(customerId, type, referenceNo, safeDebit, safeCredit, newBalance, description);
   }
 
   /**

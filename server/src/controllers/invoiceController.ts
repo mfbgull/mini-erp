@@ -410,7 +410,7 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
       InvoiceModel.createPaymentAllocation(db, paymentId, invoiceId, paymentAmountNum);
 
       // Ledger entry for payment (credit to reduce AR)
-      InvoiceModel.createLedgerEntry(db, parsedCustomerId, newPaymentNo, 0, paymentAmountNum, `Payment ${newPaymentNo} for Invoice ${invoice_no}`);
+      InvoiceModel.createLedgerEntry(db, parsedCustomerId, 'PAYMENT', newPaymentNo, 0, paymentAmountNum, `Payment ${newPaymentNo} for Invoice ${invoice_no}`);
 
       // Post the payment to the GL (Dr Cash / Cr AR). Cash vs Bank
       // is determined by payment_method.
@@ -547,7 +547,7 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
             InvoiceModel.createPaymentAllocation(db, newPaymentId, invoiceId, newPaymentAmount);
 
             // Ledger entry for payment (credit to reduce AR)
-            InvoiceModel.createLedgerEntry(db, parsedCustomerId, newPaymentNo, 0, newPaymentAmount, `Payment ${newPaymentNo} for Invoice ${resolvedInvoiceNo}`);
+            InvoiceModel.createLedgerEntry(db, parsedCustomerId, 'PAYMENT', newPaymentNo, 0, newPaymentAmount, `Payment ${newPaymentNo} for Invoice ${resolvedInvoiceNo}`);
         }
 
         // === Recalculate paid/balance (accounting for returned_amount) ===
@@ -649,7 +649,7 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
         // Update ledger entry for the invoice if total changed
         // Delete old invoice ledger entry and recreate with new amount
         InvoiceModel.deleteLedgerEntryByReference(db, resolvedInvoiceNo);
-        InvoiceModel.createLedgerEntry(db, parsedCustomerId, resolvedInvoiceNo, totalAmountNum, 0, `Invoice ${resolvedInvoiceNo} (updated)`);
+        InvoiceModel.createLedgerEntry(db, parsedCustomerId, 'INVOICE', resolvedInvoiceNo, totalAmountNum, 0, `Invoice ${resolvedInvoiceNo} (updated)`);
 
         // --- FIX #6: Customer balance update inside transaction ---
         if (originalInvoice.customer_id !== parsedCustomerId) {

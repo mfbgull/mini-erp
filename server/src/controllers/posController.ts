@@ -189,11 +189,11 @@ function createPOSSale(req: AuthRequest, res: Response): void {
         const paymentId = InvoiceModel.createPayment(db, paymentNo, walkinCustomerId, sale_date, cashAmount, 'Cash', null, `POS Transaction ${transactionNo}`);
         InvoiceModel.createPaymentAllocation(db, paymentId, invoiceId, cashAmount);
         // Create ledger entry for payment
-        InvoiceModel.createLedgerEntry(db, walkinCustomerId, paymentNo, 0, cashAmount, `Payment ${paymentNo} for POS ${transactionNo}`);
+        InvoiceModel.createLedgerEntry(db, walkinCustomerId, 'PAYMENT', paymentNo, 0, cashAmount, `Payment ${paymentNo} for POS ${transactionNo}`);
       }
 
       // Create ledger entry for the sale
-      InvoiceModel.createLedgerEntry(db, walkinCustomerId, transactionNo, total, 0, `POS Sale ${transactionNo}`);
+      InvoiceModel.createLedgerEntry(db, walkinCustomerId, 'INVOICE', transactionNo, total, 0, `POS Sale ${transactionNo}`);
 
       // Activity log
       db.prepare('INSERT INTO activity_log (user_id, action, entity_type, entity_id, description) VALUES (?, ?, ?, ?, ?)').run(
