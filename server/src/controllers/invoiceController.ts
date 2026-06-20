@@ -898,7 +898,7 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         throw new Error('Invoice not found');
       }
 
-      const processedItems: Array<{ item_id: number; quantity: number; unit_price: number }> = [];
+      const processedItems: Array<{ item_id: number; quantity: number; unit_price: number; discount_type?: string; discount_value?: number }> = [];
       let returnTotalTaxAmount = 0;
 
       for (const returnItem of returnItems) {
@@ -933,10 +933,20 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
           item_id: invoiceItem.item_id,
           quantity: returnItem.return_quantity,
           unit_price: invoiceItem.unit_price,
+          discount_type: invoiceItem.discount_type || 'percentage',
+          discount_value: Number(invoiceItem.discount_value) || 0,
         });
 
-        // Accumulate tax for the returned items
-        const lineAmount = Number(returnItem.return_quantity) * Number(invoiceItem.unit_price);
+        // Calculate line amount with item discount applied
+        const grossLineAmount = Number(returnItem.return_quantity) * Number(invoiceItem.unit_price);
+        const itemDiscountType = invoiceItem.discount_type || 'percentage';
+        const itemDiscountValue = Number(invoiceItem.discount_value) || 0;
+        let lineAmount = grossLineAmount;
+        if (itemDiscountType === 'percentage' && itemDiscountValue > 0) {
+          lineAmount = grossLineAmount * (1 - itemDiscountValue / 100);
+        } else if (itemDiscountType === 'flat' && itemDiscountValue > 0) {
+          lineAmount = Math.max(0, grossLineAmount - itemDiscountValue * Number(returnItem.return_quantity));
+        }
         returnTotalTaxAmount += lineAmount * ((Number(invoiceItem.tax_rate) || 0) / 100);
 
         // Update per-item returned quantity tracking
@@ -953,10 +963,20 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         'RETURN'
       );
 
-      // Calculate the total return amount
+      // Calculate the total return amount (with item discounts applied)
       const returnAmount = processedItems.reduce(
-        (sum: number, item: { quantity: number; unit_price: number }) =>
-          sum + Number(item.quantity) * Number(item.unit_price),
+        (sum: number, item: { quantity: number; unit_price: number; discount_type?: string; discount_value?: number }) => {
+          const grossAmount = Number(item.quantity) * Number(item.unit_price);
+          const discountType = item.discount_type || 'percentage';
+          const discountValue = Number(item.discount_value) || 0;
+          let netAmount = grossAmount;
+          if (discountType === 'percentage' && discountValue > 0) {
+            netAmount = grossAmount * (1 - discountValue / 100);
+          } else if (discountType === 'flat' && discountValue > 0) {
+            netAmount = Math.max(0, grossAmount - discountValue * Number(item.quantity));
+          }
+          return sum + netAmount;
+        },
         0
       );
 
