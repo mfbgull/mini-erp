@@ -457,19 +457,21 @@ class QuotationModel {
       throw new Error('Cannot delete a converted quotation');
     }
 
-    db.prepare('DELETE FROM quotation_items WHERE quotation_id = ?').run(id);
-    db.prepare('DELETE FROM quotations WHERE id = ?').run(id);
+    db.transaction(() => {
+      db.prepare('DELETE FROM quotation_items WHERE quotation_id = ?').run(id);
+      db.prepare('DELETE FROM quotations WHERE id = ?').run(id);
 
-    db.prepare(`
-      INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(
-      userId,
-      'DELETE',
-      'Quotation',
-      id,
-      `Deleted quotation ${quotation.quotation_no}`
-    );
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'DELETE',
+        'Quotation',
+        id,
+        `Deleted quotation ${quotation.quotation_no}`
+      );
+    })();
 
     return true;
   }

@@ -454,19 +454,21 @@ class SalesOrderModel {
       throw new Error(`Cannot delete a ${salesOrder.status} sales order`);
     }
 
-    db.prepare('DELETE FROM sales_order_items WHERE so_id = ?').run(id);
-    db.prepare('DELETE FROM sales_orders WHERE id = ?').run(id);
+    db.transaction(() => {
+      db.prepare('DELETE FROM sales_order_items WHERE so_id = ?').run(id);
+      db.prepare('DELETE FROM sales_orders WHERE id = ?').run(id);
 
-    db.prepare(`
-      INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(
-      userId,
-      'DELETE',
-      'SalesOrder',
-      id,
-      `Deleted sales order ${salesOrder.so_no}`
-    );
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'DELETE',
+        'SalesOrder',
+        id,
+        `Deleted sales order ${salesOrder.so_no}`
+      );
+    })();
 
     return true;
   }

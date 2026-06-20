@@ -534,18 +534,21 @@ class PurchaseOrderModel {
       throw new Error('Only Draft Purchase Orders can be deleted');
     }
 
-    db.prepare('DELETE FROM purchase_orders WHERE id = ?').run(id);
+    db.transaction(() => {
+      db.prepare('DELETE FROM purchase_order_items WHERE po_id = ?').run(id);
+      db.prepare('DELETE FROM purchase_orders WHERE id = ?').run(id);
 
-    db.prepare(`
-      INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(
-      userId,
-      'DELETE',
-      'PurchaseOrder',
-      id,
-      `Deleted PO ${po.po_no}`
-    );
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'DELETE',
+        'PurchaseOrder',
+        id,
+        `Deleted PO ${po.po_no}`
+      );
+    })();
 
     return true;
   }
