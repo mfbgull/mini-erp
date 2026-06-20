@@ -184,25 +184,30 @@ function returnPurchaseItems(req: AuthRequest, res: Response): Response | void {
       return res.status(400).json({ error: 'A positive return quantity is required' });
     }
 
-    // Fetch purchase first to get its number for the GL entry
-    const purchase = Purchase.getById(purchaseId, db);
-    if (!purchase) {
-      return res.status(404).json({ error: 'Purchase not found' });
-    }
+    // Wrap everything in a transaction so GL posting is atomic with stock return
+    let result: { returnedQuantity: number; totalCost: number };
+    let purchaseNo: string;
 
-    // Return stock and get the cost for GL posting
-    const result = Purchase.returnPurchaseItems(db, purchaseId, quantity, userId, reason);
+    db.transaction(() => {
+      // Fetch purchase first to get its number for the GL entry
+      const purchase = Purchase.getById(purchaseId, db);
+      if (!purchase) throw new Error('Purchase not found');
+      purchaseNo = purchase.purchase_no;
 
-    // Post GL reversal — Dr AP, Cr Inventory
-    AccountingService.postPurchaseReturnEntry(db, {
-      purchaseId,
-      purchaseNo: purchase.purchase_no,
-      returnAmount: result.totalCost,
-      returnDate: new Date().toISOString().split('T')[0],
-      userId,
-    });
+      // Return stock and get the cost for GL posting
+      result = Purchase.returnPurchaseItems(db, purchaseId, quantity, userId, reason);
 
-    res.json({ success: true, message: 'Return processed successfully', data: result });
+      // Post GL reversal — Dr AP, Cr Inventory
+      AccountingService.postPurchaseReturnEntry(db, {
+        purchaseId,
+        purchaseNo: purchase.purchase_no,
+        returnAmount: result.totalCost,
+        returnDate: new Date().toISOString().split('T')[0],
+        userId,
+      });
+    })();
+
+    res.json({ success: true, message: 'Return processed successfully', data: result! });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Return purchase items error:', { error: errorMessage });

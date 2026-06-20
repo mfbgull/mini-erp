@@ -344,18 +344,22 @@ function returnReceiptItems(req: AuthRequest, res: Response): void {
       }
     }
 
-    const result = PurchaseOrderModel.returnReceiptItems(poId, items, userId, db, reason);
+    let result: { returnedCount: number; totalQuantity: number; totalAmount: number };
 
-    // Post GL reversal — Dr AP, Cr Inventory
-    AccountingService.postPurchaseReturnEntry(db, {
-      purchaseId: poId,
-      purchaseNo: `PO-${poId}`, // Will be resolved properly inside the method if needed
-      returnAmount: result.totalAmount,
-      returnDate: new Date().toISOString().split('T')[0],
-      userId,
-    });
+    db.transaction(() => {
+      result = PurchaseOrderModel.returnReceiptItems(poId, items, userId, db, reason);
 
-    res.json({ success: true, message: 'Return processed successfully', data: result });
+      // Post GL reversal — Dr AP, Cr Inventory
+      AccountingService.postPurchaseReturnEntry(db, {
+        purchaseId: poId,
+        purchaseNo: `PO-${poId}`,
+        returnAmount: result.totalAmount,
+        returnDate: new Date().toISOString().split('T')[0],
+        userId,
+      });
+    })();
+
+    res.json({ success: true, message: 'Return processed successfully', data: result! });
   } catch (error: any) {
     logger.error('Return receipt items error:', error);
     res.status(400).json({ error: error.message || 'Failed to process return' });
