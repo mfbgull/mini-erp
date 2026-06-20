@@ -501,16 +501,20 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
     const parsedCustomerId = parseInt(String(customer_id), 10);
     const userId = req.user!.id;
 
-    // Get the original invoice before the transaction
-    const originalInvoice = InvoiceModel.getById(invoiceId, db);
-    if (!originalInvoice) {
+    // Fast-fail check outside transaction
+    const invoiceExists = InvoiceModel.getById(invoiceId, db);
+    if (!invoiceExists) {
       return res.status(404).json({ error: 'Invoice not found' });
     }
 
-    // Fallback to original invoice_no if not provided in request
-    const resolvedInvoiceNo = invoice_no || originalInvoice.invoice_no;
-
     const transaction = db.transaction(() => {
+        // Re-read invoice INSIDE transaction for fresh data
+        const originalInvoice = InvoiceModel.getById(invoiceId, db);
+        if (!originalInvoice) throw new Error('Invoice not found');
+
+        // Fallback to original invoice_no if not provided in request
+        const resolvedInvoiceNo = invoice_no || originalInvoice.invoice_no;
+
         // === Handle deleted payments ===
         if (deleted_payments && Array.isArray(deleted_payments) && deleted_payments.length > 0) {
             for (const deletedPaymentId of deleted_payments) {
