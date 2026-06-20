@@ -430,9 +430,7 @@ function createInvoice(req: AuthRequest, res: Response): Response | void {
     }
 
     // --- FIX #6: Customer balance update inside transaction ---
-    // Update customer balance (this would typically be handled by ledgerUtils)
-    // For now, we'll note that ledgerUtils.updateCustomerBalance should be called
-    // ledgerUtils.updateCustomerBalance(parsedCustomerId);
+    ledgerUtils.updateCustomerBalance(parsedCustomerId);
 
       return invoiceId;
     });
@@ -657,13 +655,9 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
 
         // --- FIX #6: Customer balance update inside transaction ---
         if (originalInvoice.customer_id !== parsedCustomerId) {
-            // Update customer balance (this would typically be handled by ledgerUtils)
-            // For now, we'll note that ledgerUtils.updateCustomerBalance should be called
-            // ledgerUtils.updateCustomerBalance(originalInvoice.customer_id);
+            ledgerUtils.updateCustomerBalance(originalInvoice.customer_id);
         }
-        // Update customer balance (this would typically be handled by ledgerUtils)
-        // For now, we'll note that ledgerUtils.updateCustomerBalance should be called
-        // ledgerUtils.updateCustomerBalance(parsedCustomerId);
+        ledgerUtils.updateCustomerBalance(parsedCustomerId);
 
         // Update invoice status and balance
         updateInvoiceStatus(invoiceId);
