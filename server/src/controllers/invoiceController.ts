@@ -191,7 +191,11 @@ function getInvoices(req: AuthRequest, res: Response): void {
 
     if (status) {
       const statusList = status.split(',').map((s) => s.trim());
-      const invoices = InvoiceModel.getByStatus(statusList, db);
+      let invoices = InvoiceModel.getByStatus(statusList, db);
+      if (customerId) {
+        const cid = parseInt(customerId, 10);
+        invoices = invoices.filter(inv => inv.customer_id === cid);
+      }
       res.json({ success: true, data: invoices });
       return;
     }
