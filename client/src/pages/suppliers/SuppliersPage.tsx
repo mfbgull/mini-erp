@@ -12,7 +12,7 @@ import SupplierForm from '../../components/suppliers/SupplierForm';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
-import type { Supplier } from '../../utils/supplierTypes';
+import type { Supplier } from '../../types';
 import './SuppliersPage.css';
 
 export default function SuppliersPage() {

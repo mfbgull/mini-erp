@@ -2,7 +2,7 @@
  * Sales Order calculations — all pure functions, no React imports.
  */
 
-import type { SOFormItem } from './salesOrderTypes';
+import type { SOFormItem } from '../types';
 
 const FIELD_ORDER: readonly string[] = ['name', 'quantity', 'unitPrice', 'discountValue', 'taxRate'];
 
@@ -86,13 +86,4 @@ export function calculateTotal(items: SOFormItem[]): number {
   return calculateSubtotal(items) - calculateDiscount(items) + calculateTax(items);
 }
 
-export function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    Draft: 'bg-gray-100 text-gray-700',
-    Confirmed: 'bg-blue-100 text-blue-700',
-    Invoiced: 'bg-yellow-100 text-yellow-700',
-    Completed: 'bg-green-100 text-green-700',
-    Cancelled: 'bg-red-100 text-red-700',
-  };
-  return colors[status] || 'bg-gray-100 text-gray-700';
-}
+export { getStatusColor } from './statusColors';

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
-import type { IntegrationSettings, IntegrationService } from '../utils/integrationTypes';
+import type { IntegrationSettings, IntegrationService } from '../types';
 
 export const useIntegrationSettings = () => {
   return useQuery<IntegrationSettings>({

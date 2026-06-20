@@ -24,8 +24,8 @@ function getSummary(db: Database.Database): DashboardSummary {
   const itemCount = db.prepare('SELECT COUNT(*) as count FROM items WHERE is_active = 1').get() as { count: number };
 
   const stockValue = db.prepare(`
-    SELECT COALESCE(SUM(current_stock * standard_cost), 0) as total
-    FROM items WHERE is_active = 1
+    SELECT COALESCE(SUM(quantity_remaining * unit_cost), 0) as total
+    FROM stock_batches WHERE quantity_remaining > 0
   `).get() as { total: number };
 
   const salesRevenue = db.prepare(`

@@ -1,7 +1,7 @@
 import { X, User, Package, Plus, Check } from 'lucide-react';
 import Button from '../common/Button';
 import FormInput from '../common/FormInput';
-import type { QuotationMobileWizardProps, QuotationFormItem } from '../../utils/quotationTypes';
+import type { QuotationMobileWizardProps, QuotationFormItem } from '../../types';
 
 export default function QuotationMobileWizard({
   customer,

@@ -139,7 +139,7 @@ export async function submitInvoice(req: AuthRequest, res: Response) {
     res.status(201).json({ success: true, data: createdInvoice, message: 'Invoice created successfully' });
   } catch (error) {
     logger.error('Submit invoice error:', error);
-    res.status(500).json({ error: 'Failed to create invoice: ' + (error as Error).message });
+    res.status(500).json({ success: false, error: 'Failed to create invoice' });
   }
 }
 

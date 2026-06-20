@@ -10,7 +10,7 @@ import { MoreVertical, Edit2, Trash2 } from 'lucide-react';
 import DropdownMenu from '../../components/common/DropdownMenu';
 import { createActionColDef } from '../../utils/agGridIntegration';
 import { formatAsCurrency, formatDateString } from '../../utils/customerCalculations';
-import type { PaymentsTabProps, Payment, PaymentColDef } from '../../utils/customerTypes';
+import type { PaymentsTabProps, Payment, PaymentColDef } from '../../types';
 
 
 function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }: PaymentsTabProps) {

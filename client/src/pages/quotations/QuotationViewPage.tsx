@@ -11,7 +11,7 @@ import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import { salesApi } from '../../utils/salesApi';
-import type { QuotationApiResponse, QuotationApiItem, QuotationViewSettings, QuotationItem } from '../../utils/quotationViewTypes';
+import type { QuotationApiResponse, QuotationApiItem, QuotationViewSettings, QuotationViewItem } from '../../types';
 import './QuotationViewPage.css';
 
 interface CompanyInfo {
@@ -36,7 +36,7 @@ interface QuotationDisplay {
   total_amount: number;
   subtotal: number | null;
   tax_amount: number | null;
-  items: QuotationItem[];
+  items: QuotationViewItem[];
 }
 
 export default function QuotationViewPage() {

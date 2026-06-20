@@ -6,7 +6,7 @@ import FormInput from '../common/FormInput';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { customerSchema } from '../../schemas';
 import api from '../../utils/api';
-import type { Customer, CustomerFormData } from '../../utils/customerTypes';
+import type { Customer, CustomerFormData } from '../../types';
 
 interface CustomerFormProps {
   customer: Customer | null;

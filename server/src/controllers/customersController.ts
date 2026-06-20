@@ -244,9 +244,12 @@ function getCustomerBalance(req: Request, res: Response): void {
 function recalculateAllBalances(req: AuthRequest, res: Response): void {
   try {
     const customerIds = CustomerModel.getAllIds(db);
-    for (const id of customerIds) {
-      CustomerModel.recalculateBalance(id, db);
-    }
+    const recalculateAll = db.transaction(() => {
+      for (const id of customerIds) {
+        CustomerModel.recalculateBalance(id, db);
+      }
+    });
+    recalculateAll();
     res.json({ success: true, message: `Recalculated balances for ${customerIds.length} customers` });
   } catch (error) {
     logger.error('Error recalculating balances:', error);

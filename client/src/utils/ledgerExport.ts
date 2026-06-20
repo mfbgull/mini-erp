@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
-import type { LedgerEntry } from './customerTypes';
+import type { LedgerEntry } from '../types';
 
 /** Column definitions used across all export formats. */
 const EXPORT_HEADERS = ['Date', 'Type', 'Reference', 'Description', 'Debit', 'Credit', 'Balance'] as const;

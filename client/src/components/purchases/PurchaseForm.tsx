@@ -8,7 +8,7 @@ import { purchaseSchema } from "../../schemas";
 import { useSettings } from "../../context/SettingsContext";
 import { useTranslation } from "../../hooks/useTranslation";
 import api from "../../utils/api";
-import type { PurchaseFormData } from "../../utils/purchaseTypes";
+import type { PurchaseFormData } from "../../types";
 
 interface PurchaseFormProps {
   onClose: () => void;

@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
 import { salesApi } from '../utils/salesApi';
-import type { CustomerOption, InventoryItemOption } from '../utils/quotationTypes';
+import type { CustomerOption, InventoryItemOption } from '../types';
 
 // Query key factory
 export const qtnKeys = {

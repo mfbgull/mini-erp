@@ -9,8 +9,8 @@ import Button from '../../components/common/Button';
 import SummaryCard, { SummaryGrid } from '../../components/common/SummaryCard';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
-import type { Supplier } from '../../utils/supplierTypes';
-import type { POSummary, BalanceData, Transaction } from '../../utils/supplierDetailTypes';
+import type { Supplier } from '../../types';
+import type { POSummary, BalanceData, SupplierTransaction } from '../../types';
 
 import './SuppliersPage.css';
 
@@ -49,11 +49,11 @@ export default function SupplierDetailPage() {
     enabled: !!supplier
   });
 
-  const { data: transactions } = useQuery<Transaction[]>({
+  const { data: transactions } = useQuery<SupplierTransaction[]>({
     queryKey: ['supplierTransactions', id],
     queryFn: async () => {
       const response = await api.get(`/suppliers/${id}/transactions`);
-      return (response.data.data || []) as Transaction[];
+      return (response.data.data || []) as SupplierTransaction[];
     },
     enabled: !!supplier
   });
@@ -240,7 +240,7 @@ export default function SupplierDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.slice(0, 10).map((txn: Transaction, idx: number) => (
+                {transactions.slice(0, 10).map((txn: SupplierTransaction, idx: number) => (
                   <tr key={idx}>
                     <td>{format(new Date(txn.transaction_date), 'dd MMM yyyy')}</td>
                     <td className="txn-type">{txn.transaction_type}</td>

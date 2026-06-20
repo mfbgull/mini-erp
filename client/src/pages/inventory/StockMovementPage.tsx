@@ -36,7 +36,7 @@ import { useSettings } from "../../context/SettingsContext";
 import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { useTranslation } from "../../hooks/useTranslation";
 import api from "../../utils/api";
-import type { StockMovement } from "../../utils/stockMovementTypes";
+import type { StockMovement } from "../../types";
 import "./StockMovementPage.css";
 
 interface MovementStats {

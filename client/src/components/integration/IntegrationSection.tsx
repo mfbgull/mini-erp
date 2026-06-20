@@ -5,7 +5,7 @@ import type {
   IntegrationSectionDef,
   IntegrationConfig,
   IntegrationSettings,
-} from '../../utils/integrationTypes';
+} from '../../types';
 
 interface Props {
   def: IntegrationSectionDef;

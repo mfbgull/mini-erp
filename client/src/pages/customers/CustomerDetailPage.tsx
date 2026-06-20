@@ -43,7 +43,7 @@ import { useMobileDetection } from '../../hooks/useMobileDetection';
 import {
   computeCustomerMetrics,
 } from '../../utils/customerCalculations';
-import type { TabId, TabConfig, Invoice, Payment } from '../../utils/customerTypes';
+import type { TabId, TabConfig, Invoice, Payment } from '../../types';
 import { canDeleteInvoice } from '../../utils/invoiceRules';
 
 

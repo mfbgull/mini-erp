@@ -3,7 +3,7 @@ import { Plus, Trash2 } from 'lucide-react';
 
 import SOSearchableCell from './SalesOrderSearchableCell';
 import SOEditableCell from './SalesOrderEditableCell';
-import type { SOItemsTableProps } from '../../utils/salesOrderTypes';
+import type { SOItemsTableProps } from '../../types';
 import { getFieldOrder } from '../../utils/salesOrderCalculations';
 
 const SOItemsTable = memo(function SOItemsTable({

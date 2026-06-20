@@ -6,7 +6,7 @@ import FormInput from '../common/FormInput';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { stockMovementSchema } from '../../schemas';
 import api from '../../utils/api';
-import type { LineItem, Warehouse, InventoryItem, StockBalance } from '../../utils/stockMovementTypes';
+import type { LineItem, Warehouse, InventoryItem, StockBalance } from '../../types';
 
 interface StockAdjustmentFormProps {
   onClose: () => void;

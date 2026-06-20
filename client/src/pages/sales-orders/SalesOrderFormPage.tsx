@@ -24,7 +24,7 @@ import type {
   SelectedCustomer,
   SOSubmitData,
   SOSubmitItem,
-} from '../../utils/salesOrderTypes';
+} from '../../types';
 import {
   createEmptyItemRow,
   padItemsToMinimum,

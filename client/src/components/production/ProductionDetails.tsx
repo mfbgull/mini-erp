@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { useSettings } from '../../context/SettingsContext';
-import type { ProductionRecord } from '../../utils/productionTypes';
+import type { ProductionRecord } from '../../types';
 
 interface Props {
   production: ProductionRecord;

@@ -1,4 +1,4 @@
-import type { BOMDetail } from "../../utils/bomTypes";
+import type { BOMDetail } from "../../types";
 
 interface BOMDetailsProps {
   bom: BOMDetail;

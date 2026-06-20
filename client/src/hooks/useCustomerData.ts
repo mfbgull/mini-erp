@@ -6,7 +6,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import api from '../utils/api';
-import type { Customer, Invoice, LedgerEntry, Payment } from '../utils/customerTypes';
+import type { Customer, Invoice, LedgerEntry, Payment } from '../types';
 
 /* ── Query Key Factory ──────────────────────────────────────────── */
 

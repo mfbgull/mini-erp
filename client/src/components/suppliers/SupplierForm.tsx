@@ -5,7 +5,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import Button from '../common/Button';
 import FormInput from '../common/FormInput';
 import api from '../../utils/api';
-import type { Supplier, SupplierFormData } from '../../utils/supplierTypes';
+import type { Supplier, SupplierFormData } from '../../types';
 
 interface SupplierFormProps {
   supplier?: Supplier | null;

@@ -16,7 +16,7 @@ import CompactSalesSummaryCardView from '../../components/common/CompactSalesSum
 import DateRangePicker from '../../components/common/DateRangePicker';
 import SearchableSelect from '../../components/common/SearchableSelect';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
-import type { DateRangeFilter } from '../../utils/reportTypes';
+import type { DateRangeFilter } from '../../types';
 import { useSettings } from '../../context/SettingsContext';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';

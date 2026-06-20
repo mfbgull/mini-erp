@@ -19,7 +19,7 @@ import type {
   ProductionSubmitPayload,
   BOMRecord,
   StockItem,
-} from '../../utils/productionTypes';
+} from '../../types';
 
 interface Props {
   production?: Record<string, unknown> | null;

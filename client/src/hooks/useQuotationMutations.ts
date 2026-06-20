@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { salesApi } from '../utils/salesApi';
 import { invalidateQuotationQueries } from './useQuotationData';
-import type { QuotationSubmitData } from '../utils/quotationTypes';
+import type { QuotationSubmitData } from '../types';
 
 export const useSaveQuotation = (id?: string) => {
   const queryClient = useQueryClient();

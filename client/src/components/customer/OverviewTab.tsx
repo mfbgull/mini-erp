@@ -30,7 +30,7 @@ import {
   formatAsCurrency,
   formatDateString,
 } from '../../utils/customerCalculations';
-import type { OverviewTabProps } from '../../utils/customerTypes';
+import type { OverviewTabProps } from '../../types';
 import { getInvoiceStatusBadgeClass } from '../../utils/invoiceRules';
 
 type SectionKey = 'contactInfo' | 'accountSettings' | 'recentInvoices' | 'recentPayments';

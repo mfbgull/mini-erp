@@ -1,5 +1,5 @@
 import React from "react";
-import type { ARAgingData } from "../../utils/arReportsTypes";
+import type { ARAgingData } from "../../types";
 
 interface ARAgingReportProps {
   data: ARAgingData | null;

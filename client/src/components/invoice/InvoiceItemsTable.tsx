@@ -4,7 +4,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import InvoiceSearchableCell from './InvoiceSearchableCell';
 import InvoiceEditableCell from './InvoiceEditableCell';
 import PriceHistoryHint from './PriceHistoryHint';
-import type { ItemsTableProps } from '../../utils/invoiceTypes';
+import type { ItemsTableProps } from '../../types';
 import { getFieldOrder } from '../../utils/invoiceCalculations';
 
 const InvoiceItemsTable = memo(function InvoiceItemsTable({

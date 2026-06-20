@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { invalidatePOQueries } from './usePurchaseOrderData';
-import type { POSubmitData } from '../utils/purchaseOrderTypes';
+import type { POSubmitData } from '../types';
 
 export const useSavePurchaseOrder = (id?: string) => {
   const queryClient = useQueryClient();

@@ -6,7 +6,7 @@ import { Shield, Save } from 'lucide-react';
 import Button from '../common/Button';
 import Modal from '../common/Modal';
 import api from '../../utils/api';
-import type { Role, Permission } from '../../utils/roleTypes';
+import type { Role, Permission } from '../../types';
 
 interface PermissionsModalProps {
   role: Role;

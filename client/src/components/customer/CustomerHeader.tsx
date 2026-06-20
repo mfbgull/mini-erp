@@ -9,7 +9,7 @@ import { ArrowLeft, Plus, DollarSign, CreditCard, TrendingUp, AlertTriangle } fr
 
 import Button from '../../components/common/Button';
 import { formatAsCurrency, formatAsFixed } from '../../utils/customerCalculations';
-import type { CustomerHeaderProps } from '../../utils/customerTypes';
+import type { CustomerHeaderProps } from '../../types';
 
 function CustomerHeader({
   customer,

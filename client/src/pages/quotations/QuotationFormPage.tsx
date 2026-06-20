@@ -16,7 +16,7 @@ import {
   calculateTotal,
   filterFilledItems,
 } from '../../utils/quotationCalculations';
-import type { QuotationFormItem, CustomerOption, QuotationSubmitData } from '../../utils/quotationTypes';
+import type { QuotationFormItem, CustomerOption, QuotationSubmitData } from '../../types';
 
 import QuotationFormHeader from '../../components/quotation/QuotationFormHeader';
 import QuotationItemsTable from '../../components/quotation/QuotationItemsTable';

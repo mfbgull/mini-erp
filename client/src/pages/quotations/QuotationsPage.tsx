@@ -14,7 +14,7 @@ import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useTranslation } from '../../hooks/useTranslation';
 import { salesApi } from '../../utils/salesApi';
 import { createActionColDef } from '../../utils/agGridIntegration';
-import type { Quotation, QuotationTotals } from '../../utils/quotationTypes';
+import type { QuotationList, QuotationTotals } from '../../types';
 import './QuotationsPage.css';
 import '../../styles/ag-grid-status-cells.css';
 import { getStatusCellClass } from '../../utils/statusCellUtils';
@@ -28,7 +28,7 @@ export default function QuotationsPage() {
     navigate('/quotations/create');
   }, { context: 'quotations', id: 'quotations-new', label: 'New quotation' });
 
-  const { data: quotations = [], isLoading } = useQuery<Quotation[]>({
+  const { data: quotations = [], isLoading } = useQuery<QuotationList[]>({
     queryKey: ['quotations'],
     queryFn: async () => {
       const response = await salesApi.getQuotations();
@@ -57,7 +57,7 @@ export default function QuotationsPage() {
     }
   });
 
-  const handleDelete = (quotation: Quotation) => {
+  const handleDelete = (quotation: QuotationList) => {
     if (window.confirm(t('quotations.confirmDelete'))) {
       deleteMutation.mutate(quotation.id);
     }
@@ -70,7 +70,7 @@ export default function QuotationsPage() {
       sortable: true,
       filter: true,
       width: 130,
-      cellRenderer: (params: { value: string; data: Quotation }) => (
+      cellRenderer: (params: { value: string; data: QuotationList }) => (
         <span
           className="link-text"
           onClick={() => navigate(`/quotations/${params.data.id}`)}
@@ -120,7 +120,7 @@ export default function QuotationsPage() {
     },
     createActionColDef({
       headerName: t('quotations.actions'),
-      cellRenderer: (params: { data: Quotation }) => (
+      cellRenderer: (params: { data: QuotationList }) => (
         <DropdownMenu
           trigger={
             <button className="action-menu-trigger" title={t('quotations.actions')}>
@@ -171,7 +171,7 @@ export default function QuotationsPage() {
           paginationPageSize={15}
           paginationPageSizeSelector={[10, 15, 25, 50]}
           loading={isLoading}
-          onRowDoubleClicked={(params: { data: Quotation }) => navigate(`/quotations/${params.data.id}`)}
+          onRowDoubleClicked={(params: { data: QuotationList }) => navigate(`/quotations/${params.data.id}`)}
         />
       </div>
     </div>

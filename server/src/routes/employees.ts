@@ -27,9 +27,14 @@ router.post('/:id/documents', requirePermission('employees', 'update'), uploadEm
 router.delete('/:id/documents/:docId', requirePermission('employees', 'update'), employeeController.removeEmployeeDocument);
 
 // Serve uploaded document files
-router.get('/:id/documents/file/:filename', (req, res) => {
-  const { filename } = req.params;
-  const filePath = path.join(employeeDocsDir, filename);
+router.get('/:id/documents/file/:filename', requirePermission('employees', 'read'), (req, res) => {
+  const filename = Array.isArray(req.params.filename) ? req.params.filename[0] : req.params.filename;
+  const safeName = path.basename(filename);
+  if (safeName !== filename || filename.includes('..')) {
+    res.status(400).json({ success: false, error: 'Invalid filename' });
+    return;
+  }
+  const filePath = path.join(employeeDocsDir, safeName);
   res.sendFile(filePath, (err) => {
     if (err) {
       res.status(404).json({ success: false, error: 'File not found' });

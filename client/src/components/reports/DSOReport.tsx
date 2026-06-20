@@ -1,5 +1,5 @@
 import React from "react";
-import type { DSOData } from "../../utils/arReportsTypes";
+import type { DSOData } from "../../types";
 
 interface DSOReportProps {
   data: DSOData | null;

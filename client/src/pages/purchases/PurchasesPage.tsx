@@ -35,7 +35,7 @@ import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { useTranslation } from "../../hooks/useTranslation";
 import api from "../../utils/api";
 import { createActionColDef } from "../../utils/agGridIntegration";
-import type { Purchase, PurchaseStats } from "../../utils/purchaseTypes";
+import type { Purchase, PurchaseStats } from "../../types";
 import "./PurchasesPage.css";
 
 export default function PurchasesPage() {

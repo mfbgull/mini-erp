@@ -33,7 +33,7 @@ import type {
   PaymentMethodEntry,
   InvoiceSubmitData,
   InvoiceSubmitItem,
-} from '../../utils/invoiceTypes';
+} from '../../types';
 import {
   calculateItemTotal,
   calculateSubtotal,

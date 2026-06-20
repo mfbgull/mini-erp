@@ -7,7 +7,7 @@ import FormInput from '../common/FormInput';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { warehouseSchema } from '../../schemas';
 import api from '../../utils/api';
-import type { Warehouse, WarehouseFormData } from '../../utils/warehouseTypes';
+import type { Warehouse, WarehouseFormData } from '../../types';
 
 interface WarehouseFormProps {
   warehouse?: Warehouse | null;

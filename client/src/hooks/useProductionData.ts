@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
-import type { ProductionStub, BOMRecord, StockItem, Warehouse } from '../utils/productionTypes';
+import type { ProductionStub, BOMRecord, StockItem, Warehouse } from '../types';
 
 // Query key factory
 export const prodKeys = {

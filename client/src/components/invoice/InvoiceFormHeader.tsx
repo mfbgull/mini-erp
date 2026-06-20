@@ -3,7 +3,7 @@ import { Hash, Send } from 'lucide-react';
 
 import Button from '../common/Button';
 import FormInput from '../common/FormInput';
-import type { InvoiceFormHeaderProps } from '../../utils/invoiceTypes';
+import type { InvoiceFormHeaderProps } from '../../types';
 
 const fallback = (key: string, fb?: string) => fb || key;
 

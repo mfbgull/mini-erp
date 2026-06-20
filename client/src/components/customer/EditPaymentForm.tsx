@@ -7,7 +7,7 @@ import { useState, memo, type FormEvent, type ChangeEvent } from 'react';
 
 import Button from '../../components/common/Button';
 import { useUpdatePayment } from '../../hooks/useCustomerMutations';
-import type { EditPaymentFormProps, EditPaymentFormData } from '../../utils/customerTypes';
+import type { EditPaymentFormProps, EditPaymentFormData } from '../../types';
 
 function EditPaymentForm({ payment, onClose, onSuccess }: EditPaymentFormProps) {
   const [formData, setFormData] = useState<EditPaymentFormData>({

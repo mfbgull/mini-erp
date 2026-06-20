@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 import { calculateLedgerTotals, formatDateString } from '../../utils/customerCalculations';
-import type { LedgerTabProps, LedgerEntry, LedgerColDef } from '../../utils/customerTypes';
+import type { LedgerTabProps, LedgerEntry, LedgerColDef } from '../../types';
 import { exportToCSV, exportToPDF, exportToImage, handlePrint } from '../../utils/ledgerExport';
 
 function LedgerTab({ ledger, loading, customerName, formatCurrency }: LedgerTabProps) {

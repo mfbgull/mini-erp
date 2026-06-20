@@ -1,18 +1,8 @@
 import { Hash, Eye, Send } from 'lucide-react';
 import Button from '../common/Button';
 import FormInput from '../common/FormInput';
-import type { POFormHeaderProps } from '../../utils/purchaseOrderTypes';
-
-function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    'Draft': 'bg-gray-100 text-gray-700',
-    'Submitted': 'bg-blue-100 text-blue-700',
-    'Partially Received': 'bg-yellow-100 text-yellow-700',
-    'Completed': 'bg-green-100 text-green-700',
-    'Cancelled': 'bg-red-100 text-red-700',
-  };
-  return colors[status] || 'bg-gray-100 text-gray-700';
-}
+import { getStatusColor } from '../../utils/statusColors';
+import type { POFormHeaderProps } from '../../types';
 
 export default function PurchaseOrderFormHeader({
   supplier,

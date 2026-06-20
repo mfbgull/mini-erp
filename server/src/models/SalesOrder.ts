@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { getNextSequenceNumber } from '../utils/sequence';
+import { generateDocNo } from '../utils/sequence';
 import { QuotationWithWarehouse, InvoiceWithUsername } from '../types';
 import InvoiceModel from './Invoice';
 
@@ -788,30 +788,15 @@ class SalesOrderModel {
    * Generate sales order number
    */
   private static generateSalesOrderNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `SO_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `SO-${year}-${nextNo.toString().padStart(4, '0')}`;
+    return generateDocNo(db, 'SO');
   }
 
-  /**
-   * Generate invoice number
-   */
   private static generateInvoiceNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `INV_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `INV-${year}-${nextNo.toString().padStart(4, '0')}`;
+    return generateDocNo(db, 'INV');
   }
 
-  /**
-   * Generate stock movement number
-   */
   private static generateMovementNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `MOV_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `MOV-${year}-${nextNo.toString().padStart(5, '0')}`;
+    return generateDocNo(db, 'MOV', 5);
   }
 }
 

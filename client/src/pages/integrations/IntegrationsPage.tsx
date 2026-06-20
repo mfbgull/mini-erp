@@ -17,7 +17,7 @@ import type {
   ValidationConfig,
   CurrencyConfig,
   TaxConfig,
-} from '../../utils/integrationTypes';
+} from '../../types';
 
 import '../SettingsPage.css';
 

@@ -4,7 +4,7 @@ import Button from '../common/Button';
 import FormInput from '../common/FormInput';
 import { POSearchableCellEditing } from './PurchaseOrderSearchableCell';
 import PurchaseOrderEditableCell from './PurchaseOrderEditableCell';
-import type { POMobileFormProps, POFormItem } from '../../utils/purchaseOrderTypes';
+import type { POMobileFormProps, POFormItem } from '../../types';
 
 const FIELD_ORDER = ['name', 'quantity', 'unit_price'] as const;
 

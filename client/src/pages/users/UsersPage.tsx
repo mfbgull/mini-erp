@@ -14,7 +14,7 @@ import ResetPasswordModal from '../../components/users/ResetPasswordModal';
 import api from '../../utils/api';
 import { createActionColDef } from '../../utils/agGridIntegration';
 import { getIsActiveCellClass } from '../../utils/statusCellUtils';
-import type { User } from '../../utils/userTypes';
+import type { User } from '../../types';
 
 import './UsersPage.css';
 import '../../styles/ag-grid-status-cells.css';

@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { MoreVertical, Eye, Edit, Trash2, X, FileCheck, PackageCheck } from 'lucide-react';
 
-import type { PurchaseOrder, PurchaseOrderItem } from '../../utils/purchaseOrderTypes';
+import type { PurchaseOrder, PurchaseOrderItem } from '../../types';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import './PurchaseOrderCard.css';

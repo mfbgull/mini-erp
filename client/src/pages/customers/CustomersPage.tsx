@@ -20,7 +20,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { getIsActiveCellClass, getBalanceCellClass, getCreditUtilizationClass } from '../../utils/statusCellUtils';
 import api from '../../utils/api';
 import { createActionColDef } from '../../utils/agGridIntegration';
-import type { Customer } from '../../utils/customerTypes';
+import type { Customer } from '../../types';
 import './CustomersPage.css';
 import '../../styles/ag-grid-status-cells.css';
 

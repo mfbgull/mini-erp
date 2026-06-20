@@ -20,7 +20,7 @@ import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import { createActionColDef } from '../../utils/agGridIntegration';
 import { getStockCellClass } from '../../utils/statusCellUtils';
-import type { InventoryItem, ItemStats } from '../../utils/itemTypes';
+import type { InventoryItem, ItemStats } from '../../types';
 import './ItemsPage.css';
 import '../../styles/ag-grid-status-cells.css';
 

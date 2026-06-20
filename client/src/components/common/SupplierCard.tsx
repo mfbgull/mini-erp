@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Eye, Edit, Trash2, X } from 'lucide-react';
-import type { Supplier } from '../../utils/supplierTypes';
+import type { Supplier } from '../../types';
 import './SupplierCard.css';
 
 interface SupplierCardProps {

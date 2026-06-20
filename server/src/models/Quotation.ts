@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { getNextSequenceNumber } from '../utils/sequence';
+import { generateDocNo } from '../utils/sequence';
 import { SalesOrderWithWarehouse, InvoiceWithUsername } from '../types';
 
 export interface Quotation {
@@ -594,20 +594,11 @@ class QuotationModel {
    * Generate quotation number
    */
   private static generateQuotationNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `QUOTATION_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `QUO-${year}-${nextNo.toString().padStart(4, '0')}`;
+    return generateDocNo(db, 'QUO');
   }
 
-  /**
-   * Generate sales order number (used when converting quotation)
-   */
   private static generateSalesOrderNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `SO_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `SO-${year}-${nextNo.toString().padStart(4, '0')}`;
+    return generateDocNo(db, 'SO');
   }
 
   /**

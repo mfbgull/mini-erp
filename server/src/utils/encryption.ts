@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import logger from './logger';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -56,7 +57,8 @@ export function decryptIfNeeded(value: string): string {
   }
   try {
     return decrypt(value);
-  } catch {
+  } catch (error) {
+    logger.error('Decryption failed, returning raw value:', error instanceof Error ? error.message : error);
     return value;
   }
 }

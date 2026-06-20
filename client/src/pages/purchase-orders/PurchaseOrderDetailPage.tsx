@@ -18,13 +18,13 @@ import type {
   PurchaseOrderDetail,
   PurchaseOrderDetailItem,
   CompanyInfo,
-  WarehouseOption,
+  PODetailWarehouseOption as WarehouseOption,
   ReceiptItem,
   ReturnItem,
   ReceiptData,
   ReturnData,
   PrintPOItem
-} from '../../utils/purchaseOrderDetailTypes';
+} from '../../types';
 import './PurchaseOrdersPage.css';
 
 interface MutationStatusParams {

@@ -7,7 +7,7 @@ import Button from '../common/Button';
 import FormInput from '../common/FormInput';
 import Modal from '../common/Modal';
 import api from '../../utils/api';
-import type { User, UserFormData, Role } from '../../utils/userTypes';
+import type { User, UserFormData, Role } from '../../types';
 
 interface UserFormModalProps {
   user?: User | null;

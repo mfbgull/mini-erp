@@ -3,8 +3,8 @@ import { Plus, Trash2 } from 'lucide-react';
 import QuotationEditableCell from './QuotationEditableCell';
 import { QuotationSearchableCellEditing } from './QuotationSearchableCell';
 import { getFieldOrder, getNextField, isLastField } from '../../utils/quotationCalculations';
-import type { QuotationItemsTableProps } from '../../utils/quotationTypes';
-import type { InventoryItemOption } from '../../utils/quotationTypes';
+import type { QuotationItemsTableProps } from '../../types';
+import type { InventoryItemOption } from '../../types';
 import { getSellableItems } from '../../utils/quotationCalculations';
 
 export default function QuotationItemsTable({

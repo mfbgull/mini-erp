@@ -3,7 +3,7 @@
  * All business rules extracted from UI components into pure functions.
  */
 
-import type { Customer, Invoice, LedgerEntry, Payment, CustomerMetrics } from './customerTypes';
+import type { Customer, Invoice, LedgerEntry, Payment, CustomerMetrics } from '../types';
 
 /**
  * Calculate the running balance from ledger entries.

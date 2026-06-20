@@ -6,7 +6,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { usePOFormData } from '../../hooks/usePurchaseOrderData';
 import { useSavePurchaseOrder } from '../../hooks/usePurchaseOrderMutations';
-import type { POFormItem, SupplierOption, POSubmitData } from '../../utils/purchaseOrderTypes';
+import type { POFormItem, SupplierOption, POSubmitData } from '../../types';
 
 import PurchaseOrderFormHeader from '../../components/purchase-order/PurchaseOrderFormHeader';
 import PurchaseOrderItemsTable from '../../components/purchase-order/PurchaseOrderItemsTable';

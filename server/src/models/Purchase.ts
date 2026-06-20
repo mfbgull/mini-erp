@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { getNextSequenceNumber } from '../utils/sequence';
+import { generateDocNo, getNextSequenceNumber } from '../utils/sequence';
 import StockMovementModel from './StockMovement';
 
 interface Purchase {
@@ -48,6 +48,10 @@ interface CreatePurchaseDTO {
 }
 
 class PurchaseModel {
+  static generatePurchaseNo(db: Database.Database): string {
+    return generateDocNo(db, 'PURCH');
+  }
+
   static generateBatchNo(db: Database.Database): string {
     const year = new Date().getFullYear();
     const settingKey = `BATCH_last_no_${year}`;
@@ -55,7 +59,17 @@ class PurchaseModel {
     return `BATCH-${year % 100}-PUR-${nextNo.toString().padStart(4, '0')}`;
   }
 
+  static generateMovementNo(db: Database.Database): string {
+    return generateDocNo(db, 'STK');
+  }
+
   static recordPurchase(data: CreatePurchaseDTO, userId: number, db: Database.Database): Purchase {
+    if (!data.item_id || data.item_id <= 0) throw new Error('Invalid item_id');
+    if (!data.warehouse_id || data.warehouse_id <= 0) throw new Error('Invalid warehouse_id');
+    if (!data.quantity || data.quantity <= 0) throw new Error('Quantity must be positive');
+    if (data.unit_cost === undefined || data.unit_cost < 0) throw new Error('unit_cost must be non-negative');
+    if (!data.purchase_date) throw new Error('purchase_date is required');
+
     const { item_id, warehouse_id, quantity, unit_cost, supplier_name, purchase_date, invoice_no, remarks } = data;
 
     const transaction = db.transaction(() => {
@@ -184,20 +198,6 @@ class PurchaseModel {
     });
 
     return transaction();
-  }
-
-  static generatePurchaseNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `PURCH_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `PURCH-${year}-${nextNo.toString().padStart(4, '0')}`;
-  }
-
-  static generateMovementNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `STK_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `STK-${year}-${nextNo.toString().padStart(4, '0')}`;
   }
 
   static getAll(filters: PurchaseFilters = {}, db: Database.Database): Purchase[] {
@@ -509,20 +509,20 @@ class PurchaseModel {
 
       // Delete the purchase record
       db.prepare('DELETE FROM purchases WHERE id = ?').run(id);
+
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'DELETE',
+        'Purchase',
+        id,
+        `Deleted purchase ${purchase.purchase_no}`
+      );
     });
 
     transaction();
-
-    db.prepare(`
-      INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(
-      userId,
-      'DELETE',
-      'Purchase',
-      id,
-      `Deleted purchase ${purchase.purchase_no}`
-    );
 
     return true;
   }

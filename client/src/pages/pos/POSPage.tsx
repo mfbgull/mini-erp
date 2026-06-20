@@ -7,7 +7,7 @@ import { ArrowLeft, Barcode, Search, Plus, Minus, Trash2, ShoppingCart, DollarSi
 
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
-import type { POSItem, CartItem, PaymentMethod, POSWarehouse } from '../../utils/posTypes';
+import type { POSItem, CartItem, POSPaymentMethod, POSWarehouse } from '../../types';
 import './POSPage.css';
 
 interface SaleData {
@@ -30,7 +30,7 @@ export default function POSPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
+  const [paymentMethods, setPaymentMethods] = useState<POSPaymentMethod[]>([
     { id: Date.now(), method: 'Cash', amount: '', reference_no: '' }
   ]);
 
@@ -222,7 +222,7 @@ export default function POSPage() {
     setPaymentMethods(prev => prev.filter(method => method.id !== id));
   };
 
-  const updatePaymentMethod = (id: number, field: keyof PaymentMethod, value: string) => {
+  const updatePaymentMethod = (id: number, field: keyof POSPaymentMethod, value: string) => {
     setPaymentMethods(prev =>
       prev.map(method =>
         method.id === id ? { ...method, [field]: value } : method
@@ -477,7 +477,7 @@ export default function POSPage() {
                       <label>Method</label>
                       <select
                         value={method.method}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updatePaymentMethod(method.id, 'method' as keyof PaymentMethod, e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updatePaymentMethod(method.id, 'method' as keyof POSPaymentMethod, e.target.value)}
                         className="pos-payment-select"
                       >
                         <option value="Cash">Cash</option>
@@ -495,7 +495,7 @@ export default function POSPage() {
                         type="number"
                         placeholder="0.00"
                         value={method.amount}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePaymentMethod(method.id, 'amount' as keyof PaymentMethod, e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePaymentMethod(method.id, 'amount' as keyof POSPaymentMethod, e.target.value)}
                         step="0.01"
                         min="0"
                         className="pos-payment-amount"
@@ -508,7 +508,7 @@ export default function POSPage() {
                         type="text"
                         placeholder="Reference"
                         value={method.reference_no}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePaymentMethod(method.id, 'reference_no' as keyof PaymentMethod, e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePaymentMethod(method.id, 'reference_no' as keyof POSPaymentMethod, e.target.value)}
                         className="pos-payment-ref"
                       />
                     </div>

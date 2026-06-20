@@ -21,7 +21,7 @@ import { getProductionColumnDefs } from "../../components/production/ProductionC
 import ProductionForm from "../../components/production/ProductionForm";
 import ProductionDetails from "../../components/production/ProductionDetails";
 import api from "../../utils/api";
-import type { ProductionStub, ProductionRecord } from "../../utils/productionTypes";
+import type { ProductionStub, ProductionRecord } from "../../types";
 import "../inventory/ItemPreview.css";
 import "./ProductionPage.css";
 

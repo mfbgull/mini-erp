@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { DollarSign, CreditCard, Edit2, Trash2 } from 'lucide-react';
 
 import Button from '../common/Button';
-import type { PaymentPanelProps, ExistingPayment } from '../../utils/invoiceTypes';
+import type { PaymentPanelProps, ExistingPayment } from '../../types';
 
 const fallback = (key: string, fb?: string) => fb || key;
 

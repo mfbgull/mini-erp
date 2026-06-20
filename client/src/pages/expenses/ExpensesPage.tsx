@@ -33,7 +33,7 @@ import api from "../../utils/api";
 import { createActionColDef } from "../../utils/agGridIntegration";
 import { exportToPDF, exportToExcel } from "../../utils/exportUtils";
 import { getStatusCellClass } from "../../utils/statusCellUtils";
-import type { Expense, ExpenseFormData, ExpenseCategory, StatusOption, PaymentMethodOption } from "../../utils/expenseTypes";
+import type { Expense, ExpenseFormData, ExpenseCategory, ExpenseStatusOption, ExpensePaymentMethodOption } from "../../types";
 import "../inventory/ItemPreview.css";
 import "./Expenses.css";
 import "../../styles/ag-grid-status-cells.css";
@@ -108,7 +108,7 @@ export default function ExpensesPage() {
 
   const {
     data: statusOptions = [],
-  } = useQuery<StatusOption[]>({
+  } = useQuery<ExpenseStatusOption[]>({
     queryKey: ["expenseStatusOptions"],
     queryFn: async () => {
       const response = await api.get("/expenses/status-options");
@@ -118,7 +118,7 @@ export default function ExpensesPage() {
 
   const {
     data: paymentMethodOptions = [],
-  } = useQuery<PaymentMethodOption[]>({
+  } = useQuery<ExpensePaymentMethodOption[]>({
     queryKey: ["expensePaymentMethodOptions"],
     queryFn: async () => {
       const response = await api.get("/expenses/payment-method-options");

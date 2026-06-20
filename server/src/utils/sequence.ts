@@ -21,6 +21,17 @@ export function getNextSequenceNumber(db: Database.Database, settingKey: string)
 }
 
 /**
+ * Generate a year-based document number: PREFIX-YEAR-NNNN
+ * e.g., generateDocNo(db, 'INV') → 'INV-2026-0001'
+ */
+export function generateDocNo(db: Database.Database, prefix: string, padLength = 4): string {
+  const year = new Date().getFullYear();
+  const settingKey = `${prefix}_last_no_${year}`;
+  const nextNo = getNextSequenceNumber(db, settingKey);
+  return `${prefix}-${year}-${nextNo.toString().padStart(padLength, '0')}`;
+}
+
+/**
  * Initialize a sequence from the MAX value already in a table column.
  * Only sets the value if the setting doesn't already exist.
  * The prefixPattern is used to filter existing codes (e.g. 'CUST', 'SUP-%').
@@ -32,6 +43,12 @@ export function initializeSequenceFromMax(
   columnName: string,
   prefixPattern: string
 ): void {
+  const allowedTables = new Set(['customers', 'suppliers', 'items', 'purchases', 'invoices', 'payments', 'productions']);
+  const allowedColumns = new Set(['customer_code', 'supplier_code', 'item_code', 'purchase_no', 'invoice_no', 'payment_no', 'production_no']);
+  if (!allowedTables.has(tableName) || !allowedColumns.has(columnName)) {
+    throw new Error(`Invalid table or column name: ${tableName}.${columnName}`);
+  }
+
   const existing = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
   if (!existing) {
     const maxResult = db.prepare(

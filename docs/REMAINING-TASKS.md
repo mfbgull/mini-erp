@@ -20,6 +20,8 @@ Today's session completed:
 
 **Risk:** HIGH | **Effort:** 2+ hours | **Priority:** P3
 
+**Status:** ✅ COMPLETE
+
 **What:** 24 `*Types.ts` files in `client/src/utils/` (~1,847 lines) duplicate type definitions. Consolidate into a single source of truth.
 
 **Approach:**
@@ -43,29 +45,19 @@ Today's session completed:
 
 **Risk:** HIGH | **Effort:** 3+ hours | **Priority:** P3
 
-**What:** 16 component files (4x4 = EditableCell, SearchableCell, ItemsTable, FormHeader) across 4 entity types (~3,347 lines). Create generic versions.
+**Status:** PARTIAL — EditableCell consolidated (4 files → 1 generic + 4 wrappers). Remaining 3 types deferred.
 
-**Approach:**
-1. Start with `FormHeader` (simplest, ~110-164 lines each)
-2. Create `client/src/components/shared/GenericFormHeader.tsx` with props for entity-specific config
-3. Update one entity (e.g., invoice) to use it
-4. Run typecheck + visual test
-5. Migrate other 3 entities
-6. Repeat for `EditableCell`, `SearchableCell`, `ItemsTable`
+**What was done:**
+- Created `components/shared/GenericEditableCell.tsx` with unified keyboard navigation and editing logic
+- Updated InvoiceEditableCell, QuotationEditableCell, PurchaseOrderEditableCell, SalesOrderEditableCell to be thin wrappers (~15 lines each)
+- ~700 lines of duplicated logic reduced to ~235 lines
 
-**Files to create:**
-- `client/src/components/shared/GenericFormHeader.tsx`
-- `client/src/components/shared/GenericEditableCell.tsx`
-- `client/src/components/shared/GenericSearchableCell.tsx`
-- `client/src/components/shared/GenericItemsTable.tsx`
+**Why FormHeader, SearchableCell, ItemsTable were NOT consolidated:**
+- **FormHeader**: Invoice is completely different (no status, no company info, no warehouse, no total). Quotation/PO/SO share structure but have different prop naming conventions (onBack vs onCancel, soDate vs poDate vs quotationDate) and different child-wrapping patterns. A generic would need 20+ props with conditionals.
+- **SearchableCell**: Different filtering logic (invoice filters raw materials, quotation uses imported utility), different prop interfaces, Quotation exports a separate sub-component. Focus behavior differs (direct call vs setTimeout/DOM query).
+- **ItemsTable**: Each entity has unique column definitions, calculation functions, and callback signatures. Too many entity-specific differences.
 
-**Files to update:**
-- `client/src/components/invoice/*`
-- `client/src/components/sales-order/*`
-- `client/src/components/purchase-order/*`
-- `client/src/components/quotation/*`
-
-**Blocked by:** Nothing — but requires visual testing after each migration.
+**Recommendation:** Keep the remaining 3 component types as-is. The EditableCell consolidation provides the best ROI. Further consolidation would create components harder to maintain than the current duplicates.
 
 ---
 
@@ -73,34 +65,33 @@ Today's session completed:
 
 **Risk:** LOW | **Effort:** 2+ hours | **Priority:** P3
 
-**Remaining bugs from the codebase audit:**
+**Status:** ✅ ALL FIXED
 
-| # | Bug | File | Effort |
-|---|-----|------|--------|
-| 1 | No input validation on Invoice.create | `Invoice.ts:539` | 30 min |
-| 2 | No input validation on Purchase.recordPurchase | `Purchase.ts:58` | 30 min |
-| 3 | No input validation on MobileInvoice.submitInvoice | `MobileInvoice.ts:193` | 20 min |
-| 4 | Activity log outside transaction (Purchase.delete) | `Purchase.ts:537` | 5 min |
-| 5 | Activity log outside transaction (Production.delete) | `Production.ts:568` | 5 min |
-| 6 | Dashboard stock value ignores batch costing | `Dashboard.ts:26` | 30 min |
-| 7 | SQL injection via string interpolation in sequence.ts | `sequence.ts:37` | 15 min |
-| 8 | Silent decryption failure in encryption.ts | `encryption.ts:53` | 10 min |
-| 9 | Invoice number collision in MobileInvoice | `MobileInvoice.ts:296` | 10 min |
-| 10 | Non-atomic bulk balance recalculation | `customersController.ts:244` | 10 min |
+| # | Bug | Fix |
+|---|-----|-----|
+| 1 | No input validation on Invoice.create | Added validation for customer_id, invoice_date, items |
+| 2 | No input validation on Purchase.recordPurchase | Added validation for item_id, warehouse_id, quantity, unit_cost, purchase_date |
+| 3 | No input validation on MobileInvoice.submitInvoice | Added validation for customer_id, invoice_date, items |
+| 4 | Activity log outside transaction (Purchase.delete) | Moved inside transaction |
+| 5 | Activity log outside transaction (Production.delete) | Moved inside transaction |
+| 6 | Dashboard stock value ignores batch costing | Changed to query stock_batches |
+| 7 | SQL injection via string interpolation in sequence.ts | Added table/column whitelist |
+| 8 | Silent decryption failure in encryption.ts | Added error logging |
+| 9 | Invoice number collision in MobileInvoice | Added random suffix |
+| 10 | Non-atomic bulk balance recalculation | Wrapped in transaction |
 
 ---
 
 ## Recommended Order
 
 ```
-Session 1: P3 audit bugs (#4, #5, #10 — quick wins, ~30 min)
-Session 2: P3 audit bugs (#1, #2, #3 — input validation, ~1.5 hrs)
-Session 3: P3 audit bugs (#6, #7, #8, #9 — misc fixes, ~1 hr)
-Session 4: Phase 7 — Type consolidation (one file at a time, 2+ hrs)
-Session 5: Phase 10 — UI component consolidation (one component at a time, 3+ hrs)
-```
+Session 1: P3 audit bugs (#4, #5, #10 — quick wins) ✅
+Session 2: P3 audit bugs (#1, #2, #3 — input validation) ✅
+Session 3: P3 audit bugs (#6, #7, #8, #9 — misc fixes) ✅
+Session 4: Phase 7 — Type consolidation (one file at a time, 2+ hrs) ✅
+Session 5: Phase 10 — UI component consolidation (EditableCell done, others deferred) ✅
 
-**Total estimated:** ~8 hours across 5 sessions
+**Total remaining:** None — all actionable tasks complete.
 
 ---
 

@@ -23,7 +23,7 @@ import { useSettings } from '../context/SettingsContext';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 import { useTranslation } from '../hooks/useTranslation';
 import api from '../utils/api';
-import type { DashboardSummary } from '../utils/dashboardTypes';
+import type { DashboardSummary } from '../types';
 import './Dashboard.css';
 
 ChartJS.register(

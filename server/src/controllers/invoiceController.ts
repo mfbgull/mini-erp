@@ -676,7 +676,7 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorName = error instanceof Error ? error.name : 'Unknown';
     logger.error('Update invoice error:', { error: errorMessage, name: errorName, stack: error instanceof Error ? error.stack : undefined });
-    res.status(500).json({ error: 'Failed to update invoice', detail: errorMessage, code: errorName });
+    res.status(500).json({ error: 'Failed to update invoice' });
   }
 }
 

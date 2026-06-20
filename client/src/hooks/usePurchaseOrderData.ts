@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../utils/api';
-import type { SupplierOption, InventoryItemOption, WarehouseOption } from '../utils/purchaseOrderTypes';
+import type { SupplierOption, InventoryItemOption, WarehouseOption } from '../types';
 
 // Query key factory
 export const poKeys = {

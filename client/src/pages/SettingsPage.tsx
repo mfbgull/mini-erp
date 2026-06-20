@@ -9,7 +9,7 @@ import FormInput from '../components/common/FormInput';
 import { useFormValidation } from '../hooks/useFormValidation';
 import { settingsSchema } from '../schemas';
 import api from '../utils/api';
-import type { SettingsApiResponse, SettingsFormData } from '../utils/settingsTypes';
+import type { SettingsApiResponse, SettingsFormData } from '../types';
 
 import './SettingsPage.css';
 

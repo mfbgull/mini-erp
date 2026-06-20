@@ -10,7 +10,7 @@ import EditPaymentForm from './EditPaymentForm';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import PaymentModal from '../../components/customers/PaymentModal';
-import type { CustomerModalsProps } from '../../utils/customerTypes';
+import type { CustomerModalsProps } from '../../types';
 
 function CustomerModals({
   id,

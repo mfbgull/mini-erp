@@ -9,7 +9,7 @@ import FormInput from '../../components/common/FormInput';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { supplierSchema } from '../../schemas';
 import api from '../../utils/api';
-import type { Supplier, SupplierFormData } from '../../utils/supplierTypes';
+import type { Supplier, SupplierFormData } from '../../types';
 import './SuppliersPage.css';
 
 interface SupplierFormPageProps {

@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { MoreVertical, Trash2 } from 'lucide-react';
 import DropdownMenu from '../common/DropdownMenu';
 import { createActionColDef } from '../../utils/agGridIntegration';
-import type { ProductionStub } from '../../utils/productionTypes';
+import type { ProductionStub } from '../../types';
 
 export function getProductionColumnDefs(
   onDelete: (production: ProductionStub) => void,

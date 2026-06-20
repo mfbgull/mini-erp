@@ -1,5 +1,5 @@
 import React from "react";
-import type { TopDebtor } from "../../utils/arReportsTypes";
+import type { TopDebtor } from "../../types";
 
 interface TopDebtorsReportProps {
   data: TopDebtor[] | null | undefined;

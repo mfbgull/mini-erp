@@ -222,15 +222,10 @@ export const exportToExcel = (
   document.body.removeChild(link);
 };
 
-export const formatCurrencyForExport = (value: number, currency: string = 'USD'): string => {
+const formatCurrencyForExport = (value: number, currency: string = 'USD'): string => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2
   }).format(value || 0);
-};
-
-export const formatDateForExport = (dateString: string): string => {
-  if (!dateString) return '';
-  return new Date(dateString).toLocaleDateString();
 };

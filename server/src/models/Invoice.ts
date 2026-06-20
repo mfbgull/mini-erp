@@ -537,6 +537,21 @@ class InvoiceModel {
    * Create a new invoice
    */
   static createInvoice(db: Database.Database, data: CreateInvoiceDTO, userId: number): number {
+    if (!data.customer_id || data.customer_id <= 0) {
+      throw new Error('Invalid customer_id');
+    }
+    if (!data.invoice_date) {
+      throw new Error('invoice_date is required');
+    }
+    if (!data.items || data.items.length === 0) {
+      throw new Error('At least one invoice item is required');
+    }
+    for (const item of data.items) {
+      if (!item.item_id || item.item_id <= 0) throw new Error('Invalid item_id in invoice items');
+      if (!item.quantity || item.quantity <= 0) throw new Error('Invalid quantity in invoice items');
+      if (item.unit_price === undefined || item.unit_price < 0) throw new Error('Invalid unit_price in invoice items');
+    }
+
     // CRITICAL-1 fix: when the caller supplies paid_amount/balance_amount
     // overrides (e.g., an initial payment was recorded as part of the
     // same request), honor them. Otherwise default to 0 paid and the

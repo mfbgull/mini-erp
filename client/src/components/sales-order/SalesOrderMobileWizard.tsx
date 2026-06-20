@@ -4,7 +4,7 @@ import { X, User, Package, Check, Plus } from 'lucide-react';
 
 import Button from '../common/Button';
 import FormInput from '../common/FormInput';
-import type { SOMobileWizardProps, SOFormItem } from '../../utils/salesOrderTypes';
+import type { SOMobileWizardProps, SOFormItem } from '../../types';
 
 const SOMobileWizard = memo(function SOMobileWizard({
   customer, soDate, deliveryDate, status, warehouseId, notes, items, currentStep,

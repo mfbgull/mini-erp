@@ -16,7 +16,7 @@ import Button from '../../components/common/Button';
 import DateRangePicker from '../../components/common/DateRangePicker';
 import SearchableSelect from '../../components/common/SearchableSelect';
 import StatCard, { StatsGrid } from '../../components/common/StatCard';
-import type { DateRangeFilter } from '../../utils/reportTypes';
+import type { DateRangeFilter } from '../../types';
 import { useSettings } from '../../context/SettingsContext';
 import api from '../../utils/api';
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils';

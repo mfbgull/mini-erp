@@ -1,5 +1,5 @@
 import React from "react";
-import type { ReceivablesSummaryData } from "../../utils/arReportsTypes";
+import type { ReceivablesSummaryData } from "../../types";
 
 interface ReceivablesSummaryProps {
   data: ReceivablesSummaryData | null;

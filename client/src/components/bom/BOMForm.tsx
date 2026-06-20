@@ -9,7 +9,7 @@ import SearchableSelect from "../common/SearchableSelect";
 import { useFormValidation } from "../../hooks/useFormValidation";
 import { bomSchema } from "../../schemas";
 import api from "../../utils/api";
-import type { BOMListItem, BOMFormData, BOMItemFormEntry, BOMItemData } from "../../utils/bomTypes";
+import type { BOMListItem, BOMFormData, BOMItemFormEntry, BOMItemData } from "../../types";
 
 interface BOMFormProps {
   bom?: BOMListItem | null;

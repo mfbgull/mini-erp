@@ -3,7 +3,7 @@ import { Hash, Eye, Send } from 'lucide-react';
 
 import Button from '../common/Button';
 import FormInput from '../common/FormInput';
-import type { SOFormHeaderProps } from '../../utils/salesOrderTypes';
+import type { SOFormHeaderProps } from '../../types';
 import { getStatusColor } from '../../utils/salesOrderCalculations';
 
 const SOFormHeader = memo(function SOFormHeader({

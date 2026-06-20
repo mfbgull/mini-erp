@@ -14,7 +14,7 @@ import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
 import { createActionColDef } from '../../utils/agGridIntegration';
 import { getIsActiveCellClass, getRoleTypeCellClass } from '../../utils/statusCellUtils';
-import type { Role } from '../../utils/roleTypes';
+import type { Role } from '../../types';
 
 import './RolesPage.css';
 import '../../styles/ag-grid-status-cells.css';

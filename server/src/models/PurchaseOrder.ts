@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import StockMovementModel from './StockMovement';
 import AccountingService from '../services/accountingService';
-import { getNextSequenceNumber } from '../utils/sequence';
+import { generateDocNo } from '../utils/sequence';
 import { StockBalance } from '../types';
 
 interface PurchaseOrder {
@@ -189,10 +189,7 @@ class PurchaseOrderModel {
   }
 
   static generatePONo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `PO_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `PO-${year}-${nextNo.toString().padStart(4, '0')}`;
+    return generateDocNo(db, 'PO');
   }
 
   static getAll(filters: PurchaseOrderFilters = {}, db: Database.Database): PurchaseOrder[] {
@@ -907,23 +904,7 @@ class PurchaseOrderModel {
   }
 
   static generateReceiptNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `GR_last_no_${year}`;
-
-    // Atomically increment the counter using INSERT OR REPLACE
-    db.prepare(`
-      INSERT INTO settings (key, value, updated_at)
-      VALUES (?, '1', CURRENT_TIMESTAMP)
-      ON CONFLICT(key) DO UPDATE SET
-        value = CAST(CAST(settings.value AS INTEGER) + 1 AS TEXT),
-        updated_at = CURRENT_TIMESTAMP
-    `).run(settingKey);
-
-    // Get the updated value
-    const setting = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string };
-    const nextNo = parseInt(setting.value);
-
-    return `GR-${year}-${nextNo.toString().padStart(4, '0')}`;
+    return generateDocNo(db, 'GR');
   }
 
   static calculateStatus(poId: number, db: Database.Database): string {

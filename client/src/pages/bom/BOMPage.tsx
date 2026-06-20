@@ -30,7 +30,7 @@ import { useMobileDetection } from "../../hooks/useMobileDetection";
 import { useTranslation } from "../../hooks/useTranslation";
 import api from "../../utils/api";
 import { createActionColDef } from "../../utils/agGridIntegration";
-import type { BOMListItem, BOMStats, BOMDetail } from "../../utils/bomTypes";
+import type { BOMListItem, BOMStats, BOMDetail } from "../../types";
 import "../inventory/ItemPreview.css";
 import "./BOMPage.css";
 import "../../styles/ag-grid-status-cells.css";

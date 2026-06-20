@@ -1,4 +1,4 @@
-import type { QuotationFormItem } from './quotationTypes';
+import type { QuotationFormItem } from '../types';
 
 // ============================================
 // Item Row Utilities
@@ -77,17 +77,7 @@ export const calculateTotal = (items: QuotationFormItem[]): number => {
 // UI Utilities
 // ============================================
 
-export const getStatusColor = (status: string): string => {
-  const colors: Record<string, string> = {
-    'Draft': 'bg-gray-100 text-gray-700',
-    'Sent': 'bg-blue-100 text-blue-700',
-    'Accepted': 'bg-green-100 text-green-700',
-    'Rejected': 'bg-red-100 text-red-700',
-    'Converted': 'bg-purple-100 text-purple-700',
-    'Expired': 'bg-orange-100 text-orange-700',
-  };
-  return colors[status] || 'bg-gray-100 text-gray-700';
-};
+export { getStatusColor } from './statusColors';
 
 // ============================================
 // Field Navigation

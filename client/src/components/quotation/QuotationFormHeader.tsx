@@ -2,7 +2,7 @@ import { Hash, Eye, Send } from 'lucide-react';
 import Button from '../common/Button';
 import FormInput from '../common/FormInput';
 import { getStatusColor } from '../../utils/quotationCalculations';
-import type { QuotationFormHeaderProps } from '../../utils/quotationTypes';
+import type { QuotationFormHeaderProps } from '../../types';
 
 export default function QuotationFormHeader({
   customer,

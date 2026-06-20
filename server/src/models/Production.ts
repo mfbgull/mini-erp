@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { getNextSequenceNumber } from '../utils/sequence';
+import { generateDocNo, getNextSequenceNumber } from '../utils/sequence';
 import StockMovementModel from './StockMovement';
 
 interface Production {
@@ -84,6 +84,10 @@ class ProductionModel {
     const settingKey = `BATCH_last_no_${year}`;
     const nextNo = getNextSequenceNumber(db, settingKey);
     return `BATCH-${year % 100}-PRD-${nextNo.toString().padStart(4, '0')}`;
+  }
+
+  static generateProductionNo(db: Database.Database): string {
+    return generateDocNo(db, 'PROD');
   }
 
   static recordProduction(data: CreateProductionDTO, userId: number, db: Database.Database): Production {
@@ -364,13 +368,6 @@ class ProductionModel {
     return transaction.immediate();
   }
 
-  static generateProductionNo(db: Database.Database): string {
-    const year = new Date().getFullYear();
-    const settingKey = `PROD_last_no_${year}`;
-    const nextNo = getNextSequenceNumber(db, settingKey);
-    return `PROD-${year}-${nextNo.toString().padStart(4, '0')}`;
-  }
-
   static getAll(filters: ProductionFilters = {}, db: Database.Database): Production[] {
     let query = `
       SELECT
@@ -563,20 +560,20 @@ class ProductionModel {
       // 3. Delete production inputs and production record
       db.prepare('DELETE FROM production_inputs WHERE production_id = ?').run(id);
       db.prepare('DELETE FROM productions WHERE id = ?').run(id);
+
+      db.prepare(`
+        INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        userId,
+        'DELETE',
+        'Production',
+        id,
+        `Deleted production ${production.production_no}`
+      );
     });
 
     transaction();
-
-    db.prepare(`
-      INSERT INTO activity_log (user_id, action, entity_type, entity_id, description)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(
-      userId,
-      'DELETE',
-      'Production',
-      id,
-      `Deleted production ${production.production_no}`
-    );
 
     return true;
   }

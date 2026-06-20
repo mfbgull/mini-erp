@@ -6,7 +6,7 @@ import FormInput from '../common/FormInput';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { itemSchema } from '../../schemas';
 import api from '../../utils/api';
-import type { InventoryItem, ItemFormData } from '../../utils/itemTypes';
+import type { InventoryItem, ItemFormData } from '../../types';
 
 interface ItemFormProps {
   item: InventoryItem | null;

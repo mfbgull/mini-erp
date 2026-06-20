@@ -17,7 +17,7 @@ import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import { createActionColDef } from '../../utils/agGridIntegration';
-import type { Warehouse } from '../../utils/warehouseTypes';
+import type { Warehouse } from '../../types';
 import './WarehousesPage.css';
 
 export default function WarehousesPage() {

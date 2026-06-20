@@ -7,7 +7,7 @@ import Button from '../common/Button';
 import FormInput from '../common/FormInput';
 import Modal from '../common/Modal';
 import api from '../../utils/api';
-import type { User } from '../../utils/userTypes';
+import type { User } from '../../types';
 
 interface ResetPasswordModalProps {
   user: User;

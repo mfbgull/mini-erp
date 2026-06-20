@@ -10,7 +10,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { useMobileDetection } from '../../hooks/useMobileDetection';
 import api from '../../utils/api';
-import type { PurchaseOrder, PurchaseOrderStats } from '../../utils/purchaseOrderTypes';
+import type { PurchaseOrder, PurchaseOrderStats } from '../../types';
 import './PurchaseOrdersPage.css';
 
 export default function PurchaseOrdersPage() {

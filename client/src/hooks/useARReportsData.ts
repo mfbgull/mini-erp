@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../utils/api';
-import type { ARAgingData, ReceivablesSummaryData, TopDebtor, DSOData } from '../utils/arReportsTypes';
+import type { ARAgingData, ReceivablesSummaryData, TopDebtor, DSOData } from '../types';
 
 export function useARReportsData({ dateRange }: { dateRange: { from: string; to: string } }) {
   const aging = useQuery<ARAgingData>({

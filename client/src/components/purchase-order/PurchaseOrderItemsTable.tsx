@@ -1,7 +1,7 @@
 import { Plus, Trash2 } from 'lucide-react';
 import PurchaseOrderEditableCell from './PurchaseOrderEditableCell';
 import { POSearchableCellEditing } from './PurchaseOrderSearchableCell';
-import type { POItemsTableProps } from '../../utils/purchaseOrderTypes';
+import type { POItemsTableProps } from '../../types';
 
 const FIELD_ORDER = ['name', 'quantity', 'unit_price'] as const;
 

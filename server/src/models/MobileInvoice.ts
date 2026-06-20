@@ -192,6 +192,15 @@ function findWarehouseForItem(db: Database.Database, itemId: number, quantity: n
 }
 
 function submitInvoice(db: Database.Database, data: SubmitInvoiceDTO): number {
+  if (!data.customer_id || data.customer_id <= 0) throw new Error('Invalid customer_id');
+  if (!data.invoice_date) throw new Error('invoice_date is required');
+  if (!data.items || data.items.length === 0) throw new Error('At least one invoice item is required');
+  for (const item of data.items) {
+    if (!item.item_id || item.item_id <= 0) throw new Error('Invalid item_id in invoice items');
+    if (!item.quantity || item.quantity <= 0) throw new Error('Invalid quantity in invoice items');
+    if (item.unit_price === undefined || item.unit_price < 0) throw new Error('Invalid unit_price in invoice items');
+  }
+
   return db.transaction(() => {
     const subtotal = data.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.unit_price || 0), 0);
     const totalTax = data.items.reduce((sum, item) => {
@@ -306,7 +315,8 @@ function getInvoiceWithCustomer(db: Database.Database, invoiceId: number) {
 function generateInvoiceNumber(): string {
   const year = new Date().getFullYear();
   const timestamp = Date.now().toString().slice(-6);
-  return `INV-${year}-${timestamp.padStart(6, '0')}`;
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  return `INV-${year}-${timestamp}${random}`;
 }
 
 export default {
