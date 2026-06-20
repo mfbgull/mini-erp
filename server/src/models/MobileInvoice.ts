@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import StockMovementModel from './StockMovement';
 import { initializeSequenceFromMax, getNextSequenceNumber } from '../utils/sequence';
+import ledgerUtils from '../utils/ledgerUtils';
 
 interface DraftRecord {
   id: number;
@@ -274,7 +275,16 @@ function submitInvoice(db: Database.Database, data: SubmitInvoiceDTO): number {
       db.prepare(`
         UPDATE invoices SET paid_amount = ?, balance_amount = ?, status = ? WHERE id = ?
       `).run(paymentAmount, totalAmount - paymentAmount, paymentAmount >= totalAmount ? 'Paid' : 'Partially Paid', invoiceId);
+
+      // Create ledger entry for payment (credit to reduce AR)
+      ledgerUtils.createLedgerEntry(data.customer_id, 'PAYMENT', paymentNo, 0, paymentAmount, `Payment ${paymentNo} for Invoice ${invoiceId}`);
     }
+
+    // Create customer ledger entry for the invoice (debit to increase AR)
+    ledgerUtils.createLedgerEntry(data.customer_id, 'INVOICE', invoiceNo, totalAmount, 0, `Invoice ${invoiceNo}`);
+
+    // Update customer balance
+    ledgerUtils.updateCustomerBalance(data.customer_id);
 
     if (data.draft_id) {
       db.prepare('DELETE FROM invoice_drafts WHERE id = ?').run(data.draft_id);
