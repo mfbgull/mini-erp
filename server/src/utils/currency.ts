@@ -6,7 +6,8 @@
  */
 
 export function roundCurrency(value: number): number {
-  return Math.round(value * 100) / 100;
+  // Use the e+2 trick to avoid IEEE 754 rounding errors (e.g., 1.005 → 1.01 instead of 1.00)
+  return Number(Math.round(Number(value + 'e+2')) + 'e-2');
 }
 
 export function addCurrency(a: number, b: number): number {
