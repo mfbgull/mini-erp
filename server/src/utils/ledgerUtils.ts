@@ -42,17 +42,19 @@ function createLedgerEntry(customerId: number, type: string, referenceNo: string
 }
 
 function updateCustomerBalance(customerId: number): number {
-  const balanceResult = db.prepare(`
-    SELECT COALESCE(SUM(balance_amount), 0) as total_balance
-    FROM invoices
-    WHERE customer_id = ? AND status IN ('Unpaid', 'Partially Paid', 'Overdue')
-  `).get(customerId) as { total_balance: number };
+  return db.transaction(() => {
+    const balanceResult = db.prepare(`
+      SELECT COALESCE(SUM(balance_amount), 0) as total_balance
+      FROM invoices
+      WHERE customer_id = ? AND status IN ('Unpaid', 'Partially Paid', 'Overdue')
+    `).get(customerId) as { total_balance: number };
 
-  const newBalance = parseCurrency(balanceResult.total_balance);
+    const newBalance = parseCurrency(balanceResult.total_balance);
 
-  db.prepare('UPDATE customers SET current_balance = ? WHERE id = ?').run(newBalance, customerId);
+    db.prepare('UPDATE customers SET current_balance = ? WHERE id = ?').run(newBalance, customerId);
 
-  return newBalance;
+    return newBalance;
+  })();
 }
 
 function calculateInvoiceBalance(invoiceId: number): number {
@@ -135,19 +137,21 @@ function updateInvoiceBalanceAndStatus(invoiceId: number, _amountPaid: number = 
  * chain is consistent: balance = previous_balance + debit - credit.
  */
 function rebuildLedgerBalances(customerId: number): void {
-  const entries = db.prepare(`
-    SELECT id, debit, credit FROM customer_ledger
-    WHERE customer_id = ?
-    ORDER BY id ASC
-  `).all(customerId) as Array<{ id: number; debit: number; credit: number }>;
+  db.transaction(() => {
+    const entries = db.prepare(`
+      SELECT id, debit, credit FROM customer_ledger
+      WHERE customer_id = ?
+      ORDER BY id ASC
+    `).all(customerId) as Array<{ id: number; debit: number; credit: number }>;
 
-  let runningBalance = 0;
-  const updateStmt = db.prepare('UPDATE customer_ledger SET balance = ? WHERE id = ?');
+    let runningBalance = 0;
+    const updateStmt = db.prepare('UPDATE customer_ledger SET balance = ? WHERE id = ?');
 
-  for (const entry of entries) {
-    runningBalance = addCurrency(subtractCurrency(runningBalance, entry.credit), entry.debit);
-    updateStmt.run(runningBalance, entry.id);
-  }
+    for (const entry of entries) {
+      runningBalance = addCurrency(subtractCurrency(runningBalance, entry.credit), entry.debit);
+      updateStmt.run(runningBalance, entry.id);
+    }
+  })();
 }
 
 export default {
