@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client'
 
 // AG-Grid Theming API (v33+) — no CSS file imports needed
 // AG Grid uses the Theming API by default (themeQuartz)
-import './utils/registerAgGrid'
+import './utils/agGridIntegration'
 
 import App from './App'
 import './styles/variables.css'

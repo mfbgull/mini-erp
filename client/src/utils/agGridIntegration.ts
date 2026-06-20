@@ -1,10 +1,11 @@
 /**
  * AG-Grid integration utilities.
- * Imports and registers AG-Grid modules and CSS.
+ * Registers AG-Grid modules and provides helper functions.
  */
-import { GridApi } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule, GridApi } from 'ag-grid-community';
 import type { ColDef } from 'ag-grid-community';
-import './registerAgGrid';
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export function isAGGridEditing(api: GridApi | null): boolean {
   if (!api) return false;

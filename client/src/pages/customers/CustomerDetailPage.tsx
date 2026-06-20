@@ -45,15 +45,13 @@ import {
 } from '../../utils/customerCalculations';
 import type { TabId, TabConfig, Invoice, Payment } from '../../utils/customerTypes';
 import { canDeleteInvoice } from '../../utils/invoiceRules';
-import { registerAgGrid } from '../../utils/registerAgGrid';
+
 
 // Lazily import non-critical components
 
 
 import './CustomerDetailPage.css';
 import '../../styles/ag-grid-status-cells.css';
-
-registerAgGrid();
 
 /* ── Tab Configuration ──────────────────────────────────────────── */
 

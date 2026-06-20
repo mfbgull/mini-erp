@@ -8,7 +8,7 @@ import type {
   RowDoubleClickedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import '../../utils/registerAgGrid';
+import '../../utils/agGridIntegration';
 
 export interface MiniERPGridProps<TData = any> {
   // Required
