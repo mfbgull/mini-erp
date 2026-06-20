@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="29.6.6">
+  <diagram name="miniERP Architecture">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- SWIMLANE 1: PRESENTATION LAYER                                  -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <mxCell id="2" value="PRESENTATION LAYER — React 19 + TypeScript + Vite" style="swimlane;startSize=34;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;whiteSpace=wrap;html=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="50" y="40" width="1700" height="260" as="geometry"/>
+        </mxCell>
+
+        <!-- Pages container -->
+        <mxCell id="3" value="&lt;b&gt;Pages&lt;/b&gt; (Route-level, React.lazy() code-split)&#xa;&#xa;• Dashboard&#xa;• Sales: Invoices, SalesOrders, Quotations, POS&#xa;• Inventory: Items, Warehouses, StockMovements, PhysicalCounts&#xa;• Purchasing: Purchases, PurchaseOrders&#xa;• Manufacturing: BOMs, Production&#xa;• Customers, Suppliers&#xa;• Reports (18 views), Expenses, Employees&#xa;• Accounting, Forecasts, Integrations&#xa;• Users, Roles, ActivityLog, Settings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="2">
+          <mxGeometry x="60" y="70" width="370" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- Shared Components container -->
+        <mxCell id="4" value="&lt;b&gt;Shared Components&lt;/b&gt;&#xa;&#xa;• MiniERPGrid (AG Grid wrapper, pagination, filter, sort)&#xa;• Modal / Dialog, DateRangePicker&#xa;• SearchableSelect, PageHeader&#xa;• InvoiceTemplates (A4, Thermal, Wizard)&#xa;• Compact Cards (mobile view)&#xa;• ShortcutBar, FloatingActionButton&#xa;• Sidebar, TopMenu, MobileActionBar" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="2">
+          <mxGeometry x="460" y="70" width="370" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- State & Data Hooks container -->
+        <mxCell id="5" value="&lt;b&gt;State &amp;amp; Data Layer&lt;/b&gt;&#xa;&#xa;• React Contexts: Auth, Theme, Settings, Invoice,&#xa;  KeyboardShortcuts, Search, ActivityLog&#xa;• React Query Hooks (TanStack Query v5):&#xa;  useInvoiceData, useCustomerData,&#xa;  usePurchaseOrderData, useSalesOrderData,&#xa;  useProductionData, useQuotationData,&#xa;  useARReportsData, 16+ domain hooks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="2">
+          <mxGeometry x="860" y="70" width="370" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- API Client & Utils container -->
+        <mxCell id="6" value="&lt;b&gt;API Client &amp;amp; Utilities&lt;/b&gt;&#xa;&#xa;• Axios instance (/api base, JWT+CSRF interceptors)&#xa;• Domain API files (invoiceApi, salesApi)&#xa;• Formatters (date, number, currency)&#xa;• Invoice calculations, customer calculations&#xa;• i18n: English + Urdu (RTL support)&#xa;• InputGuard, Error utils&#xa;• ServiceWorker, storage utils&#xa;• WebMCP (mocked)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="2">
+          <mxGeometry x="1260" y="70" width="370" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- SWIMLANE 2: API LAYER                                           -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <mxCell id="10" value="API LAYER — Express 5 + TypeScript (port 3011)" style="swimlane;startSize=34;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;whiteSpace=wrap;html=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="50" y="340" width="1700" height="310" as="geometry"/>
+        </mxCell>
+
+        <!-- Middleware Pipeline container -->
+        <mxCell id="11" value="&lt;b&gt;Middleware Pipeline&lt;/b&gt; (order of execution)&#xa;&#xa;1. Helmet (security headers) → CORS → CookieParser → JSON parser&#xa;2. RateLimiter (global 100/15min + sensitive 20/15min)&#xa;3. RequestLogger (Winston)&#xa;4. CSRF Protection (cookie → x-csrf-token header)&#xa;5. authenticateToken (JWT httpOnly cookie / Bearer, HS256, 24h)&#xa;6. requirePermission (RBAC: module:action check)&#xa;7. Validation (request schema)&#xa;8. Upload (multer, 10MB limit)&#xa;9. ErrorHandler (structured JSON, no stack leak in prod)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="10">
+          <mxGeometry x="60" y="70" width="370" height="210" as="geometry"/>
+        </mxCell>
+
+        <!-- Sales endpoints container -->
+        <mxCell id="12" value="&lt;b&gt;Routes / Controllers — Sales&lt;/b&gt;&#xa;&#xa;• /api/invoices — CRUD + returns + cancel&#xa;• /api/quotations — CRUD + SO import&#xa;• /api/sales-orders — CRUD&#xa;• /api/pos — sale + transactions&#xa;• /api/customers — CRUD + statement + ledger&#xa;• /api/payments — CRUD + allocations&#xa;• /api/mobile-invoices — drafts + tax/term configs&#xa;• /api/sales — legacy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="10">
+          <mxGeometry x="460" y="70" width="370" height="210" as="geometry"/>
+        </mxCell>
+
+        <!-- Core + Inventory endpoints container -->
+        <mxCell id="13" value="&lt;b&gt;Routes / Controllers — Core &amp;amp; Inventory&lt;/b&gt;&#xa;&#xa;• /api/auth — login, logout, me&#xa;• /api/users — CRUD + status&#xa;• /api/roles — CRUD + permissions&#xa;• /api/settings — key-value + company info&#xa;• /api/inventory — items, warehouses, stock-movements,&#xa;  stock-balances, physical-counts, stock-ledger&#xa;• /api/purchases — CRUD + returns&#xa;• /api/purchase-orders — CRUD + status transitions&#xa;• /api/suppliers — CRUD + detail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="10">
+          <mxGeometry x="860" y="70" width="370" height="210" as="geometry"/>
+        </mxCell>
+
+        <!-- Other endpoints container -->
+        <mxCell id="14" value="&lt;b&gt;Routes / Controllers — Other&lt;/b&gt;&#xa;&#xa;• /api/boms — CRUD + cost-analysis&#xa;• /api/production — CRUD + costs&#xa;• /api/reports — 18 report endpoints&#xa;• /api/dashboard — summary + chart data&#xa;• /api/expenses — CRUD&#xa;• /api/employees — CRUD + documents&#xa;• /api/activity-logs — filtered + export&#xa;• /api/integrations — email, SMS, weather, etc.&#xa;• /api/forecasts — generate + CRUD&#xa;• /api/accounting — CoA, journal, TB, BS, P&amp;amp;L" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="10">
+          <mxGeometry x="1260" y="70" width="370" height="210" as="geometry"/>
+        </mxCell>
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- SWIMLANE 3: SERVICE LAYER (Business Logic)                      -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <mxCell id="20" value="SERVICE LAYER — Business Logic" style="swimlane;startSize=34;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;whiteSpace=wrap;html=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="50" y="690" width="1700" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="21" value="&lt;b&gt;Sales Service&lt;/b&gt;&#xa;(salesService.ts)&#xa;&#xa;Quotation → SalesOrder → Invoice&#xa;transactional pipeline&#xa;Status: Draft/Approved/Converted&#xa;Draft/Confirmed/Delivered/Invoiced&#xa;Unpaid/Paid/Overdue/Returned" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="20">
+          <mxGeometry x="60" y="70" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="22" value="&lt;b&gt;Accounting Service&lt;/b&gt;&#xa;(accountingService.ts)&#xa;&#xa;Chart of Accounts (16 standard)&#xa;Journal Lines (multi-line, double-entry)&#xa;Trial Balance, Balance Sheet, P&amp;amp;L&#xa;Fiscal Period open/close" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="20">
+          <mxGeometry x="460" y="70" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="23" value="&lt;b&gt;Integrations&lt;/b&gt;&#xa;(integrations/*.ts)&#xa;&#xa;• Email — SendGrid (invoices, quotations, reports)&#xa;• SMS — Twilio (notifications, alerts)&#xa;• Currency — Fixer API (FX rates)&#xa;• Weather — Weatherstack (logistics)&#xa;• Tax — TaxJar / GST (compliance)&#xa;• Validation — address/entity validation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="20">
+          <mxGeometry x="860" y="70" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="24" value="&lt;b&gt;Other Services&lt;/b&gt;&#xa;&#xa;• Forecast Service — demand&#xa;  forecasting algorithms&#xa;  (time-series, trend analysis)&#xa;• Activity Logger — CRUD audit&#xa;  trail (logCRUD pattern)&#xa;• Legacy: journal_entries&#xa;  (dual system coexistence)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="20">
+          <mxGeometry x="1260" y="70" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- SWIMLANE 4: DATA ACCESS LAYER (Models)                          -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <mxCell id="30" value="DATA ACCESS LAYER — Models (better-sqlite3, raw SQL)" style="swimlane;startSize=34;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;whiteSpace=wrap;html=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="50" y="930" width="1700" height="200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="31" value="&lt;b&gt;Core Models&lt;/b&gt;&#xa;&#xa;User, Role, Permission&#xa;Settings (key-value)&#xa;ActivityLog" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="30">
+          <mxGeometry x="60" y="70" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="32" value="&lt;b&gt;Sales + Financial Models&lt;/b&gt;&#xa;&#xa;Invoice, InvoiceItem&#xa;Payment, PaymentAllocation&#xa;Customer, CustomerLedger&#xa;SalesOrder, Quotation&#xa;TaxRate, PaymentTerms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="30">
+          <mxGeometry x="460" y="70" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="33" value="&lt;b&gt;Inventory + Purchasing Models&lt;/b&gt;&#xa;&#xa;Item, Warehouse&#xa;StockMovement, StockBalance, StockBatch&#xa;ItemLocation&#xa;Purchase, PurchaseOrder, GoodsReceipt&#xa;Supplier, SupplierLedger&#xa;PhysicalCount, PhysicalCountItem" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="30">
+          <mxGeometry x="860" y="70" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="34" value="&lt;b&gt;Manufacturing + Other Models&lt;/b&gt;&#xa;&#xa;BOM, BOMItem&#xa;Production, ProductionInput&#xa;WorkOrder, MaterialConsumption&#xa;Employee, Expense, ExpenseCategory&#xa;ChartOfAccounts, JournalLine, JournalEntry&#xa;AccountingPeriod, DemandForecast&#xa;MobileInvoice" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="30">
+          <mxGeometry x="1260" y="70" width="370" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- SWIMLANE 5: DATABASE                                             -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <mxCell id="40" value="DATABASE — SQLite (better-sqlite3)" style="swimlane;startSize=34;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;whiteSpace=wrap;html=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1170" width="1700" height="190" as="geometry"/>
+        </mxCell>
+
+        <!-- SQLite engine -->
+        <mxCell id="41" value="&lt;b&gt;SQLite Engine&lt;/b&gt;&#xa;&#xa;better-sqlite3 (synchronous, fast)&#xa;WAL mode (concurrent reads)&#xa;Foreign Keys enabled&#xa;Prepared statements only&#xa;Transactional writes via db.transaction()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="40">
+          <mxGeometry x="60" y="65" width="370" height="95" as="geometry"/>
+        </mxCell>
+
+        <!-- Tables -->
+        <mxCell id="42" value="&lt;b&gt;40+ Tables&lt;/b&gt;&#xa;&#xa;Core (6) | Sales (7) | Inventory (6)&#xa;Purchasing (6) | Manufacturing (5)&#xa;Financial (4) | HR (3) | Forecasts (1)&#xa;" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="40">
+          <mxGeometry x="460" y="55" width="370" height="105" as="geometry"/>
+        </mxCell>
+
+        <!-- Views + Migrations -->
+        <mxCell id="43" value="&lt;b&gt;Views &amp;amp; Migrations&lt;/b&gt;&#xa;&#xa;Views: vw_customers_with_balance,&#xa;       vw_items_with_stock&#xa;&#xa;36 migration files (idempotent, rerunnable)&#xa;Rollback support per migration&#xa;Auto-apply on server start" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="40">
+          <mxGeometry x="860" y="65" width="370" height="95" as="geometry"/>
+        </mxCell>
+
+        <!-- External/Integrations box -->
+        <mxCell id="44" value="&lt;b&gt;Integrations (External APIs)&lt;/b&gt;&#xa;&#xa;SendGrid (email) | Twilio (SMS)&#xa;Fixer (currency) | Weatherstack&#xa;TaxJar / GST (tax compliance)" style="rounded=1;dashed=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;fontSize=11;spacingLeft=6;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="1230" width="370" height="105" as="geometry"/>
+        </mxCell>
+
+        <!-- ====== LAYER ARROWS (left side connecting swimlanes) ====== -->
+
+        <!-- Pres → API -->
+        <mxCell id="50" value="HTTP REST /api/*&#xa;JWT + CSRF + JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;strokeWidth=2;" edge="1" parent="1" source="2" target="10">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="15" y="175" as="sourcePoint" />
+            <mxPoint x="15" y="500" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- API → Services -->
+        <mxCell id="51" value="Delegate to&#xa;services" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;strokeWidth=2;" edge="1" parent="1" source="10" target="20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Services → Data Access -->
+        <mxCell id="52" value="Calls model&#xa;methods" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;strokeWidth=2;" edge="1" parent="1" source="20" target="30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Data Access → DB -->
+        <mxCell id="53" value="Prepared SQL&#xa;queries" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;strokeWidth=2;" edge="1" parent="1" source="30" target="40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Integrations arrow from API to External -->
+        <mxCell id="54" value="External API&#xa;calls" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;fontSize=11;strokeWidth=1;strokeColor=#666666;dashed=1;" edge="1" parent="1" source="10" target="44">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1810" y="500" />
+              <mxPoint x="1810" y="1285" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Title label -->
+        <mxCell id="60" value="&lt;b&gt;miniERP Architecture&lt;/b&gt;&#xa;Monorepo: client/ + server/ + database/ + electron/" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="550" y="5" width="700" height="30" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
