@@ -876,26 +876,39 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
       return res.status(400).json({ error: 'Invalid request: items must be a non-empty array' });
     }
 
-    const invoice = InvoiceModel.getById(invoiceId, db);
-    if (!invoice) {
+    // Fast-fail checks outside transaction
+    const invoiceExists = InvoiceModel.getById(invoiceId, db);
+    if (!invoiceExists) {
       return res.status(404).json({ error: 'Invoice not found' });
     }
 
-    if (invoice.status === 'Cancelled') {
+    if (invoiceExists.status === 'Cancelled') {
       return res.status(400).json({ error: 'Cannot return a cancelled invoice' });
     }
 
     // Default disposition: if invoice was paid, default to refund; otherwise default to credit
     const resolvedDisposition: 'refund' | 'credit' | 'adjust' =
-      disposition || (invoice.balance_amount <= 0 ? 'refund' : 'credit');
+      disposition || (invoiceExists.balance_amount <= 0 ? 'refund' : 'credit');
 
     const transaction = db.transaction(() => {
+      // Re-read invoice INSIDE transaction to get fresh returned_qty values
+      // This prevents race conditions on concurrent return requests
+      const invoice = InvoiceModel.getById(invoiceId, db);
+      if (!invoice) {
+        throw new Error('Invoice not found');
+      }
+
       const processedItems: Array<{ item_id: number; quantity: number; unit_price: number }> = [];
       let returnTotalTaxAmount = 0;
 
       for (const returnItem of returnItems) {
-        // Find the invoice item to get item_id, unit_price
-        const invoiceItem = invoice.items?.find(
+        // Re-fetch item from DB inside transaction to get fresh returned_qty
+        const freshItem = db.prepare(
+          'SELECT ii.*, i.item_name FROM invoice_items ii LEFT JOIN items i ON ii.item_id = i.id WHERE ii.id = ? OR ii.item_id = ?'
+        ).get(returnItem.invoice_item_id, returnItem.invoice_item_id) as any;
+
+        // Fallback to in-memory item if DB fetch fails
+        const invoiceItem = freshItem || invoice.items?.find(
           (ii: any) => ii.id === returnItem.invoice_item_id || ii.item_id === returnItem.invoice_item_id
         );
 
