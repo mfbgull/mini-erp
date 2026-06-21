@@ -51,15 +51,17 @@ export function initializeSequenceFromMax(
 
   const existing = db.prepare('SELECT value FROM settings WHERE key = ?').get(settingKey) as { value: string } | undefined;
   if (!existing) {
-    const maxResult = db.prepare(
-      `SELECT MAX(${columnName}) as max_val FROM ${tableName} WHERE ${columnName} LIKE ?`
-    ).get(`${prefixPattern}%`) as { max_val: string | null } | undefined;
-    const maxVal = maxResult?.max_val ?? null;
-    let maxNo = 0;
-    if (maxVal) {
-      const numStr = maxVal.replace(/[^0-9]/g, '');
-      maxNo = parseInt(numStr, 10) || 0;
+    // For payment_no, use numeric MAX to avoid string comparison bugs where
+    // PAY1000 sorts before PAY999 alphabetically ('9' > '1' at position 3).
+    // All other codes use fixed-length zero-padded suffixes, so string MAX is fine.
+    let query: string;
+    if (columnName === 'payment_no') {
+      query = `SELECT MAX(CAST(SUBSTR(${columnName}, ${prefixPattern.length + 1}) AS INTEGER)) as max_val FROM ${tableName} WHERE ${columnName} LIKE ?`;
+    } else {
+      query = `SELECT MAX(${columnName}) as max_val FROM ${tableName} WHERE ${columnName} LIKE ?`;
     }
+    const maxResult = db.prepare(query).get(`${prefixPattern}%`) as { max_val: number | null } | undefined;
+    const maxNo = maxResult?.max_val ?? 0;
     db.prepare('INSERT INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)').run(settingKey, maxNo.toString());
   }
 }

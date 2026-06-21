@@ -56,6 +56,7 @@ interface LedgerEntry {
   balance: number;
   description?: string;
   created_at?: string;
+  linked_invoice_no?: string;
 }
 
 interface CreateCustomerDTO {
@@ -230,18 +231,62 @@ class CustomerModel {
   static getLedger(id: string | string[] | number, sortBy: string, sortOrder: string, db: Database.Database): LedgerEntry[] {
     const { sortBy: safeBy, sortOrder: safeOrder } = safeSortBy(sortBy, sortOrder);
     return db.prepare(`
-      SELECT id, transaction_date, transaction_type, reference_no,
-        debit, credit, balance, description, created_at
-      FROM customer_ledger
-      WHERE customer_id = ?
-      ORDER BY ${safeBy} ${safeOrder}
+      SELECT cl.id, cl.transaction_date, cl.transaction_type, cl.reference_no,
+        cl.debit, cl.credit, cl.balance, cl.description, cl.created_at,
+        COALESCE(
+          inv_adjust.invoice_no,
+          inv_return.invoice_no,
+          inv_direct.invoice_no
+        ) as linked_invoice_no
+      FROM customer_ledger cl
+      LEFT JOIN payments p ON cl.reference_no = p.payment_no
+      LEFT JOIN payment_allocations pa ON p.id = pa.payment_id
+      LEFT JOIN invoices inv_direct ON pa.invoice_id = inv_direct.id
+      LEFT JOIN payments p_return ON cl.transaction_type = 'RETURN'
+        AND cl.customer_id = p_return.customer_id
+        AND p_return.amount = 0
+        AND p_return.notes LIKE '%' || cl.reference_no || '%'
+      LEFT JOIN payment_allocations pa_return ON p_return.id = pa_return.payment_id
+      LEFT JOIN invoices inv_return ON pa_return.invoice_id = inv_return.id
+      LEFT JOIN payments p_adjust ON cl.transaction_type = 'RETURN'
+        AND cl.customer_id = p_adjust.customer_id
+        AND p_adjust.amount = 0
+        AND p_adjust.payment_method = 'Credit'
+        AND p_adjust.notes LIKE '%' || cl.reference_no || '%'
+      LEFT JOIN payment_allocations pa_adjust ON p_adjust.id = pa_adjust.payment_id
+      LEFT JOIN invoices inv_adjust ON pa_adjust.invoice_id = inv_adjust.id
+      WHERE cl.customer_id = ?
+      ORDER BY cl.${safeBy} ${safeOrder}
     `).all(id) as LedgerEntry[];
   }
 
   static getStatement(id: string | string[] | number, fromDate: string | undefined, toDate: string | undefined, db: Database.Database): { transactions: LedgerEntry[]; openingBalance: number } {
     let query = `
-      SELECT transaction_date, transaction_type, reference_no, debit, credit, balance, description
-      FROM customer_ledger WHERE customer_id = ?
+      SELECT cl.transaction_date, cl.transaction_type, cl.reference_no,
+        cl.debit, cl.credit, cl.balance, cl.description,
+        COALESCE(
+          inv_adjust.invoice_no,
+          inv_return.invoice_no,
+          inv_direct.invoice_no
+        ) as linked_invoice_no
+      FROM customer_ledger cl
+      LEFT JOIN payments p ON cl.reference_no = p.payment_no
+      LEFT JOIN payment_allocations pa ON p.id = pa.payment_id
+      LEFT JOIN invoices inv_direct ON pa.invoice_id = inv_direct.id
+      LEFT JOIN payments p_return ON cl.transaction_type = 'RETURN'
+        AND cl.customer_id = p_return.customer_id
+        AND p_return.amount = 0
+        AND p_return.notes LIKE '%' || cl.reference_no || '%'
+      LEFT JOIN payment_allocations pa_return ON p_return.id = pa_return.payment_id
+      LEFT JOIN invoices inv_return ON pa_return.invoice_id = inv_return.id
+      LEFT JOIN payments p_adjust ON cl.transaction_type = 'RETURN'
+        AND cl.customer_id = p_adjust.customer_id
+        AND p_adjust.amount = 0
+        AND p_adjust.payment_method = 'Credit'
+        AND p_adjust.notes LIKE '%' || cl.reference_no || '%'
+      LEFT JOIN payment_allocations pa_adjust ON p_adjust.id = pa_adjust.payment_id
+      LEFT JOIN invoices inv_adjust ON pa_adjust.invoice_id = inv_adjust.id
+      WHERE cl.customer_id = ?
     `;
     const params: unknown[] = [id];
 

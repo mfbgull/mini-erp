@@ -4,6 +4,7 @@ import db from '../config/database';
 import { getRouteParam } from '../utils/queryUtils';
 import logger from '../utils/logger';
 import MobileInvoiceModel from '../models/MobileInvoice';
+import { getQueryParam } from '../utils/queryUtils';
 
 export async function createDraft(req: AuthRequest, res: Response) {
   try {
@@ -73,8 +74,8 @@ export async function deleteDraft(req: AuthRequest, res: Response) {
 
 export async function searchItems(req: AuthRequest, res: Response) {
   try {
-    const qParam = Array.isArray(req.query.q) ? req.query.q[0] : req.query.q;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const qParam = getQueryParam(req.query.q);
+    const limitParam = getQueryParam(req.query.limit);
     const q = qParam || '';
     const limit = parseInt(limitParam as string || '20', 10);
 
@@ -88,8 +89,8 @@ export async function searchItems(req: AuthRequest, res: Response) {
 
 export async function searchCustomers(req: AuthRequest, res: Response) {
   try {
-    const qParam = Array.isArray(req.query.q) ? req.query.q[0] : req.query.q;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const qParam = getQueryParam(req.query.q);
+    const limitParam = getQueryParam(req.query.limit);
     const q = qParam || '';
     const limit = parseInt(limitParam as string || '20', 10);
 

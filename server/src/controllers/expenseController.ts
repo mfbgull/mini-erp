@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getQueryParam } from '../utils/queryUtils';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
@@ -43,14 +44,14 @@ function createExpense(req: AuthRequest, res: Response): void {
 
 function getExpenses(req: Request, res: Response): void {
   try {
-    const pageParam = Array.isArray(req.query.page) ? req.query.page[0] : req.query.page;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
-    const categoryParam = Array.isArray(req.query.category) ? req.query.category[0] : req.query.category;
-    const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status;
-    const vendorParam = Array.isArray(req.query.vendor) ? req.query.vendor[0] : req.query.vendor;
-    const fromDateParam = Array.isArray(req.query.from_date) ? req.query.from_date[0] : req.query.from_date;
-    const toDateParam = Array.isArray(req.query.to_date) ? req.query.to_date[0] : req.query.to_date;
-    const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search;
+    const pageParam = getQueryParam(req.query.page);
+    const limitParam = getQueryParam(req.query.limit);
+    const categoryParam = getQueryParam(req.query.category);
+    const statusParam = getQueryParam(req.query.status);
+    const vendorParam = getQueryParam(req.query.vendor);
+    const fromDateParam = getQueryParam(req.query.from_date);
+    const toDateParam = getQueryParam(req.query.to_date);
+    const searchParam = getQueryParam(req.query.search);
 
     const filters = {
       page: parseInt(pageParam as string) || 1,
@@ -133,8 +134,8 @@ function deleteExpense(req: AuthRequest, res: Response): void {
 
 function getExpensesByDateRange(req: Request, res: Response): void {
   try {
-    const fromDateParam = Array.isArray(req.query.from_date) ? req.query.from_date[0] : req.query.from_date;
-    const toDateParam = Array.isArray(req.query.to_date) ? req.query.to_date[0] : req.query.to_date;
+    const fromDateParam = getQueryParam(req.query.from_date);
+    const toDateParam = getQueryParam(req.query.to_date);
     const from_date = fromDateParam as string;
     const to_date = toDateParam as string;
 
@@ -152,8 +153,8 @@ function getExpensesByCategory(req: Request, res: Response): void {
   try {
     const { category } = req.params;
     const categoryParam = Array.isArray(category) ? category[0] : category;
-    const fromDateParam = Array.isArray(req.query.from_date) ? req.query.from_date[0] : req.query.from_date;
-    const toDateParam = Array.isArray(req.query.to_date) ? req.query.to_date[0] : req.query.to_date;
+    const fromDateParam = getQueryParam(req.query.from_date);
+    const toDateParam = getQueryParam(req.query.to_date);
 
     const result = ExpenseModel.getByCategory(db, categoryParam, fromDateParam as string, toDateParam as string);
     res.json({ success: true, data: result.expenses, summary: { category: categoryParam, total_expenses: result.expenses.length, total_amount: result.total_amount } });
@@ -165,8 +166,8 @@ function getExpensesByCategory(req: Request, res: Response): void {
 
 function getExpenseSummary(req: Request, res: Response): void {
   try {
-    const fromDateParam = Array.isArray(req.query.from_date) ? req.query.from_date[0] : req.query.from_date;
-    const toDateParam = Array.isArray(req.query.to_date) ? req.query.to_date[0] : req.query.to_date;
+    const fromDateParam = getQueryParam(req.query.from_date);
+    const toDateParam = getQueryParam(req.query.to_date);
     const summary = ExpenseModel.getSummary(db, fromDateParam as string, toDateParam as string);
     res.json({ success: true, data: { category_summary: summary.category_summary, overall_summary: summary.overall_summary } });
   } catch (error) {

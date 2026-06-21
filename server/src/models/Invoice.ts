@@ -1,4 +1,5 @@
 import { multiplyCurrency, addCurrency, subtractCurrency, parseCurrency } from '../utils/currency';
+import { getNextSequenceNumber } from '../utils/sequence';
 import Database from 'better-sqlite3';
 import logger from '../utils/logger';
 import StockMovementModel from './StockMovement';
@@ -319,58 +320,29 @@ class InvoiceModel {
   static generatePaymentNoAtomic(db: Database.Database): string {
     const settingKey = 'PAY_last_no';
 
-    // Use a transaction to ensure atomicity
-    const generateInTransaction = db.transaction(() => {
-      // Get current value from settings
-      const setting = db.prepare(`SELECT value FROM settings WHERE key = ?`).get(settingKey) as { value: string } | undefined;
+    // Sync the PAY_last_no setting with the actual max payment_no by numeric
+    // comparison (not string comparison). String MAX on PAY1000 vs PAY999
+    // would return PAY999 because '9' > '1' at position 3, so we must
+    // extract the numeric portion and use MAX on INTEGER.
+    const maxResult = db.prepare(
+      `SELECT MAX(CAST(SUBSTR(payment_no, 4) AS INTEGER)) as max_val FROM payments WHERE payment_no LIKE 'PAY%'`
+    ).get() as { max_val: number | null } | undefined;
 
-      let nextNo: number;
-      if (!setting) {
-        // Setting doesn't exist - find the last payment number from the payments table
-        const lastPayment = db.prepare(`
-          SELECT payment_no FROM payments 
-          WHERE payment_no LIKE 'PAY%' 
-          ORDER BY payment_no DESC 
-          LIMIT 1
-        `).get() as { payment_no: string } | undefined;
-
-        if (lastPayment) {
-          // Extract the number from the last payment (e.g., 'PAY030' -> 30)
-          const lastNoMatch = lastPayment.payment_no.match(/PAY(\d+)/);
-          if (lastNoMatch) {
-            nextNo = parseInt(lastNoMatch[1], 10) + 1;
-          } else {
-            nextNo = 1;
-          }
-        } else {
-          // No payments exist at all
-          nextNo = 1;
-        }
-
-        // Initialize the setting with the correct value
+    const maxNo = maxResult?.max_val ?? 0;
+    if (maxNo > 0) {
+        // Atomically bump setting to at least maxNo so next number is fresh
         db.prepare(`
           INSERT INTO settings (key, value, updated_at)
-          VALUES (?, ?, CURRENT_TIMESTAMP)
-        `).run(settingKey, nextNo.toString());
-      } else {
-        nextNo = parseInt(setting.value, 10);
-        // Handle case where value might be invalid (NaN)
-        if (isNaN(nextNo) || nextNo < 1) {
-          nextNo = 1;
-        } else {
-          nextNo = nextNo + 1;
-        }
-        // Update the counter
-        db.prepare(`
-          UPDATE settings SET value = ?, updated_at = CURRENT_TIMESTAMP
-          WHERE key = ?
-        `).run(nextNo.toString(), settingKey);
-      }
+          VALUES (?, CAST(? AS TEXT), CURRENT_TIMESTAMP)
+          ON CONFLICT(key) DO UPDATE SET
+            value = CAST(MAX(CAST(settings.value AS INTEGER), ?) AS TEXT),
+            updated_at = CURRENT_TIMESTAMP
+        `).run(settingKey, maxNo.toString(), maxNo.toString());
+    }
 
-      return `PAY${String(nextNo).padStart(3, '0')}`;
-    });
-
-    return generateInTransaction();
+    // Atomically increment and get the next sequence number
+    const nextNo = getNextSequenceNumber(db, settingKey);
+    return `PAY${String(nextNo).padStart(3, '0')}`;
   }
 
   /**

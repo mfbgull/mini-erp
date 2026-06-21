@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getQueryParam } from '../utils/queryUtils';
 import Database from 'better-sqlite3';
 import ItemModel from '../models/Item';
 import WarehouseModel from '../models/Warehouse';
@@ -374,7 +375,7 @@ function getStockSummary(req: Request, res: Response): void {
 function getItemLedger(req: Request, res: Response): void {
   try {
     const itemId = Number(req.params.itemId);
-    const warehouseIdParam = Array.isArray(req.query.warehouse_id) ? req.query.warehouse_id[0] : req.query.warehouse_id;
+    const warehouseIdParam = getQueryParam(req.query.warehouse_id);
     const warehouseId = warehouseIdParam ? Number(warehouseIdParam) : null;
 
     const ledger = StockMovementModel.getItemLedger(itemId, warehouseId, db);

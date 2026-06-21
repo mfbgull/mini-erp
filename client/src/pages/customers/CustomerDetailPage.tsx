@@ -17,7 +17,7 @@
  * component. These are the only 'any' usages in this file.
  */
 
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { useQueryClient } from '@tanstack/react-query';
@@ -102,6 +102,14 @@ export default function CustomerDetailPage() {
   const deleteInvoiceMutation = useDeleteInvoice(id);
   const cancelInvoiceMutation = useCancelInvoice(id);
   const deletePaymentMutation = useDeletePayment(id);
+
+  // Extracted returned invoice numbers for totals filtering
+  const returnedInvoiceNos = useMemo(() => {
+    const returned = invoices
+      .filter((inv) => inv.status === 'Returned')
+      .map((inv) => inv.invoice_no);
+    return returned.length > 0 ? new Set(returned) : undefined;
+  }, [invoices]);
 
   // Memoized metrics
   const metrics = computeCustomerMetrics(invoices, ledger, customer);
@@ -260,6 +268,7 @@ export default function CustomerDetailPage() {
                 <CompactLedgerCardView
                   ledger={ledger}
                   formatCurrency={formatCurrency}
+                  returnedInvoiceNos={returnedInvoiceNos}
                   onView={(entry) => {
                     if (entry.reference_no) {
                       navigate(`/sales/invoice/${entry.reference_no}`);
@@ -274,6 +283,7 @@ export default function CustomerDetailPage() {
                   loading={ledgerLoading}
                   customerName={customer?.customer_name}
                   formatCurrency={formatCurrency}
+                  invoices={invoices}
                 />
               </Suspense>
             )

@@ -979,6 +979,68 @@
   color: #7c3aed;
 }
 
+/* Ledger Group Styles - Desktop (AG-Grid) */
+.ledger-group-header {
+  background: var(--neutral-50, #f8fafc) !important;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color, #e2e8f0);
+}
+
+.ledger-group-header:hover {
+  background: var(--neutral-100, #f1f5f9) !important;
+}
+
+.ledger-child-row {
+  background: transparent !important;
+}
+
+.ledger-child-row td:first-child {
+  padding-left: 2rem !important;
+}
+
+/* Ledger Group Styles - Mobile */
+.ledger-group-mobile {
+  margin-bottom: 0.5rem;
+}
+
+.ledger-group-header-card {
+  border-left: 3px solid var(--primary, #3b82f6) !important;
+  background: var(--neutral-50, #f8fafc);
+}
+
+.ledger-group-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.ledger-group-children {
+  margin-left: 1rem;
+  border-left: 2px solid var(--border-color, #e2e8f0);
+  padding-left: 0.5rem;
+}
+
+.ledger-child-wrapper {
+  opacity: 0.9;
+}
+
+.ledger-balance-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+}
+
+.ledger-balance-badge.outstanding {
+  background: var(--error-bg, #fee2e2);
+  color: #991b1b;
+}
+
+.ledger-balance-badge.paid {
+  background: var(--success-bg, #dcfce7);
+  color: #166534;
+}
+
 @media (max-width: 640px) {
   .ledger-toolbar {
     flex-direction: column;

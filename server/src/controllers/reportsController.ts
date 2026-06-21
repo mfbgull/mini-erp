@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
+import { getQueryParam } from '../utils/queryUtils';
 import db from '../config/database';
 import logger from '../utils/logger';
 import ReportsModel from '../models/Reports';
 
 function getARAgingReport(req: Request, res: Response): void {
   try {
-    const asOfDate = (Array.isArray(req.query.asOfDate) ? req.query.asOfDate[0] : req.query.asOfDate) || new Date().toISOString().split('T')[0];
+    const asOfDate = (getQueryParam(req.query.asOfDate)) || new Date().toISOString().split('T')[0];
     res.json({ success: true, data: ReportsModel.getARAgingReport(asOfDate as string, db) });
   } catch (error) {
     logger.error('Error fetching AR aging report:', error);
@@ -16,10 +17,10 @@ function getARAgingReport(req: Request, res: Response): void {
 function getCustomerStatements(req: Request, res: Response): void {
   try {
     const customerId = String(req.query.customerId || '');
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || '');
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || '');
     const statements = ReportsModel.getCustomerStatements(
       db,
       parseInt(customerId, 10) || 0,
@@ -36,7 +37,7 @@ function getCustomerStatements(req: Request, res: Response): void {
 function getTopDebtors(req: Request, res: Response): void {
   try {
     const { limit = 10 } = req.query;
-    const asOfDate = (Array.isArray(req.query.asOfDate) ? req.query.asOfDate[0] : req.query.asOfDate) as string | undefined;
+    const asOfDate = (getQueryParam(req.query.asOfDate)) as string | undefined;
     const debtors = ReportsModel.getTopDebtors(db, parseInt(limit as string, 10), asOfDate);
     res.json({ success: true, data: debtors });
   } catch (error) {
@@ -47,8 +48,8 @@ function getTopDebtors(req: Request, res: Response): void {
 
 function getDSOMetric(req: Request, res: Response): void {
   try {
-    const fromDate = String((Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const toDate = String((Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const fromDate = String((getQueryParam(req.query.fromDate)) || '');
+    const toDate = String((getQueryParam(req.query.toDate)) || '');
     if (!fromDate || !toDate) {
       const defaultEnd = new Date();
       const defaultStart = new Date();
@@ -85,10 +86,10 @@ function getSalesSummary(req: Request, res: Response): void {
     _defaultStart.setMonth(_defaultStart.getMonth() - 1);
     const startDefault = _defaultStart.toISOString().split('T')[0];
     const endDefault = _defaultEnd.toISOString().split('T')[0];
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || startDefault);
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || endDefault);
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || startDefault);
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || endDefault);
     const salesData = ReportsModel.getSalesSummary(db, startDate, endDate);
     res.json({ success: true, data: salesData });
   } catch (error) {
@@ -99,10 +100,10 @@ function getSalesSummary(req: Request, res: Response): void {
 
 function getSalesByCustomer(req: Request, res: Response): void {
   try {
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || '');
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || '');
     if (!startDate || !endDate) { res.status(400).json({ success: false, error: 'startDate and endDate are required' }); return; }
     const sales = ReportsModel.getSalesByCustomer(db, startDate as string, endDate as string);
     res.json({ success: true, data: sales });
@@ -114,10 +115,10 @@ function getSalesByCustomer(req: Request, res: Response): void {
 
 function getSalesByItem(req: Request, res: Response): void {
   try {
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || '');
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || '');
     if (!startDate || !endDate) { res.status(400).json({ success: false, error: 'startDate and endDate are required' }); return; }
     const sales = ReportsModel.getSalesByItem(db, startDate as string, endDate as string);
     res.json({ success: true, data: sales });
@@ -146,10 +147,10 @@ function getStockValuationReport(req: Request, res: Response): void {
 
 function getInventoryMovementReport(req: Request, res: Response): void {
   try {
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || '');
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || '');
     const { itemId } = req.query;
     const reportData = ReportsModel.getInventoryMovementReport(db, startDate, endDate, itemId ? parseInt(itemId as string, 10) : undefined);
     res.json({ success: true, data: reportData });
@@ -158,8 +159,8 @@ function getInventoryMovementReport(req: Request, res: Response): void {
 
 function getProfitLossReport(req: Request, res: Response): void {
   try {
-    const fromDate = String((Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const toDate = String((Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const fromDate = String((getQueryParam(req.query.fromDate)) || '');
+    const toDate = String((getQueryParam(req.query.toDate)) || '');
     if (!fromDate || !toDate) { res.status(400).json({ success: false, error: 'fromDate and toDate are required' }); return; }
     res.json({ success: true, data: ReportsModel.getProfitLossReport(fromDate, toDate, db) });
   } catch (error) { logger.error('Error fetching P&L report:', error); res.status(500).json({ success: false, error: 'Failed to fetch P&L report' }); }
@@ -167,8 +168,8 @@ function getProfitLossReport(req: Request, res: Response): void {
 
 function getCashFlowReport(req: Request, res: Response): void {
   try {
-    const fromDate = String((Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const toDate = String((Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const fromDate = String((getQueryParam(req.query.fromDate)) || '');
+    const toDate = String((getQueryParam(req.query.toDate)) || '');
     if (!fromDate || !toDate) { res.status(400).json({ success: false, error: 'fromDate and toDate are required' }); return; }
     res.json({ success: true, data: ReportsModel.getCashFlow(fromDate, toDate, db) });
   } catch (error) { logger.error('Error fetching cash flow report:', error); res.status(500).json({ success: false, error: 'Failed to fetch cash flow report' }); }
@@ -176,10 +177,10 @@ function getCashFlowReport(req: Request, res: Response): void {
 
 function getPurchaseSummary(req: Request, res: Response): void {
   try {
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || '');
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || '');
     if (!startDate || !endDate) { res.status(400).json({ success: false, error: 'startDate and endDate are required' }); return; }
     res.json({ success: true, data: ReportsModel.getPurchaseSummary(startDate as string, endDate as string, db) });
   } catch (error) { logger.error('Error fetching purchase summary:', error); res.status(500).json({ success: false, error: 'Failed to fetch purchase summary' }); }
@@ -187,10 +188,10 @@ function getPurchaseSummary(req: Request, res: Response): void {
 
 function getSupplierAnalysis(req: Request, res: Response): void {
   try {
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || '');
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || '');
     if (!startDate || !endDate) { res.status(400).json({ success: false, error: 'startDate and endDate are required' }); return; }
     const analysis = ReportsModel.getSupplierAnalysis(db, startDate as string, endDate as string);
     res.json({ success: true, data: analysis });
@@ -199,10 +200,10 @@ function getSupplierAnalysis(req: Request, res: Response): void {
 
 function getProductionSummary(req: Request, res: Response): void {
   try {
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || '');
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || '');
     if (!startDate || !endDate) { res.status(400).json({ success: false, error: 'startDate and endDate are required' }); return; }
     res.json({ success: true, data: ReportsModel.getProductionEfficiency(startDate as string, endDate as string, db) });
   } catch (error) { logger.error('Error fetching production summary:', error); res.status(500).json({ success: false, error: 'Failed to fetch production summary' }); }
@@ -210,10 +211,10 @@ function getProductionSummary(req: Request, res: Response): void {
 
 function getBOMUsageReport(req: Request, res: Response): void {
   try {
-    const startDate = String((Array.isArray(req.query.startDate) ? req.query.startDate[0] : req.query.startDate) ||
-      (Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || '');
-    const endDate = String((Array.isArray(req.query.endDate) ? req.query.endDate[0] : req.query.endDate) ||
-      (Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || '');
+    const startDate = String((getQueryParam(req.query.startDate)) ||
+      (getQueryParam(req.query.fromDate)) || '');
+    const endDate = String((getQueryParam(req.query.endDate)) ||
+      (getQueryParam(req.query.toDate)) || '');
     const itemId = req.query.itemId ? parseInt(req.query.itemId as string, 10) : null;
     res.json({ success: true, data: ReportsModel.getBOMUsageReport(startDate || '2000-01-01', endDate || '2099-12-31', itemId, db) });
   } catch (error) { logger.error('Error fetching BOM usage report:', error); res.status(500).json({ success: false, error: 'Failed to fetch BOM usage report' }); }
@@ -221,9 +222,9 @@ function getBOMUsageReport(req: Request, res: Response): void {
 
 function getExpensesReport(req: Request, res: Response): void {
   try {
-    const fromDate = String((Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate) || req.query.from_date || '');
-    const toDate = String((Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate) || req.query.to_date || '');
-    const category = String((Array.isArray(req.query.category) ? req.query.category[0] : req.query.category) || '');
+    const fromDate = String((getQueryParam(req.query.fromDate)) || req.query.from_date || '');
+    const toDate = String((getQueryParam(req.query.toDate)) || req.query.to_date || '');
+    const category = String((getQueryParam(req.query.category)) || '');
     if (!fromDate || !toDate) { res.status(400).json({ success: false, error: 'fromDate and toDate are required' }); return; }
     res.json({ success: true, data: ReportsModel.getExpenseReport(fromDate, toDate, category, db) });
   } catch (error) { logger.error('Error fetching expenses report:', error); res.status(500).json({ success: false, error: 'Failed to fetch expenses report' }); }

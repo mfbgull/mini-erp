@@ -40,15 +40,12 @@ export class PaymentModel {
    * duplicate payment_no errors when data is manually inserted or restored.
    */
   static generatePaymentNo(db: Database.Database): string {
+    // Use numeric MAX (not string MAX) so PAY1000 sorts after PAY999.
+    // String comparison would make PAY999 > PAY1000, causing duplicate generation.
     const maxResult = db.prepare(
-      `SELECT MAX(payment_no) as max_val FROM payments WHERE payment_no LIKE 'PAY%'`
-    ).get() as { max_val: string | null } | undefined;
-    const maxVal = maxResult?.max_val ?? null;
-    let maxNo = 0;
-    if (maxVal) {
-      const numStr = maxVal.replace(/[^0-9]/g, '');
-      maxNo = parseInt(numStr, 10) || 0;
-    }
+      `SELECT MAX(CAST(SUBSTR(payment_no, 4) AS INTEGER)) as max_val FROM payments WHERE payment_no LIKE 'PAY%'`
+    ).get() as { max_val: number | null } | undefined;
+    const maxNo = maxResult?.max_val ?? 0;
 
     const currentSetting = db.prepare("SELECT value FROM settings WHERE key = 'PAY_last_no'").get() as { value: string } | undefined;
     const currentSeq = currentSetting ? parseInt(currentSetting.value, 10) || 0 : 0;

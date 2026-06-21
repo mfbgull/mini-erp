@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getQueryParam } from '../utils/queryUtils';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
@@ -12,14 +13,14 @@ import InvoiceModel from '../models/Invoice';
 
 function getPayments(req: Request, res: Response): void {
   try {
-    const pageParam = Array.isArray(req.query.page) ? req.query.page[0] : req.query.page;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
-    const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search;
-    const customerIdParam = Array.isArray(req.query.customerId) ? req.query.customerId[0] : req.query.customerId;
-    const fromDateParam = Array.isArray(req.query.fromDate) ? req.query.fromDate[0] : req.query.fromDate;
-    const toDateParam = Array.isArray(req.query.toDate) ? req.query.toDate[0] : req.query.toDate;
-    const sortByParam = Array.isArray(req.query.sortBy) ? req.query.sortBy[0] : req.query.sortBy;
-    const sortOrderParam = Array.isArray(req.query.sortOrder) ? req.query.sortOrder[0] : req.query.sortOrder;
+    const pageParam = getQueryParam(req.query.page);
+    const limitParam = getQueryParam(req.query.limit);
+    const searchParam = getQueryParam(req.query.search);
+    const customerIdParam = getQueryParam(req.query.customerId);
+    const fromDateParam = getQueryParam(req.query.fromDate);
+    const toDateParam = getQueryParam(req.query.toDate);
+    const sortByParam = getQueryParam(req.query.sortBy);
+    const sortOrderParam = getQueryParam(req.query.sortOrder);
 
     const filters = {
       page: parseInt(pageParam as string) || 1,

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getQueryParam } from '../utils/queryUtils';
 import ProductionModel from '../models/Production';
 import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
@@ -49,11 +50,11 @@ function recordProduction(req: AuthRequest, res: Response): void {
 
 function getProductions(req: Request, res: Response): void {
   try {
-    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
-    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
-    const outputItemIdParam = Array.isArray(req.query.output_item_id) ? req.query.output_item_id[0] : req.query.output_item_id;
-    const warehouseIdParam = Array.isArray(req.query.warehouse_id) ? req.query.warehouse_id[0] : req.query.warehouse_id;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const startDateParam = getQueryParam(req.query.start_date);
+    const endDateParam = getQueryParam(req.query.end_date);
+    const outputItemIdParam = getQueryParam(req.query.output_item_id);
+    const warehouseIdParam = getQueryParam(req.query.warehouse_id);
+    const limitParam = getQueryParam(req.query.limit);
 
     const filters = {
       start_date: startDateParam as string | undefined,

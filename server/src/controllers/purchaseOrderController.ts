@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getQueryParam } from '../utils/queryUtils';
 import { AuthRequest } from '../types';
 import PurchaseOrderModel from '../models/PurchaseOrder';
 import SupplierLedgerModel from '../models/SupplierLedger';
@@ -68,11 +69,11 @@ function createPurchaseOrder(req: AuthRequest, res: Response): void {
 
 function getPurchaseOrders(req: Request, res: Response): void {
   try {
-    const supplierIdParam = Array.isArray(req.query.supplier_id) ? req.query.supplier_id[0] : req.query.supplier_id;
-    const statusParam = Array.isArray(req.query.status) ? req.query.status[0] : req.query.status;
-    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
-    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const supplierIdParam = getQueryParam(req.query.supplier_id);
+    const statusParam = getQueryParam(req.query.status);
+    const startDateParam = getQueryParam(req.query.start_date);
+    const endDateParam = getQueryParam(req.query.end_date);
+    const limitParam = getQueryParam(req.query.limit);
 
     const filters = {
       supplier_id: supplierIdParam ? Number(supplierIdParam) : undefined,

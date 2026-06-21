@@ -471,6 +471,7 @@ export interface LedgerEntry {
   debit: number;
   credit: number;
   balance: number;
+  linked_invoice_no?: string;
 }
 
 export interface CustomerMetrics {
@@ -572,6 +573,7 @@ export interface LedgerTabProps {
   loading: boolean;
   customerName: string;
   formatCurrency: (amount: number | string) => string;
+  invoices?: Invoice[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

@@ -4,6 +4,7 @@
  */
 
 import { Request, Response } from 'express';
+import { getQueryParam } from '../utils/queryUtils';
 import activityLogModel from '../models/ActivityLog';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import { AuthRequest } from '../types';
@@ -198,12 +199,12 @@ export function getActions(req: Request, res: Response): void {
  */
 export function exportLogs(req: Request, res: Response): void {
   try {
-    const userIdParam = Array.isArray(req.query.user_id) ? req.query.user_id[0] : req.query.user_id;
-    const entityTypeParam = Array.isArray(req.query.entity_type) ? req.query.entity_type[0] : req.query.entity_type;
-    const actionParam = Array.isArray(req.query.action) ? req.query.action[0] : req.query.action;
-    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
-    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
-    const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search;
+    const userIdParam = getQueryParam(req.query.user_id);
+    const entityTypeParam = getQueryParam(req.query.entity_type);
+    const actionParam = getQueryParam(req.query.action);
+    const startDateParam = getQueryParam(req.query.start_date);
+    const endDateParam = getQueryParam(req.query.end_date);
+    const searchParam = getQueryParam(req.query.search);
 
     const user_id = userIdParam as string;
     const entity_type = entityTypeParam as string;

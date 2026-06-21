@@ -8,17 +8,43 @@ import type { Customer, Invoice, LedgerEntry, Payment, CustomerMetrics } from '.
 /**
  * Calculate the running balance from ledger entries.
  * Balance = Total Debit - Total Credit (Debit increases AR, Credit decreases AR).
+ *
+ * RETURN and REFUND entries are excluded from the totals. Additionally, entries
+ * related to fully returned invoices (INVOICE entries and their original PAYMENT
+ * entries) are excluded from the debit/credit totals so the summary shows
+ * only active, non-returned business activity. The balance is always computed
+ * from ALL entries for true AR.
  */
-export function calculateLedgerTotals(ledger: LedgerEntry[]): { debit: number; credit: number; balance: number } {
+export function calculateLedgerTotals(
+  ledger: LedgerEntry[],
+  returnedInvoiceNos?: Set<string>,
+): { debit: number; credit: number; balance: number } {
   if (!ledger || ledger.length === 0) return { debit: 0, credit: 0, balance: 0 };
 
-  const totalDebit = ledger.reduce((sum, item) => sum + (item.debit || 0), 0);
-  const totalCredit = ledger.reduce((sum, item) => sum + (item.credit || 0), 0);
+  // Exclude RETURN/REFUND entries, plus entries tied to fully returned invoices
+  const mainEntries = ledger.filter((e) => {
+    if (e.transaction_type === 'RETURN' || e.transaction_type === 'REFUND') return false;
+    if (returnedInvoiceNos && returnedInvoiceNos.size > 0) {
+      // Exclude INVOICE entries for returned invoices
+      if (e.transaction_type === 'INVOICE' && returnedInvoiceNos.has(e.reference_no)) return false;
+      // Exclude PAYMENT entries linked to returned invoices
+      if (e.linked_invoice_no && returnedInvoiceNos.has(e.linked_invoice_no)) return false;
+    }
+    return true;
+  });
+
+  const totalDebit = mainEntries.reduce((sum, item) => sum + (item.debit || 0), 0);
+  const totalCredit = mainEntries.reduce((sum, item) => sum + (item.credit || 0), 0);
+
+  // Balance from ALL entries (including returns & returned invoices)
+  // so true AR is reflected regardless of sort order.
+  const allDebit = ledger.reduce((sum, item) => sum + (item.debit || 0), 0);
+  const allCredit = ledger.reduce((sum, item) => sum + (item.credit || 0), 0);
 
   return {
     debit: totalDebit,
     credit: totalCredit,
-    balance: totalDebit - totalCredit,
+    balance: allDebit - allCredit,
   };
 }
 
@@ -127,7 +153,12 @@ export function computeCustomerMetrics(
   ledger: LedgerEntry[],
   customer: Customer | undefined,
 ): CustomerMetrics {
-  const totals = calculateLedgerTotals(ledger);
+  const returnedInvoiceNos = new Set(
+    invoices
+      .filter((inv) => inv.status === 'Returned')
+      .map((inv) => inv.invoice_no)
+  );
+  const totals = calculateLedgerTotals(ledger, returnedInvoiceNos);
   const totalInvoiced = calculateTotalInvoiced(invoices);
   const totalPaid = calculateTotalPaid(invoices);
   const overdue = calculateOverdueInvoices(invoices);

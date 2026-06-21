@@ -1,22 +1,15 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
 import { format } from 'date-fns';
-import { MoreVertical, Eye, X, FileText, CreditCard, Scale, BarChart3, TrendingDown, TrendingUp, ClipboardList, Search } from 'lucide-react';
+import { MoreVertical, Eye, X, FileText, CreditCard, Scale, BarChart3, TrendingDown, TrendingUp, ClipboardList, Search, ChevronDown, ChevronRight } from 'lucide-react';
 
 import Card from './Card';
+import { groupLedgerByInvoice } from '../../utils/ledgerGrouping';
+import type { InvoiceGroup, LedgerGroupNode } from '../../utils/ledgerGrouping';
+import type { LedgerEntry } from '../../types';
+import { calculateLedgerTotals } from '../../utils/customerCalculations';
 import '../../styles/components/card.css';
 import './CompactLedgerCard.css';
-
-interface LedgerEntry {
-  id: number;
-  transaction_date: string;
-  transaction_type: string;
-  reference_no?: string;
-  description?: string;
-  debit: number;
-  credit: number;
-  balance: number;
-}
 
 interface CompactLedgerCardProps {
   entry: LedgerEntry;
@@ -186,34 +179,41 @@ export function CompactLedgerCard({ entry, onView, formatCurrency }: CompactLedg
 export default function CompactLedgerCardView({
   ledger,
   onView,
-  formatCurrency
+  formatCurrency,
+  returnedInvoiceNos
 }: {
   ledger: LedgerEntry[],
   onView?: (entry: LedgerEntry) => void,
-  formatCurrency: (amount: number | string) => string
+  formatCurrency: (amount: number | string) => string,
+  returnedInvoiceNos?: Set<string>
 }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
-  const filteredLedger = ledger.filter(entry =>
-    entry.transaction_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    entry.reference_no?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    entry.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const totals = useMemo(() => calculateLedgerTotals(ledger, returnedInvoiceNos), [ledger, returnedInvoiceNos]);
 
-  const totalDebit = ledger.reduce((sum, item) => sum + parseFloat(String(item.debit || 0)), 0);
-  const totalCredit = ledger.reduce((sum, item) => sum + parseFloat(String(item.credit || 0)), 0);
-  const currentBalance = totalDebit - totalCredit;
+  const filteredLedger = useMemo(() => {
+    if (!searchTerm) return ledger;
+    const term = searchTerm.toLowerCase();
+    return ledger.filter(entry =>
+      entry.transaction_type?.toLowerCase().includes(term) ||
+      entry.reference_no?.toLowerCase().includes(term) ||
+      entry.description?.toLowerCase().includes(term)
+    );
+  }, [ledger, searchTerm]);
 
-  const ledgerWithBalance = filteredLedger.reduce((acc, entry) => {
-    const entryDebit = parseFloat(String(entry.debit || 0));
-    const entryCredit = parseFloat(String(entry.credit || 0));
-    const previousBalance = acc.length > 0 ? acc[acc.length - 1].calculatedBalance : 0;
-    const calculatedBalance = previousBalance + entryDebit - entryCredit;
-    acc.push({ ...entry, calculatedBalance });
-    return acc;
-  }, [] as Array<typeof ledger[0] & { calculatedBalance: number }>);
+  const groupedNodes = useMemo(() => groupLedgerByInvoice(filteredLedger), [filteredLedger]);
 
-  if (ledgerWithBalance.length === 0) {
+  const toggleGroup = useCallback((gid: string) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(gid)) next.delete(gid);
+      else next.add(gid);
+      return next;
+    });
+  }, []);
+
+  if (groupedNodes.length === 0) {
     return (
       <div className="compact-mobile-cards-wrapper">
         <div className="compact-mobile-search-container">
@@ -252,30 +252,96 @@ export default function CompactLedgerCardView({
         <div className="totals-grid">
           <div className="total-item">
             <span className="total-label">Total Debit</span>
-            <span className="total-value debit">{formatCurrency(totalDebit)}</span>
+            <span className="total-value debit">{formatCurrency(totals.debit)}</span>
           </div>
           <div className="total-item">
             <span className="total-label">Total Credit</span>
-            <span className="total-value credit">{formatCurrency(totalCredit)}</span>
+            <span className="total-value credit">{formatCurrency(totals.credit)}</span>
           </div>
           <div className="total-item">
             <span className="total-label">Current Balance</span>
-            <span className={`total-value balance ${currentBalance > 0 ? 'positive' : 'zero'}`}>
-              {formatCurrency(currentBalance)}
+            <span className={`total-value balance ${totals.balance > 0 ? 'positive' : 'zero'}`}>
+              {formatCurrency(totals.balance)}
             </span>
           </div>
         </div>
       </div>
 
       <div className="compact-mobile-cards-container">
-        {ledgerWithBalance.map((entry) => (
-          <CompactLedgerCard
-            key={entry.id}
-            entry={{ ...entry, balance: entry.calculatedBalance || entry.balance }}
-            onView={onView}
-            formatCurrency={formatCurrency}
-          />
-        ))}
+        {groupedNodes.map((node) => {
+          if (node.type === 'ungrouped') {
+            return (
+              <CompactLedgerCard
+                key={`u-${node.entry.id}`}
+                entry={node.entry}
+                onView={onView}
+                formatCurrency={formatCurrency}
+              />
+            );
+          }
+
+          const group = node as InvoiceGroup;
+          const gid = `g-${group.invoice.reference_no}`;
+          const isExpanded = expandedGroups.has(gid);
+
+          return (
+            <div key={gid} className="ledger-group-mobile">
+              <Card
+                variant="compact"
+                hoverable
+                className="ledger-group-header-card"
+                onClick={() => toggleGroup(gid)}
+              >
+                <Card.Row justify="space-between" align="center" className="card-content-clickable">
+                  <div className="ledger-info-section">
+                    <div className="ledger-group-header-row">
+                      {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      <p className="ledger-item-name">{group.invoice.reference_no}</p>
+                    </div>
+                    <div className="ledger-meta">
+                      <span className="ledger-item-code">
+                        {group.children.length} payment{group.children.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="ledger-amount-row">
+                    <div className="quantity-display">
+                      <span className="qty-text qty-low">
+                        {formatCurrency(group.invoice.debit || 0)}
+                      </span>
+                    </div>
+                  </div>
+                </Card.Row>
+                <div className="ledger-card-info-row">
+                  <span className="ledger-type-text">
+                    <FileText size={14} />
+                    INVOICE
+                  </span>
+                  <span className="ledger-date-text">
+                    {group.invoice.transaction_date ? format(new Date(group.invoice.transaction_date), 'dd MMM') : ''}
+                  </span>
+                  <span className={`ledger-balance-badge ${group.balance > 0 ? 'outstanding' : 'paid'}`}>
+                    Bal: {formatCurrency(group.balance)}
+                  </span>
+                </div>
+              </Card>
+
+              {isExpanded && (
+                <div className="ledger-group-children">
+                  {group.children.map((child) => (
+                    <div key={child.id} className="ledger-child-wrapper">
+                      <CompactLedgerCard
+                        entry={child}
+                        onView={onView}
+                        formatCurrency={formatCurrency}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

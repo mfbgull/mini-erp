@@ -82,7 +82,11 @@ const MiniERPGrid = forwardRef<AgGridReact, MiniERPGridProps>((props, ref) => {
   } = props;
 
   // Resolve auto-size strategy
-  const autoSizeStrategy = autoSize === false
+  // AG Grid: colDef.flex and autoSizeStrategy are mutually exclusive.
+  // If any column uses flex, skip autoSizeStrategy.
+  const hasFlexColumns = columnDefs?.some((col) => (col as any).flex != null);
+  const shouldAutoSize = autoSize !== false && !hasFlexColumns;
+  const autoSizeStrategy = !shouldAutoSize
     ? undefined
     : typeof autoSize === 'object'
       ? autoSize

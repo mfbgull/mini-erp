@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getQueryParam } from '../utils/queryUtils';
 import { AuthRequest } from '../types';
 import Purchase from '../models/Purchase';
 import AccountingService from '../services/accountingService';
@@ -46,12 +47,12 @@ function recordPurchase(req: AuthRequest, res: Response): void {
 
 function getPurchases(req: Request, res: Response): void {
   try {
-    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
-    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
-    const itemIdParam = Array.isArray(req.query.item_id) ? req.query.item_id[0] : req.query.item_id;
-    const warehouseIdParam = Array.isArray(req.query.warehouse_id) ? req.query.warehouse_id[0] : req.query.warehouse_id;
-    const supplierNameParam = Array.isArray(req.query.supplier_name) ? req.query.supplier_name[0] : req.query.supplier_name;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const startDateParam = getQueryParam(req.query.start_date);
+    const endDateParam = getQueryParam(req.query.end_date);
+    const itemIdParam = getQueryParam(req.query.item_id);
+    const warehouseIdParam = getQueryParam(req.query.warehouse_id);
+    const supplierNameParam = getQueryParam(req.query.supplier_name);
+    const limitParam = getQueryParam(req.query.limit);
 
     const filters = {
       start_date: startDateParam as string | undefined,
@@ -125,10 +126,10 @@ function getPurchaseSummaryByDateRange(req: Request, res: Response): void {
 
 function getReturnHistory(req: Request, res: Response): void {
   try {
-    const startDateParam = Array.isArray(req.query.start_date) ? req.query.start_date[0] : req.query.start_date;
-    const endDateParam = Array.isArray(req.query.end_date) ? req.query.end_date[0] : req.query.end_date;
-    const itemIdParam = Array.isArray(req.query.item_id) ? req.query.item_id[0] : req.query.item_id;
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const startDateParam = getQueryParam(req.query.start_date);
+    const endDateParam = getQueryParam(req.query.end_date);
+    const itemIdParam = getQueryParam(req.query.item_id);
+    const limitParam = getQueryParam(req.query.limit);
 
     const filters = {
       start_date: startDateParam as string | undefined,
@@ -147,7 +148,7 @@ function getReturnHistory(req: Request, res: Response): void {
 
 function getTopSuppliers(req: Request, res: Response): void {
   try {
-    const limitParam = Array.isArray(req.query.limit) ? req.query.limit[0] : req.query.limit;
+    const limitParam = getQueryParam(req.query.limit);
     const limit = limitParam ? parseInt(String(limitParam)) : 10;
     const suppliers = Purchase.getTopSuppliers(limit, db);
 
