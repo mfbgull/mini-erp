@@ -1,82 +1,266 @@
-# Plan: Return Disposition Options for Invoice Returns
+# Return-Time Deduction (Restocking Fee) for Partially Paid Invoices
 
 ## Context
 
-When a return is processed on a fully paid invoice (e.g., INV-2026-593336: $2,000 paid, then $1,000 return), the current system simply creates a ledger credit and adjusts the invoice balance, leaving the balance negative (-$1,000). There is no user-facing choice about what to do with the returned amount.
+When a customer returns an item from a **partially paid** invoice, the shop owner needs to apply a **deduction** (restocking fee) — either a percentage or flat amount — before crediting the customer. The deduction stays with the shop as income; the customer's balance decreases only by the **net** amount.
 
-This plan adds three disposition options at return time:
-1. **Refund to customer** — create a cash refund (negative payment) for the returned amount
-2. **Keep as customer credit** — add the amount as a credit on the customer's account for future invoices
-3. **Adjust against unpaid invoices** — apply the credit to outstanding unpaid/partially-paid invoices for the same customer
+### Design Decisions (confirmed)
 
-## Approach
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Balance change | Decreases by **NET** (gross − deduction) | Customer owes the deducted portion because the shop keeps it as fee |
+| Deduction nature | **Restocking fee income** (separate GL account 4150) | Explicit tracking in financial reports |
+| Disposition for partial invoices | **Auto credit note** (reduce balance, no store credit / cash) | Simplest — the customer owes less, no money moves |
 
-The return flow will be extended to:
-1. **Backend**: Add a `disposition` field to the return API payload with one of `refund`, `credit`, or `adjust`. Depending on the choice, the backend will:
-   - **refund**: Create a refund payment (a payment with negative amount or a new `REFUND` payment type), a ledger entry (credit), and an accounting entry (Dr AR / Cr Cash). Void or reduce the original payment allocation by the returned amount.
-   - **credit**: Update the customer's `current_balance` as a positive credit (reducing what they owe or creating a credit balance). Add a ledger entry.
-   - **adjust**: Find unpaid/partially-paid invoices for the customer and apply the credit as a payment allocation across them. Create payment allocations, update invoice balances, create ledger entries and accounting entries.
+---
 
-2. **Frontend**: Add a radio/option selector in the return modal asking how to handle the return amount. Conditionally show relevant sub-forms (e.g., invoice selection for "adjust").
+## How It Works — Example
+
+- Invoice total: $5,000 · Paid: $2,000 · Balance: $3,000
+- Item returned: $1,000 · Deduction: 10% ($100) · Net: $900
+
+| After return | Value |
+|---|---|
+| `returned_amount` (gross cumulative) | $1,000 |
+| `return_fee` (cumulative deductions) | $100 |
+| `balance_amount = total - paid - returned + return_fee` | $2,100 (was $3,000, down $900 ✓) |
+| GL: Cr AR $900, Dr Sales Returns $1,000, Cr Restocking Fee Income $100 | ✓ |
+| Status | `Partially Returned` |
+
+`returned_amount` stores **gross** so the status logic (`returned >= total → Returned`) works correctly when all items are returned even with a deduction.
+
+---
 
 ## Files to Modify
 
-| File | What Changes |
-|---|---|
-| `server/src/controllers/invoiceController.ts` | Extend `returnInvoiceItems` to accept `disposition` and branch logic |
-| `server/src/models/Invoice.ts` | Add helper methods for refund, credit, and adjust operations |
-| `server/src/models/Payment.ts` | Add `createRefundPayment` method |
-| `server/src/services/accountingService.ts` | Add `postRefundEntry` for refund GL posting |
-| `server/src/utils/ledgerUtils.ts` | May need minor updates for credit/adjust flows |
-| `client/src/pages/sales/InvoiceReturn.tsx` | Add disposition option UI |
-| `client/src/pages/sales/InvoiceReturn.css` | Style the new disposition options |
-| `client/src/pages/sales/InvoiceViewPage.jsx` | Pass disposition data through to API call |
-| `server/src/routes/invoices.ts` | No change needed (payload field is optional) |
+### Database
+| File | Change |
+|------|--------|
+| `server/src/migrations/add-gl-foundation.sql` | Add `'4150'` account (Restocking Fee Income) via `INSERT OR IGNORE` |
+| `server/src/config/database.ts` | Add idempotent `ALTER TABLE invoices ADD COLUMN return_fee` in `runGLFoundationMigration()` |
 
-## Reuse
+### Backend
+| File | Change |
+|------|--------|
+| `server/src/controllers/invoiceController.ts` | Parse deduction from request, split return into gross/net, update `returned_amount` + `return_fee`, modify GL/customer ledger calls |
+| `server/src/services/accountingService.ts` | Extend `postInvoiceReturnEntry` to accept deduction and add a `Restocking Fee Income` credit line |
+| `server/src/utils/ledgerUtils.ts` | Update `calculateInvoiceBalance()` to include `return_fee` |
 
-- `server/src/controllers/invoiceController.ts:returnInvoiceItems` — existing return logic (stock reversal, ledger entries, COGS reversal) stays; we add disposition handling after it.
-- `server/src/models/Payment.ts:create` — can be adapted for refunds.
-- `server/src/services/accountingService.ts:postPaymentEntry` — pattern for posting refund GL entry.
-- `server/src/utils/ledgerUtils.ts:createLedgerEntry` — reused for credit/adjust ledger entries.
-- `server/src/models/Invoice.ts:getByStatus` — to find unpaid invoices for the "adjust" option.
-- `server/src/models/Payment.ts:getTotalPaidByInvoiceId` — for recalculating balances.
-- `client/src/pages/sales/InvoiceReturn.tsx` — existing return quantity UI; new disposition UI section added.
+### Frontend
+| File | Change |
+|------|--------|
+| `client/src/pages/sales/InvoiceReturn.tsx` | Add deduction input (type + value), show net in summary, include in payload |
+| `client/src/pages/sales/SalesPage.tsx` | Update the `onSubmit` handler to pass deduction to the API |
 
-## Steps
+### Types
+| File | Change |
+|------|--------|
+| `client/src/types/index.ts` (or relevant) | Add `deduction_type` / `deduction_value` to the return payload type |
 
-- [x] **1. Add `customers` table migration for `credit_balance` field** — Added migration file and migration function in database.ts. ✅
-- [x] **2. Backend: Extend `returnInvoiceItems` controller** — Accepts `disposition` and `adjust_invoice_ids` from request body. ✅
-- [x] **3. Backend: Implement refund disposition** — Creates negative payment record (PAY012 with -1000), refund allocation, ledger entry, and GL entry via `postRefundEntry`. ✅
-- [x] **4. Backend: Implement credit disposition** — Adds returned amount to customer's `credit_balance` column on customers table. ✅
-- [x] **5. Backend: Implement adjust disposition** — Applies credit to selected unpaid invoices, creates payment allocations, updates invoice balances/statuses, creates ledger entries. Leftover credit added to `credit_balance`. ✅
-- [x] **6. Frontend: Add disposition selector UI** in `InvoiceReturn.tsx` — Three radio options (Refund/Credit/Adjust). Invoice selection list (checkboxes) shown when "adjust" is selected. ✅
-- [x] **7. Frontend: Update API call** in `InvoiceViewPage.jsx` — Passes `disposition` and `adjust_invoice_ids` to the return endpoint. ✅
-- [x] **8. Frontend: Style the new UI** in `InvoiceReturn.css` — Added styles for disposition options, invoice picker, summaries. ✅
-- [x] **9. Test end-to-end** — All three dispositions tested and verified:
-  - **CREDIT**: credit_balance incremented, ledger entries created ✅
-  - **REFUND**: Refund payment (negative amount) created, payment allocation created, ledger entry created ✅
-  - **ADJUST**: Target unpaid invoice balance reduced to $0, payment allocation created, ledger entries created ✅
+---
+
+## Implementation Steps
+
+### 1. Database — Add Restocking Fee Account
+
+**`server/src/migrations/add-gl-foundation.sql`** — Append one line to the `INSERT OR IGNORE INTO chart_of_accounts` seed:
+
+```sql
+('4150', 'Restocking Fee Income', 'revenue', 'credit', 'restocking_fee_income', 'Fees charged on returned items'),
+```
+
+Also add a new `ALTER TABLE` in **`server/src/config/database.ts`** inside `runGLFoundationMigration()`:
+
+```sql
+ALTER TABLE invoices ADD COLUMN return_fee DECIMAL(15,2) NOT NULL DEFAULT 0
+```
+
+Idempotent — check `pragma_table_info` first (same pattern as existing `returned_amount` column).
+
+### 2. Backend — Parse Deduction in Controller
+
+**`server/src/controllers/invoiceController.ts`** — `returnInvoiceItems()`:
+
+- **Parse** new fields from `req.body`:
+  ```ts
+  const deductionType = body.deduction_type;  // 'percentage' | 'flat' | undefined
+  const deductionValue = Number(body.deduction_value) || 0;
+  ```
+
+- **Compute deduction** after the existing `returnAmount` (gross) calculation:
+  ```ts
+  let deduction = 0;
+  if (deductionValue > 0) {
+    if (deductionType === 'percentage') {
+      deduction = returnAmount * (deductionValue / 100);
+    } else { // flat
+      deduction = Math.min(deductionValue, returnAmount); // cap at gross
+    }
+  }
+  const netReturn = returnAmount - deduction;
+  ```
+
+- **Update `returned_amount`** with **gross**:
+  ```ts
+  db.prepare(`UPDATE invoices SET returned_amount = returned_amount + ?, return_fee = return_fee + ? WHERE id = ?`)
+    .run(returnAmount.toFixed(2), deduction.toFixed(2), invoiceId);
+  ```
+
+- **Modify the over-return guard** to check against remaining gross (`total_amount - currentReturned`):
+  ```ts
+  const remainingReturnable = Number(invoice.total_amount) - currentReturned;
+  if (returnAmount > remainingReturnable) {
+    throw new Error(`Cannot return more than invoice total...`);
+  }
+  ```
+
+- **Modify `postInvoiceReturnEntry` call** — pass `grossReturn`, `netReturn`, and `deduction`.
+
+- **Modify the credit disposition** — for partial invoices (balance > 0), **don't add to `credit_balance`**. Just let the balance reduction via `returned_amount` do the work. Keep the RETURN ledger entry but for `netReturn`:
+  ```ts
+  if (resolvedDisposition === 'credit' && invoice.balance_amount > 0) {
+    // Credit note: reduce balance, no store credit. Only for partial invoices.
+    createLedgerEntry(invoice.customer_id, 'RETURN', invoice.invoice_no, 0, netReturn,
+      `Return on ${invoice.invoice_no} (net after $${deduction.toFixed(2)} deduction)`);
+    // Do NOT update credit_balance — just reducing what customer owes on this invoice
+  }
+  ```
+
+  Wait — the current "credit" disposition logic runs for ALL invoices where balance > 0. But the user wants "auto reduce balance" for partial invoices. The existing `returned_amount` + `calculateInvoiceBalance()` already reduces the balance. The `credit_balance` update is a separate thing that gives the customer store credit. For partial invoices, we should skip it.
+
+  However, there's a subtlety: what if the customer has overpaid? After the return (gross - fee), the balance might go negative. In that case, we'd want a refund, not just a balance reduction. But the user chose "auto: reduce balance" for simplicity. I'll implement it as: for partial invoices, the return just reduces the balance. If it goes negative, `calculateInvoiceBalance` will handle it and status will reflect it.
+
+  Actually, let me keep it even simpler: don't modify the credit disposition behavior for now. The current code adds to `credit_balance`. The user wants to reduce balance. But `returned_amount` already does that. The `credit_balance` is extra. The balance change via `returned_amount` is what matters, and `credit_balance` is just additional store credit.
+
+  Hmm, but the user chose "auto: reduce balance (credit note)" — this means they DON'T want store credit. So I should modify the credit disposition to NOT update `credit_balance` when the deduction feature is used, or better, when it's a partial invoice scenario.
+
+  Actually, I think the cleanest approach: since the user specifically chose "Auto: reduce balance (credit note)" for the disposition, I'll modify the "credit" disposition to be a pure balance reduction (credit note) when the invoice is partially paid (balance > 0), without adding to `credit_balance`. The RETURN ledger entry still records the credit.
+
+### 3. Backend — Modify GL Entry
+
+**`server/src/services/accountingService.ts`** — `postInvoiceReturnEntry()`:
+
+Add a new parameter `deduction` to the args and add a line for Restocking Fee Income:
+
+```ts
+static postInvoiceReturnEntry(db, args: {
+  invoiceId: number; invoiceNo: string;
+  grossReturn: number;     // was returnAmount — the gross returned value
+  netReturn: number;       // new — the net amount customer gets credit for
+  deduction: number;       // new — the restocking fee
+  invoiceDate: string; userId?: number; taxAmount?: number;
+}): PostedEntry | null {
+  if (!args.grossReturn || args.grossReturn <= 0) return null;
+
+  const ar = AccountingService.getAccountByCode(db, '1100');
+  const salesReturns = AccountingService.getAccountByCode(db, '4100');
+  let restockingFeeAcct: Account | undefined;
+
+  if (args.deduction > 0) {
+    restockingFeeAcct = AccountingService.getAccountByCode(db, '4150');
+  }
+
+  // journal_entry_id...
+  const lines: Array<{ account_id: number; debit: number; credit: number; description: string }> = [];
+
+  // Credit AR by netReturn (what customer's receivable is actually reduced by)
+  lines.push({
+    account_id: ar.id,
+    debit: 0,
+    credit: args.netReturn,
+    description: `Return on invoice ${args.invoiceNo}`
+  });
+
+  // Debit Sales Returns by grossReturn (full reversal of revenue)
+  lines.push({
+    account_id: salesReturns.id,
+    debit: args.grossReturn,
+    credit: 0,
+    description: `Return on invoice ${args.invoiceNo}`
+  });
+
+  // Credit Restocking Fee Income (the deduction the shop keeps)
+  if (restockingFeeAcct && args.deduction > 0) {
+    lines.push({
+      account_id: restockingFeeAcct.id,
+      debit: 0,
+      credit: args.deduction,
+      description: `Restocking fee on return — invoice ${args.invoiceNo}`
+    });
+  }
+
+  // Handle tax...
+  // Post the journal entry with these lines
+}
+```
+
+### 4. Backend — Fix Balance Calculation
+
+**`server/src/utils/ledgerUtils.ts`** — `calculateInvoiceBalance()`:
+
+```ts
+const returnedAmount = parseCurrency(invoice.returned_amount || 0);
+const returnFee = parseCurrency(invoice.return_fee || 0);
+const newBalance = subtractCurrency(
+  subtractCurrency(totalAmount, totalPaid),
+  subtractCurrency(returnedAmount, returnFee)  // gross minus fee = net reduction
+);
+// Which simplifies to:
+const newBalance = addCurrency(
+  subtractCurrency(subtractCurrency(totalAmount, totalPaid), returnedAmount),
+  returnFee
+);
+```
+
+### 5. Frontend — Add Deduction UI
+
+**`client/src/pages/sales/InvoiceReturn.tsx`**:
+
+- Add state: `deductionType` ('percentage' | 'flat'), `deductionValue`
+- Add UI inputs below the item list / in the summary section:
+
+```
+  Return Amount (gross):     $1,000.00
+  Deduction:         [▼ % | $ ] [  100  ] 
+  Net Return:                $900.00
+```
+
+- Modify `calculateReturnTotal()` to return both gross and net
+- Modify `onSubmit` payload:
+  ```ts
+  onSubmit({
+    items: [...],
+    disposition,
+    adjust_invoice_ids: [...],
+    deduction_type: deductionType,
+    deduction_value: deductionValue,
+  })
+  ```
+
+- Show the net amount to the user, not just gross
+
+### 6. Frontend — Update SalesPage onSubmit
+
+**`client/src/pages/sales/SalesPage.tsx`**: Find where the return modal's `onSubmit` sends the API request and include the new deduction fields.
+
+---
 
 ## Verification
 
-1. **Refund path**: Create an invoice, pay it in full, then process a return with disposition `refund`. Verify:
-   - A refund payment record is created (negative amount or `REFUND` type)
-   - Original payment allocation is reduced or voided
-   - Customer ledger shows the refund
-   - GL entries are balanced
-   - Invoice status updates correctly
+### Backend
+1. Create an invoice with items, record a partial payment
+2. Return an item with a deduction (try both percentage and flat)
+3. Verify:
+   - `returned_amount` increased by gross
+   - `return_fee` increased by deduction
+   - `balance_amount` decreased by net (gross - deduction)
+   - `customer_ledger` has RETURN entry for net amount
+   - `journal_lines` has 3 lines: Cr AR (net), Dr Sales Returns (gross), Cr Restocking Fee Income (fee)
+   - Invoice status is `Partially Returned`
+4. Return remaining items with deduction → status becomes `Returned`
 
-2. **Credit path**: Same setup, choose disposition `credit`. Verify:
-   - Customer `credit_balance` increases
-   - No payment record created
-   - Ledger shows the credit
-   - Invoice balance goes to $0 (not negative)
-   - Customer can use credit on a future invoice
+### Frontend
+5. Open return modal on a partially paid invoice — deduction inputs appear
+6. Enter deduction, verify summary shows gross / deduction / net correctly
+7. Submit, verify server receives the deduction fields
 
-3. **Adjust path**: Same setup, with the customer having an unpaid invoice. Choose disposition `adjust`, select the unpaid invoice. Verify:
-   - Payment allocation is created on the unpaid invoice
-   - Unpaid invoice balance decreases / status may change to Paid
-   - Returned invoice balance goes to $0
-   - Both invoices' ledger entries are correct
-   - GL entries are balanced for both invoice adjustments
