@@ -58,7 +58,7 @@ function updateCustomerBalance(customerId: number): number {
 }
 
 function calculateInvoiceBalance(invoiceId: number): number {
-  const invoice = db.prepare('SELECT total_amount, returned_amount FROM invoices WHERE id = ?').get(invoiceId) as { total_amount: number; returned_amount?: number } | undefined;
+  const invoice = db.prepare('SELECT total_amount, returned_amount, return_fee FROM invoices WHERE id = ?').get(invoiceId) as { total_amount: number; returned_amount?: number; return_fee?: number } | undefined;
 
   if (!invoice) {
     throw new Error(`Invoice ${invoiceId} not found`);
@@ -73,8 +73,11 @@ function calculateInvoiceBalance(invoiceId: number): number {
   const totalPaid = parseCurrency(paidResult?.total_paid);
   const totalAmount = parseCurrency(invoice.total_amount);
   const returnedAmount = parseCurrency(invoice.returned_amount || 0);
-  // Balance = total owed minus paid minus returned
-  const newBalance = subtractCurrency(subtractCurrency(totalAmount, totalPaid), returnedAmount);
+  const returnFee = parseCurrency(invoice.return_fee || 0);
+  // Balance = total owed minus paid minus (returned minus fee)
+  // Equivalent to: total - paid - returned + return_fee
+  const netReturnReduction = subtractCurrency(returnedAmount, returnFee);
+  const newBalance = subtractCurrency(subtractCurrency(totalAmount, totalPaid), netReturnReduction);
 
   db.prepare('UPDATE invoices SET paid_amount = ?, balance_amount = ? WHERE id = ?')
     .run(totalPaid, newBalance, invoiceId);

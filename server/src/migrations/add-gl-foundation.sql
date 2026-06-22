@@ -42,6 +42,7 @@ INSERT OR IGNORE INTO chart_of_accounts (code, name, type, normal_balance, text_
     ('3100', 'Retained Earnings',             'equity',    'credit', 'opening_retained_earnings', 'Cumulative profit/loss carried forward'),
     ('4000', 'Sales Revenue',                 'revenue',   'credit',  'sales_revenue',          'Revenue from invoices and POS'),
     ('4100', 'Sales Returns',                 'revenue',   'debit',   'sales_returns',          'Contra-revenue: returned/credited sales'),
+    ('4150', 'Restocking Fee Income',         'revenue',   'credit',   'restocking_fee_income', 'Fees charged on returned items'),
     ('5000', 'Cost of Goods Sold',            'expense',   'debit',  'cogs',                   'Cost of items sold'),
     ('6000', 'Operating Expenses',            'expense',   'debit',  'operating_expenses',     'General operating costs'),
     ('6100', 'Wages & Salaries',              'expense',   'debit',  'wages_salaries',         'Payroll'),

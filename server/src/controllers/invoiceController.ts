@@ -869,6 +869,8 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
     const rawDisposition = body.disposition;
     const rawAdjustInvoiceIds = body.adjust_invoice_ids;
     const rawReason = body.reason;
+    const rawDeductionType = body.deduction_type;      // 'percentage' | 'flat' | undefined
+    const rawDeductionValue = Number(body.deduction_value) || 0;
 
     const returnItems: Array<{ invoice_item_id: number; return_quantity: number }> = Array.isArray(rawItems) ? rawItems : [];
     const reason: string = rawReason || (returnItems.length > 0 ? (returnItems[0] as any).reason || '' : '');
@@ -985,11 +987,25 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
 
       const todayDate = new Date().toISOString().split('T')[0];
 
-      // Post GL reversal — reverse AR, reduce revenue, reverse tax
+      // Compute deduction (restocking fee) if applicable
+      const deductionType: 'percentage' | 'flat' = rawDeductionType === 'percentage' ? 'percentage' : 'flat';
+      let deduction = 0;
+      if (rawDeductionValue > 0) {
+        if (deductionType === 'percentage') {
+          deduction = returnAmount * (rawDeductionValue / 100);
+        } else {
+          deduction = Math.min(rawDeductionValue, returnAmount);
+        }
+      }
+      const netReturn = returnAmount - deduction;
+
+      // Post GL reversal — reverse AR by net, reverse revenue by gross, record fee
       AccountingService.postInvoiceReturnEntry(db, {
         invoiceId,
         invoiceNo: invoice.invoice_no,
-        returnAmount,
+        grossReturn: returnAmount,
+        netReturn,
+        deduction,
         invoiceDate: todayDate,
         userId,
         taxAmount: returnTotalTaxAmount,
@@ -1027,22 +1043,23 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         });
       }
 
-      // Update returned_amount on the invoice
+      // Update returned_amount and return_fee on the invoice
       // Guard: prevent monetary over-return (defense in depth beyond item-level check)
       const currentReturned = Number(invoice.returned_amount || 0);
+      const invoiceTotal = Number(invoice.total_amount);
       const newReturnedTotal = currentReturned + returnAmount;
-      if (newReturnedTotal > Number(invoice.total_amount)) {
+      if (newReturnedTotal > invoiceTotal && (newReturnedTotal - invoiceTotal) > 0.01) {
         throw new Error(
           `Cannot return more than the invoice total. ` +
           `Already returned: ${parseCurrency(currentReturned)}, ` +
           `this return: ${parseCurrency(returnAmount)}, ` +
-          `invoice total: ${parseCurrency(invoice.total_amount)}.`
+          `invoice total: ${parseCurrency(invoiceTotal)}.`
         );
       }
-      // Update returned_amount on the invoice (second copy kept for minimal diff)
+      // Update returned_amount (+gross) and return_fee (+deduction)
       db.prepare(
-        `UPDATE invoices SET returned_amount = returned_amount + ? WHERE id = ?`
-      ).run(returnAmount.toFixed(2), invoiceId);
+        `UPDATE invoices SET returned_amount = returned_amount + ?, return_fee = return_fee + ? WHERE id = ?`
+      ).run(returnAmount.toFixed(2), deduction.toFixed(2), invoiceId);
 
       // ==================================================================
       // DISPOSITION HANDLING
@@ -1054,14 +1071,14 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
       // below already handle the AR reduction.
 
       if (resolvedDisposition === 'refund') {
-        // Create customer ledger entry for the return (credit to reduce AR)
+        // Create customer ledger entry for the return (credit to reduce AR) — net amount
         createLedgerEntry(
           invoice.customer_id,
           'RETURN',
           invoice.invoice_no,
           0,
-          returnAmount,
-          `Return on Invoice ${invoice.invoice_no}`
+          netReturn,
+          `Return on Invoice ${invoice.invoice_no}${deduction > 0 ? ` (fee: $${deduction.toFixed(2)})` : ''}`
         );
         // ----------------------------------------------------------------
         // REFUND: Create a refund payment (negative payment record),
@@ -1070,27 +1087,27 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
 
         const refundPaymentNo = InvoiceModel.generatePaymentNoAtomic(db);
 
-        // Create a refund payment (negative amount)
+        // Create a refund payment (negative amount) — refund only the net
         const refundPaymentId = InvoiceModel.createPayment(
           db,
           refundPaymentNo,
           invoice.customer_id,
           todayDate,
-          -returnAmount,  // negative = money going out
+          -netReturn,  // negative = money going out — only net is refunded
           invoice.paid_amount > 0 ? 'Cash' : 'Cash',
           null,
-          `Refund for return on ${invoice.invoice_no}`
+          `Refund for return on ${invoice.invoice_no}${deduction > 0 ? ` (fee: $${deduction.toFixed(2)})` : ''}`
         );
 
         // Record a refund allocation (negative allocation = reduction of original payment)
-        InvoiceModel.createPaymentAllocation(db, refundPaymentId, invoiceId, -returnAmount);
+        InvoiceModel.createPaymentAllocation(db, refundPaymentId, invoiceId, -netReturn);
 
         // Ledger entry: Dr (debit) the refund payment no. to reflect cash out
         createLedgerEntry(
           invoice.customer_id,
           'REFUND',
           refundPaymentNo,
-          returnAmount,   // debit = customer owes us more (contra)
+          netReturn,   // debit = customer owes us more (contra)
           0,
           `Refund ${refundPaymentNo} for return on ${invoice.invoice_no}`
         );
@@ -1102,7 +1119,7 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         AccountingService.postRefundEntry(db, {
           refundPaymentId,
           refundPaymentNo,
-          amount: returnAmount,
+          amount: netReturn,
           refundDate: todayDate,
           paymentMethod: invoice.paid_amount > 0 ? 'Cash' : 'Cash',
           customerId: invoice.customer_id,
@@ -1112,24 +1129,24 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
 
       else if (resolvedDisposition === 'credit') {
         // ----------------------------------------------------------------
-        // CREDIT: Add the returned amount to customer's credit_balance
+        // CREDIT: Add the net returned amount to customer's credit_balance
         // ----------------------------------------------------------------
 
-        // Create customer ledger entry for the return (credit to reduce AR)
+        // Create customer ledger entry for the return (credit to reduce AR) — net amount
         createLedgerEntry(
           invoice.customer_id,
           'RETURN',
           invoice.invoice_no,
           0,
-          returnAmount,
-          `Return on Invoice ${invoice.invoice_no}`
+          netReturn,
+          `Return on Invoice ${invoice.invoice_no}${deduction > 0 ? ` (fee: $${deduction.toFixed(2)})` : ''}`
         );
 
         const currentCreditBalance = db.prepare(
           `SELECT credit_balance FROM customers WHERE id = ?`
         ).get(invoice.customer_id) as { credit_balance: number } | undefined;
 
-        const newCreditBalance = (currentCreditBalance?.credit_balance || 0) + returnAmount;
+        const newCreditBalance = (currentCreditBalance?.credit_balance || 0) + netReturn;
 
         db.prepare(
           `UPDATE customers SET credit_balance = ? WHERE id = ?`
@@ -1147,7 +1164,7 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         // The RETURN entry above serves as the audit trail for the return itself.
         // ----------------------------------------------------------------
 
-        let remainingCredit = returnAmount;
+        let remainingCredit = netReturn;
 
         // Determine which invoices to adjust
         let targetInvoiceIds = adjust_invoice_ids;
@@ -1269,6 +1286,8 @@ function returnInvoiceItems(req: AuthRequest, res: Response): Response | void {
         totalItems: processedItems.length,
         disposition: resolvedDisposition,
         returnAmount,
+        netReturn,
+        deduction,
       };
     });
 

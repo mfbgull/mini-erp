@@ -62,6 +62,8 @@ interface InvoiceReturnProps {
     items: { invoice_item_id: number; return_quantity: number; reason: string }[];
     disposition: 'refund' | 'credit' | 'adjust';
     adjust_invoice_ids?: number[];
+    deduction_type?: 'percentage' | 'flat';
+    deduction_value?: number;
   }) => void;
   loading?: boolean;
 }
@@ -76,6 +78,8 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
   const [unpaidInvoices, setUnpaidInvoices] = useState<UnpaidInvoice[]>([]);
   const [selectedAdjustInvoices, setSelectedAdjustInvoices] = useState<number[]>([]);
   const [loadingUnpaid, setLoadingUnpaid] = useState(false);
+  const [deductionType, setDeductionType] = useState<'percentage' | 'flat'>('percentage');
+  const [deductionValue, setDeductionValue] = useState(0);
 
   // Initialize state when items prop changes
   useEffect(() => {
@@ -242,7 +246,9 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
         reason
       })),
       disposition,
-      adjust_invoice_ids: disposition === 'adjust' ? selectedAdjustInvoices : undefined
+      adjust_invoice_ids: disposition === 'adjust' ? selectedAdjustInvoices : undefined,
+      deduction_type: deductionValue > 0 ? deductionType : undefined,
+      deduction_value: deductionValue > 0 ? deductionValue : undefined,
     });
   };
 
@@ -398,6 +404,13 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
               </h3>
               <p className="disposition-hint">
                 You are returning <strong>{formatCurrency(returnTotal)}</strong> worth of items.
+                {deductionValue > 0 && (
+                  <> Net after deduction: <strong className="net-amount-text">-{formatCurrency(
+                    deductionType === 'percentage'
+                      ? returnTotal * (1 - deductionValue / 100)
+                      : Math.max(0, returnTotal - deductionValue)
+                  )}</strong></>
+                )}
               </p>
 
               <div className="disposition-options">
@@ -541,6 +554,79 @@ export default function InvoiceReturn({ invoice, items, onClose, onSubmit, loadi
                   )}
                 </div>
               )}
+            </div>
+          )}
+          
+          {/* Restocking Fee / Deduction */}
+          {hasReturns && (
+            <div className="return-deduction-section">
+              <h3 className="section-title">
+                <DollarSign size={16} />
+                Restocking Fee
+              </h3>
+              <div className="deduction-controls">
+                <div className="deduction-type-toggle">
+                  <button
+                    type="button"
+                    className={`deduction-type-btn ${deductionType === 'percentage' ? 'active' : ''}`}
+                    onClick={() => setDeductionType('percentage')}
+                  >
+                    %
+                  </button>
+                  <button
+                    type="button"
+                    className={`deduction-type-btn ${deductionType === 'flat' ? 'active' : ''}`}
+                    onClick={() => setDeductionType('flat')}
+                  >
+                    $
+                  </button>
+                </div>
+                <input
+                  type="number"
+                  className="deduction-value-input"
+                  placeholder="0"
+                  min="0"
+                  max={deductionType === 'percentage' ? '100' : undefined}
+                  value={deductionValue || ''}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value) || 0;
+                    if (deductionType === 'percentage') {
+                      setDeductionValue(Math.min(val, 100));
+                    } else {
+                      setDeductionValue(Math.max(0, val));
+                    }
+                  }}
+                />
+                <span className="deduction-suffix">
+                  {deductionType === 'percentage' ? '% of return value' : 'flat fee'}
+                </span>
+              </div>
+              <div className="deduction-preview">
+                <div className="deduction-preview-row">
+                  <span>Gross Return:</span>
+                  <span>{formatCurrency(returnTotal)}</span>
+                </div>
+                {deductionValue > 0 && (
+                  <div className="deduction-preview-row deduction-fee">
+                    <span>Deduction ({deductionType === 'percentage' ? `${deductionValue}%` : formatCurrency(deductionValue)}):</span>
+                    <span className="negative">-{formatCurrency(
+                      deductionType === 'percentage'
+                        ? returnTotal * (deductionValue / 100)
+                        : Math.min(deductionValue, returnTotal)
+                    )}</span>
+                  </div>
+                )}
+                <div className="deduction-preview-row net-amount">
+                  <span>Net Return:</span>
+                  <span className="negative">-{formatCurrency(
+                    deductionValue > 0
+                      ? (deductionType === 'percentage'
+                          ? returnTotal * (1 - deductionValue / 100)
+                          : Math.max(0, returnTotal - deductionValue))
+                      : returnTotal
+                  )}</span>
+                </div>
+              </div>
             </div>
           )}
 

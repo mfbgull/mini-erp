@@ -768,3 +768,112 @@
 .summary-row.adjust-note {
   color: #15803d;
 }
+
+/* Deduction / Restocking Fee Section */
+.return-deduction-section {
+  margin-top: 16px;
+  padding: 14px;
+  background: var(--neutral-50, #f8f9fa);
+  border: 1px solid var(--neutral-200, #e9ecef);
+  border-radius: 10px;
+}
+
+.return-deduction-section .section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 10px 0;
+}
+
+.deduction-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deduction-type-toggle {
+  display: flex;
+  border: 1px solid var(--neutral-300, #ced4da);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.deduction-type-btn {
+  width: 36px;
+  height: 34px;
+  border: none;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neutral-600, #495057);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.deduction-type-btn:not(:last-child) {
+  border-right: 1px solid var(--neutral-300, #ced4da);
+}
+
+.deduction-type-btn.active {
+  background: var(--info, #3b82f6);
+  color: white;
+}
+
+.deduction-value-input {
+  width: 90px;
+  height: 34px;
+  border: 1px solid var(--neutral-300, #ced4da);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 14px;
+  text-align: center;
+  outline: none;
+}
+
+.deduction-value-input:focus {
+  border-color: var(--info, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.deduction-suffix {
+  font-size: 12px;
+  color: var(--text-secondary, #6c757d);
+}
+
+.deduction-preview {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--neutral-300, #ced4da);
+}
+
+.deduction-preview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding: 3px 0;
+  color: #1a1a1a;
+}
+
+.deduction-preview-row.deduction-fee {
+  color: var(--error, #dc2626);
+}
+
+.deduction-preview-row.net-amount {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--neutral-200, #e9ecef);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.deduction-preview-row .negative {
+  color: var(--error, #dc2626);
+}
+
+.net-amount-text {
+  color: var(--error, #dc2626);
+}

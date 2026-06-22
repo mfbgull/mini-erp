@@ -42,6 +42,8 @@ interface ReturnPayload {
   items: { invoice_item_id: number; return_quantity: number; reason: string }[];
   disposition: 'refund' | 'credit' | 'adjust';
   adjust_invoice_ids?: number[];
+  deduction_type?: 'percentage' | 'flat';
+  deduction_value?: number;
 }
 
 export default function SalesPage() {

@@ -532,11 +532,12 @@ export class AccountingService {
   }
 
   /**
-   * Post GL reversal for a sales invoice return.
+   * Post GL reversal for a sales invoice return, with optional restocking fee.
    * Reverses what postInvoiceEntry originally posted:
-   *   Cr AR (1100) — reduce receivable
-   *   Dr Sales Returns (4100) — contra-revenue, reduces revenue
-   *   Dr Tax Payable (2100) — reverse tax liability
+   *   Cr AR (1100) — reduce receivable by NET (gross - deduction)
+   *   Dr Sales Returns (4100) — full gross return (contra-revenue)
+   *   Dr Tax Payable (2100) — reverse tax liability (if any)
+   *   Cr Restocking Fee Income (4150) — fee the shop keeps (if deduction > 0)
    *
    * Returns the posted entry's journal_entry_id, or null if total is zero.
    */
@@ -545,13 +546,15 @@ export class AccountingService {
     args: {
       invoiceId: number;
       invoiceNo: string;
-      returnAmount: number;
+      grossReturn: number;      // full return value before deduction
+      netReturn: number;        // what AR is actually reduced by (gross - deduction)
+      deduction: number;        // restocking fee (0 if none)
       invoiceDate: string;
       userId?: number;
       taxAmount?: number;
     }
   ): PostedEntry | null {
-    if (!args.returnAmount || args.returnAmount <= 0) return null;
+    if (!args.grossReturn || args.grossReturn <= 0) return null;
 
     const ar = AccountingService.getAccountByCode(db, '1100');
     const salesReturns = AccountingService.getAccountByCode(db, '4100');
@@ -562,7 +565,19 @@ export class AccountingService {
     }
 
     const taxAmount = Number(args.taxAmount) || 0;
-    const netAmount = args.returnAmount - taxAmount;
+    const deduction = Number(args.deduction) || 0;
+    const grossAmount = args.grossReturn;
+    const netAmount = args.netReturn; // gross - deduction (further reduced by tax if applicable — handled below)
+
+    let restockingFeeAcct: Account | undefined;
+    if (deduction > 0) {
+      restockingFeeAcct = AccountingService.getAccountByCode(db, '4150');
+      if (!restockingFeeAcct) {
+        throw new Error('Chart of accounts is missing required account: 4150 (Restocking Fee Income)');
+      }
+    }
+
+    // Build lines array
 
     if (taxAmount > 0) {
       const taxPayable = AccountingService.getAccountByCode(db, '2100');
@@ -570,31 +585,88 @@ export class AccountingService {
         throw new Error('Chart of accounts is missing required account: 2100 (Tax Payable)');
       }
 
+      const lines: Array<{ account_id: number; debit: number; credit: number; description: string }> = [];
+
+      // Cr AR by netReturn (what AR is actually reduced by)
+      lines.push({
+        account_id: ar.id,
+        debit: 0,
+        credit: netAmount,
+        description: `AR reduced for return of ${args.invoiceNo}`,
+      });
+
+      // Dr Sales Returns by grossReturn (full reversal of revenue before any deduction)
+      lines.push({
+        account_id: salesReturns.id,
+        debit: grossAmount,
+        credit: 0,
+        description: `Sales returns contra-revenue for ${args.invoiceNo}`,
+      });
+
+      // Dr Tax Payable by taxAmount
+      lines.push({
+        account_id: taxPayable.id,
+        debit: taxAmount,
+        credit: 0,
+        description: `Tax reversal for return of ${args.invoiceNo}`,
+      });
+
+      // Cr Restocking Fee Income by deduction (if any)
+      if (restockingFeeAcct && deduction > 0) {
+        lines.push({
+          account_id: restockingFeeAcct.id,
+          debit: 0,
+          credit: deduction,
+          description: `Restocking fee on return of ${args.invoiceNo}`,
+        });
+      }
+
       return AccountingService.postEntry(db, {
         entry_date: args.invoiceDate,
-        description: `Sales return for ${args.invoiceNo} — ${args.returnAmount.toFixed(2)} (net ${netAmount.toFixed(2)} + tax ${taxAmount.toFixed(2)})`,
+        description: `Sales return for ${args.invoiceNo} — ${grossAmount.toFixed(2)} gross, ${netAmount.toFixed(2)} net${deduction > 0 ? `, fee ${deduction.toFixed(2)}` : ''}${taxAmount > 0 ? `, tax ${taxAmount.toFixed(2)}` : ''}`,
         reference_type: 'INVOICE_RETURN',
         reference_id: args.invoiceId,
         created_by: args.userId,
-        lines: [
-          { account_id: ar.id, credit: args.returnAmount, description: `AR reduced for return of ${args.invoiceNo}` },
-          { account_id: salesReturns.id, debit: netAmount, description: `Sales returns contra-revenue for ${args.invoiceNo}` },
-          { account_id: taxPayable.id, debit: taxAmount, description: `Tax reversal for return of ${args.invoiceNo}` },
-        ],
+        lines,
       });
     }
 
-    // No tax — 2-line reversal
+    // No tax — 2 or 3 line reversal depending on deduction
+    const lines: Array<{ account_id: number; debit: number; credit: number; description: string }> = [];
+
+    // Cr AR by netReturn
+    lines.push({
+      account_id: ar.id,
+      debit: 0,
+      credit: netAmount,
+      description: `AR reduced for return of ${args.invoiceNo}`,
+    });
+
+    // Dr Sales Returns by grossReturn
+    lines.push({
+      account_id: salesReturns.id,
+      debit: grossAmount,
+      credit: 0,
+      description: `Sales returns contra-revenue for ${args.invoiceNo}`,
+    });
+
+    // Cr Restocking Fee Income by deduction (if any)
+    if (restockingFeeAcct && deduction > 0) {
+      lines.push({
+        account_id: restockingFeeAcct.id,
+        debit: 0,
+        credit: deduction,
+        description: `Restocking fee on return of ${args.invoiceNo}`,
+      });
+    }
+
     return AccountingService.postEntry(db, {
       entry_date: args.invoiceDate,
-      description: `Sales return for ${args.invoiceNo} — ${args.returnAmount.toFixed(2)}`,
+      description: `Sales return for ${args.invoiceNo} — ${grossAmount.toFixed(2)} gross, ${netAmount.toFixed(2)} net${deduction > 0 ? `, fee ${deduction.toFixed(2)}` : ''}`,
       reference_type: 'INVOICE_RETURN',
       reference_id: args.invoiceId,
       created_by: args.userId,
-      lines: [
-        { account_id: ar.id, credit: args.returnAmount, description: `AR reduced for return of ${args.invoiceNo}` },
-        { account_id: salesReturns.id, debit: args.returnAmount, description: `Sales returns contra-revenue for ${args.invoiceNo}` },
-      ],
+      lines,
     });
   }
 

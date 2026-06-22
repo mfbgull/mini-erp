@@ -208,7 +208,7 @@ function runCustomerARMigrations(): void {
           SELECT SUM(pa.amount)
           FROM payment_allocations pa
           WHERE pa.invoice_id = invoices.id
-        ), 0) - COALESCE(returned_amount, 0))
+        ), 0) - COALESCE(returned_amount, 0) + COALESCE(return_fee, 0))
         `);
 
         db.exec(`
@@ -1095,6 +1095,19 @@ function runGLFoundationMigration(): void {
     }
   } catch (error: any) {
     logger.error('returned_amount migration error:', error.message);
+  }
+
+  // Add return_fee column to invoices (idempotent — restocking fee tracking)
+  try {
+    const hasReturnFee = db.prepare(
+      `SELECT COUNT(*) as count FROM pragma_table_info('invoices') WHERE name='return_fee'`
+    ).get() as { count: number };
+    if (hasReturnFee.count === 0) {
+      db.exec("ALTER TABLE invoices ADD COLUMN return_fee DECIMAL(15,2) NOT NULL DEFAULT 0");
+      logger.info('✅ return_fee column added to invoices');
+    }
+  } catch (error: any) {
+    logger.error('return_fee migration error:', error.message);
   }
 
   // Add returned_qty column to invoice_items (per-item return tracking)
