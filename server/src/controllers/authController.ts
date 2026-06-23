@@ -34,7 +34,7 @@ function login(req: Request, res: Response): void {
     logAuth(ActionType.LOGIN, user.id, `User ${username} logged in successfully`, { username, email: user.email }, ipAddress);
     req.activityLogged = true;
 
-    const { password_hash, ...userWithoutPassword } = user;
+    const { password_hash: _password_hash, ...userWithoutPassword } = user;
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 24 * 60 * 60 * 1000 });
     sendSuccess(res, { user: userWithoutPassword });
   } catch (error) {

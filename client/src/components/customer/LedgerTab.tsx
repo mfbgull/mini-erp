@@ -18,8 +18,8 @@ import {
 
 import { calculateLedgerTotals, formatDateString } from '../../utils/customerCalculations';
 import { groupLedgerByInvoice } from '../../utils/ledgerGrouping';
-import type { LedgerTabProps, LedgerEntry, LedgerColDef, Invoice } from '../../types';
-import type { LedgerGroupNode, InvoiceGroup } from '../../utils/ledgerGrouping';
+import type { LedgerTabProps, LedgerColDef } from '../../types';
+import type { InvoiceGroup } from '../../utils/ledgerGrouping';
 import { exportToCSV, exportToPDF, exportToImage, handlePrint } from '../../utils/ledgerExport';
 
 interface GroupedRow {
@@ -35,62 +35,6 @@ interface GroupedRow {
   credit: number;
   balance: number;
   linked_invoice_no?: string;
-}
-
-function flattenGroupedNodes(nodes: LedgerGroupNode[]): GroupedRow[] {
-  const rows: GroupedRow[] = [];
-  const expandedGroups = new Set<string>();
-
-  for (const node of nodes) {
-    if (node.type === 'ungrouped') {
-      rows.push({
-        _id: `u-${node.entry.id}`,
-        _isGroupHeader: false,
-        _isChild: false,
-        transaction_date: node.entry.transaction_date,
-        transaction_type: node.entry.transaction_type,
-        reference_no: node.entry.reference_no || '',
-        description: node.entry.description || '',
-        debit: node.entry.debit,
-        credit: node.entry.credit,
-        balance: node.entry.balance,
-      });
-    } else {
-      const group = node as InvoiceGroup;
-      const gid = `g-${group.invoice.reference_no}`;
-      rows.push({
-        _id: gid,
-        _isGroupHeader: true,
-        _isChild: false,
-        _groupId: gid,
-        transaction_date: group.invoice.transaction_date,
-        transaction_type: group.invoice.transaction_type,
-        reference_no: group.invoice.reference_no || '',
-        description: `${group.children.length} payment${group.children.length !== 1 ? 's' : ''} — Balance: ${group.balance.toFixed(2)}`,
-        debit: group.invoice.debit,
-        credit: group.totalPaid,
-        balance: group.balance,
-      });
-      if (expandedGroups.has(gid)) {
-        for (const child of group.children) {
-          rows.push({
-            _id: `c-${child.id}`,
-            _isGroupHeader: false,
-            _isChild: true,
-            _groupId: gid,
-            transaction_date: child.transaction_date,
-            transaction_type: child.transaction_type,
-            reference_no: child.reference_no || '',
-            description: child.description || '',
-            debit: child.debit,
-            credit: child.credit,
-            balance: child.balance,
-          });
-        }
-      }
-    }
-  }
-  return rows;
 }
 
 function LedgerTab({ ledger, loading, customerName, formatCurrency, invoices }: LedgerTabProps) {

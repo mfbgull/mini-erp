@@ -13,10 +13,7 @@ function recordPurchase(req: AuthRequest, res: Response): void {
       warehouse_id,
       quantity,
       unit_cost,
-      supplier_name,
       purchase_date,
-      invoice_no,
-      remarks
     } = req.body;
 
     if (!item_id || !warehouse_id || !quantity || !unit_cost || !purchase_date) {
@@ -187,13 +184,11 @@ function returnPurchaseItems(req: AuthRequest, res: Response): Response | void {
 
     // Wrap everything in a transaction so GL posting is atomic with stock return
     let result: { returnedQuantity: number; totalCost: number };
-    let purchaseNo: string;
 
     db.transaction(() => {
       // Fetch purchase first to get its number for the GL entry
       const purchase = Purchase.getById(purchaseId, db);
       if (!purchase) throw new Error('Purchase not found');
-      purchaseNo = purchase.purchase_no;
 
       // Return stock and get the cost for GL posting
       result = Purchase.returnPurchaseItems(db, purchaseId, quantity, userId, reason);

@@ -3,20 +3,12 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import MiniERPGrid from '../../components/common/MiniERPGrid';
 import { format } from 'date-fns';
-import {
-  RotateCcw,
-  Search,
-  CalendarDays,
-  Package,
-  Filter,
-} from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 
-import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
 import { useSettings } from '../../context/SettingsContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
-import { getStatusCellClass } from '../../utils/statusCellUtils';
 import './SalesPage.css';
 import '../../styles/ag-grid-status-cells.css';
 

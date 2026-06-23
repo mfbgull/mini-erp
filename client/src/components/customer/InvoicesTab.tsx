@@ -11,7 +11,7 @@ import { MoreVertical, Eye, Trash2, Ban } from 'lucide-react';
 import DropdownMenu from '../../components/common/DropdownMenu';
 import { createActionColDef } from '../../utils/agGridIntegration';
 import { formatAsCurrency, formatDateString } from '../../utils/customerCalculations';
-import type { InvoicesTabProps, Invoice, InvoiceColDef } from '../../types';
+import type { InvoicesTabProps, InvoiceColDef } from '../../types';
 import { canShowDeleteAction, canCancelInvoice } from '../../utils/invoiceRules';
 import { getStatusCellClass, getBalanceCellClass } from '../../utils/statusCellUtils';
 

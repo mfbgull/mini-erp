@@ -4,7 +4,7 @@ import { AuthRequest } from '../types';
 import { logCRUD, ActionType } from '../services/activityLogger';
 import db from '../config/database';
 import { getRouteParam } from '../utils/queryUtils';
-import { sanitizeSortParams, PAYMENT_SORT_COLUMNS } from '../utils/sqlSanitizer';
+import { PAYMENT_SORT_COLUMNS } from '../utils/sqlSanitizer';
 import logger from '../utils/logger';
 import { parseCurrency } from '../utils/currency';
 import PaymentModel from '../models/Payment';

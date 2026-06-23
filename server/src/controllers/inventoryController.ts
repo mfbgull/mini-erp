@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { getQueryParam } from '../utils/queryUtils';
-import Database from 'better-sqlite3';
 import ItemModel from '../models/Item';
 import WarehouseModel from '../models/Warehouse';
 import StockMovementModel from '../models/StockMovement';

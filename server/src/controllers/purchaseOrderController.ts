@@ -12,10 +12,6 @@ function createPurchaseOrder(req: AuthRequest, res: Response): void {
     const {
       supplier_id,
       po_date,
-      expected_delivery_date,
-      status,
-      notes,
-      warehouse_id,
       items
     } = req.body;
 

@@ -42,7 +42,7 @@ export const getBOMsByFinishedItem = (req: Request, res: Response, next: NextFun
 
 export const createBOM = (req: AuthRequest, res: Response, next: NextFunction): void => {
   try {
-    const { finished_item_id, quantity, bom_name, description, items } = req.body;
+    const { finished_item_id, quantity, bom_name, items } = req.body;
 
     if (!finished_item_id || !quantity || !bom_name || !items || items.length === 0) {
       res.status(400).json({

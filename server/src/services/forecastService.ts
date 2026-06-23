@@ -1,8 +1,6 @@
 import db from '../config/database';
 import { ForecastResult, ForecastDashboardData, ForecastAlert, TrendData, MonthlySaleData } from '../types';
 
-const FORECAST_TTL_HOURS = 12;
-
 /**
  * Batch-fetch 12-month sales history for all given item IDs in a single query.
  * Returns a Map<itemId, number[]> where each array is monthly totals in ASC order.

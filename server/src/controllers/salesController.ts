@@ -133,7 +133,6 @@ function deleteQuotation(req: AuthRequest, res: Response): void {
 function convertQuotationToSalesOrder(req: AuthRequest, res: Response): void {
   try {
     const { id } = req.params;
-    const overrides = req.body;
 
     const result = db.transaction(() => {
       const quotation = QuotationModel.getById(Number(id), db);

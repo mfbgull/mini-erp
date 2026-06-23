@@ -15,7 +15,6 @@ function recordProduction(req: AuthRequest, res: Response): void {
       raw_materials_warehouse_id,
       production_date,
       input_items,
-      remarks,
       overhead_cost
     } = req.body;
 

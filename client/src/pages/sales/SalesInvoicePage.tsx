@@ -42,8 +42,7 @@ import {
   calculateTotal,
   getNextField,
   isLastField,
-  getFieldOrder,
-  createEmptyItemRow,
+
   padItemsToMinimum,
   generateInvoiceNo,
   createDefaultInvoice,

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import db from '../config/database';
-import { AuthRequest, InvoiceItemDTO, PaymentDTO, InvoiceStatus, Invoice } from '../types';
+import { AuthRequest, InvoiceItemDTO, PaymentDTO, InvoiceStatus } from '../types';
 import StockMovementModel from '../models/StockMovement';
 import InvoiceModel from '../models/Invoice';
 import PaymentModel from '../models/Payment';
@@ -12,7 +12,6 @@ import { getQueryParam } from '../utils/queryUtils';
 import {
   parseCurrency,
   subtractCurrency,
-  addCurrency,
   multiplyCurrency,
 } from '../utils/currency';
 
@@ -62,120 +61,6 @@ interface InvoiceItemRow {
   item_code?: string;
 }
 
-interface StockBalanceRow {
-  warehouse_id: number;
-  quantity: number;
-}
-
-interface WarehouseRow {
-  id: number;
-}
-
-interface PaymentRow {
-  id: number;
-  payment_no: string;
-  payment_date?: string;
-  payment_method?: string;
-  reference_no?: string;
-  notes?: string;
-  amount?: number;
-}
-
-interface AllocationRow {
-  payment_id: number;
-  invoice_id: number;
-  amount?: number;
-}
-
-interface PaidResultRow {
-  total_paid: number;
-}
-
-interface CountRow {
-  count: number;
-}
-
-interface MaxPaymentNoRow {
-  max_no: string | null;
-}
-
-interface InvoicePaymentRow {
-  id: number;
-  payment_no: string;
-  payment_date: string;
-  payment_method: string;
-  reference_no: string | null;
-  notes: string | null;
-  amount: number;
-}
-
-interface StockMovementRow {
-  warehouse_id: number;
-}
-
-// ============ Helpers ============
-
-/**
- * Generate the next payment number atomically using a transaction.
- * This prevents race conditions where two concurrent requests could
- * read the same MAX(payment_no) and generate duplicates.
- */
-function generatePaymentNoAtomic(): string {
-  return InvoiceModel.generatePaymentNoAtomic(db);
-}
-
-/**
- * Find the best warehouse for an item, with stock validation logging.
- * Returns the warehouse_id to use for deduction.
- */
-function findWarehouseForItem(
-  itemId: number,
-  requestedQty: number,
-  explicitWarehouseId?: number
-): number {
-  return InvoiceModel.findWarehouseForItem(db, itemId, requestedQty, explicitWarehouseId);
-}
-
-/**
- * Reverse stock movements for a list of invoice items that were previously sold.
- * Used during invoice update and delete.
- */
-function reverseStockForItems(
-  items: Array<{ item_id: number; quantity: number; unit_price: number }>,
-  invoiceNo: string,
-  userId: number,
-  referenceDoctype: string
-): void {
-  for (const item of items) {
-    // Find the original warehouse from the SALE movement
-    const originalWarehouseId = StockMovementModel.getOriginalWarehouseForItem(db, item.item_id, invoiceNo);
-    let warehouseId: number;
-    if (originalWarehouseId !== undefined) {
-      warehouseId = originalWarehouseId;
-    } else {
-      const defaultWarehouse = WarehouseModel.getDefaultWarehouse(db);
-      warehouseId = defaultWarehouse ? defaultWarehouse.id : 1;
-    }
-
-    // Add stock back (positive quantity to reverse the sale)
-    StockMovementModel.recordMovement(
-      {
-        item_id: item.item_id,
-        warehouse_id: warehouseId,
-        movement_type: 'ADJUSTMENT',
-        quantity: item.quantity, // Positive to add back stock
-        unit_cost: item.unit_price,
-        reference_doctype: referenceDoctype,
-        reference_docno: invoiceNo,
-        remarks: `Stock reversed - Invoice ${invoiceNo} ${referenceDoctype === 'INVOICE_DELETE' ? 'deleted' : 'updated'}`,
-        movement_date: new Date().toISOString().split('T')[0],
-      },
-      userId,
-      db
-    );
-  }
-}
-
 // ============ Controllers ============
 
 /**
@@ -186,7 +71,6 @@ function getInvoices(req: AuthRequest, res: Response): void {
   try {
     const { customerId, status } = req.query as { customerId?: string; status?: string };
     const filters: Parameters<typeof InvoiceModel.getAll>[0] = {};
-    const params: (string | number)[] = [];
 
     if (customerId) { filters.customer_id = parseInt(customerId, 10); }
 
@@ -542,7 +426,7 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
         ledgerUtils.rebuildLedgerBalances(parsedCustomerId);
 
         // === Handle new payment recording (FIX #2: inside transaction) ===
-        let newPaymentAmount = 0;
+        let newPaymentAmount: number;
         if (record_payment && payment && parseCurrency(payment.amount) > 0) {
             newPaymentAmount = parseCurrency(payment.amount);
 
@@ -604,8 +488,6 @@ function updateInvoice(req: AuthRequest, res: Response): Response | void {
 
         // Insert new invoice items and create new stock movements
         for (const item of items) {
-            const amount = multiplyCurrency(item.quantity, item.unit_price);
-
             InvoiceModel.createInvoiceItem(db, invoiceId, {
                 item_id: item.item_id,
                 quantity: item.quantity,

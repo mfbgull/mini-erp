@@ -193,7 +193,7 @@ function getSupplierById(req: Request, res: Response): void {
       return;
     }
     res.json({ success: true, data: supplier });
-  } catch (error) {
+  } catch {
     res.status(500).json({ success: false, error: 'Failed to fetch supplier' });
   }
 }

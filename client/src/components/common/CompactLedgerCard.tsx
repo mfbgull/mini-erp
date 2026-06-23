@@ -5,7 +5,7 @@ import { MoreVertical, Eye, X, FileText, CreditCard, Scale, BarChart3, TrendingD
 
 import Card from './Card';
 import { groupLedgerByInvoice } from '../../utils/ledgerGrouping';
-import type { InvoiceGroup, LedgerGroupNode } from '../../utils/ledgerGrouping';
+import type { InvoiceGroup } from '../../utils/ledgerGrouping';
 import type { LedgerEntry } from '../../types';
 import { calculateLedgerTotals } from '../../utils/customerCalculations';
 import '../../styles/components/card.css';
