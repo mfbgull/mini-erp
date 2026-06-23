@@ -149,50 +149,7 @@ export interface BOM {
   updated_at?: string;
 }
 
-// ============ Sale Types ============
-export interface Sale {
-  id: number;
-  sale_date: string;
-  customer_id: number;
-  item_id: number;
-  quantity: number;
-  unit_price: number;
-  total_amount: number;
-  invoice_id?: number;
-  created_by?: number;
-  created_at?: string;
-}
-
-export interface PriceHistory {
-  customer_name: string;
-  transaction_count: number;
-  lowest_price: number;
-  highest_price: number;
-  avg_price: number;
-  last_price: number;
-  last_invoice_id?: string;
-  invoice_date?: string;
-}
-
 // ============ API Response Types ============
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  error?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-// ============ Database Types ============
-export interface DatabaseResult {
-  changes: number;
-  lastInsertRowid: number | bigint;
-}
 
 // ============ Forecast Types ============
 export interface DemandForecast {
@@ -346,21 +303,6 @@ export interface InvoiceWithUsername extends Invoice {
   created_by_username?: string;
 }
 
-// ============ Pricing Summary Types ============
-export interface PricingSummary {
-  customer_name: string;
-  transaction_count: number;
-  lowest_price: number;
-  highest_price: number;
-  avg_price: number;
-}
-
-export interface LastSale {
-  last_invoice_id?: string;
-  invoice_date?: string;
-  last_price?: number;
-}
-
 // ============ Integration Service Types ============
 export interface Setting {
   key: string;
@@ -426,35 +368,6 @@ export interface NumverifyResponse {
     carrier: string;
     line_type: string;
   };
-}
-
-// ============ Report Types ============
-export interface ReceivablesSummary {
-  total_invoices: number;
-  total_outstanding: number;
-  total_paid: number;
-  unpaid_count: number;
-  partial_count: number;
-  unused_overdue_count: number;
-  overdue_amount?: number;
-  total_current?: number;
-  total_1_30?: number;
-  total_31_60?: number;
-  total_61_90?: number;
-  total_over_90?: number;
-  statusBreakdown?: {
-    unpaid: { count: number; amount: number };
-    partiallyPaid: { count: number; amount: number };
-    overdue: { count: number; amount: number };
-  };
-}
-
-export interface SalesSummary {
-  total_invoices: number;
-  total_revenue: number;
-  unique_customers: number;
-  unique_items: number;
-  avg_invoice_value: number;
 }
 
 // ============ Batch Costing Types ============

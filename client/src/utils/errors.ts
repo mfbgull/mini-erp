@@ -67,30 +67,6 @@ export function handleError(
   return appError;
 }
 
-export function handleApiError(
-  error: unknown,
-  context: string,
-  fallbackMessage?: string
-): AppError {
-  return handleError(error, context, { fallbackMessage });
-}
-
-export function handleFormError(
-  error: unknown,
-  context: string,
-  fallbackMessage?: string
-): AppError {
-  return handleError(error, context, { fallbackMessage });
-}
-
-export function logError(error: unknown, context: string): void {
-  console.error(`[${context}]`, error);
-}
-
 export default {
-  parseError,
   handleError,
-  handleApiError,
-  handleFormError,
-  logError,
 };

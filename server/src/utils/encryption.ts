@@ -27,7 +27,7 @@ export function encrypt(text: string): string {
   return iv.toString('hex') + ':' + authTag + ':' + encrypted;
 }
 
-export function decrypt(encryptedText: string): string {
+function decrypt(encryptedText: string): string {
   const key = getEncryptionKey();
   const parts = encryptedText.split(':');
   if (parts.length !== 3) {
@@ -47,11 +47,11 @@ export function decrypt(encryptedText: string): string {
   return decrypted;
 }
 
-export function isEncrypted(value: string): boolean {
+function isEncrypted(value: string): boolean {
   return value.includes(':') && value.split(':').length === 3;
 }
 
-export function decryptIfNeeded(value: string): string {
+function decryptIfNeeded(value: string): string {
   if (!value || !isEncrypted(value)) {
     return value;
   }

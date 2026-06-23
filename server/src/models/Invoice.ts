@@ -648,11 +648,7 @@ class InvoiceModel {
    * Update customer balance
    */
   static updateCustomerBalance(db: Database.Database, customerId: number): void {
-    // This would typically call a function in ledgerUtils, but for now we'll keep it simple
-    // In a real implementation, this would recalculate the balance from ledger entries
-    // For now, we'll just note that this should be handled by ledgerUtils
-    // const ledgerUtils = require('../utils/ledgerUtils');
-    // ledgerUtils.updateCustomerBalance(customerId);
+    // Balance is recalculated from ledger entries — no action needed here
   }
 
   /**

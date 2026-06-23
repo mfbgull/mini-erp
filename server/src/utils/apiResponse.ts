@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-export interface ApiErrorResponse {
+interface ApiErrorResponse {
   success: false;
   error: {
     code: string;
@@ -9,7 +9,7 @@ export interface ApiErrorResponse {
   };
 }
 
-export interface ApiSuccessResponse<T = unknown> {
+interface ApiSuccessResponse<T = unknown> {
   success: true;
   data: T;
   meta?: {
@@ -35,7 +35,7 @@ export function sendCreated<T>(res: Response, data: T): void {
   sendSuccess(res, data, 201);
 }
 
-export function sendError(
+function sendError(
   res: Response,
   statusCode: number,
   code: string,

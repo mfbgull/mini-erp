@@ -125,36 +125,6 @@ function updateInvoiceStatus(invoiceId: number): string {
   return newStatus;
 }
 
-function updateInvoiceBalanceAndStatus(invoiceId: number, _amountPaid: number = 0): string {
-  calculateInvoiceBalance(invoiceId);
-  return updateInvoiceStatus(invoiceId);
-}
-
-/**
- * Recompute the running balance for all customer_ledger entries for a given
- * customer. This is needed when rows are deleted (e.g. invoice or payment
- * delete) because the remaining rows' balance column was computed based on
- * the now-removed row.
- *
- * Walks all entries ordered by id and rewrites the balance column so the
- * chain is consistent: balance = previous_balance + debit - credit.
- */
-/**
- * Record a customer transaction: create ledger entry + update customer balance.
- * Single call replaces the repeated createLedgerEntry + updateCustomerBalance pattern.
- */
-function recordCustomerTransaction(
-  customerId: number,
-  type: string,
-  referenceNo: string,
-  debit: number,
-  credit: number,
-  description: string,
-): void {
-  createLedgerEntry(customerId, type, referenceNo, debit, credit, description);
-  updateCustomerBalance(customerId);
-}
-
 function rebuildLedgerBalances(customerId: number): void {
   db.transaction(() => {
     const entries = db.prepare(`
@@ -176,9 +146,7 @@ function rebuildLedgerBalances(customerId: number): void {
 export default {
   createLedgerEntry,
   updateCustomerBalance,
-  recordCustomerTransaction,
   calculateInvoiceBalance,
   updateInvoiceStatus,
-  updateInvoiceBalanceAndStatus,
   rebuildLedgerBalances
 };

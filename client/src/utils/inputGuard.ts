@@ -20,12 +20,3 @@ export function shouldIgnoreShortcut(event: KeyboardEvent): boolean {
   
   return false;
 }
-
-export function isInputElement(element: Element | null): boolean {
-  if (!element) return false;
-  return (
-    element.tagName === 'INPUT' ||
-    element.tagName === 'TEXTAREA' ||
-    element.getAttribute('contenteditable') === 'true'
-  );
-}

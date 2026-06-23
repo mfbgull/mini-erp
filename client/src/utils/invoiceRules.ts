@@ -51,19 +51,6 @@ export function preparePaymentData(
 }
 
 /**
- * Get sellable items (exclude raw materials).
- */
-export function getSellableItems<T extends { is_raw_material?: boolean; is_finished_good?: boolean; is_purchased?: boolean }>(
-  items: T[],
-): T[] {
-  return items.filter(
-    (item) =>
-      !item.is_raw_material &&
-      (item.is_finished_good === true || item.is_purchased === true),
-  );
-}
-
-/**
  * Validate invoice before submission.
  */
 export function validateInvoiceSubmission(

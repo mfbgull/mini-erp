@@ -70,30 +70,6 @@ export function getRoleTypeCellClass(isSystemRole: boolean | number | null | und
   return isSystemRole ? 'cell-type-system' : 'cell-type-custom';
 }
 
-/** Returns CSS class for movement type column */
-export function getMovementCellClass(type: string | null | undefined): string {
-  const t = (type || '').toLowerCase().replace(/[\s_-]+/g, '_');
-
-  const inbound = [
-    'purchase', 'purchase_return',
-    'in', 'inbound',
-    'production', 'production_receipt',
-    'adjustment_positive', 'positive_adjustment',
-  ];
-  if (inbound.includes(t)) return 'cell-movement-in';
-
-  const outbound = [
-    'sale', 'sales_return', 'invoice_return',
-    'out', 'outbound',
-    'transfer', 'stock_transfer',
-    'adjustment_negative', 'negative_adjustment',
-    'write_off', 'writeoff',
-  ];
-  if (outbound.includes(t)) return 'cell-movement-out';
-
-  return '';
-}
-
 /** Returns CSS class for on-time delivery rate */
 export function getDeliveryRateCellClass(rate: number | string | null | undefined): string {
   const r = parseFloat(String(rate || 0)) || 0;

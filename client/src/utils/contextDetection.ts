@@ -15,14 +15,3 @@ export function useCurrentContext(): string {
 
   return 'global';
 }
-
-export function usePageType(): string {
-  const location = useLocation();
-  const pathname = location.pathname;
-
-  if (pathname.includes('/form') || pathname.includes('/edit')) return 'form';
-  if (pathname.includes('/detail') || pathname.includes('/view')) return 'detail';
-  if (pathname.includes('/create')) return 'create';
-  
-  return 'list';
-}
