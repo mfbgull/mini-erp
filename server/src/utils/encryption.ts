@@ -49,15 +49,3 @@ function decrypt(encryptedText: string): string {
 function isEncrypted(value: string): boolean {
   return value.includes(':') && value.split(':').length === 3;
 }
-
-function decryptIfNeeded(value: string): string {
-  if (!value || !isEncrypted(value)) {
-    return value;
-  }
-  try {
-    return decrypt(value);
-  } catch (error) {
-    logger.error('Decryption failed, returning raw value:', error instanceof Error ? error.message : error);
-    return value;
-  }
-}

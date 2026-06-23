@@ -1,5 +1,4 @@
 import Database from 'better-sqlite3';
-import logger from '../utils/logger';
 
 interface PhysicalCount {
   id: number;
@@ -47,12 +46,6 @@ interface PhysicalCountItem {
 interface CreateCountDTO {
   warehouse_id: number;
   count_date?: string;
-  notes?: string;
-}
-
-interface CountItemDTO {
-  item_id: number;
-  counted_quantity: number;
   notes?: string;
 }
 

@@ -53,17 +53,6 @@ interface GoodsReceipt {
   total_amount?: number;
 }
 
-interface GoodsReceiptItem {
-  id: number;
-  receipt_id: number;
-  po_item_id: number;
-  item_id: number;
-  received_quantity: number;
-  item_code?: string;
-  item_name?: string;
-  unit_of_measure?: string;
-}
-
 interface CreatePurchaseOrderDTO {
   supplier_id: number;
   po_date: string;

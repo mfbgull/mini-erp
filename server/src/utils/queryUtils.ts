@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import { ParsedQs } from 'qs';
 
 /**
