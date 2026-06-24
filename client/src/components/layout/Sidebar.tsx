@@ -85,6 +85,7 @@ const getNavItems = (): NavItem[] => [
       { path: '/reports/inventory-movement', labelKey: 'nav.inventoryMovement' },
       { path: '/reports/profit-loss', labelKey: 'nav.profitLoss' },
       { path: '/reports/cash-flow', labelKey: 'nav.cashFlow' },
+      { path: '/reports/custom', labelKey: 'nav.customReports' },
       { path: '/expenses', labelKey: 'nav.manageExpenses' }
     ]
   },
@@ -94,7 +95,8 @@ const getNavItems = (): NavItem[] => [
     children: [
       { path: '/forecasts', labelKey: 'nav.forecastsDashboard' },
       { path: '/forecasts/demand', labelKey: 'nav.demand' },
-      { path: '/forecasts/trends', labelKey: 'nav.forecastTrends' }
+      { path: '/forecasts/trends', labelKey: 'nav.forecastTrends' },
+      { path: '/forecasts/accuracy', labelKey: 'nav.forecastAccuracy' }
     ]
   },
   {

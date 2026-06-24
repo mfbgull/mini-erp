@@ -152,20 +152,109 @@ export interface BOM {
 // ============ API Response Types ============
 
 // ============ Forecast Types ============
+
+/** Supported forecast model types */
+export type ForecastModelType =
+  | 'weighted_moving_average'
+  | 'simple_exponential_smoothing'
+  | 'holts_linear_trend'
+  | 'holt_winters'
+  | 'arima';
+
+/** Reorder recommendation levels */
+export type RecommendationLevel = 'order_now' | 'order_soon' | 'monitor' | 'adequate';
+
+/** Trend directions */
+export type TrendDirection = 'growing' | 'stable' | 'declining';
+
+/** Forecast periods */
+export type ForecastPeriod = 'next_week' | 'next_month' | 'next_quarter';
+
+/** Base demand_forecasts row from DB */
 export interface DemandForecast {
   id: number;
   item_id: number;
   forecast_date: string;
-  period: 'next_week' | 'next_month' | 'next_quarter';
+  period: ForecastPeriod;
   predicted_quantity: number;
   confidence_level: number;
-  trend_direction: 'growing' | 'stable' | 'declining';
+  trend_direction: TrendDirection;
   trend_percentage: number;
   model_type: string;
+  is_manual_override: number;
+  override_reason: string | null;
+  override_expires: string | null;
+  bias_adjustment: number | null;
+  seasonal_multiplier: number | null;
+  run_id: string | null;
   created_at: string;
   updated_at: string;
 }
 
+/** Per-item config for model selection */
+export interface ForecastModelConfig {
+  id: number;
+  item_id: number | null;
+  category: string | null;
+  model_type: ForecastModelType;
+  ses_alpha: number | null;
+  holt_alpha: number | null;
+  holt_beta: number | null;
+  hw_alpha: number | null;
+  hw_beta: number | null;
+  hw_gamma: number | null;
+  seasonal_periods: number;
+  service_level: number;
+  lead_time_days: number;
+  bias_correction: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** A seasonal calendar event */
+export interface SeasonalEvent {
+  id: number;
+  event_name: string;
+  start_date: string;
+  end_date: string;
+  multiplier: number;
+  applies_to_category: string | null;
+  applies_to_item_id: number | null;
+  is_recurring: number;
+  created_at: string;
+}
+
+/** Forecast accuracy record */
+export interface ForecastAccuracy {
+  id: number;
+  forecast_date: string;
+  item_id: number;
+  period: ForecastPeriod;
+  model_type: string;
+  predicted_quantity: number;
+  actual_quantity: number | null;
+  mape: number | null;
+  mae: number | null;
+  smape: number | null;
+  is_override: number;
+  computed_at: string | null;
+  created_at: string;
+}
+
+/** Track a forecast run */
+export interface ForecastRun {
+  id: number;
+  run_id: string;
+  run_type: 'auto' | 'manual' | 'scheduled';
+  started_at: string;
+  completed_at: string | null;
+  items_processed: number;
+  errors: number;
+  status: 'running' | 'completed' | 'failed';
+  error_message: string | null;
+}
+
+/** Enhanced forecast result returned by the service */
 export interface ForecastResult {
   itemId: number;
   itemCode: string;
@@ -177,34 +266,46 @@ export interface ForecastResult {
     nextMonth: number;
     nextQuarter: number;
   };
-  trend: 'growing' | 'stable' | 'declining';
+  trend: TrendDirection;
   trendPercentage: number;
   confidence: number;
-  recommendation: 'order_now' | 'order_soon' | 'monitor' | 'adequate';
+  recommendation: RecommendationLevel;
+  modelType: ForecastModelType;
+  safetyStock: number;
+  reorderPoint: number;
+  biasAdjustment: number | null;
+  seasonalMultiplier: number | null;
+  isOverride: boolean;
   lastUpdated: string;
 }
 
+/** Dashboard summary data */
 export interface ForecastDashboardData {
   summary: {
     totalItems: number;
     itemsNeedingRestock: number;
     avgConfidence: number;
     criticalAlerts: number;
+    avgAccuracy: number | null;
+    modelDistribution: Record<string, number>;
   };
   alerts: ForecastAlert[];
   topGrowing: ForecastResult[];
   topDeclining: ForecastResult[];
 }
 
+/** Alert for items needing attention */
 export interface ForecastAlert {
   itemId: number;
   itemName: string;
   currentStock: number;
   predictedDemand: number;
+  safetyStock: number;
   alertLevel: 'critical' | 'warning' | 'monitor' | 'adequate';
   recommendation: string;
 }
 
+/** Monthly data point for trend charts */
 export interface MonthlySaleData {
   month: string;
   actual: number | null;
@@ -212,13 +313,70 @@ export interface MonthlySaleData {
   movingAvg?: number | null;
 }
 
+/** Trend data response */
 export interface TrendData {
   historicalTrends: MonthlySaleData[];
   itemBreakdown: {
     itemName: string;
     totalSold: number;
-    trend: 'growing' | 'stable' | 'declining';
+    trend: TrendDirection;
   }[];
+}
+
+/** Accuracy summary for an item */
+export interface ItemAccuracy {
+  itemId: number;
+  itemName: string;
+  itemCode: string;
+  mape: number | null;
+  mae: number | null;
+  smape: number | null;
+  sampleSize: number;
+  modelType: string;
+  trend: TrendDirection;
+}
+
+/** Accuracy data point for charts */
+export interface AccuracyDataPoint {
+  forecastDate: string;
+  period: ForecastPeriod;
+  predicted: number;
+  actual: number | null;
+  mape: number | null;
+  mae: number | null;
+}
+
+/** Forecast override request */
+export interface ForecastOverrideRequest {
+  itemId: number;
+  nextWeek?: number;
+  nextMonth?: number;
+  nextQuarter?: number;
+  reason?: string;
+  expiresDays?: number;
+}
+
+/** Safety stock result for an item */
+export interface SafetyStockResult {
+  itemId: number;
+  itemName: string;
+  itemCode: string;
+  dailyDemand: number;
+  demandStdDev: number;
+  leadTimeDays: number;
+  serviceLevel: number;
+  zScore: number;
+  safetyStock: number;
+  reorderPoint: number;
+  currentStock: number;
+}
+
+/** ABC classification for items */
+export interface ABCClassification {
+  itemId: number;
+  itemName: string;
+  annualValue: number;
+  class: 'A' | 'B' | 'C';
 }
 
 // ============ Stock Balance Types ============

@@ -768,6 +768,8 @@ runSalaryPaymentsMigration();
 runCreditBalanceMigration();
 runEmployeesMigration();
 runPhysicalCountsMigration();
+runForecastEnhancementsMigration();
+runCustomReportsMigration();
 
 // Rollback support: run if --rollback flag is passed
 if (process.argv.includes('--rollback')) {
@@ -1303,6 +1305,172 @@ function runPhysicalCountsMigration(): void {
     }
   } catch (error: any) {
     logger.error('Physical counts migration error:', error.message);
+  }
+}
+
+function runCustomReportsMigration(): void {
+  try {
+    const tableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='custom_reports'
+    `).get() as { name: string } | undefined;
+
+    if (!tableCheck) {
+      logger.info('Running custom reports migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-custom-reports.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      logger.info('✅ Custom reports migration completed!');
+
+      // Seed 5 report templates
+      seedReportTemplates();
+    }
+  } catch (error: any) {
+    logger.error('Custom reports migration error:', error.message);
+  }
+}
+
+function seedReportTemplates(): void {
+  try {
+    logger.info('Seeding report templates...');
+
+    const templates = [
+      {
+        name: 'Sales Summary',
+        description: 'Invoice sales grouped by month with totals',
+        config: {
+          entity: 'invoices',
+          columns: [
+            { field: 'invoice_date', alias: 'Date' },
+            { field: 'invoice_no', alias: 'Invoice #' },
+            { field: 'customer_name', alias: 'Customer' },
+            { field: 'total_amount', alias: 'Total' },
+            { field: 'status', alias: 'Status' },
+          ],
+          filters: [],
+          sort: [{ field: 'invoice_date', direction: 'desc' }],
+        },
+      },
+      {
+        name: 'Inventory Status',
+        description: 'Current stock levels with items below reorder level highlighted',
+        config: {
+          entity: 'items',
+          columns: [
+            { field: 'item_code', alias: 'Code' },
+            { field: 'item_name', alias: 'Item' },
+            { field: 'category', alias: 'Category' },
+            { field: 'current_stock', alias: 'Stock' },
+            { field: 'reorder_level', alias: 'Min Stock' },
+          ],
+          filters: [],
+          sort: [{ field: 'current_stock', direction: 'asc' }],
+        },
+      },
+      {
+        name: 'Customer Aging',
+        description: 'Outstanding invoices by customer with aging',
+        config: {
+          entity: 'invoices',
+          columns: [
+            { field: 'customer_name', alias: 'Customer' },
+            { field: 'invoice_no', alias: 'Invoice' },
+            { field: 'due_date', alias: 'Due Date' },
+            { field: 'balance_amount', alias: 'Balance' },
+            { field: 'status', alias: 'Status' },
+          ],
+          filters: [
+            {
+              field: 'status',
+              operator: 'in_list',
+              value: ['Unpaid', 'Overdue', 'Partially Paid'],
+            },
+          ],
+          sort: [{ field: 'due_date', direction: 'asc' }],
+        },
+      },
+      {
+        name: 'Top Customers',
+        description: 'Customers ranked by total invoice amount',
+        config: {
+          entity: 'invoices',
+          columns: [
+            { field: 'customer_name', alias: 'Customer' },
+          ],
+          computedColumns: [
+            { name: 'total_invoiced', expression: 'SUM(total_amount)', type: 'number' },
+            { name: 'invoice_count', expression: 'COUNT(id)', type: 'number' },
+          ],
+          groupBy: { enabled: true, fields: ['customer_name'] },
+          sort: [{ field: 'total_invoiced', direction: 'desc' }],
+          filters: [
+            { field: 'status', operator: 'not_equals', value: 'Cancelled' },
+          ],
+        },
+      },
+      {
+        name: 'Stock Valuation',
+        description: 'Inventory value calculated from stock × cost',
+        config: {
+          entity: 'items',
+          columns: [
+            { field: 'item_code', alias: 'Code' },
+            { field: 'item_name', alias: 'Item' },
+            { field: 'category', alias: 'Category' },
+            { field: 'current_stock', alias: 'Qty' },
+            { field: 'standard_cost', alias: 'Unit Cost' },
+          ],
+          computedColumns: [
+            { name: 'stock_value', expression: 'ROUND(current_stock * standard_cost, 2)', type: 'number' },
+          ],
+          filters: [],
+          sort: [{ field: 'stock_value', direction: 'desc' }],
+        },
+      },
+    ];
+
+    const insert = db.prepare(`
+      INSERT OR IGNORE INTO custom_reports (user_id, name, description, config)
+      VALUES (0, ?, ?, ?)
+    `);
+
+    for (const t of templates) {
+      insert.run(t.name, t.description, JSON.stringify(t.config));
+    }
+
+    logger.info('✅ Report templates seeded!');
+  } catch (error: any) {
+    logger.error('Seed report templates error:', error.message);
+  }
+}
+
+function runForecastEnhancementsMigration(): void {
+  try {
+    // Check if forecast_model_config table exists — if so, migration already ran
+    const tableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='forecast_model_config'
+    `).get() as { name: string } | undefined;
+
+    if (!tableCheck) {
+      logger.info('Running forecast enhancements migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/enhance-forecasts.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      logger.info('✅ Forecast enhancements migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Forecast enhancements migration error:', error.message);
   }
 }
 

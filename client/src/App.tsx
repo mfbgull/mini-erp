@@ -99,7 +99,10 @@ const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
 const ForecastDashboard = lazy(() => import('./pages/forecasts/ForecastDashboard'));
 const DemandForecast = lazy(() => import('./pages/forecasts/DemandForecast'));
 const ForecastTrends = lazy(() => import('./pages/forecasts/ForecastTrends'));
+const ForecastAccuracy = lazy(() => import('./pages/forecasts/ForecastAccuracy'));
 const EcosystemView = lazy(() => import('./pages/EcosystemView'));
+const CustomReportsPage = lazy(() => import('./pages/reports/CustomReportsPage'));
+const ReportBuilder = lazy(() => import('./pages/reports/ReportBuilder'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -249,7 +252,10 @@ function AppLayout() {
               <Route path="/forecasts" element={<ForecastDashboard />} />
               <Route path="/forecasts/demand" element={<DemandForecast />} />
               <Route path="/forecasts/trends" element={<ForecastTrends />} />
+              <Route path="/forecasts/accuracy" element={<ForecastAccuracy />} />
               <Route path="/ecosystem" element={<EcosystemView />} />
+              <Route path="/reports/custom" element={<CustomReportsPage />} />
+              <Route path="/reports/custom/:id/edit" element={<ReportBuilder />} />
               <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Suspense>
