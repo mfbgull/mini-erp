@@ -1,0 +1,305 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Dashboard Customization Bar
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dash-custom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  background: var(--card-bg, #1a1d23);
+  border: 1px solid var(--neutral-700, #2a2d35);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  animation: dash-custom-bar-slide-down 0.2s ease-out;
+}
+
+@keyframes dash-custom-bar-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEFT / RIGHT SECTIONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dash-custom-bar-left,
+.dash-custom-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dash-custom-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--neutral-700, #2a2d35);
+  border-radius: 6px;
+  background: var(--neutral-800, #1e2028);
+  color: var(--neutral-200, #c8cad0);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.dash-custom-bar-btn:hover:not(:disabled) {
+  background: var(--neutral-700, #2a2d35);
+  color: var(--neutral-100, #e8e9ed);
+  border-color: var(--neutral-600, #3a3d45);
+}
+
+.dash-custom-bar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.dash-custom-bar-btn--active {
+  background: var(--primary-700, #2563eb) !important;
+  border-color: var(--primary-600, #3b82f6) !important;
+  color: #fff !important;
+}
+
+.dash-custom-bar-btn--save {
+  border-color: var(--primary-700, #2563eb);
+  color: var(--primary-400, #60a5fa);
+}
+
+.dash-custom-bar-btn--save:hover:not(:disabled) {
+  background: var(--primary-800, #1d4ed8);
+  color: #fff;
+}
+
+.dash-custom-bar-btn--done {
+  background: var(--primary-700, #2563eb);
+  border-color: var(--primary-600, #3b82f6);
+  color: #fff;
+}
+
+.dash-custom-bar-btn--done:hover {
+  background: var(--primary-600, #3b82f6);
+}
+
+.dash-custom-bar-btn--revert {
+  color: var(--warning-400, #fbbf24);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.dash-custom-bar-btn--revert:hover:not(:disabled) {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+.dash-custom-bar-btn--danger {
+  background: var(--danger-700, #dc2626);
+  border-color: var(--danger-600, #ef4444);
+  color: #fff;
+}
+
+.dash-custom-bar-btn--danger:hover {
+  background: var(--danger-600, #ef4444);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESET CONFIRMATION OVERLAY
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dash-custom-bar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  animation: dash-confirm-fade-in 0.15s ease-out;
+}
+
+@keyframes dash-confirm-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dash-custom-bar-confirm {
+  background: var(--card-bg, #1a1d23);
+  border: 1px solid var(--neutral-700, #2a2d35);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: dash-confirm-pop 0.2s ease-out;
+}
+
+@keyframes dash-confirm-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dash-custom-bar-confirm-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+}
+
+.dash-custom-bar-confirm-title {
+  margin: 0 0 8px;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--neutral-100, #e8e9ed);
+}
+
+.dash-custom-bar-confirm-msg {
+  margin: 0 0 20px;
+  font-size: 0.875rem;
+  color: var(--neutral-400, #9ca3af);
+  line-height: 1.5;
+}
+
+.dash-custom-bar-confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.dash-custom-bar-confirm-actions .dash-custom-bar-btn {
+  min-width: 100px;
+  justify-content: center;
+}
+
+
+.dash-custom-bar-btn-label {
+  display: none;
+}
+
+/* Show labels on wider viewports */
+@media (min-width: 768px) {
+  .dash-custom-bar-btn-label {
+    display: inline;
+  }
+}
+
+.dash-custom-bar-group {
+  display: flex;
+  gap: 2px;
+}
+
+.dash-custom-bar-group .dash-custom-bar-btn {
+  padding: 6px 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYOUT NAME
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dash-custom-bar-name-btn,
+.dash-custom-bar-name-input {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--neutral-100, #e8e9ed);
+}
+
+.dash-custom-bar-name-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  max-width: 200px;
+}
+
+.dash-custom-bar-name-btn:hover {
+  background: var(--neutral-800, #1e2028);
+  border-color: var(--neutral-700, #2a2d35);
+}
+
+.dash-custom-bar-name-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dash-custom-bar-name-input {
+  padding: 4px 8px;
+  border: 1px solid var(--primary-600, #3b82f6);
+  border-radius: 6px;
+  background: var(--neutral-800, #1e2028);
+  outline: none;
+  max-width: 200px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SAVE STATE BADGE
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dash-custom-bar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.dash-custom-bar-badge--unsaved {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+}
+
+.dash-custom-bar-badge--saving {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+}
+
+.dash-custom-bar-badge--failed {
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+}
+
+.dash-custom-bar-badge--saved {
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
+}
+
+/* Spinning animation for saving state */
+.dash-custom-bar-spin {
+  animation: dash-custom-bar-spin 1s linear infinite;
+}
+
+@keyframes dash-custom-bar-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

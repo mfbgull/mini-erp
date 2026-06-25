@@ -201,6 +201,65 @@
 }
 
 /* Tablet breakpoint */
+/* ═══════════════════════════════════════════════════════════════════
+   DASHBOARD CUSTOMIZATION
+   ═══════════════════════════════════════════════════════════════════ */
+
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* Customize button (shown when NOT editing) */
+.dashboard-customize-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--neutral-700, #2a2d35);
+  border-radius: 8px;
+  background: var(--card-bg, #1a1d23);
+  color: var(--neutral-200, #c8cad0);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dashboard-customize-btn:hover {
+  background: var(--neutral-700, #2a2d35);
+  color: var(--neutral-100, #e8e9ed);
+  border-color: var(--primary-600, #3b82f6);
+}
+
+/* Edit mode container */
+.dashboard-edit-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Drag hint bar at the bottom of edit mode */
+.dashboard-edit-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  margin-top: 16px;
+  background: var(--neutral-800, #1e2028);
+  border: 1px solid var(--neutral-700, #2a2d35);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: var(--neutral-400, #9ca3af);
+}
+
+.dashboard-edit-hint-shortcut {
+  color: var(--neutral-500, #6b7280);
+  font-family: monospace;
+}
+
 @media (max-width: 768px) {
   .charts-grid {
     grid-template-columns: 1fr;
@@ -212,5 +271,9 @@
 
   .chart-container {
     height: 250px;
+  }
+
+  .dashboard-customize-btn span {
+    display: none;
   }
 }

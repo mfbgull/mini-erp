@@ -6,6 +6,7 @@ import errorHandlerMiddleware from './middleware/errorHandler';
 import { apiLimiter } from './middleware/rateLimiter';
 import logger from './utils/logger';
 import { requestLogger, errorLogger } from './middleware/requestLogger';
+import db from './config/database';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -93,12 +94,96 @@ app.use('/api/', apiLimiter);
 // Request logging middleware
 app.use(requestLogger);
 
-// Health check endpoint
+/**
+ * Health check endpoint — verifies server liveness AND readiness.
+ *
+ * Returns HTTP 200 when all critical subsystems are healthy.
+ * Returns HTTP 503 when any critical check fails (database, core tables).
+ *
+ * Response:
+ * {
+ *   status: 'ok' | 'degraded' | 'down',
+ *   timestamp: ISO string,
+ *   uptime: seconds,
+ *   checks: { name: string, status: 'ok' | 'fail', detail?: string }[]
+ * }
+ */
+
+/** Critical tables that must exist for the app to function */
+const CRITICAL_TABLES = [
+  'users',
+  'items',
+  'invoices',
+  'dashboard_layouts',
+  'roles',
+  'permissions',
+];
+
+function checkDatabaseHealth(): Array<{ name: string; status: 'ok' | 'fail'; detail?: string }> {
+  const results: Array<{ name: string; status: 'ok' | 'fail'; detail?: string }> = [];
+
+  // Check 1: Database connection
+  try {
+    const row = db.prepare('SELECT 1 AS alive').get() as { alive: number };
+    if (row?.alive === 1) {
+      results.push({ name: 'database_connectivity', status: 'ok' });
+    } else {
+      results.push({ name: 'database_connectivity', status: 'fail', detail: 'Unexpected result from probe query' });
+    }
+  } catch (error: any) {
+    results.push({ name: 'database_connectivity', status: 'fail', detail: error.message });
+  }
+
+  // Check 2: Critical tables exist
+  for (const tableName of CRITICAL_TABLES) {
+    try {
+      const row = db.prepare(`
+        SELECT name FROM sqlite_master
+        WHERE type='table' AND name=?
+      `).get(tableName) as { name: string } | undefined;
+
+      if (row) {
+        results.push({ name: `table_${tableName}`, status: 'ok' });
+      } else {
+        results.push({ name: `table_${tableName}`, status: 'fail', detail: `Table '${tableName}' does not exist` });
+      }
+    } catch (error: any) {
+      results.push({ name: `table_${tableName}`, status: 'fail', detail: error.message });
+    }
+  }
+
+  return results;
+}
+
 app.get('/health', (req: express.Request, res: express.Response) => {
-  res.json({
-    status: 'ok',
+  const checks = checkDatabaseHealth();
+
+  const criticalFailures = checks.filter(
+    (c) => c.status === 'fail' && c.name !== 'table_dashboard_layouts', // dashboard_layouts is optional until first save
+  );
+
+  // Determine overall status
+  let healthStatus: 'ok' | 'degraded' | 'down' = 'ok';
+  let httpStatus = 200;
+
+  if (criticalFailures.length > 0) {
+    healthStatus = 'down';
+    httpStatus = 503;
+  } else {
+    const hasNonCriticalFailure = checks.some(
+      (c) => c.status === 'fail',
+    );
+    if (hasNonCriticalFailure) {
+      healthStatus = 'degraded';
+    }
+  }
+
+  res.status(httpStatus).json({
+    status: healthStatus,
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    checks,
   });
 });
 

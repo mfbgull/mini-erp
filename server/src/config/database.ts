@@ -770,6 +770,7 @@ runEmployeesMigration();
 runPhysicalCountsMigration();
 runForecastEnhancementsMigration();
 runCustomReportsMigration();
+runDashboardLayoutsMigration();
 
 // Rollback support: run if --rollback flag is passed
 if (process.argv.includes('--rollback')) {
@@ -832,10 +833,10 @@ function runRolesPermissionsMigration(): void {
       db.exec(rolesPermissionsSQL);
 
       logger.info('✅ Roles and permissions migration completed!');
-
-      // Seed default permissions
-      seedDefaultPermissions();
     }
+
+    // Always seed — backfills missing permissions for existing databases
+    seedDefaultPermissions();
   } catch (error: any) {
     logger.error('Roles and permissions migration error:', error.message);
   }
@@ -849,6 +850,10 @@ function seedDefaultPermissions(): void {
     const permissions = [
       // Dashboard
       { name: 'dashboard:read', module: 'dashboard', action: 'read', description: 'View dashboard' },
+      { name: 'dashboard_layouts:read', module: 'dashboard', action: 'read', description: 'View dashboard layouts' },
+      { name: 'dashboard_layouts:create', module: 'dashboard', action: 'create', description: 'Create dashboard layouts' },
+      { name: 'dashboard_layouts:update', module: 'dashboard', action: 'update', description: 'Update dashboard layouts' },
+      { name: 'dashboard_layouts:delete', module: 'dashboard', action: 'delete', description: 'Delete dashboard layouts' },
       
       // Users
       { name: 'users:read', module: 'users', action: 'read', description: 'View users' },
@@ -1471,6 +1476,30 @@ function runForecastEnhancementsMigration(): void {
     }
   } catch (error: any) {
     logger.error('Forecast enhancements migration error:', error.message);
+  }
+}
+
+function runDashboardLayoutsMigration(): void {
+  try {
+    const tableCheck = db.prepare(`
+      SELECT name FROM sqlite_master
+      WHERE type='table' AND name='dashboard_layouts'
+    `).get() as { name: string } | undefined;
+
+    if (!tableCheck) {
+      logger.info('Running dashboard layouts migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/dashboard-layouts.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      logger.info('✅ Dashboard layouts migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Dashboard layouts migration error:', error.message);
   }
 }
 

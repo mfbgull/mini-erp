@@ -1,0 +1,332 @@
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD BLOCK
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  contain: layout;
+}
+
+/* Edit mode */
+.dashboard-block--editing {
+  cursor: grab;
+}
+
+.dashboard-block--editing:active {
+  cursor: grabbing;
+}
+
+/* Deprecated block */
+.dashboard-block--deprecated {
+  border: 2px dashed var(--warning);
+  opacity: 0.8;
+}
+
+.dashboard-block-deprecated {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  color: var(--neutral-500);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DRAG HANDLE
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block-drag-handle {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 10;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--neutral-100);
+  border-radius: 4px;
+  color: var(--neutral-500);
+  cursor: grab;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.dashboard-block-drag-handle:hover {
+  opacity: 1;
+  background: var(--neutral-200);
+}
+
+.dashboard-block-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACTION BUTTONS (settings, delete)
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 10;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.dashboard-block--editing:hover .dashboard-block-actions {
+  opacity: 1;
+}
+
+.dashboard-block-action-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--neutral-100);
+  border: none;
+  border-radius: 4px;
+  color: var(--neutral-500);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dashboard-block-action-btn:hover {
+  background: var(--neutral-200);
+  color: var(--neutral-700);
+}
+
+.dashboard-block-action-btn--delete:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESIZE HANDLE
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block-resize-handle {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  z-index: 10;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neutral-400);
+  cursor: nwse-resize;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.dashboard-block--editing:hover .dashboard-block-resize-handle {
+  opacity: 0.6;
+}
+
+.dashboard-block-resize-handle:hover {
+  opacity: 1 !important;
+  color: var(--primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BLOCK CONTENT
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  min-height: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS POPOVER
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block-settings-popover {
+  position: absolute;
+  top: 36px;
+  right: 6px;
+  z-index: 100;
+  width: 220px;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--neutral-200);
+  overflow: hidden;
+}
+
+.dashboard-block-settings-header {
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--neutral-800);
+  background: var(--neutral-50);
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.dashboard-block-settings-body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-block-settings-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--neutral-600);
+  font-weight: 500;
+}
+
+.dashboard-block-settings-input,
+.dashboard-block-settings-select {
+  padding: 6px 8px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.dashboard-block-settings-input:focus,
+.dashboard-block-settings-select:focus {
+  border-color: var(--primary);
+}
+
+.dashboard-block-settings-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dashboard-block-settings-size-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 4px;
+  background: white;
+  color: var(--neutral-600);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dashboard-block-settings-size-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.dashboard-block-settings-size-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.dashboard-block-settings-footer {
+  padding: 8px 12px;
+  border-top: 1px solid var(--neutral-100);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dashboard-block-settings-cancel-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--neutral-300);
+  border-radius: 6px;
+  background: white;
+  color: var(--neutral-700);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dashboard-block-settings-cancel-btn:hover {
+  background: var(--neutral-50);
+  border-color: var(--neutral-400);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DELETE CONFIRMATION
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block-delete-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+.dashboard-block-delete-dialog {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 200px;
+}
+
+.dashboard-block-delete-dialog p {
+  margin: 0 0 12px 0;
+  font-size: 0.9rem;
+  color: var(--neutral-800);
+  font-weight: 500;
+}
+
+.dashboard-block-delete-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.dashboard-block-delete-cancel,
+.dashboard-block-delete-confirm {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.dashboard-block-delete-cancel {
+  background: var(--neutral-100);
+  color: var(--neutral-600);
+}
+
+.dashboard-block-delete-confirm {
+  background: var(--danger);
+  color: white;
+}
+
+.dashboard-block-delete-cancel:hover {
+  background: var(--neutral-200);
+}
+
+.dashboard-block-delete-confirm:hover {
+  opacity: 0.9;
+}

@@ -1,0 +1,111 @@
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD LAYOUT
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-layout {
+  position: relative;
+  width: 100%;
+  margin-top: var(--space-md);
+}
+
+/* Empty State */
+.dashboard-layout-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--neutral-400);
+  font-size: 1.1rem;
+  border: 2px dashed var(--neutral-300);
+  border-radius: var(--radius-md);
+  background: var(--neutral-50);
+}
+
+.dashboard-layout-empty-hint {
+  margin-top: var(--space-sm);
+  font-size: 0.85rem;
+  color: var(--neutral-400);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHIMMER LOADING
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--neutral-100) 0%,
+    var(--neutral-200) 50%,
+    var(--neutral-100) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ERROR / RETRY
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-block-error {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  color: var(--neutral-500);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.dashboard-block-retry-btn {
+  padding: 6px 14px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.dashboard-block-retry-btn:hover {
+  opacity: 0.9;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DRAG-AND-DROP EDIT MODE OVERLAY
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboard-layout--editing {
+  /* Subtle background change when editing */
+}
+
+.dashboard-layout--editing .dashboard-block {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--neutral-200);
+}
+
+.dashboard-layout--editing .dashboard-block:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — single column on mobile
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    /* On mobile, blocks are rendered in a single-column flow by the component */
+  }
+}

@@ -1,0 +1,199 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Dashboard Block Palette
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Backdrop */
+.dash-palette-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 49;
+  animation: dash-palette-fade-in 0.2s ease-out;
+}
+
+@keyframes dash-palette-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Panel */
+.dash-palette {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 360px;
+  max-width: 90vw;
+  height: 100vh;
+  background: var(--card-bg, #1a1d23);
+  border-left: 1px solid var(--neutral-700, #2a2d35);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dash-palette--open {
+  transform: translateX(0);
+}
+
+/* Header */
+.dash-palette-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--neutral-700, #2a2d35);
+  flex-shrink: 0;
+}
+
+.dash-palette-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--neutral-100, #e8e9ed);
+}
+
+.dash-palette-count {
+  font-size: 0.75rem;
+  color: var(--neutral-400, #9ca3af);
+  background: var(--neutral-800, #1e2028);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Max reached notice */
+.dash-palette-notice {
+  margin: 12px 18px 0;
+  padding: 8px 12px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  color: #fbbf24;
+}
+
+/* Block List */
+.dash-palette-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Individual palette item */
+.dash-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--neutral-200, #c8cad0);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.dash-palette-item:hover:not(:disabled) {
+  background: var(--neutral-800, #1e2028);
+  border-color: var(--neutral-700, #2a2d35);
+}
+
+.dash-palette-item:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.dash-palette-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Item icon */
+.dash-palette-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--primary-900, #1e3a5f);
+  color: var(--primary-400, #60a5fa);
+  flex-shrink: 0;
+}
+
+/* Item body (name + description) */
+.dash-palette-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-palette-item-name {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--neutral-100, #e8e9ed);
+}
+
+.dash-palette-item-desc {
+  font-size: 0.7rem;
+  color: var(--neutral-400, #9ca3af);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Size badge */
+.dash-palette-item-size {
+  font-size: 0.65rem;
+  color: var(--neutral-500, #6b7280);
+  background: var(--neutral-800, #1e2028);
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Add icon */
+.dash-palette-item-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--primary-400, #60a5fa);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.dash-palette-item:hover:not(:disabled) .dash-palette-item-action {
+  opacity: 1;
+}
+
+/* Scrollbar styling */
+.dash-palette-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dash-palette-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dash-palette-list::-webkit-scrollbar-thumb {
+  background: var(--neutral-700, #2a2d35);
+  border-radius: 3px;
+}
+
+.dash-palette-list::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-600, #3a3d45);
+}
