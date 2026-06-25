@@ -137,6 +137,22 @@ opencode.jsonc
 temp/
 _tmp/
 
+# Debug / scratch files
+__check_db.*
+__inspect_*
+entities.json
+chroma.sqlite3
+mcp_requirements.txt
+playwright.config.js
+
+# Research notes
+*-research.md
+*spec.md
+*demandspec.md
+
+# Startup scripts
+start_opencode_*.sh
+
 # ----------------------------------------
 # AGENT/AI TOOL FILES
 # ----------------------------------------
