@@ -16,10 +16,13 @@ A complete, production-ready ERP solution for small to medium businesses.
 # Install dependencies
 cd server && npm install && cd ../client && npm install
 
+# Run migrations (after first install or schema changes)
+cd server && npm run migrate
+
 # Start backend (port 3011)
 cd server && npm start
 
-# Start frontend (port 5173)
+# Start frontend (port 5173)  
 cd client && npm run dev
 ```
 
@@ -35,8 +38,11 @@ cd client && npm run dev
 | Manufacturing | BOM, work orders, production cost tracking |
 | **General Ledger** | **Double-entry GL, chart of accounts, accounting periods, trial balance** |
 | Expenses | Categories, expense tracking |
-| Reports | 20+ reports (P&L, balance sheet, AR/AP aging, cash flow) |
+| Reports | 20+ reports + custom report builder with entity field picker |
+| Forecasts | Demand forecasting with accuracy tracking dashboard |
+| Dashboard | Fully customizable drag-and-drop block layout (save/reset) |
 | CLI | `cli-anything-minierp` — full feature access from terminal |
+| Localization | English & Urdu (UI language switcher, locale files) |
 
 > See **[ECOSYSTEM_README.md](ECOSYSTEM_README.md)** for the full system architecture, module map, GL posting flows, and sequence diagrams.
 
@@ -57,8 +63,14 @@ cli-anything-minierp utils backup --name "backup"
 
 ```
 mini-erp/
-├── client/           # React frontend
-├── server/           # Express backend
+├── client/           # React frontend (Vite, TanStack Query, AG-Grid)
+│   ├── src/components/dashboard/  # Draggable block components
+│   └── src/pages/                 # Feature pages incl. reports, forecasts
+├── server/           # Express backend (layered architecture)
+│   ├── src/controllers/
+│   ├── src/services/              # Business logic + report query engine
+│   ├── src/migrations/
+│   └── src/models/
 ├── electron/         # Desktop app (optional)
 ├── database/         # SQLite database
 └── AGENTS.md        # Agent operational rules
