@@ -59,6 +59,7 @@ const getNavItems = (): NavItem[] => [
     children: [
       { path: '/pos', labelKey: 'nav.pos' },
       { path: '/sales', labelKey: 'nav.invoices' },
+      { path: '/sales/invoice-v2', labelKey: 'nav.quickInvoice' },
       { path: '/quotations', labelKey: 'nav.quotations' },
       { path: '/sales-orders', labelKey: 'nav.salesOrders' },
       { path: '/sales/returns', labelKey: 'nav.invoiceReturns' }

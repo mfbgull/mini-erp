@@ -1,0 +1,992 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Invoice V2 — Modal Shell & Base Styles
+   Enterprise / Professional aesthetic: dense, structured, compact.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Variables ──────────────────────────────────────────────────── */
+
+:root {
+  --iv2-primary: #2563eb;
+  --iv2-primary-hover: #1d4ed8;
+  --iv2-bg: #ffffff;
+  --iv2-bg-muted: #f8fafc;
+  --iv2-bg-header: #f8fafc;
+  --iv2-text: #111827;
+  --iv2-text-secondary: #6b7280;
+  --iv2-text-tertiary: #9ca3af;
+  --iv2-border: #e2e8f0;
+  --iv2-border-light: #f1f5f9;
+  --iv2-success: #10b981;
+  --iv2-error: #ef4444;
+  --iv2-warning: #f59e0b;
+  --iv2-accent-bg: #eff6ff;
+  --iv2-font: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --iv2-radius: 4px;
+  --iv2-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Backdrop & Modal Container ────────────────────────────────── */
+
+.iv2-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.iv2-modal {
+  width: 90vw;
+  max-width: 1400px;
+  max-height: 95vh;
+  background: var(--iv2-bg);
+  border-radius: var(--iv2-radius);
+  box-shadow: var(--iv2-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: iv2SlideUp 0.25s ease-out;
+}
+
+@keyframes iv2SlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.iv2-modal-exit {
+  animation: iv2FadeOut 0.15s ease-out forwards;
+}
+
+@keyframes iv2FadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ── Header Bar ────────────────────────────────────────────────── */
+
+.iv2-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--iv2-border);
+  background: var(--iv2-bg-header);
+  flex-shrink: 0;
+}
+
+.iv2-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iv2-header-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--iv2-text);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.iv2-header-invoice-no {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--iv2-text-secondary);
+  background: var(--iv2-bg-muted);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+}
+
+.iv2-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--iv2-primary);
+  background: var(--iv2-accent-bg);
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid #bfdbfe;
+}
+
+.iv2-source-badge button {
+  background: none;
+  border: none;
+  color: var(--iv2-primary);
+  cursor: pointer;
+  font-size: 0.6875rem;
+  text-decoration: underline;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+.iv2-header-close {
+  background: none;
+  border: none;
+  color: var(--iv2-text-tertiary);
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  font-size: 1.25rem;
+  transition: all 0.15s;
+}
+
+.iv2-header-close:hover {
+  background: var(--iv2-bg-muted);
+  color: var(--iv2-text);
+}
+
+/* ── Modal Body (scrollable) ───────────────────────────────────── */
+
+.iv2-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+/* ── Customer Panel ─────────────────────────────────────────────── */
+
+.iv2-customer-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 0 0.75rem 0;
+  border-bottom: 1px solid var(--iv2-border-light);
+}
+
+.iv2-customer-field {
+  flex: 1;
+  max-width: 400px;
+}
+
+.iv2-customer-balance {
+  font-size: 0.75rem;
+  color: var(--iv2-text-secondary);
+  white-space: nowrap;
+}
+
+.iv2-customer-balance .positive {
+  color: var(--iv2-error);
+  font-weight: 600;
+}
+
+.iv2-customer-balance .zero {
+  color: var(--iv2-success);
+  font-weight: 600;
+}
+
+/* ── Collapsible Section ────────────────────────────────────────── */
+
+.iv2-collapsible {
+  border: 1px solid var(--iv2-border-light);
+  border-radius: 3px;
+}
+
+.iv2-collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--iv2-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.iv2-collapsible-header:hover {
+  background: var(--iv2-bg-muted);
+}
+
+.iv2-collapsible-header .chevron {
+  font-size: 0.625rem;
+  transition: transform 0.15s;
+}
+
+.iv2-collapsible-header .chevron.open {
+  transform: rotate(180deg);
+}
+
+.iv2-collapsible-body {
+  padding: 0.75rem;
+  border-top: 1px solid var(--iv2-border-light);
+}
+
+/* ── Items Grid Header ──────────────────────────────────────────── */
+
+.iv2-items-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.iv2-items-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.iv2-discount-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--iv2-text-secondary);
+  background: var(--iv2-bg-muted);
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid var(--iv2-border-light);
+}
+
+.iv2-discount-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  font-size: 0.6875rem;
+}
+
+.iv2-discount-toggle input[type="radio"] {
+  accent-color: var(--iv2-primary);
+  margin: 0;
+}
+
+/* ── Items Grid ─────────────────────────────────────────────────── */
+
+.iv2-grid-wrapper {
+  border: 1px solid var(--iv2-border);
+  border-radius: var(--iv2-radius);
+  overflow: auto;
+  flex: 1;
+  min-height: 150px;
+  max-height: calc(100vh - 420px);
+}
+
+.iv2-grid {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.8125rem;
+}
+
+.iv2-grid thead {
+  background: var(--iv2-bg-header);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.iv2-grid th {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--iv2-text-tertiary);
+  border-right: 1px solid var(--iv2-border);
+  border-bottom: 1px solid var(--iv2-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.iv2-grid th:last-child {
+  border-right: none;
+}
+
+.iv2-grid th.text-right {
+  text-align: right;
+}
+
+.iv2-grid th.text-center {
+  text-align: center;
+}
+
+.iv2-grid td {
+  padding: 0.375rem 0.5rem;
+  border-right: 1px solid var(--iv2-border-light);
+  border-bottom: 1px solid var(--iv2-border-light);
+  color: var(--iv2-text);
+  vertical-align: middle;
+}
+
+.iv2-grid td:last-child {
+  border-right: none;
+}
+
+.iv2-grid tbody tr:hover {
+  background: var(--iv2-bg-muted);
+}
+
+.iv2-grid tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Cell types */
+.iv2-cell-row {
+  color: var(--iv2-text-tertiary);
+  font-weight: 500;
+  text-align: center;
+  width: 2.25rem;
+  min-width: 2.25rem;
+}
+
+.iv2-cell-desc {
+  min-width: 12.5rem;
+}
+
+.iv2-cell-qty {
+  width: 5rem;
+  min-width: 5rem;
+  text-align: right;
+}
+
+.iv2-cell-rate {
+  width: 6.875rem;
+  min-width: 6.875rem;
+  text-align: right;
+}
+
+.iv2-cell-disc {
+  width: 5rem;
+  min-width: 5rem;
+  text-align: right;
+}
+
+.iv2-cell-tax {
+  width: 4.375rem;
+  min-width: 4.375rem;
+  text-align: right;
+}
+
+.iv2-cell-amount {
+  width: 6.875rem;
+  min-width: 6.875rem;
+  text-align: right;
+  font-weight: 600;
+  color: var(--iv2-primary);
+}
+
+.iv2-cell-delete {
+  width: 2.25rem;
+  min-width: 2.25rem;
+  text-align: center;
+}
+
+/* Editable cell */
+.iv2-editable {
+  cursor: pointer;
+  padding: 0.25rem;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  min-height: 1.5rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  transition: all 0.1s;
+}
+
+.iv2-editable:hover {
+  background: var(--iv2-bg-muted);
+}
+
+.iv2-editable:focus,
+.iv2-editable.active {
+  outline: none;
+  border-color: var(--iv2-primary);
+  background: var(--iv2-accent-bg);
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.15);
+}
+
+.iv2-editable-input {
+  width: 100%;
+  padding: 0.25rem 0.375rem;
+  border: 1px solid var(--iv2-primary);
+  border-radius: 2px;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  background: var(--iv2-bg);
+  box-sizing: border-box;
+}
+
+.iv2-editable-input:focus {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.iv2-cell-delete button {
+  background: none;
+  border: none;
+  color: var(--iv2-text-tertiary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  transition: all 0.15s;
+}
+
+.iv2-cell-delete button:hover {
+  opacity: 1;
+  color: var(--iv2-error);
+  background: #fef2f2;
+}
+
+/* ── Totals & Discount ──────────────────────────────────────────── */
+
+.iv2-totals-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.iv2-totals-panel {
+  width: 18rem;
+  flex-shrink: 0;
+  background: var(--iv2-bg-muted);
+  border-radius: var(--iv2-radius);
+  padding: 0.75rem;
+  border: 1px solid var(--iv2-border);
+}
+
+.iv2-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+  font-size: 0.8125rem;
+  color: var(--iv2-text-secondary);
+}
+
+.iv2-total-row .value {
+  font-weight: 500;
+  color: var(--iv2-text);
+}
+
+.iv2-total-row.discount .value {
+  color: var(--iv2-success);
+}
+
+.iv2-total-row.border-top {
+  border-top: 1px solid var(--iv2-border);
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.iv2-total-row.final {
+  border-top: 2px solid var(--iv2-border);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--iv2-text);
+}
+
+.iv2-total-row.final .value {
+  color: var(--iv2-primary);
+  font-size: 1.125rem;
+}
+
+.iv2-discount-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--iv2-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.iv2-discount-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.iv2-discount-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.iv2-discount-controls select {
+  padding: 0.25rem;
+  border: 1px solid var(--iv2-border);
+  border-radius: 2px;
+  font-size: 0.75rem;
+  background: var(--iv2-bg);
+  width: 3rem;
+}
+
+.iv2-discount-controls input {
+  width: 5rem;
+  padding: 0.25rem 0.375rem;
+  border: 1px solid var(--iv2-border);
+  border-radius: 2px;
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.iv2-discount-controls input:focus {
+  outline: none;
+  border-color: var(--iv2-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* ── Payment Section ────────────────────────────────────────────── */
+
+.iv2-payment-section {
+  border-top: 1px solid var(--iv2-border);
+  padding-top: 0.75rem;
+}
+
+.iv2-payment-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.iv2-payment-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--iv2-text);
+  cursor: pointer;
+}
+
+.iv2-payment-checkbox input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--iv2-primary);
+}
+
+.iv2-payment-total-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--iv2-primary);
+}
+
+.iv2-payment-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.iv2-payment-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.iv2-payment-field label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--iv2-text-tertiary);
+  text-transform: uppercase;
+}
+
+.iv2-payment-field select,
+.iv2-payment-field input {
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--iv2-border);
+  border-radius: 2px;
+  font-size: 0.8125rem;
+  background: var(--iv2-bg);
+}
+
+.iv2-payment-field select:focus,
+.iv2-payment-field input:focus {
+  outline: none;
+  border-color: var(--iv2-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.iv2-payment-field.method {
+  width: 8rem;
+}
+
+.iv2-payment-field.amount {
+  width: 8rem;
+}
+
+.iv2-payment-field.ref {
+  flex: 1;
+  min-width: 6rem;
+}
+
+.iv2-payment-field select {
+  width: 100%;
+}
+
+.iv2-payment-field input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.iv2-payment-shortcuts {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0.5rem 0;
+}
+
+.iv2-shortcut-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  font-size: 0.625rem;
+  color: var(--iv2-text-tertiary);
+  background: var(--iv2-bg-muted);
+  padding: 0.125rem 0.375rem;
+  border-radius: 2px;
+  border: 1px solid var(--iv2-border-light);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.iv2-shortcut-badge:hover {
+  background: var(--iv2-accent-bg);
+  border-color: #bfdbfe;
+  color: var(--iv2-primary);
+}
+
+.iv2-shortcut-badge .key {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.5625rem;
+}
+
+.iv2-payment-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--iv2-text);
+  padding: 0.5rem 0 0 0;
+  border-top: 1px solid var(--iv2-border-light);
+  margin-top: 0.5rem;
+}
+
+.iv2-add-method-btn {
+  background: none;
+  border: 1px dashed var(--iv2-border);
+  color: var(--iv2-text-secondary);
+  padding: 0.375rem 0.75rem;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.iv2-add-method-btn:hover {
+  border-color: var(--iv2-primary);
+  color: var(--iv2-primary);
+  background: var(--iv2-accent-bg);
+}
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+
+.iv2-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--iv2-border);
+  background: var(--iv2-bg-header);
+  flex-shrink: 0;
+}
+
+.iv2-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--iv2-border);
+  border-radius: var(--iv2-radius);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--iv2-bg);
+  color: var(--iv2-text);
+  font-family: inherit;
+}
+
+.iv2-btn:hover {
+  background: var(--iv2-bg-muted);
+}
+
+.iv2-btn.primary {
+  background: var(--iv2-primary);
+  color: white;
+  border-color: var(--iv2-primary);
+}
+
+.iv2-btn.primary:hover {
+  background: var(--iv2-primary-hover);
+}
+
+.iv2-btn.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.iv2-btn .spinner {
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: iv2Spin 0.5s linear infinite;
+}
+
+@keyframes iv2Spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Notes/Terms Textareas ──────────────────────────────────────── */
+
+.iv2-notes-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.iv2-notes-field {
+  flex: 1;
+}
+
+.iv2-notes-field label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--iv2-text-tertiary);
+  margin-bottom: 0.25rem;
+}
+
+.iv2-notes-field textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--iv2-border);
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  resize: vertical;
+  min-height: 3rem;
+  max-height: 7.5rem;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.iv2-notes-field textarea:focus {
+  outline: none;
+  border-color: var(--iv2-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* ── Validation / Error ─────────────────────────────────────────── */
+
+.iv2-error {
+  color: var(--iv2-error);
+  font-size: 0.6875rem;
+  margin-top: 0.125rem;
+  padding: 0.125rem 0.375rem;
+  background: #fef2f2;
+  border-radius: 2px;
+  border-left: 2px solid var(--iv2-error);
+}
+
+/* ── Discard confirmation mini-modal ────────────────────────────── */
+
+.iv2-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iv2-confirm-dialog {
+  background: var(--iv2-bg);
+  border-radius: var(--iv2-radius);
+  box-shadow: var(--iv2-shadow);
+  padding: 1.5rem;
+  max-width: 24rem;
+  width: 90%;
+}
+
+.iv2-confirm-dialog h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--iv2-text);
+}
+
+.iv2-confirm-dialog p {
+  margin: 0 0 1.25rem 0;
+  font-size: 0.8125rem;
+  color: var(--iv2-text-secondary);
+}
+
+.iv2-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* ── Loading skeleton ───────────────────────────────────────────── */
+
+.iv2-skeleton {
+  animation: iv2Pulse 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  border-radius: 2px;
+}
+
+@keyframes iv2Pulse {
+  0%, 100% { background-position: 200% 0; }
+  50% { background-position: -200% 0; }
+}
+
+.iv2-skeleton-row {
+  height: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.iv2-skeleton-cell {
+  height: 1.5rem;
+  width: 80%;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .iv2-modal {
+    width: 95vw;
+  }
+
+  .iv2-totals-section {
+    flex-direction: column;
+  }
+
+  .iv2-totals-panel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .iv2-overlay {
+    padding: 0;
+  }
+
+  .iv2-modal {
+    width: 100vw;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    animation: none;
+  }
+
+  .iv2-header {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .iv2-body {
+    padding: 0.75rem;
+  }
+
+  .iv2-grid-wrapper {
+    max-height: 50vh;
+  }
+
+  .iv2-payment-row {
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .iv2-payment-field.method,
+  .iv2-payment-field.amount {
+    width: 100%;
+  }
+
+  .iv2-notes-row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .iv2-grid td,
+  .iv2-grid th {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.75rem;
+  }
+
+  .iv2-customer-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .iv2-customer-field {
+    max-width: 100%;
+  }
+
+  .iv2-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .iv2-footer .iv2-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

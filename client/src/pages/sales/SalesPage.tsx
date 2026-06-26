@@ -341,6 +341,10 @@ export default function SalesPage() {
             <Plus size={18} />
             {t('sales.newInvoice')}
           </Button>
+          <Button variant="secondary" onClick={() => navigate('/sales/invoice-v2')}>
+            <Plus size={18} />
+            Quick Invoice
+          </Button>
         </div>
       </div>
 

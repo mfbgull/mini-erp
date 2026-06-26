@@ -50,6 +50,7 @@ const InvoiceViewPage = lazy(() => import('./pages/sales/InvoiceViewPage'));
 const InvoiceReturnHistory = lazy(() => import('./pages/sales/InvoiceReturnHistory'));
 const InvoiceRouter = lazy(() => import('./components/invoice/InvoiceRouter'));
 const InvoiceWizardPage = lazy(() => import('./pages/invoice/InvoiceWizardPage'));
+const SalesInvoiceV2Page = lazy(() => import('./pages/sales/SalesInvoiceV2Page'));
 
 // Quotations & Sales Orders
 const QuotationsPage = lazy(() => import('./pages/quotations/QuotationsPage'));
@@ -241,6 +242,7 @@ function AppLayout() {
               <Route path="/sales/invoice/:id" element={<InvoiceRouter />} />
               <Route path="/sales/invoice/:id/view" element={<InvoiceViewPage />} />
               <Route path="/sales/invoice/:id/edit" element={<InvoiceRouter defaultMode="edit" />} />
+              <Route path="/sales/invoice-v2" element={<SalesInvoiceV2Page />} />
               <Route path="/sales/returns" element={<InvoiceReturnHistory />} />
               <Route path="/invoices/create" element={<InvoiceWizardPage />} />
               <Route path="/pos" element={<POSPage />} />

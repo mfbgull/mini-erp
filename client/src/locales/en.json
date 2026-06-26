@@ -614,6 +614,7 @@
     "manufacturing": "Manufacturing",
     "purchaseReturns": "Purchase Returns",
     "invoiceReturns": "Invoice Returns",
+    "quickInvoice": "Quick Invoice",
     "productionSummary": "Production Summary",
     "bomUsage": "BOM Usage",
     "manageExpenses": "Manage Expenses",
