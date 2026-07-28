@@ -771,6 +771,7 @@ runPhysicalCountsMigration();
 runForecastEnhancementsMigration();
 runCustomReportsMigration();
 runDashboardLayoutsMigration();
+runLooseItemMigration();
 
 // Rollback support: run if --rollback flag is passed
 if (process.argv.includes('--rollback')) {
@@ -1500,6 +1501,30 @@ function runDashboardLayoutsMigration(): void {
     }
   } catch (error: any) {
     logger.error('Dashboard layouts migration error:', error.message);
+  }
+}
+
+function runLooseItemMigration(): void {
+  try {
+    const columnCheck = db.prepare(`
+      SELECT COUNT(*) as count FROM pragma_table_info('items')
+      WHERE name='sale_type'
+    `).get() as { count: number };
+
+    if (columnCheck.count === 0) {
+      logger.info('Running loose item support migration...');
+
+      const migrationSQL = fs.readFileSync(
+        path.join(__dirname, '../migrations/add-loose-item-support.sql'),
+        'utf8'
+      );
+
+      db.exec(migrationSQL);
+
+      logger.info('✅ Loose item support migration completed!');
+    }
+  } catch (error: any) {
+    logger.error('Loose item support migration error:', error.message);
   }
 }
 

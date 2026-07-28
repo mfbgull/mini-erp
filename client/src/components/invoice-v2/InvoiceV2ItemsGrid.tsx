@@ -6,7 +6,7 @@
  * Input cells stopPropagation so the grid-level keyboard handler only fires for display cells.
  */
 
-import { useState, useCallback, useRef, useEffect, memo } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo, memo } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
 import { useInvoiceV2Keyboard } from '../../hooks/useInvoiceV2Keyboard';
@@ -15,6 +15,7 @@ import type {
   CellColumn,
   InvoiceV2ItemsGridProps,
 } from '../../types/invoiceV2';
+import { applyLineFieldUpdate, lineIssue } from '../../utils/invoiceLineCalc';
 
 
 
@@ -126,7 +127,17 @@ const SearchableDescCell = memo(function SearchableDescCell({
 
   const selectItem = useCallback(
     (inv: (typeof inventoryItems)[number]) => {
-      onUpdate('itemId', inv.id);
+      // Single atomic patch: identity + pricing + loose-item calculation settings
+      onUpdate('patch', {
+        itemId: inv.id,
+        description: inv.item_name,
+        rate: inv.standard_selling_price || 0,
+        sale_type: inv.sale_type || 'packed',
+        qty_decimal_precision: inv.qty_decimal_precision || 0,
+        rounding_step: inv.rounding_step ?? null,
+        amount: 0,
+        lastEditedField: null,
+      });
       setTempValue(inv.item_name);
       setShowDropdown(false);
       setFiltered([]);
@@ -345,6 +356,8 @@ interface NumberCellProps {
   onNavigate: (row: number, col: CellColumn) => void;
   onAddRow: () => void;
   fieldOrder: readonly CellColumn[];
+  /** Decimal places to display (from item master qty_decimal_precision) */
+  decimals?: number;
 }
 
 const EditableNumberCell = memo(function EditableNumberCell({
@@ -358,6 +371,7 @@ const EditableNumberCell = memo(function EditableNumberCell({
   onNavigate,
   onAddRow,
   fieldOrder,
+  decimals = 0,
 }: NumberCellProps) {
   const [tempValue, setTempValue] = useState(String(value));
 
@@ -469,7 +483,7 @@ const EditableNumberCell = memo(function EditableNumberCell({
 
   return (
     <DisplayCell row={row} col={col} onActivate={onActivate}>
-      {value || 0}
+      {decimals > 0 ? (value || 0).toFixed(decimals) : value || 0}
     </DisplayCell>
   );
 });
@@ -640,13 +654,26 @@ export default function InvoiceV2ItemsGrid({
   });
 
   const fieldOrder = getFieldOrder();
+  const amountFieldOrder = useMemo<readonly CellColumn[]>(
+    () => [...fieldOrder, 'amount'],
+    [fieldOrder],
+  );
 
   /* ── Item row-level update wrapper ─────────────────────────── */
   const handleUpdateItemField = useCallback(
     (itemId: number, field: string, value: unknown) => {
+      const item = items.find((i) => i.id === itemId);
+
+      // quantity/rate/amount all route through the shared calculation so packed
+      // and loose lines stay consistent and the driver field is preserved.
+      if (item && (field === 'quantity' || field === 'rate' || field === 'amount')) {
+        onUpdateItem(itemId, 'patch', applyLineFieldUpdate(item, field, Number(value) || 0));
+        return;
+      }
+
       onUpdateItem(itemId, field, value);
     },
-    [onUpdateItem],
+    [items, onUpdateItem],
   );
 
   /* ── Navigate helper (wraps focusCell with row clamping) ──── */
@@ -814,6 +841,7 @@ export default function InvoiceV2ItemsGrid({
                       onNavigate={navigate}
                       onAddRow={handleAddRowFromKeyboard}
                       fieldOrder={fieldOrder}
+                      decimals={item.qty_decimal_precision || 0}
                     />
                   </td>
 
@@ -867,9 +895,41 @@ export default function InvoiceV2ItemsGrid({
                     />
                   </td>
 
-                  {/* Amount (calculated, display only) */}
+                  {/* Amount — editable for loose items, calculated display for packed */}
                   <td className="iv2-cell-amount">
-                    {formatCurrency(calculateItemTotal(item))}
+                    {item.sale_type === 'loose' ? (
+                      <>
+                        <EditableNumberCell
+                          row={idx}
+                          col="amount"
+                          value={item.amount || 0}
+                          isEditing={isEditing && focusedCell?.col === 'amount'}
+                          isLastRow={idx === items.length - 1}
+                          onUpdate={(field, value) => handleUpdateItemField(item.id, field, value)}
+                          onActivate={() => activate(idx, 'amount')}
+                          onNavigate={navigate}
+                          onAddRow={handleAddRowFromKeyboard}
+                          // Amount is last in the row's tab sequence for loose items;
+                          // it is not in the grid-level field order (packed rows have no input there).
+                          fieldOrder={amountFieldOrder}
+                          decimals={2}
+                        />
+                        {lineIssue(item) && (
+                          <div
+                            className="iv2-line-issue"
+                            style={{
+                              fontSize: '0.6875rem',
+                              color:
+                                lineIssue(item)!.severity === 'error' ? '#dc2626' : '#d97706',
+                            }}
+                          >
+                            {lineIssue(item)!.message}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      formatCurrency(calculateItemTotal(item))
+                    )}
                   </td>
 
                   {/* Delete */}

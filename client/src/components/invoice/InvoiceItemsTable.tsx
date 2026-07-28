@@ -6,6 +6,7 @@ import InvoiceEditableCell from './InvoiceEditableCell';
 import PriceHistoryHint from './PriceHistoryHint';
 import type { ItemsTableProps } from '../../types';
 import { getFieldOrder } from '../../utils/invoiceCalculations';
+import { lineIssue } from '../../utils/invoiceLineCalc';
 
 const InvoiceItemsTable = memo(function InvoiceItemsTable({
   invoice,
@@ -118,7 +119,11 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                 </td>
                 <td className="text-right invoice-item-cell">
                   <InvoiceEditableCell
-                    value={item.quantity}
+                    value={
+                      item.qty_decimal_precision
+                        ? item.quantity.toFixed(item.qty_decimal_precision)
+                        : item.quantity
+                    }
                     itemId={item.id}
                     field="quantity"
                     type="number"
@@ -201,7 +206,39 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                   />
                 </td>
                 <td className="text-right amount-cell-modern">
-                  {formatCurrency(calculateItemTotal(item))}
+                  {item.sale_type === 'loose' ? (
+                    <>
+                      <InvoiceEditableCell
+                        value={(item.amount || 0).toFixed(2)}
+                        itemId={item.id}
+                        field="amount"
+                        type="number"
+                        isLastItem={index === invoice.items.length - 1}
+                        editingCell={editingCell}
+                        items={invoice.items}
+                        fieldOrder={fieldOrder}
+                        onSetEditingCell={(cellId) => onSetEditingCell(cellId)}
+                        onUpdateItem={onUpdateItem}
+                        onAddNewItem={onAddNewItem}
+                        onSetPendingFocus={onSetPendingFocus}
+                        getNextField={(f) => getNextField(f, invoice.discountScope)}
+                        isLastField={isLastField}
+                      />
+                      {lineIssue(item) && (
+                        <div
+                          className="field-error"
+                          style={{
+                            fontSize: '0.6875rem',
+                            color: lineIssue(item)!.severity === 'error' ? '#dc2626' : '#d97706',
+                          }}
+                        >
+                          {lineIssue(item)!.message}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    formatCurrency(calculateItemTotal(item))
+                  )}
                 </td>
                 <td className="text-center invoice-item-cell">
                   <button

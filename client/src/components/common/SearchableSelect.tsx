@@ -39,7 +39,11 @@ export default function SearchableSelect({
   loading = false
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  // `query` is only the text the user typed. The selected option's label is
+  // derived from `value` — keeping them separate, otherwise the label itself
+  // filters the list down to a single entry once something is selected.
+  const [query, setQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,19 +54,29 @@ export default function SearchableSelect({
     [filterOption]
   );
 
-  // Filter options based on search query - use useMemo instead of useEffect
+  // Label of the currently selected option (single-select only)
+  const selectedLabel = useMemo(() => {
+    if (multiple) return '';
+    if (value === '' || value === null || value === undefined) return '';
+    return options.find(opt => opt.value === value)?.label ?? String(value);
+  }, [value, options, multiple]);
+
+  // Filter only while the user is actively typing
   const filteredOptions = useMemo(() => {
-    if (searchQuery.trim() === '') {
+    if (!isSearching || query.trim() === '') {
       return options;
     }
-    return options.filter(option => memoizedFilterOption(option, searchQuery));
-  }, [searchQuery, options, memoizedFilterOption]);
+    return options.filter(option => memoizedFilterOption(option, query));
+  }, [isSearching, query, options, memoizedFilterOption]);
 
   // Handle clicks outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        // Drop the abandoned query so the selected label shows again
+        setIsSearching(false);
+        setQuery('');
       }
     };
 
@@ -78,19 +92,21 @@ export default function SearchableSelect({
         ? currentValues.filter((v: string | number) => v !== option.value)
         : [...currentValues, option.value];
       onChange({ target: { name, value: newValue as string[] } });
+      setQuery('');
+      setIsSearching(false);
     } else {
       onChange({ target: { name, value: option.value } });
-      setSearchQuery(option.label);
+      setQuery('');
+      setIsSearching(false);
       setIsOpen(false);
     }
   };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    setSearchQuery(inputValue);
+    setQuery(event.target.value);
+    setIsSearching(true);
     setHighlightedIndex(0); // Reset highlight to first item
-    // Open dropdown when user starts typing
-    if (inputValue.trim() !== '' && !isOpen) {
+    if (!isOpen) {
       setIsOpen(true);
     }
   };
@@ -117,36 +133,23 @@ export default function SearchableSelect({
         break;
       case 'Escape':
         setIsOpen(false);
+        setIsSearching(false);
+        setQuery('');
         break;
     }
   };
 
   const handleInputClick = () => {
-    if (!disabled) {
-      setIsOpen(!isOpen); // Toggle dropdown
+    if (disabled) return;
+    if (isOpen) {
+      setIsOpen(false);
+    } else {
+      // Opening shows the full list; typing then narrows it
+      setIsOpen(true);
+      setIsSearching(false);
+      setQuery('');
     }
   };
-
-  // Update search query when value changes (for pre-selected values)
-  useEffect(() => {
-    // Only update if options are available
-    if (!options || options.length === 0) {
-      return;
-    }
-
-    // Don't override search query if user is actively searching
-    if (searchQuery.trim() !== '' && isOpen) {
-      return;
-    }
-
-    // For single select: show the selected option's label
-    if (!multiple && value) {
-      const selectedOption = options.find(opt => opt.value === value);
-      if (selectedOption) {
-        setSearchQuery(selectedOption.label);
-      }
-    }
-  }, [value, options, multiple, isOpen, searchQuery]);
 
   // Filter options to show available options
   const availableOptions = useMemo(() =>
@@ -164,7 +167,8 @@ export default function SearchableSelect({
   const handleClearAll = (e: React.MouseEvent) => {
     e.stopPropagation();
     onChange({ target: { name, value: [] } });
-    setSearchQuery('');
+    setQuery('');
+    setIsSearching(false);
   };
 
   return (
@@ -180,7 +184,7 @@ export default function SearchableSelect({
         <input
           ref={inputRef}
           type="text"
-          value={searchQuery}
+          value={isSearching || multiple ? query : selectedLabel}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onClick={handleInputClick}
@@ -227,7 +231,7 @@ export default function SearchableSelect({
             ))
           ) : (
             <div className="searchable-select-no-options">
-              {searchQuery ? 'No options found' : 'Start typing to search...'}
+              {query ? 'No options found' : 'Start typing to search...'}
             </div>
           )}
         </div>

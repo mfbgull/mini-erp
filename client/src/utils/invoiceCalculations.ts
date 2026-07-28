@@ -10,8 +10,20 @@ import type { InvoiceFormItem, Discount, InvoiceFormState } from '../types';
 /**
  * Calculate the discount amount for a single item, given the discountScope.
  */
+export function calculateItemBase(item: InvoiceFormItem): number {
+  // Loose lines where the user typed the Amount use it verbatim —
+  // qty × rate would differ by the quantity rounding.
+  if (item.sale_type === 'loose' && item.lastEditedField === 'amount') {
+    return item.amount || 0;
+  }
+  return (item.quantity || 0) * (item.rate || 0);
+}
+
+/**
+ * Calculate the discount amount for a single item, given the discountScope.
+ */
 export function calculateItemDiscount(item: InvoiceFormItem): number {
-  const subtotal = (item.quantity || 0) * (item.rate || 0);
+  const subtotal = calculateItemBase(item);
   if (item.discount?.type === 'percentage') {
     return (subtotal * (item.discount.value || 0)) / 100;
   }
@@ -22,7 +34,7 @@ export function calculateItemDiscount(item: InvoiceFormItem): number {
  * Calculate the total for a single item (subtotal − discount + tax).
  */
 export function calculateItemTotal(item: InvoiceFormItem, discountScope: 'item' | 'invoice' = 'item'): number {
-  const subtotal = (item.quantity || 0) * (item.rate || 0);
+  const subtotal = calculateItemBase(item);
   const discount = discountScope === 'item' ? calculateItemDiscount(item) : 0;
   const afterDiscount = subtotal - discount;
   const taxAmount = (afterDiscount * (item.tax || 0)) / 100;
@@ -35,7 +47,7 @@ export function calculateItemTotal(item: InvoiceFormItem, discountScope: 'item' 
  * Calculate the subtotal (sum of qty × rate for all items).
  */
 export function calculateSubtotal(items: InvoiceFormItem[]): number {
-  return items.reduce((sum, item) => sum + (item.quantity || 0) * (item.rate || 0), 0);
+  return items.reduce((sum, item) => sum + calculateItemBase(item), 0);
 }
 
 /**
@@ -43,7 +55,7 @@ export function calculateSubtotal(items: InvoiceFormItem[]): number {
  */
 export function calculateTax(items: InvoiceFormItem[], discountScope: 'item' | 'invoice' = 'item'): number {
   return items.reduce((sum, item) => {
-    const subtotal = (item.quantity || 0) * (item.rate || 0);
+    const subtotal = calculateItemBase(item);
     const discount = discountScope === 'item' ? calculateItemDiscount(item) : 0;
     const afterDiscount = subtotal - discount;
     return sum + (afterDiscount * (item.tax || 0)) / 100;
@@ -109,6 +121,11 @@ export function createEmptyItemRow(index: number): InvoiceFormItem {
     rate: 0,
     tax: 0,
     discount: { type: 'flat', value: 0 },
+    sale_type: 'packed',
+    amount: 0,
+    lastEditedField: null,
+    qty_decimal_precision: 0,
+    rounding_step: null,
   };
 }
 
@@ -125,6 +142,11 @@ export function padItemsToMinimum(items: InvoiceFormItem[], min = 1): InvoiceFor
       rate: 0,
       tax: 0,
       discount: { type: 'flat', value: 0 },
+      sale_type: 'packed',
+      amount: 0,
+      lastEditedField: null,
+      qty_decimal_precision: 0,
+      rounding_step: null,
     });
   }
   return padded;
@@ -132,7 +154,8 @@ export function padItemsToMinimum(items: InvoiceFormItem[], min = 1): InvoiceFor
 
 /* ── Status helpers ─────────────────────────────────────────────── */
 
-export { getStatusColor } from './statusColors';
+// .ts extension so Node's test runner can load this module directly (Vite handles it too)
+export { getStatusColor } from './statusColors.ts';
 
 export function getExpectedStatus(
   invoiceId: string | undefined,

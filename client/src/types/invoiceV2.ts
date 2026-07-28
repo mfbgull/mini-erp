@@ -5,7 +5,7 @@
  * Reuses Discount, PaymentMethodEntry, and InvoiceSubmitData from types/index.ts.
  */
 
-import type { Discount, PaymentMethodEntry, PriceHistory } from './index';
+import type { Discount, PaymentMethodEntry, PriceHistory, SaleType } from './index';
 
 /* ── Customer ──────────────────────────────────────────────────── */
 
@@ -33,6 +33,14 @@ export interface InvoiceV2FormItem {
   rate: number;
   tax: number;
   discount: Discount;
+  /** 'packed' (qty drives amount) or 'loose' (bidirectional). Defaults to packed. */
+  sale_type?: SaleType;
+  /** Explicit line amount — authoritative only for loose amount-driven lines. */
+  amount?: number;
+  /** Which field the user last edited, driving loose recalculation. */
+  lastEditedField?: 'quantity' | 'amount' | null;
+  qty_decimal_precision?: number;
+  rounding_step?: number | null;
 }
 
 /* ── Payment ────────────────────────────────────────────────────── */
@@ -87,6 +95,7 @@ export type CellColumn =
   | 'rate'
   | 'discountValue'
   | 'tax'
+  | 'amount'
   | 'delete';
 
 export interface CellPosition {
@@ -147,6 +156,9 @@ export interface InvoiceV2ItemsGridProps {
     is_finished_good?: boolean | number;
     is_purchased?: boolean | number;
     is_manufactured?: boolean | number;
+    sale_type?: SaleType;
+    qty_decimal_precision?: number;
+    rounding_step?: number | null;
   }>;
   onUpdateItem: (id: number, field: string, value: unknown) => void;
   onRemoveItem: (id: number) => void;

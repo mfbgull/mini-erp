@@ -47,6 +47,7 @@ import {
   generateInvoiceNo,
   createDefaultInvoice,
 } from '../../utils/invoiceCalculations';
+import { applyLineFieldUpdate } from '../../utils/invoiceLineCalc';
 import {
   filterFilledItems,
   isValidPaymentAmount,
@@ -432,13 +433,21 @@ export default function SalesInvoicePage() {
         ...prev,
         items: prev.items.map((item) => {
           if (item.id !== id) return item;
-          if (field === 'itemId') {
+          if (field === 'patch') {
+            // Multi-field atomic update (used by the items table for loose-item recalculation)
+            return { ...item, ...(value as Partial<typeof item>) };
+          } else if (field === 'itemId') {
             const selectedItem = items.find((i) => i.id === Number(value));
             return {
               ...item,
               item_id: Number(value),
               description: selectedItem?.item_name || item.description,
               rate: selectedItem?.standard_selling_price || item.rate,
+              sale_type: selectedItem?.sale_type || 'packed',
+              qty_decimal_precision: selectedItem?.qty_decimal_precision || 0,
+              rounding_step: selectedItem?.rounding_step ?? null,
+              amount: 0,
+              lastEditedField: null,
             };
           } else if (field === 'discountType') {
             return { ...item, discount: { ...item.discount, type: value as 'flat' | 'percentage' } };
@@ -446,6 +455,9 @@ export default function SalesInvoicePage() {
             return { ...item, discount: { ...item.discount, value: Number(value) || 0 } };
           } else if (field === 'description') {
             return { ...item, description: String(value) };
+          } else if (field === 'quantity' || field === 'rate' || field === 'amount') {
+            // Shared calc keeps packed/loose lines consistent and preserves the driver field
+            return { ...item, ...applyLineFieldUpdate(item, field, Number(value) || 0) };
           } else {
             return { ...item, [field]: Number(value) || 0 };
           }

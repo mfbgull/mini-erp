@@ -778,6 +778,8 @@ export interface WarehouseFormData {
   description: string;
 }
 
+export type SaleType = 'packed' | 'loose';
+
 export interface InventoryItem {
   id: number;
   item_code: string;
@@ -795,6 +797,9 @@ export interface InventoryItem {
   is_manufactured: boolean | number;
   warehouse_id?: number;
   warehouse?: string;
+  sale_type?: SaleType;
+  qty_decimal_precision?: number;
+  rounding_step?: number | null;
 }
 
 export interface ItemFormData {
@@ -810,6 +815,9 @@ export interface ItemFormData {
   is_finished_good: boolean | number;
   is_purchased: boolean | number;
   is_manufactured: boolean | number;
+  sale_type: SaleType;
+  qty_decimal_precision: number;
+  rounding_step: number | null;
 }
 
 export interface ItemStats {
@@ -1603,6 +1611,9 @@ export interface InventoryItemOption {
   is_manufactured?: boolean;
   standard_cost?: number;
   purchase_price?: number;
+  sale_type?: SaleType;
+  qty_decimal_precision?: number;
+  rounding_step?: number | null;
 }
 
 export interface QuotationSubmitData {
@@ -2065,6 +2076,14 @@ export interface InvoiceFormItem {
   rate: number;
   tax: number;
   discount: Discount;
+  /** 'packed' (qty drives amount) or 'loose' (bidirectional). Defaults to packed. */
+  sale_type?: SaleType;
+  /** Explicit line amount — authoritative only for loose amount-driven lines. */
+  amount?: number;
+  /** Which field the user last edited, driving loose recalculation. */
+  lastEditedField?: 'quantity' | 'amount' | null;
+  qty_decimal_precision?: number;
+  rounding_step?: number | null;
 }
 
 export interface InvoiceCompany {

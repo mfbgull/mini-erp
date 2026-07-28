@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import Button from '../common/Button';
-import FormInput from '../common/FormInput';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { itemSchema } from '../../schemas';
-import api from '../../utils/api';
 import type { InventoryItem, ItemFormData } from '../../types';
+import api from '../../utils/api';
+import Button from '../common/Button';
+import FormInput from '../common/FormInput';
 
 interface ItemFormProps {
   item: InventoryItem | null;
@@ -29,9 +31,41 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
     is_finished_good: item?.is_finished_good || false,
     is_purchased: item?.is_purchased !== undefined ? item.is_purchased : true,
     is_manufactured: item?.is_manufactured || false,
+    sale_type: item?.sale_type || 'packed',
+    qty_decimal_precision: item?.qty_decimal_precision ?? 0,
+    rounding_step: item?.rounding_step ?? null,
   });
 
   const { errors, validate, clearErrors } = useFormValidation(itemSchema);
+  const queryClient = useQueryClient();
+
+  // Units of measure: standard list + those already used by existing items.
+  // Hardcoding them here made saved values like 'piece' unselectable.
+  const { data: uomOptions = [] } = useQuery<string[]>({
+    queryKey: ['items-uom'],
+    queryFn: async () => {
+      const response = await api.get('/inventory/items-uom');
+      return Array.isArray(response.data) ? response.data : [];
+    },
+  });
+
+  const { data: categoryOptions = [] } = useQuery<string[]>({
+    queryKey: ['items-categories'],
+    queryFn: async () => {
+      const response = await api.get('/inventory/items-categories');
+      const rows = Array.isArray(response.data) ? response.data : [];
+      return rows
+        .map((row: { category?: string } | string) =>
+          typeof row === 'string' ? row : row.category,
+        )
+        .filter((c): c is string => !!c);
+    },
+  });
+
+  // Always include the item's saved value, even if it predates the current lists
+  const uomChoices = Array.from(
+    new Set([...(formData.unit_of_measure ? [formData.unit_of_measure] : []), ...uomOptions]),
+  );
 
   const mutation = useMutation({
     mutationFn: async (data: ItemFormData) => {
@@ -43,6 +77,9 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
     },
     onSuccess: () => {
       toast.success(isEdit ? 'Item updated!' : 'Item created!');
+      // A new category/UOM typed here should appear in the lists next time
+      queryClient.invalidateQueries({ queryKey: ['items-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['items-uom'] });
       onSuccess();
     },
     onError: (error: { response?: { data?: { error?: string } } }) => {
@@ -54,10 +91,19 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    setFormData(prev => {
+      const next = { ...prev, [name]: type === 'checkbox' ? checked : value };
+      // Switching to loose defaults to gram-level precision; packed resets to whole units
+      if (name === 'sale_type') {
+        return value === 'loose'
+          ? { ...next, qty_decimal_precision: prev.qty_decimal_precision || 3 }
+          : { ...next, qty_decimal_precision: 0, rounding_step: null };
+      }
+      if (name === 'rounding_step') {
+        return { ...next, rounding_step: value === '' ? null : Number(value) };
+      }
+      return next;
+    });
 
     if (errors[name as keyof typeof errors]) {
       clearErrors();
@@ -111,6 +157,8 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
           value={formData.category}
           onChange={handleChange}
           placeholder="e.g., Raw Materials"
+          options={categoryOptions.map((c) => ({ value: c, label: c }))}
+          helpText="Pick an existing category or type a new one"
         />
         <FormInput
           label="Unit of Measure"
@@ -119,14 +167,7 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
           value={formData.unit_of_measure}
           onChange={handleChange}
           required
-          options={[
-            { value: 'Nos', label: 'Nos (Pieces)' },
-            { value: 'Kg', label: 'Kg (Kilogram)' },
-            { value: 'Ltr', label: 'Ltr (Liter)' },
-            { value: 'Box', label: 'Box' },
-            { value: 'Pack', label: 'Pack' },
-            { value: 'Bottle', label: 'Bottle' },
-          ]}
+          options={uomChoices.map((u) => ({ value: u, label: u }))}
           placeholder="Search UOM..."
         />
       </div>
@@ -156,6 +197,44 @@ export default function ItemForm({ item, onClose, onSuccess }: ItemFormProps) {
           onChange={handleChange}
           placeholder="0"
         />
+      </div>
+
+      <div className="form-row">
+        <FormInput
+          label="Sale Type"
+          name="sale_type"
+          type="select"
+          value={formData.sale_type}
+          onChange={handleChange}
+          required
+          options={[
+            { value: 'packed', label: 'Packed (quantity × rate)' },
+            { value: 'loose', label: 'Loose (billed by amount)' },
+          ]}
+          error={errors.sale_type}
+        />
+        {formData.sale_type === 'loose' && (
+          <>
+            <FormInput
+              label="Qty Decimal Precision"
+              name="qty_decimal_precision"
+              type="number"
+              value={formData.qty_decimal_precision}
+              onChange={handleChange}
+              placeholder="3"
+              error={errors.qty_decimal_precision}
+            />
+            <FormInput
+              label="Rounding Step"
+              name="rounding_step"
+              type="number"
+              value={formData.rounding_step ?? ''}
+              onChange={handleChange}
+              placeholder="Auto (from precision)"
+              error={errors.rounding_step}
+            />
+          </>
+        )}
       </div>
 
       <div className="form-section">

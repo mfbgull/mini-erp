@@ -14,6 +14,9 @@ interface Item {
   is_finished_good: number;
   is_purchased: number;
   is_manufactured?: number;
+  sale_type?: string;
+  qty_decimal_precision?: number;
+  rounding_step?: number | null;
   current_stock?: number;
   created_by?: number;
   is_active?: number;
@@ -34,6 +37,9 @@ interface CreateItemDTO {
   is_finished_good?: boolean;
   is_purchased?: boolean;
   is_manufactured?: boolean;
+  sale_type?: 'packed' | 'loose';
+  qty_decimal_precision?: number;
+  rounding_step?: number | null;
 }
 
 interface UpdateItemDTO {
@@ -48,6 +54,9 @@ interface UpdateItemDTO {
   is_finished_good: boolean;
   is_purchased: boolean;
   is_manufactured: boolean;
+  sale_type?: 'packed' | 'loose';
+  qty_decimal_precision?: number;
+  rounding_step?: number | null;
 }
 
 interface ItemFilters {
@@ -115,8 +124,9 @@ class ItemModel {
         item_code, item_name, description, category,
         unit_of_measure, reorder_level, standard_cost, standard_selling_price,
         is_raw_material, is_finished_good, is_purchased, is_manufactured,
+        sale_type, qty_decimal_precision, rounding_step,
         created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = stmt.run(
@@ -132,6 +142,9 @@ class ItemModel {
       data.is_finished_good ? 1 : 0,
       data.is_purchased !== undefined ? (data.is_purchased ? 1 : 0) : 1,
       data.is_manufactured ? 1 : 0,
+      data.sale_type === 'loose' ? 'loose' : 'packed',
+      data.qty_decimal_precision || 0,
+      data.rounding_step ?? null,
       userId
     );
 
@@ -152,6 +165,9 @@ class ItemModel {
           is_finished_good = ?,
           is_purchased = ?,
           is_manufactured = ?,
+          sale_type = ?,
+          qty_decimal_precision = ?,
+          rounding_step = ?,
           updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
@@ -168,6 +184,9 @@ class ItemModel {
       data.is_finished_good ? 1 : 0,
       data.is_purchased ? 1 : 0,
       data.is_manufactured ? 1 : 0,
+      data.sale_type === 'loose' ? 'loose' : 'packed',
+      data.qty_decimal_precision || 0,
+      data.rounding_step ?? null,
       id
     );
   }

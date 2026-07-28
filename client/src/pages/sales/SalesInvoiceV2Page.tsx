@@ -23,6 +23,7 @@ import type {
 import type { Discount, InvoiceSubmitData } from '../../types';
 import {
   createDefaultInvoiceV2State,
+  createEmptyInvoiceV2Item,
   calculateItemTotal,
   calculateSubtotal,
   calculateTax,
@@ -207,6 +208,8 @@ export default function SalesInvoiceV2Page() {
         items: prev.items.map((item) => {
           if (item.id !== id) return item;
 
+          // Multi-field atomic update (used by the grid for loose-item recalculation)
+          if (field === 'patch') return { ...item, ...(value as Partial<typeof item>) };
           if (field === 'itemId') return { ...item, itemId: value as number | string };
           if (field === 'description') return { ...item, description: value as string };
           if (field === 'quantity') return { ...item, quantity: Number(value) || 0 };
@@ -229,18 +232,7 @@ export default function SalesInvoiceV2Page() {
     const newId = Date.now();
     setState((prev) => ({
       ...prev,
-      items: [
-        ...prev.items,
-        {
-          id: newId,
-          itemId: '',
-          description: '',
-          quantity: 1,
-          rate: 0,
-          tax: 0,
-          discount: { type: 'flat' as const, value: 0 },
-        },
-      ],
+      items: [...prev.items, createEmptyInvoiceV2Item(newId)],
     }));
     return newId;
   }, []);

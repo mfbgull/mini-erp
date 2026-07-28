@@ -93,6 +93,9 @@ interface UseInvoiceDataResult {
     is_raw_material?: boolean;
     is_finished_good?: boolean;
     is_purchased?: boolean;
+    sale_type?: 'packed' | 'loose';
+    qty_decimal_precision?: number;
+    rounding_step?: number | null;
   }>;
   settings: Record<string, { value: string }>;
 }

@@ -52,6 +52,9 @@ export const itemSchema = z.object({
   is_finished_good: z.union([z.boolean(), z.number()]).transform(v => Boolean(v)).default(false),
   is_purchased: z.union([z.boolean(), z.number()]).transform(v => Boolean(v)).default(true),
   is_manufactured: z.union([z.boolean(), z.number()]).transform(v => Boolean(v)).default(false),
+  sale_type: z.enum(['packed', 'loose']).default('packed'),
+  qty_decimal_precision: z.coerce.number().int().min(0).max(6).default(0),
+  rounding_step: z.coerce.number().positive().nullable().default(null),
 });
 
 export const warehouseSchema = z.object({

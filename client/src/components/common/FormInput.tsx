@@ -143,24 +143,37 @@ export default function FormInput({
           </label>
         </div>
       ) : (
-        <input
-          ref={inputRef}
-          id={inputId}
-          type={type}
-          name={name}
-          value={value as string | number}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          disabled={disabled}
-          readOnly={readOnly}
-          autoFocus={autoFocus}
-          step={step || (type === 'number' ? '0.01' : undefined)}
-          min={min}
-          max={max}
-          className={className ? `${className} form-input` : "form-input"}
-          style={style}
-        />
+        <>
+          <input
+            ref={inputRef}
+            id={inputId}
+            type={type}
+            name={name}
+            value={value as string | number}
+            onChange={onChange}
+            placeholder={placeholder}
+            required={required}
+            disabled={disabled}
+            readOnly={readOnly}
+            autoFocus={autoFocus}
+            step={step || (type === 'number' ? '0.01' : undefined)}
+            min={min}
+            max={max}
+            className={className ? `${className} form-input` : "form-input"}
+            style={style}
+            // Native combobox: suggests existing values but still accepts new ones
+            list={options.length > 0 ? `${inputId}-list` : undefined}
+          />
+          {options.length > 0 && (
+            <datalist id={`${inputId}-list`}>
+              {options.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label !== String(opt.value) ? opt.label : undefined}
+                </option>
+              ))}
+            </datalist>
+          )}
+        </>
       )}
       {helpText && !error && <div className="form-help-text">{helpText}</div>}
       {help && !error && <div className="form-help-text">{help}</div>}

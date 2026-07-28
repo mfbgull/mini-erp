@@ -59,6 +59,23 @@ export function generateInvoiceNo(): string {
 
 /* ── Default state factory ─────────────────────────────────────── */
 
+export function createEmptyInvoiceV2Item(id: number = Date.now()): InvoiceV2FormItem {
+  return {
+    id,
+    itemId: '',
+    description: '',
+    quantity: 1,
+    rate: 0,
+    tax: 0,
+    discount: { type: 'flat', value: 0 },
+    sale_type: 'packed',
+    amount: 0,
+    lastEditedField: null,
+    qty_decimal_precision: 0,
+    rounding_step: null,
+  };
+}
+
 export function createDefaultInvoiceV2State(): InvoiceV2State {
   return {
     invoiceNo: generateInvoiceNo(),
@@ -67,17 +84,7 @@ export function createDefaultInvoiceV2State(): InvoiceV2State {
     dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     discountScope: 'invoice',
     discount: { type: 'flat', value: 0 },
-    items: [
-      {
-        id: Date.now(),
-        itemId: '',
-        description: '',
-        quantity: 1,
-        rate: 0,
-        tax: 0,
-        discount: { type: 'flat', value: 0 },
-      },
-    ],
+    items: [createEmptyInvoiceV2Item()],
     notes: 'Thank you for your business. Payment is due within 14 days.',
     terms: 'Net 14 days. Late payments subject to 1.5% monthly interest.',
     source: null,
