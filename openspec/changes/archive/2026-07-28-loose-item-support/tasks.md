@@ -47,5 +47,5 @@
 
 - [x] 8.1 `npm run typecheck` — no TypeScript errors
 - [x] 8.2 Run unit tests for `invoiceLineCalc.ts` — all pass
-- [ ] 8.3 Manual test: create a loose item, create invoice with that item, verify Amount→Qty and Qty→Amount flows
-- [ ] 8.4 Manual test: existing packed items work exactly as before (no regression)
+- [x] 8.3 Manual test: create a loose item, create invoice with that item, verify Amount→Qty and Qty→Amount flows
+- [x] 8.4 Manual test: existing packed items work exactly as before (no regression)

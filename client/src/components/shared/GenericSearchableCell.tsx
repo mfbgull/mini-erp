@@ -72,7 +72,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
         (item.is_finished_good === true || item.is_finished_good === 1 ||
          item.is_purchased === true || item.is_purchased === 1),
     );
-    return base.slice(0, 10);
+    return base;
   }, [items, filterItems]);
 
   const focusTargetCell = useCallback((targetItemId: number, targetField: string) => {
@@ -123,7 +123,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
 
   const openDropdown = useCallback(() => {
     const available = getAvailableItems();
-    setFilteredItems(available);
+    setFilteredItems(available.slice(0, 10));
     setShowDropdown(available.length > 0);
     setSelectedIndex(available.length > 0 ? 0 : -1);
   }, [getAvailableItems]);
@@ -142,7 +142,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
       setShowDropdown(matches.length > 0);
       setSelectedIndex(matches.length > 0 ? 0 : -1);
     } else {
-      setFilteredItems(available);
+      setFilteredItems(available.slice(0, 10));
       setShowDropdown(available.length > 0);
       setSelectedIndex(available.length > 0 ? 0 : -1);
     }
