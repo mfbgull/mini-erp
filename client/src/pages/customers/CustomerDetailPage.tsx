@@ -45,6 +45,8 @@ import {
 } from '../../utils/customerCalculations';
 import type { TabId, TabConfig, Invoice, Payment } from '../../types';
 import { canDeleteInvoice } from '../../utils/invoiceRules';
+import { usePaymentPrint } from '../../components/payment/usePaymentPrint';
+import toast from 'react-hot-toast';
 
 
 // Lazily import non-critical components
@@ -74,6 +76,7 @@ export default function CustomerDetailPage() {
   const queryClient = useQueryClient();
   const { formatCurrency } = useSettings();
   const { isMobile } = useMobileDetection();
+  const { fetchReceiptData, printA4, printThermal } = usePaymentPrint();
 
   // Body class effect for mobile bottom nav
   useEffect(() => {
@@ -170,6 +173,19 @@ export default function CustomerDetailPage() {
   const handlePaymentSuccess = useCallback(() => {
     invalidateCustomerQueries(queryClient, id);
   }, [queryClient, id]);
+
+  const handlePrintReceipt = useCallback(async (payment: Payment, thermal: boolean) => {
+    try {
+      const data = await fetchReceiptData(payment.id);
+      if (thermal) {
+        printThermal(data);
+      } else {
+        printA4(data);
+      }
+    } catch {
+      toast.error('Failed to load receipt data');
+    }
+  }, [fetchReceiptData, printA4, printThermal]);
 
   // Loading state
   if (isLoading) {
@@ -296,6 +312,8 @@ export default function CustomerDetailPage() {
                   payments={payments}
                   onEdit={handleEditPayment}
                   onDelete={handleDeletePayment}
+                  onPrint={(p) => handlePrintReceipt(p, false)}
+                  onPrintThermal={(p) => handlePrintReceipt(p, true)}
                 />
               </div>
             ) : (
@@ -305,6 +323,8 @@ export default function CustomerDetailPage() {
                   loading={paymentsLoading}
                   onEditPayment={handleEditPayment}
                   onDeletePayment={handleDeletePayment}
+                  onPrintReceipt={(p) => handlePrintReceipt(p, false)}
+                  onPrintThermal={(p) => handlePrintReceipt(p, true)}
                 />
               </Suspense>
             )

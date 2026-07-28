@@ -1,0 +1,321 @@
+/* ============================================================
+   PaymentReceiptA4.css — A4 Receipt Print Styles
+   Matches InvoiceTemplateA4.css visually
+   ============================================================ */
+
+.receipt-a4 {
+  width: 100%;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 10mm 15mm;
+  background: #ffffff;
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1e293b;
+  line-height: 1.4;
+  font-size: 9.5pt;
+  box-sizing: border-box;
+}
+
+/* ── Header ── */
+.r4-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 5mm;
+  border-bottom: 2px solid #16a34a;
+  margin-bottom: 5mm;
+}
+
+.r4-header-left {
+  flex: 1;
+}
+
+.r4-header-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 3mm;
+}
+
+.r4-logo-placeholder {
+  width: 18mm;
+  height: 18mm;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11pt;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.r4-company-name {
+  font-size: 14pt;
+  font-weight: 700;
+  margin: 0 0 1mm 0;
+  color: #1e293b;
+}
+
+.r4-company-detail {
+  margin: 0;
+  font-size: 8.5pt;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.r4-header-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.r4-title {
+  font-size: 16pt;
+  font-weight: 800;
+  margin: 0 0 1mm 0;
+  color: #16a34a;
+  letter-spacing: 1px;
+}
+
+.r4-receipt-no {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #334155;
+  background: #f0fdf4;
+  padding: 1mm 2mm;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* ── Info Section ── */
+.r4-info-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5mm;
+  gap: 5mm;
+}
+
+.r4-bill-to {
+  flex: 1;
+}
+
+.r4-section-label {
+  font-size: 8.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  margin: 0 0 2mm 0;
+}
+
+.r4-customer-name {
+  font-size: 11pt;
+  font-weight: 600;
+  margin: 0 0 1mm 0;
+  color: #1e293b;
+}
+
+.r4-customer-detail {
+  margin: 0;
+  font-size: 8.5pt;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.r4-details {
+  flex-shrink: 0;
+  min-width: 50mm;
+}
+
+.r4-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8mm 0;
+  border-bottom: 1px dotted #e2e8f0;
+}
+
+.r4-detail-label {
+  font-size: 8pt;
+  color: #64748b;
+}
+
+.r4-detail-value {
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: right;
+}
+
+/* ── Balance Summary ── */
+.r4-balance-section {
+  margin-bottom: 5mm;
+  padding: 3mm 4mm;
+  background: #f8fafc;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.r4-balance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.r4-balance-table td {
+  padding: 1.5mm 0;
+  font-size: 9.5pt;
+}
+
+.r4-balance-label {
+  color: #475569;
+  font-weight: 500;
+}
+
+.r4-balance-amount {
+  text-align: right;
+  font-weight: 600;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  min-width: 25mm;
+}
+
+.r4-balance-payment-row td {
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 2mm 0;
+}
+
+.r4-balance-credit {
+  color: #16a34a;
+}
+
+.r4-balance-total-row td {
+  padding-top: 2mm;
+  font-weight: 700;
+  font-size: 10.5pt;
+}
+
+.r4-balance-current {
+  color: #334155;
+}
+
+/* ── Allocations Table ── */
+.r4-allocations-section {
+  margin-bottom: 5mm;
+}
+
+.r4-allocations-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+.r4-allocations-table th {
+  text-align: left;
+  font-size: 7.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  padding: 1mm 0;
+  border-bottom: 2px solid #e2e8f0;
+  letter-spacing: 0.5px;
+}
+
+.r4-allocations-table td {
+  padding: 1.5mm 0;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.r4-allocation-total-row td {
+  font-weight: 700;
+  font-size: 10pt;
+  border-top: 2px solid #94a3b8;
+  border-bottom: none;
+  padding-top: 2mm;
+  color: #1e293b;
+}
+
+.r4-text-right {
+  text-align: right;
+}
+
+/* ── Notes ── */
+.r4-notes {
+  margin-bottom: 5mm;
+  padding: 3mm;
+  background: #fffbeb;
+  border-left: 3px solid #f59e0b;
+  border-radius: 2px;
+}
+
+.r4-notes p {
+  margin: 0;
+  font-size: 8.5pt;
+  color: #92400e;
+  white-space: pre-wrap;
+}
+
+/* ── Footer ── */
+.r4-footer {
+  text-align: center;
+  padding-top: 5mm;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 10mm;
+}
+
+.r4-footer-thanks {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #16a34a;
+  margin: 0 0 1mm 0;
+}
+
+.r4-footer-contact {
+  font-size: 8pt;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* ── Error ── */
+.receipt-a4-error {
+  text-align: center;
+  padding: 10mm;
+  color: #dc2626;
+  font-size: 10pt;
+}
+
+/* ── Print ── */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 20mm;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .receipt-a4 {
+    box-shadow: none;
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .r4-balance-section {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .r4-notes {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ── Screen Preview ── */
+.receipt-a4 {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+  min-height: 297mm;
+}

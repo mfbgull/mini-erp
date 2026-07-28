@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { Eye, Edit2, Trash2, CreditCard, Search } from 'lucide-react';
+import { Eye, Edit2, Trash2, CreditCard, Search, Printer } from 'lucide-react';
 import { CompactCardShell } from './CompactCardShell';
 import { formatCurrency } from '../../utils/formatters';
 import '../../styles/components/card.css';
@@ -16,6 +16,8 @@ interface CompactPaymentCardProps {
   onView?: (p: Payment) => void;
   onEdit: (p: Payment) => void;
   onDelete?: (p: Payment) => void;
+  onPrint?: (p: Payment) => void;
+  onPrintThermal?: (p: Payment) => void;
 }
 
 function getMethodClass(method: string) {
@@ -26,10 +28,12 @@ function getMethodClass(method: string) {
   }
 }
 
-export function CompactPaymentCard({ payment, onView, onEdit, onDelete }: CompactPaymentCardProps) {
+export function CompactPaymentCard({ payment, onView, onEdit, onDelete, onPrint, onPrintThermal }: CompactPaymentCardProps) {
   const menuItems = [
     ...(onView ? [{ label: 'View', icon: <Eye className="dropdown-icon" />, onClick: () => onView(payment) }] : []),
     { label: 'Edit', icon: <Edit2 className="dropdown-icon" />, onClick: () => onEdit(payment) },
+    ...(onPrint ? [{ label: 'Print Receipt', icon: <Printer className="dropdown-icon" />, onClick: () => onPrint(payment) }] : []),
+    ...(onPrintThermal ? [{ label: 'Print Thermal', icon: <Printer className="dropdown-icon" />, onClick: () => onPrintThermal(payment) }] : []),
     ...(onDelete ? [{ label: 'Delete', icon: <Trash2 className="dropdown-icon" />, onClick: () => onDelete(payment), variant: 'danger' as const }] : []),
   ];
 
@@ -69,8 +73,9 @@ export function CompactPaymentCard({ payment, onView, onEdit, onDelete }: Compac
   );
 }
 
-export default function CompactPaymentCardView({ payments, onView, onEdit, onDelete }: {
+export default function CompactPaymentCardView({ payments, onView, onEdit, onDelete, onPrint, onPrintThermal }: {
   payments: Payment[]; onView?: (p: Payment) => void; onEdit: (p: Payment) => void; onDelete?: (p: Payment) => void;
+  onPrint?: (p: Payment) => void; onPrintThermal?: (p: Payment) => void;
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const filtered = payments.filter(p =>
@@ -92,7 +97,7 @@ export default function CompactPaymentCardView({ payments, onView, onEdit, onDel
         </div>
       ) : (
         <div className="compact-mobile-cards-container">
-          {filtered.map((p) => <CompactPaymentCard key={p.id} payment={p} onView={onView} onEdit={onEdit} onDelete={onDelete} />)}
+          {filtered.map((p) => <CompactPaymentCard key={p.id} payment={p} onView={onView} onEdit={onEdit} onDelete={onDelete} onPrint={onPrint} onPrintThermal={onPrintThermal} />)}
         </div>
       )}
     </div>

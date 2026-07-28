@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import MiniERPGrid from '../../components/common/MiniERPGrid';
-import { Search, X, CreditCard, MoreVertical, Trash2 } from 'lucide-react';
+import { Search, X, CreditCard, MoreVertical, Trash2, Printer } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import CompactPaymentCardView from '../../components/common/CompactPaymentCard';
@@ -15,6 +15,7 @@ import { useMobileDetection } from '../../hooks/useMobileDetection';
 import { useTranslation } from '../../hooks/useTranslation';
 import api from '../../utils/api';
 import { createActionColDef } from '../../utils/agGridIntegration';
+import { usePaymentPrint } from '../../components/payment/usePaymentPrint';
 import './PaymentsPage.css';
 
 interface Payment {
@@ -46,6 +47,7 @@ export default function PaymentsPage() {
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   const { isMobile } = useMobileDetection();
   const { t } = useTranslation();
+  const { fetchReceiptData, printA4, printThermal } = usePaymentPrint();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
 
@@ -106,6 +108,19 @@ export default function PaymentsPage() {
   const handleDeletePayment = (payment: Payment) => {
     setPaymentToDelete(payment);
     setIsDeleteModalOpen(true);
+  };
+
+  const handlePrintReceipt = async (payment: Payment, thermal: boolean) => {
+    try {
+      const data = await fetchReceiptData(payment.id);
+      if (thermal) {
+        printThermal(data);
+      } else {
+        printA4(data);
+      }
+    } catch {
+      toast.error('Failed to load receipt data');
+    }
   };
 
   const confirmDelete = () => {
@@ -187,6 +202,8 @@ export default function PaymentsPage() {
             </button>
           }
           items={[
+            { label: 'Print Receipt', icon: <Printer size={16} />, onClick: () => handlePrintReceipt(params.data, false) },
+            { label: 'Print Thermal', icon: <Printer size={16} />, onClick: () => handlePrintReceipt(params.data, true) },
             { label: 'Delete', icon: <Trash2 size={16} />, onClick: () => handleDeletePayment(params.data), destructive: true },
           ]}
           align="end"
@@ -261,6 +278,8 @@ export default function PaymentsPage() {
             toast('Edit payment details from the customer page');
           }}
           onDelete={handleDeletePayment}
+          onPrint={(payment: Payment) => handlePrintReceipt(payment, false)}
+          onPrintThermal={(payment: Payment) => handlePrintReceipt(payment, true)}
         />
       ) : (
         <MiniERPGrid

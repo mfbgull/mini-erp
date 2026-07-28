@@ -22,6 +22,7 @@ router.get('/:id', requirePermission('payments', 'read'), validateZodParams(zodS
 router.post('/', requirePermission('payments', 'create'), sensitiveOperationLimiter, paymentsController.createPayment);
 router.put('/:id', requirePermission('payments', 'update'), sensitiveOperationLimiter, paymentsController.updatePayment);
 router.delete('/:id', requirePermission('payments', 'delete'), sensitiveOperationLimiter, paymentsController.deletePayment);
+router.get('/:id/receipt', requirePermission('payments', 'read'), validateZodParams(zodSchemas.id), paymentsController.getPaymentReceipt);
 router.post('/:id/allocate', requirePermission('payments', 'update'), sensitiveOperationLimiter, paymentsController.allocatePaymentToInvoice);
 
 export default router;

@@ -601,6 +601,8 @@ export interface PaymentsTabProps {
   loading: boolean;
   onEditPayment: (payment: Payment) => void;
   onDeletePayment: (payment: Payment) => void;
+  onPrintReceipt?: (payment: Payment) => void;
+  onPrintThermal?: (payment: Payment) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

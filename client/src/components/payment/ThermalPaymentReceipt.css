@@ -1,0 +1,209 @@
+/* ============================================================
+   ThermalPaymentReceipt.css — Thermal Payment Receipt Styles
+   Matches ThermalInvoiceTemplate.css visually
+   ============================================================ */
+
+.tpr-receipt {
+  width: 72mm;
+  margin: 0 auto;
+  padding: 4mm 2mm;
+  background: #ffffff;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+  color: #000000;
+  font-size: 9pt;
+  line-height: 1.35;
+  box-sizing: border-box;
+}
+
+/* ── Header ── */
+.tpr-header {
+  text-align: center;
+  margin-bottom: 2mm;
+}
+
+.tpr-business-name {
+  font-size: 13pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2mm;
+  color: #000000;
+}
+
+.tpr-line {
+  font-size: 8.5pt;
+  color: #333333;
+  line-height: 1.5;
+}
+
+.tpr-divider {
+  font-size: 7pt;
+  color: #666666;
+  letter-spacing: 0;
+  white-space: pre;
+  line-height: 1.2;
+}
+
+/* ── Customer ── */
+.tpr-customer {
+  margin-bottom: 2mm;
+}
+
+/* ── Balance Trail ── */
+.tpr-balance {
+  margin-bottom: 2mm;
+}
+
+.tpr-balance-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8.5pt;
+  padding: 0.5mm 0;
+  color: #333333;
+}
+
+.tpr-b-label {
+  text-align: left;
+}
+
+.tpr-b-value {
+  text-align: right;
+  min-width: 20mm;
+}
+
+.tpr-b-payment {
+  border-top: 1px dashed #999999;
+  padding-top: 1mm;
+  color: #16a34a;
+}
+
+.tpr-b-new {
+  font-size: 10pt;
+  font-weight: 700;
+  color: #000000;
+  border-top: 1px solid #333333;
+  margin-top: 0.5mm;
+  padding-top: 1mm;
+}
+
+/* ── Payment Details ── */
+.tpr-details {
+  margin-bottom: 2mm;
+}
+
+/* ── Allocations ── */
+.tpr-allocations {
+  margin-bottom: 2mm;
+}
+
+.tpr-table-header {
+  display: flex;
+  font-size: 7.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1mm 0;
+  color: #000000;
+}
+
+.tpr-th-inv {
+  flex: 1;
+  text-align: left;
+}
+
+.tpr-th-amt {
+  width: 20mm;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.tpr-alloc-row {
+  display: flex;
+  font-size: 8pt;
+  padding: 0.5mm 0;
+  color: #333333;
+}
+
+.tpr-alloc-inv {
+  flex: 1;
+  text-align: left;
+}
+
+.tpr-alloc-amt {
+  width: 20mm;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.tpr-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10pt;
+  font-weight: 700;
+  color: #000000;
+  padding: 0.5mm 0;
+}
+
+.tpr-total-label {
+  text-align: left;
+}
+
+.tpr-total-value {
+  text-align: right;
+  min-width: 20mm;
+}
+
+/* ── Footer ── */
+.tpr-footer {
+  text-align: center;
+  margin-top: 2mm;
+}
+
+.tpr-footer-thanks {
+  font-size: 9pt;
+  font-weight: 600;
+  color: #000000;
+  margin: 1mm 0;
+}
+
+.tpr-footer-contact {
+  font-size: 7.5pt;
+  color: #666666;
+  line-height: 1.4;
+}
+
+/* ── Error ── */
+.tpr-error {
+  text-align: center;
+  padding: 5mm;
+  color: #dc2626;
+  font-size: 9pt;
+}
+
+/* ── Print ── */
+@media print {
+  @page {
+    size: 80mm 297mm;
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    width: 80mm;
+  }
+
+  .tpr-receipt {
+    box-shadow: none;
+    margin: 0 auto;
+    padding: 4mm 2mm;
+    width: 72mm;
+  }
+}
+
+/* ── Screen Preview ── */
+.tpr-receipt {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  min-height: 100mm;
+}

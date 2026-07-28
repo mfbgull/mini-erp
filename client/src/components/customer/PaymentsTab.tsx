@@ -5,7 +5,7 @@
 import { useMemo, memo } from 'react';
 
 import MiniERPGrid from '../../components/common/MiniERPGrid';
-import { MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { MoreVertical, Edit2, Trash2, Printer } from 'lucide-react';
 
 import DropdownMenu from '../../components/common/DropdownMenu';
 import { createActionColDef } from '../../utils/agGridIntegration';
@@ -13,7 +13,7 @@ import { formatAsCurrency, formatDateString } from '../../utils/customerCalculat
 import type { PaymentsTabProps, PaymentColDef } from '../../types';
 
 
-function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }: PaymentsTabProps) {
+function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment, onPrintReceipt, onPrintThermal }: PaymentsTabProps) {
   const columnDefs = useMemo<PaymentColDef[]>(
     () => [
       {
@@ -67,6 +67,16 @@ function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }: Paym
                 </button>
               }
               items={[
+                ...(onPrintReceipt ? [{
+                  label: 'Print Receipt',
+                  icon: <Printer size={16} />,
+                  onClick: () => onPrintReceipt(payment),
+                }] : []),
+                ...(onPrintThermal ? [{
+                  label: 'Print Thermal',
+                  icon: <Printer size={16} />,
+                  onClick: () => onPrintThermal(payment),
+                }] : []),
                 {
                   label: 'Edit',
                   icon: <Edit2 size={16} />,
@@ -85,7 +95,7 @@ function PaymentsTab({ payments, loading, onEditPayment, onDeletePayment }: Paym
         },
       }) as PaymentColDef,
     ],
-    [onEditPayment, onDeletePayment],
+    [onEditPayment, onDeletePayment, onPrintReceipt, onPrintThermal],
   );
 
   return (

@@ -2,11 +2,12 @@ import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, Printer, FileText } from 'lucide-react';
 
 import Button from '../../components/common/Button';
 import FormInput from '../../components/common/FormInput';
 import api from '../../utils/api';
+import { usePaymentPrint } from '../../components/payment/usePaymentPrint';
 import './PaymentModal.css';
 
 interface Customer {
@@ -55,6 +56,8 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [lastPaymentId, setLastPaymentId] = useState<number | null>(null);
+  const { fetchReceiptData, printA4, printThermal } = usePaymentPrint();
   const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery({
@@ -169,7 +172,7 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
     mutationFn: async (data: Record<string, unknown>) => {
       return api.post('/payments', data);
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       toast.success('Payment recorded successfully');
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       queryClient.invalidateQueries({ queryKey: ['customer', customerId] });
@@ -177,8 +180,14 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
       queryClient.invalidateQueries({ queryKey: ['customerLedger', customerId] });
       queryClient.invalidateQueries({ queryKey: ['customerPayments', customerId] });
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      onSuccess?.();
-      onClose();
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      const paymentId = response.data.data?.id;
+      if (paymentId) {
+        setLastPaymentId(paymentId);
+      } else {
+        onSuccess?.();
+        onClose();
+      }
     },
     onError: (error: unknown) => {
       const errorMsg = (error as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to record payment';
@@ -224,6 +233,45 @@ export default function PaymentModal({ customerId, customer, onClose, onSuccess 
       }))
     });
   };
+
+  const handlePrintReceipt = async (thermal: boolean) => {
+    if (!lastPaymentId) return;
+    try {
+      const data = await fetchReceiptData(lastPaymentId);
+      if (thermal) {
+        printThermal(data);
+      } else {
+        printA4(data);
+      }
+    } catch {
+      toast.error('Failed to load receipt data');
+    }
+  };
+
+  if (lastPaymentId) {
+    return (
+      <div className="payment-modal payment-modal-success">
+        <div className="success-icon">✓</div>
+        <h2 className="success-title">Payment Recorded Successfully</h2>
+        <p className="success-subtitle">What would you like to do next?</p>
+        <div className="success-actions">
+          <Button variant="primary" onClick={() => handlePrintReceipt(false)}>
+            <Printer size={18} />
+            Print Receipt (A4)
+          </Button>
+          <Button variant="secondary" onClick={() => handlePrintReceipt(true)}>
+            <FileText size={18} />
+            Print Thermal Receipt
+          </Button>
+        </div>
+        <div className="form-actions" style={{ marginTop: '24px' }}>
+          <Button variant="secondary" onClick={() => { onClose(); onSuccess?.(); }}>
+            Close
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="payment-modal">

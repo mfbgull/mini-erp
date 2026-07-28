@@ -175,10 +175,87 @@ function deletePayment(req: AuthRequest, res: Response): void {
   }
 }
 
+function getPaymentReceipt(req: Request, res: Response): void {
+  try {
+    const id = parseInt(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id, 10);
+    const payment = PaymentModel.getById(db, id);
+    if (!payment) { res.status(404).json({ success: false, error: 'Payment not found' }); return; }
+
+    // Customer details with current balance (already updated by the payment transaction)
+    const customer = db.prepare(`
+      SELECT id, customer_name, billing_address as customer_address, phone as customer_phone, email as customer_email, current_balance
+      FROM customers WHERE id = ?
+    `).get(payment.customer_id) as {
+      id: number; customer_name: string; customer_address: string;
+      customer_phone: string; customer_email: string; current_balance: number;
+    } | undefined;
+
+    if (!customer) { res.status(404).json({ success: false, error: 'Customer not found' }); return; }
+
+    // Company info from settings
+    const settingsRows = db.prepare("SELECT key, value FROM settings WHERE key IN ('company_name','company_address','company_phone','company_email','company_tax_id')").all() as { key: string; value: string }[];
+    const company: Record<string, string> = {};
+    for (const row of settingsRows) {
+      company[row.key.replace('company_', '')] = row.value;
+    }
+
+    // Allocations with invoice numbers
+    const allocations = db.prepare(`
+      SELECT pa.invoice_id, i.invoice_no, pa.amount
+      FROM payment_allocations pa
+      LEFT JOIN invoices i ON pa.invoice_id = i.id
+      WHERE pa.payment_id = ?
+      ORDER BY pa.id
+    `).all(id) as { invoice_id: number; invoice_no: string; amount: number }[];
+
+    const amount = parseCurrency(payment.amount);
+    const currentBalance = parseCurrency(customer.current_balance);
+    const previousBalance = parseCurrency(currentBalance + amount);
+
+    res.json({
+      success: true,
+      data: {
+        payment: {
+          id: payment.id,
+          payment_no: payment.payment_no,
+          payment_date: payment.payment_date,
+          amount,
+          payment_method: payment.payment_method,
+          reference_no: payment.reference_no || '',
+          notes: payment.notes || '',
+          created_at: payment.created_at,
+        },
+        customer: {
+          name: customer.customer_name,
+          address: customer.customer_address || '',
+          phone: customer.customer_phone || '',
+          email: customer.customer_email || '',
+        },
+        balance: {
+          previous_balance: previousBalance,
+          payment_amount: amount,
+          current_balance: currentBalance,
+        },
+        allocations,
+        company: {
+          name: company.name || 'Mini ERP',
+          address: company.address || '',
+          phone: company.phone || '',
+          email: company.email || '',
+          tax_id: company.tax_id || '',
+        },
+      },
+    });
+  } catch (error) {
+    logger.error('Error fetching payment receipt:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch receipt data' });
+  }
+}
+
 function allocatePaymentToInvoice(req: Request, res: Response): void {
   res.status(501).json({ success: false, error: 'Manual allocation endpoint not implemented - use createPayment with allocations instead' });
 }
 
 export default {
-  getPayments, getPayment, createPayment, updatePayment, deletePayment, allocatePaymentToInvoice,
+  getPayments, getPayment, createPayment, updatePayment, deletePayment, getPaymentReceipt, allocatePaymentToInvoice,
 };
