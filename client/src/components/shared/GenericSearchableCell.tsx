@@ -180,8 +180,13 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
       e.preventDefault();
       if (showDropdown && selectedIndex >= 0 && filteredItems[selectedIndex]) { selectItem(filteredItems[selectedIndex], true); return; }
       handleSave();
-      if (isLastField?.(cellField) && isLastItem) { if (onSetPendingFocus) onSetPendingFocus(onAddNewItem()); else onAddNewItem(); }
-      else { const nf = getNextField?.(cellField); if (nf) focusTargetCell(itemId, nf); }
+      if (isLastItem) {
+        // Enter at last row — always add new row
+        if (onSetPendingFocus) onSetPendingFocus(onAddNewItem()); else onAddNewItem();
+      } else {
+        const nf = getNextField?.(cellField);
+        if (nf) focusTargetCell(itemId, nf);
+      }
       return;
     }
     if (e.key === 'Tab') {

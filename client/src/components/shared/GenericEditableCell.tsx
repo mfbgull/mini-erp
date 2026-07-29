@@ -144,7 +144,8 @@ const GenericEditableCell = memo(function GenericEditableCell({
     } else if (e.key === 'Enter') {
       e.preventDefault();
       handleSave();
-      if (isLastField(field) && isLastItem) {
+      if (isLastItem) {
+        // Enter at last row — always add new row
         const newId = onAddNewItem();
         if (onSetPendingFocus) {
           onSetPendingFocus(newId);
