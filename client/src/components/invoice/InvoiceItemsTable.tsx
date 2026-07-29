@@ -79,28 +79,39 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
         <div className="field-error items-error">{errors.items}</div>
       )}
 
+      {/* ARIA live region for row announcements */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {invoice.items.length} items in invoice
+      </div>
+
       {/* Items Table */}
       <div className="items-table-container-modern">
-        <table className="items-table-modern">
-          <thead>
-            <tr>
-              <th className="text-center serial-col">#</th>
-              <th className="text-left description-col">Description</th>
-              <th className="text-right quantity-col">Qty</th>
-              <th className="text-right rate-col">Rate</th>
+        <table
+          className="items-table-modern"
+          role="grid"
+          aria-rowcount={invoice.items.length}
+          aria-colcount={invoice.discountScope === 'item' ? 8 : 7}
+          aria-label="Invoice line items"
+        >
+          <thead role="rowgroup">
+            <tr role="row">
+              <th role="columnheader" aria-colindex={1} className="text-center serial-col">#</th>
+              <th role="columnheader" aria-colindex={2} className="text-left description-col">Description</th>
+              <th role="columnheader" aria-colindex={3} className="text-right quantity-col">Qty</th>
+              <th role="columnheader" aria-colindex={4} className="text-right rate-col">Rate</th>
               {invoice.discountScope === 'item' && (
-                <th className="text-right discount-col">Discount</th>
+                <th role="columnheader" aria-colindex={5} className="text-right discount-col">Discount</th>
               )}
-              <th className="text-right tax-col">Tax %</th>
-              <th className="text-right amount-col">Amount</th>
-              <th className="delete-col"></th>
+              <th role="columnheader" aria-colindex={invoice.discountScope === 'item' ? 6 : 5} className="text-right tax-col">Tax %</th>
+              <th role="columnheader" aria-colindex={invoice.discountScope === 'item' ? 7 : 6} className="text-right amount-col">Amount</th>
+              <th role="columnheader" aria-colindex={invoice.discountScope === 'item' ? 8 : 7} className="delete-col" aria-label="Actions"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody role="rowgroup">
             {invoice.items.map((item, index) => (
-              <tr key={item.id}>
-                <td className="text-center serial-col">{index + 1}</td>
-                <td className="invoice-item-cell">
+              <tr key={item.id} role="row" aria-rowindex={index + 2}>
+                <td role="gridcell" aria-colindex={1} className="text-center serial-col" aria-readonly>{index + 1}</td>
+                <td role="gridcell" aria-colindex={2} className="invoice-item-cell">
                   <InvoiceSearchableCell
                     value={item.description}
                     itemId={item.id}
@@ -117,7 +128,7 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     isLastField={isLastField}
                   />
                 </td>
-                <td className="text-right invoice-item-cell">
+                <td role="gridcell" aria-colindex={3} className="text-right invoice-item-cell">
                   <InvoiceEditableCell
                     value={
                       item.qty_decimal_precision
@@ -139,7 +150,7 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     isLastField={isLastField}
                   />
                 </td>
-                <td className="text-right rate-cell-container invoice-item-cell" data-rate-cell={item.id}>
+                <td role="gridcell" aria-colindex={4} className="text-right rate-cell-container invoice-item-cell" data-rate-cell={item.id}>
                   <InvoiceEditableCell
                     value={item.rate.toFixed(2)}
                     itemId={item.id}
@@ -158,7 +169,7 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                   />
                 </td>
                 {invoice.discountScope === 'item' && (
-                  <td className="text-right invoice-item-cell">
+                  <td role="gridcell" aria-colindex={5} className="text-right invoice-item-cell">
                     <div className="discount-cell-modern">
                       <select
                         value={item.discount.type}
@@ -187,7 +198,7 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     </div>
                   </td>
                 )}
-                <td className="text-right invoice-item-cell">
+                <td role="gridcell" aria-colindex={invoice.discountScope === 'item' ? 6 : 5} className="text-right invoice-item-cell">
                   <InvoiceEditableCell
                     value={item.tax}
                     itemId={item.id}
@@ -205,7 +216,7 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     isLastField={isLastField}
                   />
                 </td>
-                <td className="text-right amount-cell-modern">
+                <td role="gridcell" aria-colindex={invoice.discountScope === 'item' ? 7 : 6} className="text-right amount-cell-modern">
                   {item.sale_type === 'loose' ? (
                     <>
                       <InvoiceEditableCell
@@ -240,10 +251,11 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     formatCurrency(calculateItemTotal(item))
                   )}
                 </td>
-                <td className="text-center invoice-item-cell">
+                <td role="gridcell" aria-colindex={invoice.discountScope === 'item' ? 8 : 7} className="text-center invoice-item-cell">
                   <button
                     onClick={() => onRemoveItem(item.id)}
                     className="remove-btn-modern"
+                    aria-label={`Remove item ${index + 1}: ${item.description || 'empty'}`}
                     title="Remove item"
                   >
                     <Trash2 className="trash-icon" />

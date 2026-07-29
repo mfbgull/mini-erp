@@ -93,8 +93,8 @@ export function calculateTotal(
 
 /* ── Field navigation ───────────────────────────────────────────── */
 
-const FIELD_ORDER_ITEM = ['description', 'quantity', 'rate', 'discountValue', 'tax'] as const;
-const FIELD_ORDER_INVOICE = ['description', 'quantity', 'rate', 'tax'] as const;
+const FIELD_ORDER_ITEM = ['description', 'quantity', 'rate', 'discountValue', 'tax', 'amount'] as const;
+const FIELD_ORDER_INVOICE = ['description', 'quantity', 'rate', 'tax', 'amount'] as const;
 
 export function getFieldOrder(discountScope: 'item' | 'invoice'): readonly string[] {
   return discountScope === 'item' ? FIELD_ORDER_ITEM : FIELD_ORDER_INVOICE;
@@ -107,7 +107,10 @@ export function getNextField(field: string, discountScope: 'item' | 'invoice'): 
 }
 
 export function isLastField(field: string): boolean {
-  return field === 'tax';
+  // 'amount' is only navigable for loose items; for packed items the amount is auto-calculated
+  // and the field is skipped. The caller (GenericEditableCell) handles skip logic via
+  // document.querySelector guard. Here we treat 'amount' as last field for navigation purposes.
+  return field === 'amount' || field === 'tax';
 }
 
 /* ── Item helpers ───────────────────────────────────────────────── */

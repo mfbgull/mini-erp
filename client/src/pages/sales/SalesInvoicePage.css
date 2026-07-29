@@ -496,11 +496,32 @@
   max-width: 50px;
 }
 
+/* Screen reader only - visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Editable cell focus ring for keyboard navigation */
 .editable-cell:focus-visible {
   outline: 2px solid var(--info, #2563eb);
   outline-offset: -2px;
   background: var(--info-bg, #eff6ff);
+}
+
+/* Remove button focus ring for keyboard navigation */
+.remove-btn-modern:focus-visible {
+  outline: 2px solid var(--error, #ef4444);
+  outline-offset: 2px;
+  opacity: 1;
+  background: var(--error-bg, #fee2e2);
 }
 
 /* Invoice Item Cells - Match Quotation Style */
@@ -523,7 +544,8 @@
 }
 
 .invoice-item-cell .editable-cell:focus-visible {
-  outline: none;
+  outline: 2px solid var(--info, #2563eb);
+  outline-offset: -2px;
   background: var(--info-bg, #eff6ff);
 }
 
@@ -543,9 +565,11 @@
   background: var(--neutral-100, #f3f4f6);
 }
 
-.invoice-item-cell .editable-input:focus {
+.invoice-item-cell .editable-input:focus,
+.invoice-item-cell .editable-input:focus-visible {
   border-color: var(--info, #2563eb);
   background: var(--card-bg, #ffffff);
+  outline: none;
 }
 
 .invoice-item-cell .searchable-cell-container {
@@ -759,7 +783,8 @@
   width: 50px;
 }
 
-.discount-type-select-modern:focus {
+.discount-type-select-modern:focus,
+.discount-type-select-modern:focus-visible {
   outline: none;
   border-color: var(--info, #2563eb);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);

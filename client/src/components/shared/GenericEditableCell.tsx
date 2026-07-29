@@ -1,5 +1,6 @@
 import { useState, useCallback, memo } from 'react';
 import { Edit2 } from 'lucide-react';
+import { useFocusCell } from '../../utils/focusCell';
 
 export interface GenericEditableCellProps {
   value: string | number;
@@ -36,28 +37,14 @@ const GenericEditableCell = memo(function GenericEditableCell({
 }: GenericEditableCellProps) {
   const isEditing = editingCell === `${itemId}-${field}`;
   const [tempValue, setTempValue] = useState(value);
+  const { focusTargetCell, isNavigatingRef } = useFocusCell(onEditingCell);
 
   const handleSave = useCallback(() => {
     onUpdateItem(itemId, field, tempValue);
     onEditingCell(null);
   }, [itemId, field, tempValue, onUpdateItem, onEditingCell]);
 
-  const focusTargetCell = useCallback((targetItemId: number, targetField: string) => {
-    setTimeout(() => {
-      onEditingCell(`${targetItemId}-${targetField}`);
-      const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
-      if (!el) return;
-      if (targetField === 'description') {
-        const input = el.querySelector('input');
-        if (input) {
-          (input as HTMLInputElement).focus();
-          (input as HTMLInputElement).select();
-        }
-      } else {
-        (el as HTMLElement).focus();
-      }
-    }, 50);
-  }, [onEditingCell]);
+
 
   const moveToCell = useCallback((rowOffset: number, colOffset: number) => {
     const currentItemIndex = items.findIndex((item) => item.id === itemId);
@@ -67,7 +54,10 @@ const GenericEditableCell = memo(function GenericEditableCell({
       const newItemIndex = currentItemIndex + rowOffset;
       if (newItemIndex >= 0 && newItemIndex < items.length) {
         handleSave();
-        focusTargetCell(items[newItemIndex].id, field);
+        // Skip if target field cell doesn't exist in the target row (e.g. amount in packed item)
+        if (document.querySelector(`[data-cell-id="${items[newItemIndex].id}-${field}"]`)) {
+          focusTargetCell(items[newItemIndex].id, field);
+        }
       } else if (rowOffset > 0 && newItemIndex >= items.length) {
         handleSave();
         const newId = onAddNewItem();
@@ -80,11 +70,20 @@ const GenericEditableCell = memo(function GenericEditableCell({
     }
 
     if (colOffset !== 0) {
-      const newFieldIndex = currentFieldIndex + colOffset;
-      if (newFieldIndex >= 0 && newFieldIndex < fieldOrder.length) {
-        handleSave();
-        focusTargetCell(itemId, fieldOrder[newFieldIndex]);
+      // Walk forward/backward through fields, skipping any that don't have a DOM cell (e.g. amount for packed items)
+      let newFieldIndex = currentFieldIndex + colOffset;
+      while (newFieldIndex >= 0 && newFieldIndex < fieldOrder.length) {
+        const candidateField = fieldOrder[newFieldIndex];
+        if (document.querySelector(`[data-cell-id="${itemId}-${candidateField}"]`)) {
+          handleSave();
+          focusTargetCell(itemId, candidateField);
+          return;
+        }
+        newFieldIndex += colOffset;
       }
+      // No navigable column found in this direction — move to next/prev row instead
+      handleSave();
+      moveToCell(colOffset > 0 ? 1 : -1, 0);
     }
   }, [items, itemId, field, fieldOrder, handleSave, onAddNewItem, onSetPendingFocus, focusTargetCell]);
 
@@ -166,7 +165,12 @@ const GenericEditableCell = memo(function GenericEditableCell({
         type={type}
         value={tempValue}
         onChange={(e) => setTempValue(e.target.value)}
-        onBlur={handleSave}
+        onBlur={() => {
+          // Skip save if keyboard navigation is in progress (prevents race condition)
+          if (!isNavigatingRef.current) {
+            handleSave();
+          }
+        }}
         onKeyDown={handleKeyDown}
         onFocus={(e) => e.target.select()}
         className="editable-input"

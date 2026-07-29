@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { Edit2 } from 'lucide-react';
+import { useFocusCell } from '../../utils/focusCell';
 
 export interface GenericSearchableCellItem {
   id: number;
@@ -58,6 +59,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { focusTargetCell, isNavigatingRef } = useFocusCell(onEditingCell);
 
   useEffect(() => {
     if (value !== tempValue && !isEditing) {
@@ -74,23 +76,6 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
     );
     return base;
   }, [items, filterItems]);
-
-  const focusTargetCell = useCallback((targetItemId: number, targetField: string) => {
-    setTimeout(() => {
-      onEditingCell(`${targetItemId}-${targetField}`);
-      setTimeout(() => {
-        const el = document.querySelector(`[data-cell-id="${targetItemId}-${targetField}"]`);
-        if (!el) return;
-        const input = el.querySelector('input');
-        if (input) {
-          (input as HTMLInputElement).focus();
-          (input as HTMLInputElement).select();
-        } else {
-          (el as HTMLElement).focus();
-        }
-      }, 50);
-    }, 50);
-  }, [onEditingCell]);
 
   const selectItem = useCallback((item: GenericSearchableCellItem, moveNext = true) => {
     onUpdateItem(itemId, 'itemId', item.id);
@@ -149,8 +134,11 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
   }, [getAvailableItems]);
 
   const handleBlur = useCallback((e: React.FocusEvent) => {
+    // Skip blur handling if keyboard navigation is in progress
+    if (isNavigatingRef.current) return;
     if (!(e.relatedTarget as HTMLElement)?.closest('.item-dropdown')) {
       setTimeout(() => {
+        if (isNavigatingRef.current) return; // check again after timeout
         if (showDropdown && selectedIndex >= 0 && filteredItems[selectedIndex]) {
           selectItem(filteredItems[selectedIndex], false);
         } else {
@@ -173,16 +161,16 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       const idx = allItems.findIndex((i) => i.id === itemId);
-      if (idx > 0) { handleSave(); onEditingCell(`${allItems[idx - 1].id}-${cellField}`); }
+      if (idx > 0) { handleSave(); focusTargetCell(allItems[idx - 1].id, cellField); }
       return;
     }
-    if (e.key === 'ArrowRight') { e.preventDefault(); onEditingCell(`${itemId}-quantity`); return; }
+    if (e.key === 'ArrowRight') { e.preventDefault(); handleSave(); focusTargetCell(itemId, 'quantity'); return; }
     if (e.key === 'Enter') {
       e.preventDefault();
       if (showDropdown && selectedIndex >= 0 && filteredItems[selectedIndex]) { selectItem(filteredItems[selectedIndex], true); return; }
       handleSave();
       if (isLastField?.(cellField) && isLastItem) { if (onSetPendingFocus) onSetPendingFocus(onAddNewItem()); else onAddNewItem(); }
-      else { const nf = getNextField?.(cellField); if (nf) onEditingCell(`${itemId}-${nf}`); }
+      else { const nf = getNextField?.(cellField); if (nf) focusTargetCell(itemId, nf); }
       return;
     }
     if (e.key === 'Tab') {
@@ -190,7 +178,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
       if (showDropdown && selectedIndex >= 0 && filteredItems[selectedIndex]) { selectItem(filteredItems[selectedIndex], true); return; }
       handleSave();
       const nf = getNextField?.(cellField);
-      if (nf) onEditingCell(`${itemId}-${nf}`);
+      if (nf) focusTargetCell(itemId, nf);
       else if (isLastItem) { if (onSetPendingFocus) onSetPendingFocus(onAddNewItem()); else onAddNewItem(); }
       return;
     }
@@ -199,7 +187,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
       if (showDropdown) { closeDropdown(); inputRef.current?.focus(); }
       else { setTempValue(value); onEditingCell(null); }
     }
-  }, [showDropdown, filteredItems, selectedIndex, allItems, itemId, cellField, isLastItem, value, closeDropdown, selectItem, openDropdown, handleSave, onEditingCell, getNextField, isLastField, onAddNewItem, onSetPendingFocus]);
+  }, [showDropdown, filteredItems, selectedIndex, allItems, itemId, cellField, isLastItem, value, closeDropdown, selectItem, openDropdown, handleSave, focusTargetCell, onEditingCell, getNextField, isLastField, onAddNewItem, onSetPendingFocus]);
 
   if (isEditing) {
     const inputEl = document.querySelector(`[data-cell-id="${itemId}-${cellField}"] input`);
@@ -253,10 +241,10 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
       onKeyDown={(e) => {
         const idx = allItems.findIndex((i) => i.id === itemId);
         if (e.key === 'Enter') { e.preventDefault(); setTempValue(value || ''); onEditingCell(`${itemId}-${cellField}`); }
-        else if (e.key === 'ArrowDown' && idx < allItems.length - 1) { e.preventDefault(); onEditingCell(`${allItems[idx + 1].id}-${cellField}`); }
-        else if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); onEditingCell(`${allItems[idx - 1].id}-${cellField}`); }
-        else if (e.key === 'ArrowRight') { e.preventDefault(); const nf = getNextField?.(cellField); if (nf) onEditingCell(`${itemId}-${nf}`); }
-        else if (e.key === 'Tab') { e.preventDefault(); const nf = getNextField?.(cellField); if (nf) onEditingCell(`${itemId}-${nf}`); else if (isLastItem) { if (onSetPendingFocus) onSetPendingFocus(onAddNewItem()); else onAddNewItem(); } }
+        else if (e.key === 'ArrowDown' && idx < allItems.length - 1) { e.preventDefault(); focusTargetCell(allItems[idx + 1].id, cellField); }
+        else if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); focusTargetCell(allItems[idx - 1].id, cellField); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); const nf = getNextField?.(cellField); if (nf) focusTargetCell(itemId, nf); }
+        else if (e.key === 'Tab') { e.preventDefault(); const nf = getNextField?.(cellField); if (nf) focusTargetCell(itemId, nf); else if (isLastItem) { if (onSetPendingFocus) onSetPendingFocus(onAddNewItem()); else onAddNewItem(); } }
       }}
       className="editable-cell"
       tabIndex={0}

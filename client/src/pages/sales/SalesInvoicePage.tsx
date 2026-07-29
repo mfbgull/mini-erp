@@ -227,10 +227,10 @@ export default function SalesInvoicePage() {
         paymentMethods: prev.paymentMethods,
       }));
 
-      // Auto-focus first cell for new invoice
+      // Auto-focus customer search field for new invoice
       setTimeout(() => {
-        const firstCell = document.querySelector('[data-cell-id$="-description"]');
-        if (firstCell) (firstCell as HTMLElement).focus();
+        const customerInput = document.querySelector('.customer-section .searchable-select-input') as HTMLInputElement | null;
+        if (customerInput) customerInput.focus();
       }, 200);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -380,23 +380,9 @@ export default function SalesInvoicePage() {
               : 0,
         }));
 
-        // Auto-focus first item cell
-        setTimeout(() => {
-          const firstItem = invoice.items[0];
-          if (firstItem) {
-            setEditingCell(`${firstItem.id}-description`);
-            setTimeout(() => {
-              const el = document.querySelector(`[data-cell-id="${firstItem.id}-description"]`);
-              if (el) (el as HTMLElement).focus();
-              const input = el?.querySelector('input');
-              if (input) {
-                input.focus();
-                input.select();
-              }
-            }, 100);
-          }
-        }, 100);
-      } catch (error) {
+        // Auto-focus first item description cell
+        focusFirstItemCell();
+      } catch (_) {
         setInvoice((prev) => ({
           ...prev,
           customer_id: customer.id,
@@ -406,21 +392,7 @@ export default function SalesInvoicePage() {
           customer_address: customer.billing_address || '',
         }));
 
-        setTimeout(() => {
-          const firstItem = invoice.items[0];
-          if (firstItem) {
-            setEditingCell(`${firstItem.id}-description`);
-            setTimeout(() => {
-              const el = document.querySelector(`[data-cell-id="${firstItem.id}-description"]`);
-              if (el) (el as HTMLElement).focus();
-              const input = el?.querySelector('input');
-              if (input) {
-                input.focus();
-                input.select();
-              }
-            }, 100);
-          }
-        }, 100);
+        focusFirstItemCell();
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -491,6 +463,27 @@ export default function SalesInvoicePage() {
 
   const handleSetPendingFocus = useCallback((itemId: number) => {
     pendingFocusRef.current = itemId;
+  }, []);
+
+  const focusFirstItemCell = useCallback(() => {
+    // Find the first description cell, switch it to edit mode, and focus its input
+    setTimeout(() => {
+      const first = document.querySelector('[data-cell-id$="-description"]') as HTMLElement | null;
+      if (!first) return;
+      const cellId = first.getAttribute('data-cell-id');
+      if (!cellId) return;
+      setEditingCell(cellId);
+      requestAnimationFrame(() => {
+        const cell = document.querySelector(`[data-cell-id="${cellId}"]`);
+        if (!cell) return;
+        (cell as HTMLElement).focus();
+        const input = cell.querySelector('input');
+        if (input) {
+          (input as HTMLInputElement).focus();
+          (input as HTMLInputElement).select();
+        }
+      });
+    }, 80);
   }, []);
 
   const handleSetEditingCell = useCallback(
