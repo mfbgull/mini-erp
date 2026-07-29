@@ -224,6 +224,7 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     <>
                       <InvoiceEditableCell
                         value={(item.amount || 0).toFixed(2)}
+                        displayValue={formatCurrency(item.amount || 0)}
                         itemId={item.id}
                         field="amount"
                         type="number"

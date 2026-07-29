@@ -5,6 +5,7 @@ export default function InvoiceEditableCell(props: EditableCellProps) {
   return (
     <GenericEditableCell
       value={props.value}
+      displayValue={props.displayValue}
       itemId={props.itemId}
       field={props.field}
       type={props.type}

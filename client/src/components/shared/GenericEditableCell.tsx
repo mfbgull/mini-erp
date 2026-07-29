@@ -4,6 +4,7 @@ import { useFocusCell } from '../../utils/focusCell';
 
 export interface GenericEditableCellProps {
   value: string | number;
+  displayValue?: string | number;
   itemId: number;
   field: string;
   type?: string;
@@ -21,6 +22,7 @@ export interface GenericEditableCellProps {
 
 const GenericEditableCell = memo(function GenericEditableCell({
   value,
+  displayValue,
   itemId,
   field,
   type = 'text',
@@ -207,7 +209,7 @@ const GenericEditableCell = memo(function GenericEditableCell({
       className="editable-cell"
       tabIndex={0}
     >
-      {value}
+      {displayValue ?? value}
       <Edit2 className="edit-icon" />
     </div>
   );

@@ -1991,6 +1991,7 @@ export interface SearchableCellProps {
 
 export interface EditableCellProps {
   value: string | number;
+  displayValue?: string | number;
   itemId: number;
   field: string;
   type?: string;
@@ -2192,6 +2193,7 @@ export interface SearchableCellProps {
 
 export interface EditableCellProps {
   value: string | number;
+  displayValue?: string | number;
   itemId: number;
   field: string;
   type?: string;
