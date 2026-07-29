@@ -93,10 +93,6 @@ export const getNextField = (currentField: string): string | undefined => {
   return fieldOrder[currentIndex + 1];
 };
 
-export const isLastField = (field: string): boolean => {
-  return field === 'tax';
-};
-
 // ============================================
 // Validation / Submission
 // ============================================

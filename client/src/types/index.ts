@@ -1648,7 +1648,6 @@ export interface QuotationEditableCellProps {
   onUpdateItem: (itemId: number, field: string, value: string | number) => void;
   onAddNewItem: () => number;
   getNextField: (field: string) => string | undefined;
-  isLastField: (field: string) => boolean;
 }
 
 export interface QuotationFormHeaderProps {
@@ -1803,7 +1802,6 @@ export interface POEditableCellProps {
   onUpdateItem: (itemId: number, field: string, value: string | number) => void;
   onAddNewItem: () => number;
   getNextField: (field: string) => string | undefined;
-  isLastField: (field: string) => boolean;
 }
 
 export interface POFormHeaderProps {
@@ -1985,7 +1983,6 @@ export interface SearchableCellProps {
   onSetPendingFocus: (itemId: number) => void;
   formatCurrency: (amount: number | string | null | undefined) => string;
   getNextField: (field: string) => string | undefined;
-  isLastField: (field: string) => boolean;
   setInvoice?: React.Dispatch<React.SetStateAction<InvoiceFormState>>;
 }
 
@@ -2004,7 +2001,6 @@ export interface EditableCellProps {
   onAddNewItem: () => number;
   onSetPendingFocus: (itemId: number) => void;
   getNextField: (field: string, discountScope?: 'item' | 'invoice') => string | undefined;
-  isLastField: (field: string) => boolean;
 }
 
 export interface ItemsTableProps {
@@ -2029,7 +2025,6 @@ export interface ItemsTableProps {
   calculateTax: () => number;
   calculateDiscount: () => number;
   calculateTotal: () => number;
-  isLastField: (field: string) => boolean;
 }
 
 export interface PaymentPanelProps {
@@ -2187,7 +2182,6 @@ export interface SearchableCellProps {
   onSetPendingFocus: (itemId: number) => void;
   formatCurrency: (amount: number | string | null | undefined) => string;
   getNextField: (field: string) => string | undefined;
-  isLastField: (field: string) => boolean;
   setInvoice?: React.Dispatch<React.SetStateAction<InvoiceFormState>>;
 }
 
@@ -2206,7 +2200,6 @@ export interface EditableCellProps {
   onAddNewItem: () => number;
   onSetPendingFocus: (itemId: number) => void;
   getNextField: (field: string, discountScope?: 'item' | 'invoice') => string | undefined;
-  isLastField: (field: string) => boolean;
 }
 
 export interface ItemsTableProps {
@@ -2231,7 +2224,6 @@ export interface ItemsTableProps {
   calculateTax: () => number;
   calculateDiscount: () => number;
   calculateTotal: () => number;
-  isLastField: (field: string) => boolean;
 }
 
 export interface PaymentPanelProps {
@@ -2362,7 +2354,6 @@ export interface SOSearchableCellProps {
   onSetPendingFocus: (itemId: number) => void;
   formatCurrency: (amount: number | string | null | undefined) => string;
   getNextField: (field: string) => string | undefined;
-  isLastField: (field: string) => boolean;
 }
 
 export interface SOEditableCellProps {
@@ -2379,7 +2370,6 @@ export interface SOEditableCellProps {
   onAddNewItem: () => number;
   onSetPendingFocus: (itemId: number) => void;
   getNextField: (field: string) => string | undefined;
-  isLastField: (field: string) => boolean;
 }
 
 export interface SOItemsTableProps {
@@ -2402,7 +2392,6 @@ export interface SOItemsTableProps {
   calculateTax: () => number;
   calculateTotal: () => number;
   getNextField: (field: string, discountScope?: 'item' | 'invoice') => string | undefined;
-  isLastField: (field: string) => boolean;
 }
 
 export interface SOMobileWizardProps {

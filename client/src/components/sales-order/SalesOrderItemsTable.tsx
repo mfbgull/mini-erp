@@ -12,7 +12,7 @@ const SOItemsTable = memo(function SOItemsTable({
   onSetPendingFocus, onSetNewItemId,
   formatCurrency, getCurrencySymbol,
   calculateItemTotal, calculateSubtotal, calculateDiscount, calculateTax, calculateTotal,
-  getNextField, isLastField,
+  getNextField,
 }: SOItemsTableProps) {
   const fieldOrder = getFieldOrder();
 
@@ -55,7 +55,7 @@ const SOItemsTable = memo(function SOItemsTable({
                     editingCell={editingCell} onSetEditingCell={onSetEditingCell}
                     onUpdateItem={onUpdateItem} onAddNewItem={onAddNewItem}
                     onSetPendingFocus={onSetPendingFocus} formatCurrency={formatCurrency}
-                    getNextField={(f) => getNextField(f, 'item')} isLastField={isLastField}
+                    getNextField={(f) => getNextField(f, 'item')}
                   />
                 </td>
                 <td className="text-right invoice-item-cell">
@@ -64,7 +64,7 @@ const SOItemsTable = memo(function SOItemsTable({
                     editingCell={editingCell} items={items} fieldOrder={fieldOrder}
                     onSetEditingCell={onSetEditingCell} onUpdateItem={onUpdateItem}
                     onAddNewItem={onAddNewItem} onSetPendingFocus={onSetPendingFocus}
-                    getNextField={(f) => getNextField(f, 'item')} isLastField={isLastField} />
+                    getNextField={(f) => getNextField(f, 'item')} />
                 </td>
                 <td className="text-right rate-cell-container invoice-item-cell">
                   <SOEditableCell value={item.unitPrice.toFixed(2)} itemId={item.id} field="unitPrice"
@@ -72,7 +72,7 @@ const SOItemsTable = memo(function SOItemsTable({
                     editingCell={editingCell} items={items} fieldOrder={fieldOrder}
                     onSetEditingCell={onSetEditingCell} onUpdateItem={onUpdateItem}
                     onAddNewItem={onAddNewItem} onSetPendingFocus={onSetPendingFocus}
-                    getNextField={(f) => getNextField(f, 'item')} isLastField={isLastField} />
+                    getNextField={(f) => getNextField(f, 'item')} />
                 </td>
                 <td className="text-right invoice-item-cell">
                   <div className="discount-cell-modern">
@@ -87,7 +87,7 @@ const SOItemsTable = memo(function SOItemsTable({
                       editingCell={editingCell} items={items} fieldOrder={fieldOrder}
                       onSetEditingCell={onSetEditingCell} onUpdateItem={onUpdateItem}
                       onAddNewItem={onAddNewItem} onSetPendingFocus={onSetPendingFocus}
-                      getNextField={(f) => getNextField(f, 'item')} isLastField={isLastField} />
+                      getNextField={(f) => getNextField(f, 'item')} />
                   </div>
                 </td>
                 <td className="text-right invoice-item-cell">
@@ -96,7 +96,7 @@ const SOItemsTable = memo(function SOItemsTable({
                     editingCell={editingCell} items={items} fieldOrder={fieldOrder}
                     onSetEditingCell={onSetEditingCell} onUpdateItem={onUpdateItem}
                     onAddNewItem={onAddNewItem} onSetPendingFocus={onSetPendingFocus}
-                    getNextField={(f) => getNextField(f, 'item')} isLastField={isLastField} />
+                    getNextField={(f) => getNextField(f, 'item')} />
                 </td>
                 <td className="text-right amount-cell-modern">{formatCurrency(calculateItemTotal(item))}</td>
                 <td className="text-center invoice-item-cell">

@@ -28,7 +28,6 @@ export interface GenericSearchableCellProps {
   onSetPendingFocus?: (itemId: number) => void;
   formatCurrency: (amount: number | string | null | undefined) => string;
   getNextField?: (field: string) => string | undefined;
-  isLastField?: (field: string) => boolean;
   filterItems?: (items: GenericSearchableCellItem[]) => GenericSearchableCellItem[];
   saveField?: string;
   placeholder?: string;
@@ -48,7 +47,6 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
   onSetPendingFocus,
   formatCurrency,
   getNextField,
-  isLastField,
   filterItems,
   saveField,
   placeholder = 'Type to search items...',
@@ -203,7 +201,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
       if (showDropdown) { closeDropdown(); inputRef.current?.focus(); }
       else { setTempValue(value); onEditingCell(null); }
     }
-  }, [showDropdown, filteredItems, selectedIndex, allItems, itemId, cellField, isLastItem, value, closeDropdown, selectItem, openDropdown, handleSave, focusTargetCell, onEditingCell, getNextField, isLastField, onAddNewItem, onSetPendingFocus]);
+  }, [showDropdown, filteredItems, selectedIndex, allItems, itemId, cellField, isLastItem, value, closeDropdown, selectItem, openDropdown, handleSave, focusTargetCell, onEditingCell, getNextField, onAddNewItem, onSetPendingFocus]);
 
   if (isEditing) {
     const inputEl = document.querySelector(`[data-cell-id="${itemId}-${cellField}"] input`);

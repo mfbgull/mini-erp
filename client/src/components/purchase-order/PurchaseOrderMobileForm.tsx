@@ -14,10 +14,6 @@ const getNextField = (currentField: string): string | undefined => {
   return fieldOrder[currentIndex + 1];
 };
 
-const isLastField = (field: string): boolean => {
-  return field === 'unit_price';
-};
-
 export default function PurchaseOrderMobileForm({
   supplier,
   suppliers,
@@ -199,8 +195,7 @@ export default function PurchaseOrderMobileForm({
                           onEditingCell={setEditingCell}
                           onUpdateItem={onUpdateItem}
                           onAddNewItem={onAddNewItem}
-                          getNextField={getNextField}
-                          isLastField={isLastField}
+                    getNextField={getNextField}
                         />
                       </td>
                       <td className="invoice-item-cell">
@@ -216,8 +211,7 @@ export default function PurchaseOrderMobileForm({
                           onEditingCell={setEditingCell}
                           onUpdateItem={onUpdateItem}
                           onAddNewItem={onAddNewItem}
-                          getNextField={getNextField}
-                          isLastField={isLastField}
+                    getNextField={getNextField}
                         />
                       </td>
                       <td className="amount-cell-modern">

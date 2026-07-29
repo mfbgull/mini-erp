@@ -18,7 +18,6 @@ export default function InvoiceEditableCell(props: EditableCellProps) {
       onAddNewItem={props.onAddNewItem}
       onSetPendingFocus={props.onSetPendingFocus}
       getNextField={props.getNextField}
-      isLastField={props.isLastField}
     />
   );
 }

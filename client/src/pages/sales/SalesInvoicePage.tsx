@@ -41,7 +41,6 @@ import {
   calculateDiscount,
   calculateTotal,
   getNextField,
-  isLastField,
 
   padItemsToMinimum,
   generateInvoiceNo,
@@ -793,7 +792,6 @@ export default function SalesInvoicePage() {
                 calculateTotal(invoice.items, invoice.discountScope, invoice.discount)
               }
               getNextField={(field) => getNextField(field, invoice.discountScope)}
-              isLastField={isLastField}
             />
           </div>
 

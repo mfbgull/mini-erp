@@ -17,7 +17,6 @@ export interface GenericEditableCellProps {
   onAddNewItem: () => number;
   onSetPendingFocus?: (itemId: number) => void;
   getNextField: (field: string) => string | undefined;
-  isLastField: (field: string) => boolean;
 }
 
 const GenericEditableCell = memo(function GenericEditableCell({
@@ -35,7 +34,6 @@ const GenericEditableCell = memo(function GenericEditableCell({
   onAddNewItem,
   onSetPendingFocus,
   getNextField,
-  isLastField,
 }: GenericEditableCellProps) {
   const isEditing = editingCell === `${itemId}-${field}`;
   const [tempValue, setTempValue] = useState(value);
@@ -173,7 +171,7 @@ const GenericEditableCell = memo(function GenericEditableCell({
       setTempValue(value);
       onEditingCell(null);
     }
-  }, [tempValue, field, type, itemId, isLastItem, items, fieldOrder, moveToCell, handleSave, focusTargetCell, getNextField, isLastField, onAddNewItem, onSetPendingFocus, onEditingCell, value]);
+  }, [tempValue, field, type, itemId, isLastItem, items, fieldOrder, moveToCell, handleSave, focusTargetCell, getNextField, onAddNewItem, onSetPendingFocus, onEditingCell, value]);
 
   if (isEditing) {
     return (

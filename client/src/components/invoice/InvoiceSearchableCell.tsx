@@ -14,7 +14,6 @@ export default function InvoiceSearchableCell({
   onSetPendingFocus,
   formatCurrency,
   getNextField,
-  isLastField,
 }: SearchableCellProps) {
   return (
     <GenericSearchableCell
@@ -31,7 +30,6 @@ export default function InvoiceSearchableCell({
       onSetPendingFocus={onSetPendingFocus}
       formatCurrency={formatCurrency}
       getNextField={getNextField}
-      isLastField={isLastField}
       saveField="description"
     />
   );

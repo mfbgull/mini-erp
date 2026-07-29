@@ -106,13 +106,6 @@ export function getNextField(field: string, discountScope: 'item' | 'invoice'): 
   return order[currentIndex + 1];
 }
 
-export function isLastField(field: string): boolean {
-  // 'amount' is only navigable for loose items; for packed items the amount is auto-calculated
-  // and the field is skipped. The caller (GenericEditableCell) handles skip logic via
-  // document.querySelector guard. Here we treat 'amount' as last field for navigation purposes.
-  return field === 'amount' || field === 'tax';
-}
-
 /* ── Item helpers ───────────────────────────────────────────────── */
 
 export function createEmptyItemRow(index: number): InvoiceFormItem {

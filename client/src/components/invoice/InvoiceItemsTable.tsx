@@ -30,7 +30,6 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
   calculateDiscount,
   calculateTotal,
   getNextField,
-  isLastField,
 }: ItemsTableProps) {
   const fieldOrder = getFieldOrder(invoice.discountScope);
 
@@ -125,7 +124,6 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     onSetPendingFocus={onSetPendingFocus}
                     formatCurrency={formatCurrency}
                     getNextField={(f) => getNextField(f, invoice.discountScope)}
-                    isLastField={isLastField}
                   />
                 </td>
                 <td role="gridcell" aria-colindex={3} className="text-right invoice-item-cell quantity-cell">
@@ -147,7 +145,6 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     onAddNewItem={onAddNewItem}
                     onSetPendingFocus={onSetPendingFocus}
                     getNextField={(f) => getNextField(f, invoice.discountScope)}
-                    isLastField={isLastField}
                   />
                   {item.unit_of_measure && editingCell !== `${item.id}-quantity` && (
                     <span className="unit-of-measure">{item.unit_of_measure}</span>
@@ -168,7 +165,6 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     onAddNewItem={onAddNewItem}
                     onSetPendingFocus={onSetPendingFocus}
                     getNextField={(f) => getNextField(f, invoice.discountScope)}
-                    isLastField={isLastField}
                   />
                 </td>
                 {invoice.discountScope === 'item' && (
@@ -196,7 +192,6 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                         onAddNewItem={onAddNewItem}
                         onSetPendingFocus={onSetPendingFocus}
                         getNextField={(f) => getNextField(f, invoice.discountScope)}
-                        isLastField={isLastField}
                       />
                     </div>
                   </td>
@@ -216,7 +211,6 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     onAddNewItem={onAddNewItem}
                     onSetPendingFocus={onSetPendingFocus}
                     getNextField={(f) => getNextField(f, invoice.discountScope)}
-                    isLastField={isLastField}
                   />
                 </td>
                 <td role="gridcell" aria-colindex={invoice.discountScope === 'item' ? 7 : 6} className="text-right amount-cell-modern">
@@ -237,7 +231,6 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                         onAddNewItem={onAddNewItem}
                         onSetPendingFocus={onSetPendingFocus}
                         getNextField={(f) => getNextField(f, invoice.discountScope)}
-                        isLastField={isLastField}
                       />
                       {lineIssue(item) && (
                         <div

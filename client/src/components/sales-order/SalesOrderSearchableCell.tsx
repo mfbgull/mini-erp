@@ -14,7 +14,6 @@ export default function SOSearchableCell({
   onSetPendingFocus,
   formatCurrency,
   getNextField,
-  isLastField,
 }: SOSearchableCellProps) {
   return (
     <GenericSearchableCell
@@ -31,7 +30,6 @@ export default function SOSearchableCell({
       onSetPendingFocus={onSetPendingFocus}
       formatCurrency={formatCurrency}
       getNextField={getNextField}
-      isLastField={isLastField}
       saveField="name"
     />
   );

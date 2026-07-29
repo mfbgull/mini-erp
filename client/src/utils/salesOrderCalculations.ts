@@ -15,10 +15,6 @@ export function getNextField(field: string): string | undefined {
   return FIELD_ORDER[index + 1];
 }
 
-export function isLastField(field: string): boolean {
-  return field === 'taxRate';
-}
-
 export function createEmptyItemRow(index: number): SOFormItem {
   return {
     id: Date.now() + index,

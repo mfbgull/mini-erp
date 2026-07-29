@@ -11,10 +11,6 @@ const getNextField = (currentField: string): string | undefined => {
   return fieldOrder[currentIndex + 1];
 };
 
-const isLastField = (field: string): boolean => {
-  return field === 'unit_price';
-};
-
 export default function PurchaseOrderItemsTable({
   items,
   editingCell,
@@ -96,7 +92,6 @@ export default function PurchaseOrderItemsTable({
                     onUpdateItem={onUpdateItem}
                     onAddNewItem={onAddNewItem}
                     getNextField={getNextField}
-                    isLastField={isLastField}
                   />
                 </td>
                 <td className="text-right rate-cell-container invoice-item-cell">
@@ -113,7 +108,6 @@ export default function PurchaseOrderItemsTable({
                     onUpdateItem={onUpdateItem}
                     onAddNewItem={onAddNewItem}
                     getNextField={getNextField}
-                    isLastField={isLastField}
                   />
                 </td>
                 <td className="text-right amount-cell-modern">

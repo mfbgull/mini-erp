@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import QuotationEditableCell from './QuotationEditableCell';
 import { QuotationSearchableCellEditing } from './QuotationSearchableCell';
-import { getFieldOrder, getNextField, isLastField } from '../../utils/quotationCalculations';
+import { getFieldOrder, getNextField } from '../../utils/quotationCalculations';
 import type { QuotationItemsTableProps } from '../../types';
 import type { InventoryItemOption } from '../../types';
 import { getSellableItems } from '../../utils/quotationCalculations';
@@ -96,7 +96,6 @@ export default function QuotationItemsTable({
                     onUpdateItem={onUpdateItem}
                     onAddNewItem={onAddNewItem}
                     getNextField={getNextField}
-                    isLastField={isLastField}
                   />
                 </td>
                 <td className="text-right rate-cell-container invoice-item-cell">
@@ -113,7 +112,6 @@ export default function QuotationItemsTable({
                     onUpdateItem={onUpdateItem}
                     onAddNewItem={onAddNewItem}
                     getNextField={getNextField}
-                    isLastField={isLastField}
                   />
                 </td>
                 <td className="text-right invoice-item-cell">
@@ -139,7 +137,6 @@ export default function QuotationItemsTable({
                       onUpdateItem={onUpdateItem}
                       onAddNewItem={onAddNewItem}
                       getNextField={getNextField}
-                      isLastField={isLastField}
                     />
                   </div>
                 </td>
@@ -157,7 +154,6 @@ export default function QuotationItemsTable({
                     onUpdateItem={onUpdateItem}
                     onAddNewItem={onAddNewItem}
                     getNextField={getNextField}
-                    isLastField={isLastField}
                   />
                 </td>
                 <td className="text-right amount-cell-modern">

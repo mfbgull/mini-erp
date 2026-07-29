@@ -18,7 +18,6 @@ export default function PurchaseOrderEditableCell(props: POEditableCellProps) {
       onUpdateItem={props.onUpdateItem as (itemId: number, field: string, value: unknown) => void}
       onAddNewItem={props.onAddNewItem}
       getNextField={props.getNextField}
-      isLastField={props.isLastField}
     />
   );
 }

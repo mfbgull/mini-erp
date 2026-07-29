@@ -270,7 +270,6 @@ export default function SalesOrderFormPage({ mode = 'create' }) {
               calculateTax={() => calculateTax(items)}
               calculateTotal={() => calculateTotal(items)}
               getNextField={(field) => { const order = ['name', 'quantity', 'unitPrice', 'discountValue', 'taxRate']; const idx = order.indexOf(field); return order[idx + 1]; }}
-              isLastField={(field) => field === 'taxRate'}
             />
           </div>
         </div>

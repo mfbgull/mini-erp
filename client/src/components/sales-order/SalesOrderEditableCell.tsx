@@ -17,7 +17,6 @@ export default function SalesOrderEditableCell(props: SOEditableCellProps) {
       onAddNewItem={props.onAddNewItem}
       onSetPendingFocus={props.onSetPendingFocus}
       getNextField={props.getNextField}
-      isLastField={props.isLastField}
     />
   );
 }

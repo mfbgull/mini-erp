@@ -16,7 +16,6 @@ export default function QuotationEditableCell(props: QuotationEditableCellProps)
       onUpdateItem={props.onUpdateItem as (itemId: number, field: string, value: unknown) => void}
       onAddNewItem={props.onAddNewItem}
       getNextField={props.getNextField}
-      isLastField={props.isLastField}
     />
   );
 }
