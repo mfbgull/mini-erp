@@ -94,6 +94,7 @@ interface UseInvoiceDataResult {
     is_finished_good?: boolean;
     is_purchased?: boolean;
     sale_type?: 'packed' | 'loose';
+    unit_of_measure?: string;
     qty_decimal_precision?: number;
     rounding_step?: number | null;
   }>;

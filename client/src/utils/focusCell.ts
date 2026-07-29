@@ -21,10 +21,11 @@ export function useFocusCell(onEditingCell: (cellId: string | null) => void) {
     (targetItemId: number, targetField: string) => {
       isNavigatingRef.current = true;
       const navId = ++navigationIdRef.current;
-      // Use setTimeout(0) to let React commit the edit-mode render, then rAF to query DOM
-      setTimeout(() => {
-        if (navId !== navigationIdRef.current) return; // stale — a newer navigation superseded this one
-        onEditingCell(`${targetItemId}-${targetField}`);
+      // Call onEditingCell synchronously so React starts the edit-mode render
+      onEditingCell(`${targetItemId}-${targetField}`);
+      // Double rAF: first rAF fires after React commits state, second after DOM paint
+      requestAnimationFrame(() => {
+        if (navId !== navigationIdRef.current) return; // stale
         requestAnimationFrame(() => {
           if (navId !== navigationIdRef.current) return; // stale
           const el = document.querySelector(
@@ -34,7 +35,6 @@ export function useFocusCell(onEditingCell: (cellId: string | null) => void) {
             isNavigatingRef.current = false;
             return;
           }
-          // Guard: skip if cell is no longer in edit mode (rapid navigation made it stale)
           const input = el.querySelector('input');
           if (input) {
             (input as HTMLInputElement).focus();
@@ -44,7 +44,7 @@ export function useFocusCell(onEditingCell: (cellId: string | null) => void) {
           }
           isNavigatingRef.current = false;
         });
-      }, 0);
+      });
     },
     [onEditingCell],
   );

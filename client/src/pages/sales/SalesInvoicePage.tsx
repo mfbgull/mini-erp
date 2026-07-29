@@ -416,6 +416,7 @@ export default function SalesInvoicePage() {
               description: selectedItem?.item_name || item.description,
               rate: selectedItem?.standard_selling_price || item.rate,
               sale_type: selectedItem?.sale_type || 'packed',
+              unit_of_measure: selectedItem?.unit_of_measure || '',
               qty_decimal_precision: selectedItem?.qty_decimal_precision || 0,
               rounding_step: selectedItem?.rounding_step ?? null,
               amount: 0,

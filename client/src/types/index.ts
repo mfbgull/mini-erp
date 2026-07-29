@@ -1612,6 +1612,7 @@ export interface InventoryItemOption {
   standard_cost?: number;
   purchase_price?: number;
   sale_type?: SaleType;
+  unit_of_measure?: string;
   qty_decimal_precision?: number;
   rounding_step?: number | null;
 }
@@ -2084,6 +2085,8 @@ export interface InvoiceFormItem {
   lastEditedField?: 'quantity' | 'amount' | null;
   qty_decimal_precision?: number;
   rounding_step?: number | null;
+  /** Unit of measurement for the item (e.g. 'pcs', 'kg', 'box'). */
+  unit_of_measure?: string;
 }
 
 export interface InvoiceCompany {

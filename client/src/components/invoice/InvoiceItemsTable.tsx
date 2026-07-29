@@ -128,7 +128,7 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     isLastField={isLastField}
                   />
                 </td>
-                <td role="gridcell" aria-colindex={3} className="text-right invoice-item-cell">
+                <td role="gridcell" aria-colindex={3} className="text-right invoice-item-cell quantity-cell">
                   <InvoiceEditableCell
                     value={
                       item.qty_decimal_precision
@@ -149,6 +149,9 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
                     getNextField={(f) => getNextField(f, invoice.discountScope)}
                     isLastField={isLastField}
                   />
+                  {item.unit_of_measure && editingCell !== `${item.id}-quantity` && (
+                    <span className="unit-of-measure">{item.unit_of_measure}</span>
+                  )}
                 </td>
                 <td role="gridcell" aria-colindex={4} className="text-right rate-cell-container invoice-item-cell" data-rate-cell={item.id}>
                   <InvoiceEditableCell

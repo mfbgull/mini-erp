@@ -152,12 +152,12 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (showDropdown && filteredItems.length > 0) {
       if (e.key === 'ArrowDown') { e.preventDefault(); setSelectedIndex((p) => (p < filteredItems.length - 1 ? p + 1 : 0)); return; }
-      if (e.key === 'ArrowUp') { e.preventDefault(); if (selectedIndex === 0) { closeDropdown(); return; } setSelectedIndex((p) => (p > 0 ? p - 1 : filteredItems.length - 1)); return; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); if (selectedIndex === 0) { closeDropdown(); handleSave(); const idx = allItems.findIndex((i) => i.id === itemId); if (idx > 0) focusTargetCell(allItems[idx - 1].id, cellField); return; } setSelectedIndex((p) => (p > 0 ? p - 1 : filteredItems.length - 1)); return; }
       if (e.key === 'Enter') { e.preventDefault(); if (selectedIndex >= 0 && filteredItems[selectedIndex]) selectItem(filteredItems[selectedIndex], true); return; }
       if (e.key === 'Escape') { e.preventDefault(); closeDropdown(); inputRef.current?.focus(); return; }
       if (e.key === 'Tab') { if (selectedIndex >= 0 && filteredItems[selectedIndex]) { e.preventDefault(); selectItem(filteredItems[selectedIndex], true); } return; }
     }
-    if (e.key === 'ArrowDown') { e.preventDefault(); openDropdown(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); const idx = allItems.findIndex((i) => i.id === itemId); if (idx < allItems.length - 1) { handleSave(); focusTargetCell(allItems[idx + 1].id, cellField); } return; }
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       const idx = allItems.findIndex((i) => i.id === itemId);
@@ -205,7 +205,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
           onChange={handleInputChange}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          onFocus={(e) => { e.target.select(); openDropdown(); }}
+          onFocus={(e) => e.target.select()}
           className="editable-input"
           placeholder={placeholder}
         />
@@ -237,7 +237,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
   return (
     <div
       onClick={() => { setTempValue(value || ''); onEditingCell(`${itemId}-${cellField}`); setTimeout(() => openDropdown(), 50); }}
-      onFocus={() => { setTempValue(value || ''); onEditingCell(`${itemId}-${cellField}`); setTimeout(() => openDropdown(), 50); }}
+      onFocus={() => { setTempValue(value || ''); onEditingCell(`${itemId}-${cellField}`); }}
       onKeyDown={(e) => {
         const idx = allItems.findIndex((i) => i.id === itemId);
         if (e.key === 'Enter') { e.preventDefault(); setTempValue(value || ''); onEditingCell(`${itemId}-${cellField}`); }

@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import { Edit2 } from 'lucide-react';
 import { useFocusCell } from '../../utils/focusCell';
 
@@ -39,6 +39,13 @@ const GenericEditableCell = memo(function GenericEditableCell({
   const [tempValue, setTempValue] = useState(value);
   const { focusTargetCell, isNavigatingRef } = useFocusCell(onEditingCell);
 
+  // Sync tempValue when value changes externally (e.g. item auto-populated) or when entering edit mode
+  useEffect(() => {
+    if (!isEditing || value !== tempValue) {
+      setTempValue(value);
+    }
+  }, [value, isEditing]);
+
   const handleSave = useCallback(() => {
     onUpdateItem(itemId, field, tempValue);
     onEditingCell(null);
@@ -54,19 +61,21 @@ const GenericEditableCell = memo(function GenericEditableCell({
       const newItemIndex = currentItemIndex + rowOffset;
       if (newItemIndex >= 0 && newItemIndex < items.length) {
         handleSave();
-        // Skip if target field cell doesn't exist in the target row (e.g. amount in packed item)
-        if (document.querySelector(`[data-cell-id="${items[newItemIndex].id}-${field}"]`)) {
-          focusTargetCell(items[newItemIndex].id, field);
-        }
-      } else if (rowOffset > 0 && newItemIndex >= items.length) {
-        handleSave();
-        const newId = onAddNewItem();
-        if (onSetPendingFocus) {
-          onSetPendingFocus(newId);
+        const targetId = items[newItemIndex].id;
+        // Try the same field first, then walk through fields to find a navigable one
+        if (document.querySelector(`[data-cell-id="${targetId}-${field}"]`)) {
+          focusTargetCell(targetId, field);
         } else {
-          setTimeout(() => focusTargetCell(newId, field), 100);
+          // Field doesn't exist in target row (e.g. amount in packed item) — find first navigable field
+          for (const candidateField of fieldOrder) {
+            if (document.querySelector(`[data-cell-id="${targetId}-${candidateField}"]`)) {
+              focusTargetCell(targetId, candidateField);
+              return;
+            }
+          }
         }
       }
+      // ArrowDown at last row — do nothing, only Enter creates new row
     }
 
     if (colOffset !== 0) {
@@ -81,9 +90,13 @@ const GenericEditableCell = memo(function GenericEditableCell({
         }
         newFieldIndex += colOffset;
       }
-      // No navigable column found in this direction — move to next/prev row instead
-      handleSave();
-      moveToCell(colOffset > 0 ? 1 : -1, 0);
+      // No navigable column found in this direction
+      if (colOffset < 0) {
+        // ArrowLeft at first field — save and move to previous row
+        handleSave();
+        moveToCell(-1, 0);
+      }
+      // ArrowRight at last field — do nothing, stay in edit mode
     }
   }, [items, itemId, field, fieldOrder, handleSave, onAddNewItem, onSetPendingFocus, focusTargetCell]);
 
