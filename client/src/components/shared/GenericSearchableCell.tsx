@@ -59,6 +59,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { focusTargetCell, isNavigatingRef } = useFocusCell(onEditingCell);
 
   useEffect(() => {
@@ -112,6 +113,16 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
     setShowDropdown(available.length > 0);
     setSelectedIndex(available.length > 0 ? 0 : -1);
   }, [getAvailableItems]);
+
+  // Scroll the selected dropdown item into view when selectedIndex changes
+  useEffect(() => {
+    if (showDropdown && dropdownRef.current && selectedIndex >= 0) {
+      const selectedEl = dropdownRef.current.children[selectedIndex] as HTMLElement | undefined;
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }, [selectedIndex, showDropdown]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value;
@@ -210,7 +221,7 @@ const GenericSearchableCell = memo(function GenericSearchableCell({
           placeholder={placeholder}
         />
         {showDropdown && (
-          <div className="item-dropdown" style={ddStyle}>
+          <div className="item-dropdown" style={ddStyle} ref={dropdownRef}>
             {filteredItems.length > 0 ? filteredItems.map((item, idx) => (
               <div
                 key={item.id}
