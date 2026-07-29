@@ -828,6 +828,12 @@ input[type="number"] {
   color: var(--info, #2563eb);
 }
 
+.amount-cell-modern .editable-cell,
+.amount-cell-modern .editable-input {
+  text-align: right;
+  justify-content: flex-end;
+}
+
 .remove-btn-modern {
   background: none;
   border: none;
