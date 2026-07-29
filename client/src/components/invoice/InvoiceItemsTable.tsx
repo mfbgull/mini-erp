@@ -4,6 +4,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import InvoiceSearchableCell from './InvoiceSearchableCell';
 import InvoiceEditableCell from './InvoiceEditableCell';
 import PriceHistoryHint from './PriceHistoryHint';
+import KeyboardShortcutsHelp from './KeyboardShortcutsHelp';
 import type { ItemsTableProps } from '../../types';
 import { getFieldOrder } from '../../utils/invoiceCalculations';
 import { lineIssue } from '../../utils/invoiceLineCalc';
@@ -39,6 +40,7 @@ const InvoiceItemsTable = memo(function InvoiceItemsTable({
       <div className="items-header-modern">
         <div className="items-header-left">
           <h3 className="items-title-modern">Line Items</h3>
+          <KeyboardShortcutsHelp />
           <div className="discount-scope-controls-modern">
             <span className="discount-label-modern">Discount:</span>
             <label className="discount-scope-option-modern">
